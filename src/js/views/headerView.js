@@ -8,7 +8,7 @@ export const renderHeader = (page) => {
         </a>
 
         <a href="#main-menu" class="menu-toggle" aria-label="Open main menu">
-            <svg class="burger" aria-hidden="true"><use xlink:href="svg/spritesheet.svg#burger-icon"></use></svg>
+            <svg class="list-icon" aria-hidden="true"><use xlink:href="svg/spritesheet.svg#burger-icon"></use></svg>
         </a>
 
         <nav class="header__main-menu main-menu" id="main-menu" aria-label="Main-menu">

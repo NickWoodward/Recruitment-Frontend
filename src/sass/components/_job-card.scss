@@ -1,0 +1,21 @@
+.job-card {
+    // Set space children should take up in the grid
+    --width: 3;
+    --initialbasis: calc(var(--width) / var(--columns) * 100%);
+    --gap: calc((var(--columns) - var(--width)) * var(--gap-constant));
+    flex-basis: calc(var(--initialbasis) - var(--gap));
+    margin: .75rem 0;
+    
+
+    display: flex;
+    flex-direction: column;
+    height: 40rem;
+    padding: 2rem;
+    background-color: white;
+
+    
+    &__title {
+        font-size: var(--medium);  
+        font-weight: 400;  
+    }
+}

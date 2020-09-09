@@ -11,9 +11,14 @@
     height: var(--height-header);
     width: 100%;
     padding: 0 $padding-page;
-    font-size: var(--base-size);
+    font-size: var(--small);
+    font-weight: 700;
     
     background-color: white;
+
+    &__logo {
+        align-self: flex-start;
+    }
 }
 
 // This is also the header__main-menu class (#main-menu is the target)

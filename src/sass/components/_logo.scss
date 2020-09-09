@@ -1,5 +1,5 @@
 .logo {
-    --logo-margin: .5rem;
+    --logo-margin: 1rem;
     --height-logo: calc(var(--height-header) - var(--logo-margin));
     height: var(--height-logo);
 }

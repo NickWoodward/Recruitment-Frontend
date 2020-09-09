@@ -7,22 +7,19 @@
 }
 
 :root {
-    --columns: 16;
-    --height-header: 7rem;
+    --columns: 12;
+    --height-header: 8rem;
 }
 
 html {
     font-size: 62.5%; // 10/16*100 = 62.5%
+    height: 100%;
 }
 
 body {
     font-weight: 400;
     box-sizing: border-box;
-}
-
-// First section offset by fixed header
-.section--first {
-    margin-top: var(--height-header);
+    height: 100%;
 }
 
 ul {
