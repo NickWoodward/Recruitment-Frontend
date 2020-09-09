@@ -1,0 +1,113 @@
+.header {
+    --nav-width: 50rem;
+
+    position: fixed;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+
+    top: 0;
+    height: var(--height-header);
+    width: 100%;
+    padding: 0 $padding-page;
+    font-size: var(--base-size);
+    
+    background-color: white;
+}
+
+// This is also the header__main-menu class (#main-menu is the target)
+.main-menu {
+    display: flex; 
+    align-items: center;
+    width: var(--nav-width);
+    height: 100%;
+
+    // Menu in a fixed position so you can't scroll away from it
+    @include respond-phone {
+        --nav-width: 20rem;
+        position: fixed;
+        display: block;
+        top: 0;
+        left: calc(var(--nav-width) * -1);
+
+        width: var(--nav-width);
+        height: 100%;
+        // @TODO: GSAP Mobile menu animation
+        transition: left .6s ease;
+        background-color: rgba(41, 41, 41, 0.986);
+    } 
+}
+
+
+.main-menu:target {
+    display: block;
+    left: 0;
+    z-index: 1000;
+}
+
+.main-menu:target + .backdrop {
+    opacity: 1;
+    visibility: visible;
+
+}
+
+.backdrop {
+    @include respond-phone {
+        position: fixed;
+        display: block;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background-color: rgba(41, 41, 41, 0.897);
+        cursor: default;
+        z-index: 999;
+        transition: opacity .6s ease-out;
+
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+
+.menu-toggle {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    width: 6rem;
+}
+
+.burger { 
+    @include respond-phone {
+        display: block;   
+        width: 3rem;    
+    }
+}
+
+// Hide menu toggle and close buttons at desktop sizes
+.menu-close, .menu-toggle, .burger, .close  {     
+    display: none;
+    @include respond-phone {
+        display: flex;
+    }
+}
+
+.close{
+    width: 3rem;
+    height: 3rem;
+    fill: white;
+    &:hover {
+        background-color: $color-navigation;
+    }
+}
+
+.menu-close {
+    @include respond-phone {
+        display: flex;
+        justify-content: flex-end;
+        margin: .5rem;
+    }
+}
+

@@ -1,0 +1,5 @@
+// MEDIA QUERY MANAGER
+
+@mixin respond-phone {
+    @media (max-width: 750px) { @content };
+}

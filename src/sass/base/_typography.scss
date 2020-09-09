@@ -1,0 +1,17 @@
+    /* Typescale calculator can be found at https://type-scale.com/*/
+
+:root {
+    --base-size: 1.6rem; /* 16px */
+    --type-scale: 1.25; 
+
+    --small: calc(var(--base-size) * var(--type-scale));
+    --medium: calc(var(--small) * var(--type-scale));
+    --large: calc(var(--medium) * var(--type-scale));
+    --x-large: calc(var(--large) * var(--type-scale));
+    --xx-large: calc(var(--x-large) * var(--type-scale));
+
+    --tiny: calc(var(--base-size) / var(--type-scale));
+
+    font-family: 'Nobile', sans-serif;
+}
+

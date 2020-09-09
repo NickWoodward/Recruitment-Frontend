@@ -1,0 +1,17 @@
+// Common styles
+@import 'abstract/variables';
+@import 'abstract/mixins';
+@import 'abstract/variables';
+
+@import 'base/base';
+@import 'base/typography';
+
+@import 'components/nav';
+@import 'components/logo.scss';
+
+@import 'layout/header';
+
+
+body {
+    background-color: blue;
+}  

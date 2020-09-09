@@ -1,0 +1,45 @@
+*, 
+*::after, 
+*::before {
+    margin: 0;
+    padding: 0;
+    box-sizing: inherit;
+}
+
+:root {
+    --columns: 16;
+    --height-header: 7rem;
+}
+
+html {
+    font-size: 62.5%; // 10/16*100 = 62.5%
+}
+
+body {
+    font-weight: 400;
+    box-sizing: border-box;
+}
+
+// First section offset by fixed header
+.section--first {
+    margin-top: var(--height-header);
+}
+
+ul {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0;
+}
