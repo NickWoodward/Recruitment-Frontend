@@ -1,21 +1,76 @@
 .job-card {
-    // Set space children should take up in the grid
-    --width: 3;
-    --initialbasis: calc(var(--width) / var(--columns) * 100%);
-    --gap: calc((var(--columns) - var(--width)) * var(--gap-constant));
-    flex-basis: calc(var(--initialbasis) - var(--gap));
-    margin: .75rem 0;
-    
-
     display: flex;
     flex-direction: column;
-    height: 40rem;
-    padding: 2rem;
-    background-color: white;
+    justify-content: space-between;
+    height: 36rem;
+    // width: var(--job-card-width);
+    // width: 36rem;
+    
+    @supports not (display: grid) {
+        margin-top: 2rem;
+    }
 
+    background-color: white;
+    border: none;
+    box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
     
     &__title {
-        font-size: var(--medium);  
-        font-weight: 400;  
+        position: relative;
+        display: flex;
+        align-items: center;
+        margin-top: 2rem;
+        padding-left: .7rem;
+        height: 5rem;
+        background-color: $color-primary;
+        color: white;
+        font-weight: 400;
+        font-size: var(--small);  
+
+        &::before {
+            position: absolute;
+            content: '';
+            left: -4px;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background-color: $color-primary;
+        }
+    }
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        padding-left: 1rem;
+        padding-right: 1.5rem;
+
+        flex-grow: 1;
+    }
+
+    &__wage {
+        margin: 1.5rem 0 .5rem 0;
+        padding-left: .2rem;
+    }
+    &__location {
+        margin: 0 0 1.5rem 0;
+        padding-left: .2rem;
+
+    }
+    &__description {
+        padding-left: 1rem;
+        border-left: 1px solid $color-primary;
+    }
+
+    &__footer {
+        height: 6rem;
+        width: 100%;
+        padding-left: 1.5rem;
+    }
+
+    &__view-btn {
+        display: block;
+        padding: 1.3rem 2rem;
+        background-color: $color-primary;
+        color: white;
+        font-size: var(--base-size);
     }
 }

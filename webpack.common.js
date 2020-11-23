@@ -32,8 +32,8 @@ module.exports = {
                     },
                     'svgo-loader',
                 ]
-                
-            }
+            },
+           
         ]
     },
     plugins: [

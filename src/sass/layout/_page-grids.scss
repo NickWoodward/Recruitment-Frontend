@@ -1,0 +1,25 @@
+/* JOBS PAGE */
+// (16 cols, 2 rows)
+
+.jobs { // .jobs__main is the flex container
+    &__topbar {
+        --width: 16;
+        --initialbasis: calc(var(--width) / var(--columns) * 100%);
+        flex-basis: var(--initialbasis);       
+    }
+    &__menubar {
+        --width: 3;
+        --initialbasis: calc(var(--width) / var(--columns) * 100%);
+        flex-basis: var(--initialbasis);
+    }
+    &__display {
+        --width: 10;
+        --initialbasis: calc(var(--width) / var(--columns) * 100%);
+        flex-basis: var(--initialbasis);
+    }
+    &__aside {
+        --width: 3;
+        --initialbasis: calc(var(--width) / var(--columns) * 100%);
+        flex-basis: var(--initialbasis);
+    }
+}

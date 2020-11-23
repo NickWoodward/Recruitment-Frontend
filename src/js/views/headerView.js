@@ -1,4 +1,12 @@
 import { elements } from './base';
+import { elementStrings } from './base';
+
+// If the page uses a parallax container the width of the header should account for the wrapper scrollbar
+export const setParallaxHeaderWidth = () => {
+    const width = document.querySelector('section').clientWidth;
+    const header = document.querySelector(elementStrings.header);
+    header.style.width = `${width}px`;
+}
 
 export const renderHeader = (page) => {
     const markup = `
@@ -8,7 +16,7 @@ export const renderHeader = (page) => {
         </a>
 
         <a href="#main-menu" class="menu-toggle" aria-label="Open main menu">
-            <svg class="list-icon" aria-hidden="true"><use xlink:href="svg/spritesheet.svg#burger-icon"></use></svg>
+            <svg class="burger" aria-hidden="true"><use xlink:href="svg/spritesheet.svg#burger-icon"></use></svg>
         </a>
 
         <nav class="header__main-menu main-menu" id="main-menu" aria-label="Main-menu">

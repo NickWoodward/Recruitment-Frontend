@@ -3,7 +3,9 @@
 body {
     background-color: orange;
 }
+
 .hero {
-    // display: flex;
-    // padding: $padding-section;
+    border: 1px solid red;
+    display: flex;
+    height: 100%;
 }

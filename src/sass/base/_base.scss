@@ -7,8 +7,9 @@
 }
 
 :root {
-    --columns: 12;
-    --height-header: 8rem;
+    --columns: 16;
+    --header-height: 8rem;
+
 }
 
 html {
@@ -28,6 +29,14 @@ ul {
 
 a {
     text-decoration: none;
+}
+
+button {
+    border: none;
+}
+
+fieldset {
+    border: none;
 }
 
 .sr-only {

@@ -8,13 +8,14 @@
     align-items: center;
 
     top: 0;
-    height: var(--height-header);
+    height: var(--header-height);
     width: 100%;
     padding: 0 $padding-page;
     font-size: var(--small);
     font-weight: 700;
     
     background-color: white;
+    z-index: 1;
 
     &__logo {
         align-self: flex-start;
@@ -38,7 +39,7 @@
 
         width: var(--nav-width);
         height: 100%;
-        // @TODO: GSAP Mobile menu animation
+        // #TODO: GSAP Mobile menu animation
         transition: left .6s ease;
         background-color: rgba(41, 41, 41, 0.986);
     } 

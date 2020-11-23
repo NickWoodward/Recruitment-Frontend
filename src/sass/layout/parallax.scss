@@ -1,0 +1,41 @@
+.parallax {
+    transform-style: preserve-3d;
+    z-index: -1;
+
+    &-wrapper {
+        position: relative;
+        height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        /* Set the perspective. This is essentailly the simulated distance from the viewport to transformed objects.*/
+        perspective: 2px;
+    }
+
+    &::after {
+        // @include test(blue);
+        /* Display and position the pseudo-element */
+        content: " ";
+        position: absolute;
+        top: -5rem;
+        right: 0;
+        bottom: -8rem;
+        left: 0;
+
+        /* Move the pseudo-element back away from the camera,
+         * then scale it back up to fill the viewport.
+         * Because the pseudo-element is further away, it appears to move more slowly, like in real life. */
+        transform: translateZ(-1px) scale(1.5);
+        /* Force the background image to fill the whole element. */
+        // background-size: 100%;
+        background-repeat: no-repeat;
+        /* Keep the image from overlapping sibling elements. */
+        z-index: -1;
+    }
+}
+
+.bg1::after {
+    // background-image: url('/src/assets/hero.webp');
+    // background-position: center;
+    // background-position: 50% 35%;
+  }

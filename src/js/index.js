@@ -8,7 +8,16 @@ class IndexController {
     }
 
     addEventListeners() {
-        window.addEventListener('DOMContentLoaded', () => headerView.renderHeader('index'));       
+        window.addEventListener('DOMContentLoaded', (e) => {
+            headerView.renderHeader('index');
+            // Separated from the renderHeader method for page resizing
+            headerView.setParallaxHeaderWidth();
+        });  
+        
+        window.addEventListener('resize', (e) => {
+            // #TODO: Debounce
+            headerView.setParallaxHeaderWidth();
+        });
     }
 }
 

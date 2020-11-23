@@ -7,12 +7,14 @@
 @import 'base/typography';
 
 @import 'components/job-card';
+@import 'components/loader';
 @import 'components/logo';
 @import 'components/nav';
 
 @import 'layout/header';
-@import 'layout/job-grid';
+@import 'layout/page-grids';
 @import 'layout/section';
+@import 'layout/footer';
 
 // Page styles
 @import 'pages/jobs';
