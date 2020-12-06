@@ -11,13 +11,13 @@ export const initialise = (content) => {
     const jobTitles = content.uniqueTitles;
     const jobLocations = content.uniqueLocations;
     // Render Job Titles
-    jobTitles.forEach(title => renderItem(title, elements.jobsMenuJobTitles, "jobTitles"));
+    jobTitles.forEach(title => renderItem(title, elements.jobsMenuJobTitles, "titles"));
     // Render Job Locations
-    jobLocations.forEach(location => renderItem(location, elements.jobsMenuLocations));
+    jobLocations.forEach(location => renderItem(location, elements.jobsMenuLocations, "locations"));
 }
 
 /**
- * Add a unique menu item (data), to a specific submenu (element)
+ * Add a unique menu item, to a specific submenu
  * @param {string} menuItem The menu item to be added.
  * @param {Object} htmlElement The menu section the item should be added to.
  * @param {string} menuType The type of item to be added (title/salary/location etc).
@@ -25,7 +25,7 @@ export const initialise = (content) => {
 export const renderItem = (menuItem, htmlElement, menuType) => {
     const markup = `
          <div class="jobs-menu__input-wrapper">
-             <p>${menuItem}</p><input class="jobs-menu__radio-btn" type="radio" name="${menuType}" value="${menuItem}">
+             <p>${menuItem}</p><input class="jobs-menu__${menuType}-checkbox jobs-menu__checkbox" type="checkbox" name="${menuType}" value="${menuItem}">
          </div>
     `;
   
@@ -35,7 +35,6 @@ export const renderItem = (menuItem, htmlElement, menuType) => {
 export const toggleMenu = (e) => {
     const item = e.target.closest('.jobs-menu__title');
     // If the element clicked isn't a menu title, return
-
     if(!item) return;
     // Else get the adjacent sibling (the associated content div) & its styles
     const itemContent = item.nextElementSibling;

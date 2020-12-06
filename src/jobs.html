@@ -53,27 +53,37 @@
                             <div class="jobs-menu__loading">
                                 <!--wrapper for loader-->
                             </div>
-                            <div class="jobs-menu__input-wrapper">
-                                <p>All</p><input class="jobs-menu__radio-btn" type="radio" name="jobTitles" value="all" checked>
+                            <div class="jobs-menu__input-wrapper jobs-menu__input-wrapper--all">
+                                <p>All</p><input class="jobs-menu__titles-checkbox jobs-menu__titles-checkbox--all jobs-menu__checkbox" type="checkbox" name="jobTitles" value="all" checked>
                             </div>
                             <!-- Additional items added dynamically -->
                         </fieldset>
                     </div>
+                    <!-- #TODO: add loaders to each submenu -->
                     <div class="jobs-menu__item jobs-menu__item--salaries">
                         <div class="jobs-menu__title">Salary</div>
-                        <fieldset class="jobs-menu__content jobs-menu__content--salaries">                            
+                        <fieldset class="jobs-menu__content jobs-menu__content--salaries">  
+                            <div class="jobs-menu__input-wrapper jobs-menu__input-wrapper--all">
+                                <p>All</p><input class="jobs-menu__salaries-checkbox jobs-menu__salaries-checkbox--all" type="checkbox" name="jobSalaries" value="all" checked>
+                            </div>                          
                             <!-- Items added dynamically -->
                         </fieldset>
                     </div>
                     <div class="jobs-menu__item jobs-menu__item--locations">
                         <div class="jobs-menu__title">Location</div>
                         <fieldset class="jobs-menu__content jobs-menu__content--locations">     
+                            <div class="jobs-menu__input-wrapper jobs-menu__input-wrapper--all">
+                                <p>All</p><input class="jobs-menu__locations-checkbox jobs-menu__locations-checkbox--all jobs-menu__checkbox" type="checkbox" name="jobLocations" value="all" checked>
+                            </div>  
                             <!-- Items added dynamically -->
                         </fieldset>
                     </div>
                     <div class="jobs-menu__item jobs-menu__item--vacancies">
                         <div class="jobs-menu__title">Vacancy Type</div>
                         <fieldset class="jobs-menu__content jobs-menu__content--type">
+                            <div class="jobs-menu__input-wrapper jobs-menu__input-wrapper--all">
+                                <p>All</p><input class="jobs-menu__vacancies-checkbox jobs-menu__vacancies-checkbox--all" type="checkbox" name="jobVacancies" value="all" checked>
+                            </div>  
                             <!-- Items added dynamically -->
                         </fieldset>
                     </div>

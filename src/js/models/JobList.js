@@ -3,14 +3,19 @@ import JRS from '../api/jrs';
 export default class JobList {
 
 
-    getJobs({ limit, index, jobType } = {}) {
-
+    getJobs({ 
+        limit, 
+        index,
+        jobTypes,
+        locations
+    } = {}) {
         // Handle async from the jobs controller 
         return JRS.get('/jobs/all', {
             params: {
                 limit,
                 index,
-                jobType
+                jobTypes,
+                locations
             }
         });
     }
