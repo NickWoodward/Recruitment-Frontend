@@ -4,6 +4,8 @@
     flex-direction: column;
     align-items: center;
     &__item {
+        // position for stacking context (prevent collapsed list items covering submenus below)
+        position: relative;
         width: 100%;
     }
 
