@@ -11,8 +11,9 @@ export const setParallaxHeaderWidth = () => {
 export const renderHeader = (page) => {
     const markup = `
     <header class="header header--${page}">
+        <div class="header__content header__content--${page}">
         <a href="./index.html" class="header__logo">
-            <img class="logo" src="src/assets/logo.jpg" alt="JRS Logo" />
+            <img class="logo" src="src/assets/logo-crop.jpg" alt="JRS Logo" />
         </a>
 
         <a href="#main-menu" class="menu-toggle" aria-label="Open main menu">
@@ -25,24 +26,42 @@ export const renderHeader = (page) => {
                 <svg class="close" aria-hidden="true"><use xlink:href="svg/spritesheet.svg#close-icon"></use></svg>
             </a>
 
-            <ul class="nav">
-                <li class="nav__link">
-                    <a href="./about.html" class="nav__a nav__a--about ${page === "about"? "nav__a--active":""}">About</a>
-                </li>
-                <li class="nav__link">
-                    <a href="./jobs.html" class="nav__a nav__a--jobs ${page === "jobs"? "nav__a--active":""}">Find a Job</a>
-                </li>
-                <li class="nav__link">
-                    <a href="#" class="nav__a nav__a--contact">Contact Us</a>
-                </li>
-                <li class="nav__link">
-                    <a href="#" class="nav__a nav__a--contact">Login</a>
-                </li>
-            </ul>
+            <div class="nav-wrapper">
+                <ul class="nav--social">
+                    <li class="nav__link--social">
+                        <svg class="nav__facebook-icon" aria-hidden="true"><use xlink:href="svg/spritesheet.svg#facebook-icon"></use></svg>
+                    </li>
+                    <li class="nav__link--social">
+                        <svg class="nav__twitter-icon" aria-hidden="true"><use xlink:href="svg/spritesheet.svg#twitter-icon"></use></svg>
+                    </li>                   
+                    <li class="nav__link--social">
+                        <svg class="nav__linkedin-icon" aria-hidden="true"><use xlink:href="svg/spritesheet.svg#linkedin-icon"></use></svg>
+                    </li>
+                    <li class="nav__link--social nav__link--last">
+                        <svg class="nav__instagram-icon" aria-hidden="true"><use xlink:href="svg/spritesheet.svg#instagram-icon"></use></svg>
+                    </li>
+                </ul>
+
+                <ul class="nav">
+                    <li class="nav__link">
+                        <a href="./about.html" class="nav__a nav__a--about ${page === "about"? "nav__a--active":""}">About</a>
+                    </li>
+                    <li class="nav__link">
+                        <a href="./jobs.html" class="nav__a nav__a--jobs ${page === "jobs"? "nav__a--active":""}">Find a Job</a>
+                    </li>
+                    <li class="nav__link">
+                        <a href="#" class="nav__a nav__a--contact">Contact Us</a>
+                    </li>
+                    <li class="nav__link">
+                        <a href="#" class="nav__a nav__a--login">Login</a>
+                    </li>
+                </ul>
+            </div>
         </nav>
 
         <!-- The transparent background behind the mobile menu -->
         <a href="#" class="backdrop" hidden></a>
+        </div>
     </header>`;
     
     elements.body.insertAdjacentHTML('afterbegin', markup);

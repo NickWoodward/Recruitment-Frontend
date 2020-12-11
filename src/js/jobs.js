@@ -62,13 +62,16 @@ export default class JobsController {
             .then(({ data: { jobs, totalJobs, message } } = {}) => {
                 this.totalJobs = totalJobs;
                 this.searchOptions.index += this.limit;
-                JobListView.renderJobs(jobs, elements.jobsDisplay);
+                console.log(this.searchOptions.index);
+                // Passing the index to the render and animate functions allow gsap to animate only the most recent elements added to the page
+                JobListView.renderJobs(jobs, elements.jobsGrid, this.searchOptions.index);
+                JobListView.animateJobs(this.searchOptions.index);
             })
             .catch((err) => console.log(err));
     }
 
     clearJobs() {
-        JobListView.clearJobs(elements.jobsDisplay);
+        JobListView.clearJobs(elements.jobsGrid);
     }
 
     initialiseJobsMenu() {
@@ -103,7 +106,7 @@ export default class JobsController {
             input.addEventListener("change", (e) => {
                 this.changeSearchOptions(e)
                 // Remove current Jobs
-                JobListView.clearJobs(elements.jobsDisplay);
+                JobListView.clearJobs(elements.jobsGrid);
                 // Every time a filter is added restart the index
                 this.searchOptions.index = 0;
                 // Query the database with the search term

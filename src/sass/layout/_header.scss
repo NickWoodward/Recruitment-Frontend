@@ -1,31 +1,49 @@
 .header {
     --nav-width: 50rem;
+    --logo-height: 3.8rem;
 
     position: fixed;
     display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
-    align-items: center;
 
     top: 0;
-    height: var(--header-height);
+    // height: var(--header-height);
     width: 100%;
-    padding: 0 $padding-page;
+    padding: 2rem 0;
+
     font-size: var(--small);
     font-weight: 700;
     
-    background-color: white;
+    background-color: $color-logo;
     z-index: 1;
 
-    &__logo {
-        align-self: flex-start;
+    &__content {
+        // border: 1px solid red;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
     }
+
+    &__logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid $color-navigation-highlight;  
+        height: calc(var(--logo-height) + 6.2rem);
+        width: calc(var(--logo-height) + 6.2rem);
+
+        border-radius: 50%;
+    }
+}
+
+.logo {
+    height: var(--logo-height);
 }
 
 // This is also the header__main-menu class (#main-menu is the target)
 .main-menu {
     display: flex; 
     align-items: center;
+    justify-content: flex-end;
     width: var(--nav-width);
     height: 100%;
 

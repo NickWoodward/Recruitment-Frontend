@@ -97,41 +97,55 @@
             align-items: center;
             font-size: var(--medium);
             height: var(--item-height);
+            margin-bottom: 1rem;
+
         }
         .sort-wrapper {
             display: flex;
             align-items: center;
             height: var(--item-height);
+            margin-bottom: 1rem;
         }
         .sort {
             width: 15rem;
             height: 3rem;
+            margin-right: 1rem;
         }
-        .list-btn, .grid-btn {
+        .list-btn, .grid-btn{
             padding: 1rem;
         }
+
+
         .list-icon {
             width: 3rem;
-            height: 2.8rem;
+            height: 3rem;
+            fill: grey;        
         }
         .grid-icon {
             height: 3rem;
-            width: 2.7rem;
+            width: 3rem;
+            fill: $color-navigation;
+
         }
 
-    .jobs__display {
-       
+    .jobs__grid{
         display: flex;
         flex-flow: row wrap;
         justify-content: space-between; 
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        // grid-template-columns: repeat(3, var(--job-card-width));
         justify-content: space-between;
         row-gap: 4rem;
         column-gap: 3rem;
-        margin-top: 3rem;
+        margin-top: 2rem;
     }
+    .jobs__search-box {
+        width: 100%;
+        height: 9rem;
+
+        background: lightgrey;
+    }
+
     .jobs__aside {
         display: flex;
         flex-flow: row wrap;

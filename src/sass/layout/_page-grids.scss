@@ -1,3 +1,16 @@
+/* HEADER */
+// (16 cols, set the --width to the same as the central grid below it)
+
+.header {
+    
+    &__content {
+        --width: 10;
+        --initialbasis: calc(var(--width) / var(--columns) * 100%);
+        flex-basis: var(--initialbasis);
+        margin: 0 auto;
+    }
+}
+
 /* JOBS PAGE */
 // (16 cols, 2 rows)
 

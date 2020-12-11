@@ -5,7 +5,8 @@ export const elements = {
     parallaxWrapper: document.querySelector('.parallax-wrapper'),
 
     /* Jobs.html */
-    jobsDisplay: document.querySelector('.jobs__display'),
+    jobsMain: document.querySelector('.jobs__main'),
+    jobsGrid: document.querySelector('.jobs__grid'),
     jobsMenu: document.querySelector('.jobs-menu'),
     // jobsMenuTitle: document.querySelector('.jobs-menu__title'),
 
