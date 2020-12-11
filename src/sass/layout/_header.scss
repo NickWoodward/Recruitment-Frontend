@@ -1,14 +1,14 @@
 .header {
     --nav-width: 50rem;
-    --logo-height: 3.8rem;
+    --logo-height: 4rem;
 
     position: fixed;
     display: flex;
 
     top: 0;
-    // height: var(--header-height);
     width: 100%;
-    padding: 2rem 0;
+    height: var(--header-height);
+    padding: 0 0 2rem 0;
 
     font-size: var(--small);
     font-weight: 700;
@@ -28,8 +28,8 @@
         align-items: center;
         justify-content: center;
         border: 2px solid $color-navigation-highlight;  
-        height: calc(var(--logo-height) + 6.2rem);
-        width: calc(var(--logo-height) + 6.2rem);
+        height: calc(var(--logo-height) + 5.5rem);
+        width: calc(var(--logo-height) + 5.5rem);
 
         border-radius: 50%;
     }

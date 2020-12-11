@@ -2,7 +2,7 @@
 import * as headerView from './views/headerView';
 
 // Header assets
-import '../assets/logo.jpg';
+import '../assets/logo-crop.jpg';
 import '../assets/icons/facebook-icon.svg';
 import '../assets/icons/linkedin-icon.svg';
 import '../assets/icons/twitter-icon.svg';

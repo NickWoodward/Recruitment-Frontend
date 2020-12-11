@@ -5,7 +5,7 @@
     flex-direction: column;
     justify-content: flex-end;
     height: 100%;
-    padding-bottom: 1rem;
+    padding-bottom: .5rem;
 }
 
 .nav {
@@ -44,8 +44,8 @@
     &__twitter-icon,
     &__linkedin-icon,
     &__instagram-icon {
-        height: 2.2rem;
-        width: 2.2rem;
+        height: 2rem;
+        width: 2rem;
         fill: $color-navigation-highlight;
     }
 
@@ -67,7 +67,7 @@
             bottom: 0;
             left: 10%;
             width: 80%;
-            height: 2px;
+            height: 1px;
             background-color: $color-navigation-highlight;
             transition: width .3s ease-out;
         }

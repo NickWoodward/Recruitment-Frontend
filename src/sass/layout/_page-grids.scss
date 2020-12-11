@@ -20,7 +20,7 @@
         --initialbasis: calc(var(--width) / var(--columns) * 100%);
         flex-basis: var(--initialbasis);       
     }
-    &__menubar {
+    &__menu-wrapper {
         --width: 3;
         --initialbasis: calc(var(--width) / var(--columns) * 100%);
         flex-basis: var(--initialbasis);

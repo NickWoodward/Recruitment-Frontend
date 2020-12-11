@@ -10,6 +10,7 @@ import { elementStrings } from "./views/base";
 
 // Assets
 import "../sass/jobs.scss";
+// import "../assets/search-jobs.png";
 
 export default class JobsController {
     constructor() {

@@ -23,9 +23,13 @@ export const initialise = (content) => {
  * @param {string} menuType The type of item to be added (title/salary/location etc).
  */
 export const renderItem = (menuItem, htmlElement, menuType) => {
+    const random = Math.floor(Math.random() * 10) +1;
     const markup = `
          <div class="jobs-menu__input-wrapper">
-             <p>${menuItem}</p><input class="jobs-menu__${menuType}-checkbox jobs-menu__checkbox" type="checkbox" name="${menuType}" value="${menuItem}">
+             <input class="jobs-menu__${menuType}-checkbox jobs-menu__checkbox" type="checkbox" name="${menuType}" value="${menuItem}">
+             <p class="jobs-menu__description">${menuItem}</p>
+             <div class="jobs-menu__count">(${random})</div>
+
          </div>
     `;
   
