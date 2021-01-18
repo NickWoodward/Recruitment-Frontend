@@ -8,8 +8,9 @@ export const elements = {
     jobsMain: document.querySelector('.jobs__main'),
     jobsGrid: document.querySelector('.jobs__grid'),
     jobsMenu: document.querySelector('.jobs-menu'),
-    // jobsMenuTitle: document.querySelector('.jobs-menu__title'),
 
+    jobsSort: document.querySelector('.sort'),
+    jobsTitleSearch: document.querySelector('.search-input--title'),
     jobsMenuContents: document.querySelectorAll('.jobs-menu__content'),
     jobsMenuJobTitles: document.querySelector('.jobs-menu__content--titles'),
     jobsMenuSalaries: document.querySelector('.jobs-menu__content--salaries'),

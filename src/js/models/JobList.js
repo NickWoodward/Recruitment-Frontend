@@ -6,16 +6,20 @@ export default class JobList {
     getJobs({ 
         limit, 
         index,
-        jobTypes,
-        locations
+        titles,
+        locations,
+        orderField,
+        orderDirection
     } = {}) {
         // Handle async from the jobs controller 
         return JRS.get('/jobs/all', {
             params: {
                 limit,
                 index,
-                jobTypes,
-                locations
+                titles,
+                locations,
+                orderField,
+                orderDirection
             }
         });
     }

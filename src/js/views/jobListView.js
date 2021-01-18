@@ -22,7 +22,7 @@ export const animateJobs = (batchNum) => {
 export const isAtBottom = () => {
     const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
 
-    return scrollTop + clientHeight >= scrollHeight;
+    return (Math.ceil(scrollTop) + Math.ceil(clientHeight) ) + 1 >= scrollHeight;
 };
 
 export const renderJobs = (jobs, element, batchNum) => {
@@ -35,14 +35,20 @@ export const renderJobs = (jobs, element, batchNum) => {
 }
 
 const renderJob = ({title, wage, location, description}, element, batchNum) => {
-    console.log(batchNum);
-
     const markup =            
     `<div class="job-card job-card-${batchNum}">
-        <h3 class="job-card__title">${title}</h3> 
+        <div class="job-card__title-wrapper">
+            <h3 class="job-card__title">${title}</h3> 
+            <div class="job-card__pin">
+                <svg class="pin-icon">
+                <use xlink:href="svg/spritesheet.svg#pin-angle"></use>
+
+                </svg>
+            </div>
+        </div>
         <div class="job-card__content">
-            <div class="job-card__wage">${wage}</div> 
             <div class="job-card__location">${location}</div>
+            <div class="job-card__wage">£${wage} per annum</div> 
             <div class="job-card__description">${description}</div>
         </div>    
         <div class="job-card__footer">

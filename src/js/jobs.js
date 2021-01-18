@@ -15,12 +15,22 @@ import "../sass/jobs.scss";
 export default class JobsController {
     constructor() {
         this.JobList = new JobList();
+        this.menuItems = {
+            titles: []
+        }
         this.searchOptions = {
             index: 0,
             limit: 12,
-            jobTypes: [],
+            titles: [],
             locations: [],
+            orderField: "title",
+            orderDirection: "ASC"
         };
+
+        this.searchSuggestions = {
+            titles: [],
+            locations: []
+        }
 
         // Used to determine if infinite scroll effect should continue by comparing to # job-card elements
         this.totalJobs = 0;
@@ -55,15 +65,67 @@ export default class JobsController {
             jobsMenuView.toggleMenu(e);
         });
 
-        // Menu item listeners added once menu initialised
+        // Job Controls
+        elements.jobsTitleSearch.addEventListener("input", (e) => {
+
+            const suggestions = this.getSuggestions(e.target.value);
+
+            // #TODO: DEBOUNCE THIS
+            if(suggestions.length > 0) {
+                if(this.searchOptions.titles.length !== [...new Set(suggestions)].length) {
+                    this.searchOptions.titles = [...new Set(suggestions)];
+                    // Remove current Jobs
+                    JobListView.clearJobs(elements.jobsGrid);
+
+                    // Every time a filter is added restart the index
+                    this.searchOptions.index = 0;
+                    console.log(this.searchOptions.titles);
+                    this.getJobs();
+                }
+            }
+            
+            // Return the suggestions to unfiltered menu items
+            this.searchSuggestions.titles = this.menuItems.titles;
+        });
+        elements.jobsSort.addEventListener('change', e => {
+
+******START HERE
+
+            if(e.target.value === 'A-Z &#8595') {
+                this.searchOptions.orderField = 'title';
+                this.searchOptions.orderDirection = 'ASC';
+            } else if (e.target.value === 'A-Z &#8593') {
+                this.searchOptions.orderField = 'title';
+                this.searchOptions.orderDirection = 'DESC';
+            }
+            this.getJobs();
+            console.log(this.searchOptions);
+        });
+
+        // NB: Menu item listeners added once menu initialised (this.initialiseJobsMenu)
+    }
+    getSuggestions(input) {
+        this.searchSuggestions.titles = this.searchSuggestions.titles.filter(suggestion => {
+            const words = suggestion.split(" ");
+            const temp = words.filter(word => this.compareTwoStrings(word, input));
+            return temp.length > 0;
+        });
+        return this.searchSuggestions.titles;
+
+    }
+
+    compareTwoStrings(string, subString) {
+        const temp = string.split("", subString.length).join("");
+        if (subString.toLowerCase() == temp.toLowerCase()) return subString;
     }
 
     getJobs() {
+        console.log(this.searchOptions);
         this.JobList.getJobs(this.searchOptions)
-            .then(({ data: { jobs, totalJobs, message } } = {}) => {
+            .then(({ data, data: { jobs, totalJobs, message } } = {}) => {
+                console.log(data);
                 this.totalJobs = totalJobs;
                 this.searchOptions.index += this.limit;
-                console.log(this.searchOptions.index);
                 // Passing the index to the render and animate functions allow gsap to animate only the most recent elements added to the page
                 JobListView.renderJobs(jobs, elements.jobsGrid, this.searchOptions.index);
                 JobListView.animateJobs(this.searchOptions.index);
@@ -89,7 +151,13 @@ export default class JobsController {
                 });
 
                 // Render content
-                jobsMenuView.initialise(items);
+                jobsMenuView.populateMenu(items);
+
+                // Store menu items in the controller & add to the suggested search arrays
+                this.menuItems.titles = items.uniqueTitles;
+                // this.menuItems.titles = items.uniqueLocations;
+                this.searchSuggestions.titles = items.uniqueTitles;
+                this.searchSuggestions.locations = items.uniqueLocations;
 
                 // Add listeners to the JobsMenu
                 this.addMenuListeners();
@@ -98,93 +166,46 @@ export default class JobsController {
     }
 
     addMenuListeners() {
-        const titleCheckboxes = document.querySelectorAll(
-            // elementStrings.titleCheckbox
+        const checkboxes = document.querySelectorAll(
             elementStrings.jobsMenuCheckbox
         );
         // Add listeners to the checkboxes in the jobs menu
-        titleCheckboxes.forEach((input) => {
+        checkboxes.forEach((input) => {
             input.addEventListener("change", (e) => {
-                this.changeSearchOptions(e)
+                // Find out which submenu has been selected
+                const submenu = jobsMenuView.findSelectedSubmenu(e);
+                const checkboxTitle = e.target.value;
+
+                // Update checkboxes based on selection
+                jobsMenuView.updateCheckboxes(submenu, checkboxTitle);
+
+                // Change the search object's options
+                this.changeSearchOptions(submenu, checkboxTitle);
+                
                 // Remove current Jobs
                 JobListView.clearJobs(elements.jobsGrid);
+
                 // Every time a filter is added restart the index
                 this.searchOptions.index = 0;
-                // Query the database with the search term
+
+                // Query the database using the new search object
                 this.getJobs();
             });
         });
     }
 
-    // #TODO: move to jobsMenuView
-    changeSearchOptions(e) {
-        const value = e.target.value;
-        // Discover which submenu the selection was made from
-        const titlesSubmenu = e.target.closest(elementStrings.titlesContent);
-        const salariesSubmenu = e.target.closest(elementStrings.salariesContent);
-        const locationsSubmenu = e.target.closest(elementStrings.locationsContent);
-        const vacanciesSubmenu = e.target.closest(elementStrings.vacanciesContent);
-
-            // const selectedMenu = tit
-        // Job Titles Submenu
-        if (titlesSubmenu) {
-            // Uncheck other options
-            this.uncheckOptions('titles', value);
-
-            // Clear jobType searchOptions if no filter needed
-            if(value === "all") {
-                this.searchOptions.jobTypes = [];
-            }
-            // Else if value not present in jobTypes array, add it
-            else if (!this.searchOptions.jobTypes.includes(value)) {
-                this.searchOptions.jobTypes.push(value);
-            // Else remove it if already present
-            } else {
-                const index = this.searchOptions.jobTypes.indexOf(value);
-                this.searchOptions.jobTypes.splice(index, 1);
-            }
-        // Locations Submenu 
-        } else if(locationsSubmenu) {
-            // Uncheck other options
-            this.uncheckOptions('locations', value);
-            // Clear 'locations' parameter in searchOptions if not needed
-            if(value === 'all') {
-                this.searchOptions.locations = [];
-            } 
-            // Else if value not present in locations array, add it
-            else if(!this.searchOptions.locations.includes(value)) {
-                this.searchOptions.locations.push(value);
-            // Else remove it if already present
-            } else {
-                const index = this.searchOptions.locations.indexOf(value);
-                this.searchOptions.locations.splice(index, 1);
-            }
-        }
-    }
-
-    uncheckOptions(submenu, value) {
-        // Select the submenu's checkboxes (except 'all') 
-        const checkboxArray = Array.from(document.querySelectorAll(elementStrings[`${submenu}Checkbox`]))
-                                    .filter((element) => !element.classList.contains(elementStrings[`${submenu}CheckboxAll`]))
-        const checkboxAll = document.querySelector("."+elementStrings[`${submenu}CheckboxAll`]);
-        // If 'all' is selected, uncheck the other options in the Submenu
-        if (value === "all") {
-            // Uncheck each element
-            checkboxArray.forEach(checkbox => checkbox.checked = false);
-        }  
-        // If it's the last checkbox, select 'all', else just uncheck 
-        else if(this.isLastCheckbox(checkboxArray)) {
-            checkboxAll.checked = true;
+    changeSearchOptions(submenu, checkboxTitle) {
+        // Reset the submenu search options if 'all' is selected
+        if(checkboxTitle === 'all') {
+            this.searchOptions[submenu] = [];
+        // Else if the option doesn't exist, add it
+        } else if(!this.searchOptions[submenu].includes(checkboxTitle)) {
+            this.searchOptions[submenu].push(checkboxTitle);
+        // Else remove it
         } else {
-        // Uncheck the 'all' option if any other checkbox is selected
-            checkboxAll.checked = false;
+            const index = this.searchOptions[submenu].indexOf(checkboxTitle);
+            this.searchOptions[submenu].splice(index, 1);
         }
-    }
-
-    isLastCheckbox(checkboxes) {
-        let count = 0;
-        checkboxes.forEach(checkbox => count = checkbox.checked? count+1:count);
-        return count === 0;
     }
 }
 

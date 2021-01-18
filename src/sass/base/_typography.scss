@@ -13,5 +13,20 @@
     --tiny: calc(var(--base-size) / var(--type-scale));
 
     font-family: 'Lato', sans-serif;
+
+    /* JOBS PAGE */
+
+    // Jobs Menu
+    --menu-title: 1.6rem;
+    --menu-content: 1.5rem;
+
+    // Job Card
+    --job-card-title: 1.8rem;
+    --job-card-content: 1.6rem;
+    --job-card-location: 1.65rem;
+    --job-card-wage: 1.65rem;
+
+    // Jobs Aside
+    --blog-title: 1.7rem;
 }
 

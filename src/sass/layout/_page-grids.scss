@@ -2,37 +2,48 @@
 // (16 cols, set the --width to the same as the central grid below it)
 
 .header {
-    
+
     &__content {
-        --width: 10;
-        --initialbasis: calc(var(--width) / var(--columns) * 100%);
-        flex-basis: var(--initialbasis);
-        margin: 0 auto;
+        flex-basis: 100%;
+        justify-content: space-between;
+
+    /* USE TO MAKE HEADER CONTENT ALIGN WITH THE MIDDLE COLUMN OF THE CONTENT */ 
+    //     --gap-constant: .15%;
+    //     --gap: calc((var(--columns, 16) - var(--width, 0)) * var(--gap-constant, 0.3%));
+
+    //     --width: 10;
+    //     --initialbasis: calc(var(--width) / var(--columns) * 100%);
+    //     flex-basis: calc(var(--initialbasis) - var(--gap));
+    //     margin: 0 auto;
     }
 }
 
 /* JOBS PAGE */
 // (16 cols, 2 rows)
 
-.jobs { // .jobs__main is the flex container
-    &__topbar {
-        --width: 16;
+
+.jobs { // .jobs__content is the flex container
+    &__topbar,
+    &__menu-wrapper,
+    &__wrapper,
+    &__aside {
+        --gap-constant: .15%;
+        --gap: calc((var(--columns, 16) - var(--width, 0)) * var(--gap-constant, 0.3%));
+
         --initialbasis: calc(var(--width) / var(--columns) * 100%);
-        flex-basis: var(--initialbasis);       
+        flex-basis: calc(var(--initialbasis) - var(--gap));
+    }
+
+    &__topbar {
+        --width: 16;    
     }
     &__menu-wrapper {
-        --width: 3;
-        --initialbasis: calc(var(--width) / var(--columns) * 100%);
-        flex-basis: var(--initialbasis);
+        --width: 3.5;
     }
-    &__display {
-        --width: 10;
-        --initialbasis: calc(var(--width) / var(--columns) * 100%);
-        flex-basis: var(--initialbasis);
+    &__wrapper {
+        --width: 9;
     }
     &__aside {
-        --width: 3;
-        --initialbasis: calc(var(--width) / var(--columns) * 100%);
-        flex-basis: var(--initialbasis);
+        --width: 3.5;
     }
 }
