@@ -11,11 +11,10 @@ import '../assets/icons/instagram-icon.svg';
 
 import '../assets/icons/close-icon.svg';
 import '../assets/icons/burger-icon.svg';
-import '../assets/icons/grid-icon-test.svg';
 import '../assets/icons/pin-angle.svg';
 
 import '../assets/icons/loader.svg';
-import '../assets/icons/list-icon-test.svg';
+
 
 /* Controls the javascript common to all pages */
 

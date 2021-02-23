@@ -1,0 +1,30 @@
+// Some reset styles in base.scss
+
+.btn {
+    padding: 1.3rem 2.5rem;
+}
+
+.btn-wrapper {
+    &--hero {
+        margin-top: 2.5rem;
+    }
+}
+
+.signup-btn {
+
+    &--hero {
+        margin-right: 2rem;
+        color: $color-white;
+        background-color: $color-secondary;
+        font-size: 1.5rem;
+    }
+}
+
+.browse-btn {
+    &--hero {
+        color: $color-white;
+        background: $color-logo;
+        font-size: 1.5rem;
+
+    }
+}

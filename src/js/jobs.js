@@ -10,6 +10,11 @@ import { elementStrings } from "./views/base";
 
 // Assets
 import "../sass/jobs.scss";
+import '../assets/icons/list-icon-test.svg';
+import '../assets/icons/grid-icon-test.svg';
+import '../assets/icons/identity-card.svg';
+import '../assets/icons/clock.svg';
+import '../assets/icons/location.svg';
 // import "../assets/search-jobs.png";
 
 export default class JobsController {
@@ -87,20 +92,20 @@ export default class JobsController {
             // Return the suggestions to unfiltered menu items
             this.searchSuggestions.titles = this.menuItems.titles;
         });
-        elements.jobsSort.addEventListener('change', e => {
+//         elements.jobsSort.addEventListener('change', e => {
 
-******START HERE
+// ******START HERE
 
-            if(e.target.value === 'A-Z &#8595') {
-                this.searchOptions.orderField = 'title';
-                this.searchOptions.orderDirection = 'ASC';
-            } else if (e.target.value === 'A-Z &#8593') {
-                this.searchOptions.orderField = 'title';
-                this.searchOptions.orderDirection = 'DESC';
-            }
-            this.getJobs();
-            console.log(this.searchOptions);
-        });
+//             if(e.target.value === 'A-Z &#8595') {
+//                 this.searchOptions.orderField = 'title';
+//                 this.searchOptions.orderDirection = 'ASC';
+//             } else if (e.target.value === 'A-Z &#8593') {
+//                 this.searchOptions.orderField = 'title';
+//                 this.searchOptions.orderDirection = 'DESC';
+//             }
+//             this.getJobs();
+//             console.log(this.searchOptions);
+//         });
 
         // NB: Menu item listeners added once menu initialised (this.initialiseJobsMenu)
     }

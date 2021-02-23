@@ -13,7 +13,7 @@ module.exports = merge(common, {
                 ]
             },
             {
-                test: /\.(png|jpg)$/,
+                test: /\.(png|jpg|webp)$/,
                 use: [ 
                     "url-loader",
                     {
@@ -29,6 +29,9 @@ module.exports = merge(common, {
                             pngquant: {
                                 quality: [0.65, 0.9],
                                 speed: 4,
+                            },
+                            webp: {
+                                quality: 75
                             },
                         },
                     },

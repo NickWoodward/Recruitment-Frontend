@@ -1,6 +1,7 @@
 import * as headerView from './views/headerView';
 /* ASSETS */
 import '../sass/index.scss';
+import '../assets/hero.webp';
 
 class IndexController {
     constructor() {

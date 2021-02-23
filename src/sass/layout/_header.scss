@@ -1,25 +1,25 @@
 .header {
     --nav-width: 50rem;
-    --logo-height: 4rem;
+    --logo-height: 2.8rem;
 
     position: fixed;
     display: flex;
-
+    align-items: center;
     top: 0;
     width: 100%;
     height: var(--header-height);
-    // L & R padding matches the horizontal padding of the content element below the header
-    padding: 0 5% 2rem 5%;
 
-    font-size: var(--small);
+    padding: 0 var(--page-padding) 0 var(--page-padding);
+
+    font-size: 1.6rem;
     font-weight: 700;
     
     background-color: $color-logo;
     z-index: 1;
 
     &__content {
-        // border: 1px solid red;
         display: flex;
+        flex-basis: 100%;
         justify-content: space-between;
         align-items: flex-end;
     }
@@ -28,9 +28,9 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 2px solid $color-navigation-highlight;  
-        height: calc(var(--logo-height) + 5.5rem);
-        width: calc(var(--logo-height) + 5.5rem);
+        border: 2px solid $color-secondary-highlight;  
+        height: calc(var(--logo-height) + 5rem);
+        width: calc(var(--logo-height) + 5rem);
 
         border-radius: 50%;
     }
@@ -124,7 +124,7 @@
     height: 3rem;
     fill: white;
     &:hover {
-        background-color: $color-navigation;
+        background-color: $color-secondary;
     }
 }
 

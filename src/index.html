@@ -3,77 +3,103 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700&display=swap"
-        />
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Rufina&display=swap" rel="stylesheet"> 
         <title>JRS: Home</title>
     </head>
     <body>
         <main class="parallax-wrapper">
-            <section class="hero section--first">
-                <p class="hero__tagline">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Distinctio perferendis accusamus et eum, nihil aliquid
-                    eveniet aperiam incidunt, minima facilis consequuntur eaque
-                    asperiores ullam culpa maiores provident libero ea enim
-                    rerum maxime repellat sunt vel sit excepturi! Esse totam
-                    aliquam inventore suscipit. Obcaecati alias perspiciatis
-                    assumenda eos adipisci quaerat corporis nemo tempore
-                    explicabo, harum minus fugiat quae sed, atque excepturi
-                    culpa dolor! Repellendus error consectetur animi alias
-                    dolore explicabo, nobis fugiat ex recusandae quod doloremque
-                    quam fugit consequuntur ab iste perspiciatis itaque labore
-                    laudantium accusamus? Assumenda asperiores odit accusamus
-                    suscipit, quisquam fugit blanditiis reiciendis. Ex quisquam
-                    eaque adipisci cupiditate, id tempore! Placeat cupiditate
-                    optio quod nostrum dolor. Consectetur recusandae vel numquam
-                    accusamus at odit hic atque repellendus. Voluptates
-                    consequatur reiciendis nobis illo! Aperiam dolorem ab
-                    tempora facere, pariatur maxime error. Quod nesciunt
-                    quisquam, neque, error debitis qui, delectus provident
-                    assumenda aperiam quia sit consequatur quasi quas rerum.
-                    Corporis rem alias, quo saepe ullam nemo, debitis ipsum quis
-                    minima provident nulla! Facere, corrupti quisquam corporis
-                    aspernatur doloribus beatae omnis consectetur at, non
-                    explicabo optio, asperiores animi accusantium quis
-                    laboriosam hic magni odit exercitationem fugit ipsa atque
-                    porro nostrum fugiat! Aperiam dignissimos provident quasi
-                    blanditiis accusamus rem ab nulla temporibus voluptates
-                    magnam.
-                </p>
+            <section class="hero parallax section--first bg1">
+                <div class="hero__content">
+                    <h1 class="hero__tagline">
+                        Legal Recruitment at its Best
+                    </h1>
+                    <div class="btn-wrapper btn-wrapper--hero">
+                        <button class="btn signup-btn signup-btn--hero">
+                            Sign Up
+                        </button>
+                        <button class="btn browse-btn browse-btn--hero">
+                            Browse
+                        </button>
+                    </div>
+                </div>
+                <div class="hero__divider"></div>
             </section>
-            <section class="hero">
-                <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Distinctio perferendis accusamus et eum, nihil aliquid
-                    eveniet aperiam incidunt, minima facilis consequuntur eaque
-                    asperiores ullam culpa maiores provident libero ea enim
-                    rerum maxime repellat sunt vel sit excepturi! Esse totam
-                    aliquam inventore suscipit. Obcaecati alias perspiciatis
-                    assumenda eos adipisci quaerat corporis nemo tempore
-                    explicabo, harum minus fugiat quae sed, atque excepturi
-                    culpa dolor! Repellendus error consectetur animi alias
-                    dolore explicabo, nobis fugiat ex recusandae quod doloremque
-                    quam fugit consequuntur ab iste perspiciatis itaque labore
-                    laudantium accusamus? Assumenda asperiores odit accusamus
-                    suscipit, quisquam fugit blanditiis reiciendis. Ex quisquam
-                    eaque adipisci cupiditate, id tempore! Placeat cupiditate
-                    optio quod nostrum dolor. Consectetur recusandae vel numquam
-                    accusamus at odit hic atque repellendus. Voluptates
-                    consequatur reiciendis nobis illo! Aperiam dolorem ab
-                    tempora facere, pariatur maxime error. Quod nesciunt
-                    quisquam, neque, error debitis qui, delectus provident
-                    assumenda aperiam quia sit consequatur quasi quas rerum.
-                    Corporis rem alias, quo saepe ullam nemo, debitis ipsum quis
-                    minima provident nulla! Facere, corrupti quisquam corporis
-                    aspernatur doloribus beatae omnis consectetur at, non
-                    explicabo optio, asperiores animi accusantium quis
-                    laboriosam hic magni odit exercitationem fugit ipsa atque
-                    porro nostrum fugiat! Aperiam dignissimos provident quasi
-                    blanditiis accusamus rem ab nulla temporibus voluptates
-                    magnam.
-                </p>
+            <section class="candidate-search section static">
+                <div class="candidate-search__content">
+                    <div class="roles">
+                        <div class="roles__title">
+                            Candidates for every role
+                        </div>
+                        <div class="roles__list">
+                            <div class="roles__item">
+                                <div class="roles__icon roles__id-card">
+                                    <svg class="id-card" aria-hidden="true">
+                                        <use xlink:href="svg/spritesheet.svg#identity-card">
+                                    </svg>
+                                </div>
+                                <div class="roles__type">Permanent</div>
+                            </div>
+                            <div class="roles__divider"></div>
+                            <div class="roles__item">
+                                <div class="roles__icon roles__interim">
+                                    <svg class="clock" aria-hidden="true">
+                                        <use xlink:href="svg/spritesheet.svg#clock">
+                                    </svg>
+                                </div>
+                                <div class="roles__type">Interim</div>
+                            </div>
+                            <div class="roles__divider"></div>
+                            <div class="roles__item">
+                                <div class="roles__icon roles__location">
+                                    <svg class="location" aria-hidden="true">
+                                        <use xlink:href="svg/spritesheet.svg#location">
+                                    </svg>
+                                </div>
+                                <div class="roles__type">Remote</div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="search">
+                        <div class="search__field">
+                            <div class="search__label">Job Title</div>
+                            <select name="title" id="" class="search__input">
+                                <option value="">----</option>
+                                <option value="dog">Dog</option>
+                                <option value="cat">Cat</option>
+                                <option value="hamster">Hamster</option>
+                                <option value="parrot">Parrot</option>
+                                <option value="spider">Spider</option>
+                                <option value="goldfish">Goldfish</option>
+                            </select>
+                        </div>
+                        <div class="search__field">
+                            <div class="search__label">Salary</div>
+                            <select name="salary" id="" class="search__input">
+                                <option value="">----</option>
+                                <option value="dog">Dog</option>
+                                <option value="cat">Cat</option>
+                                <option value="hamster">Hamster</option>
+                                <option value="parrot">Parrot</option>
+                                <option value="spider">Spider</option>
+                                <option value="goldfish">Goldfish</option>
+                            </select>
+                        </div>
+                        <div class="search__field">
+                            <div class="search__label">Location</div>
+                            <select name="location" id="" class="search__input">
+                                <option value="">----</option>
+                                <option value="dog">Dog</option>
+                                <option value="cat">Cat</option>
+                                <option value="hamster">Hamster</option>
+                                <option value="parrot">Parrot</option>
+                                <option value="spider">Spider</option>
+                                <option value="goldfish">Goldfish</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </section>
             <section class="hero">
                 <p>

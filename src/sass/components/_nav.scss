@@ -1,6 +1,5 @@
 // Component: Deal with dimensions in the container.
 .nav-wrapper {
-    // border: 1px solid red;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -9,7 +8,10 @@
 }
 
 .nav {
+    // border: 1px solid red;
+
     display: flex;
+    justify-content: flex-end;
     align-items: flex-end;
 
     @include respond-phone {
@@ -44,9 +46,9 @@
     &__twitter-icon,
     &__linkedin-icon,
     &__instagram-icon {
-        height: 2rem;
-        width: 2rem;
-        fill: $color-navigation-highlight;
+        height: 1.6rem;
+        width: 1.6rem;
+        fill: $color-secondary-highlight;
     }
 
     &__a {
@@ -54,7 +56,7 @@
         display: flex;
         align-items: center;
         height: 100%;
-        padding: 1.5rem 2rem 1rem 2rem;
+        padding: .8rem 2rem 1rem 2rem;
         color: rgb(221, 221, 221);
         z-index: 1;
 
@@ -68,7 +70,7 @@
             left: 10%;
             width: 80%;
             height: 1px;
-            background-color: $color-navigation-highlight;
+            background-color: $color-secondary-highlight;
             transition: width .3s ease-out;
         }
 
@@ -87,7 +89,7 @@
                 right: 0;
                 width: 100%;
                 height: 0px;
-                background-color: $color-navigation;
+                background-color: $color-secondary;
                 transition: none;
 
             }

@@ -20,11 +20,11 @@
         top: -5rem;
         right: 0;
         bottom: -8rem;
-        left: 0;
+        left: -4px;
 
         /* Move the pseudo-element back away from the camera,
          * then scale it back up to fill the viewport.
-         * Because the pseudo-element is further away, it appears to move more slowly, like in real life. */
+         * Because the pseudo-element is further away, it appears to move more slowly */
         transform: translateZ(-1px) scale(1.5);
         /* Force the background image to fill the whole element. */
         // background-size: 100%;
@@ -34,8 +34,22 @@
     }
 }
 
+.static {
+    background-color: white; // Makes them cover the parallax sections where they overlap
+}
+
 .bg1::after {
-    // background-image: url('/src/assets/hero.webp');
-    // background-position: center;
-    // background-position: 50% 35%;
+    background-color: royalblue;
+    background-image: linear-gradient(
+        to bottom right,
+        rgba(black, .6),
+        rgba(31, 31, 31, .6),
+        rgba(31, 31, 31, .5),
+        rgba(31, 31, 31, .2),
+
+        rgba(31, 31, 31, .1),
+        rgba(31, 31, 31, .02)
+    ), url('/src/assets/hero.webp');
+    background-position: center;
+    background-position: 50% 35%;
   }

@@ -1,13 +1,18 @@
 /* COLOURS */
 // Common Colours
-$color-primary: rgb(91, 118, 139); 
-$color-navigation: rgb(117,53,53);
-// $color-navigation-highlight: rgb(218, 210, 166);
-// $color-navigation-highlight: rgb(139, 187, 190);
-// $color-navigation-highlight: rgb(179, 208, 228);
-$color-navigation-highlight: rgb(154, 191, 216);
-
 $color-logo: rgb(102, 124, 148);
+
+$color-primary: rgb(91, 118, 139); 
+$color-secondary: rgb(117,53,53);
+// $color-secondary-highlight: rgb(218, 210, 166);
+// $color-secondary-highlight: rgb(139, 187, 190);
+// $color-secondary-highlight: rgb(179, 208, 228);
+$color-secondary-highlight: rgb(154, 191, 216);
+
+$color-white: rgb(233, 233, 233);
+
+// Text Colours
+$color-text-primary: rgb(19, 39, 54);
 
 // Jobs Colours
 $color-jobs-background: rgb(238, 238, 238);
@@ -15,7 +20,8 @@ $color-menu-item: rgb(246, 247, 249);
 
 
 /* HEIGHT */
-
+$height-logo: 4rem;
+$height-hero: 75%;
 
 /* WIDTH */
 
