@@ -1,19 +1,32 @@
 // Some reset styles in base.scss
 
 .btn {
-    padding: 1.3rem 2.5rem;
+    padding: 1.2rem 2rem;
 }
 
 .btn-wrapper {
     &--hero {
         margin-top: 2.5rem;
     }
+
+    &--about {
+        margin-top: 4rem;
+        @include respond-desktop-small() {
+            margin-top: 5rem;
+        }
+    }
 }
 
 .signup-btn {
-
     &--hero {
         margin-right: 2rem;
+        color: $color-white;
+        background-color: $color-secondary;
+        font-size: 1.5rem;
+    }
+
+    &--about {
+        margin-left: 2rem;
         color: $color-white;
         background-color: $color-secondary;
         font-size: 1.5rem;
@@ -25,6 +38,13 @@
         color: $color-white;
         background: $color-logo;
         font-size: 1.5rem;
+    }
+}
 
+.contact-btn {
+    &--about {
+        color: $color-white;
+        background: $color-logo;
+        font-size: 1.5rem;
     }
 }

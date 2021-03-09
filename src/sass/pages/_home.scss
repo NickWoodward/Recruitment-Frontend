@@ -6,7 +6,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    height: $height-hero;
+    height: var(--hero-height);
 
     &__content {
 
@@ -14,14 +14,14 @@
         display: flex; 
         flex-direction: column;
         justify-content: center;
-        width: 45rem;
-        top: 28%;
-        margin: 0 0 0 calc(var(--page-padding) + 15rem);
+        width: 35rem;
+        top: 24%;
+        margin: 0 0 0 var(--page-padding--l);
     }
 
     &__tagline {
         font-family: 'rufina', sans-serif;
-        font-size: 4.9rem;
+        font-size: 4rem;
         font-weight: 400;
         color: $color-white;
     }
@@ -37,42 +37,103 @@
 /* CANDIDATE SEARCH SECTION */
 
 .candidate-search {
+    display: flex;
+    align-items: center;
+    height: calc(100% - var(--hero-height));
+
+    @include respond-desktop-vsmall() {
+        justify-content: center;
+    }
+
     &__content {
         display: flex;
         justify-content: space-between;
         align-items: center;
         width: 100%;
-        height: calc(100% - #{$height-hero});
+        margin: 0 var(--page-padding--content) 0 var(--page-padding--content);
+        
+        @include respond-desktop-large() {
+            margin: 0 var(--page-padding--l) 0 var(--page-padding--l);
+        }
+        @include respond-desktop-vsmall() {
+            flex-direction: column;
+            align-items: flex-start;
+            width: auto;
+            margin: 0;
+        }
     }
 }
 
 .roles {
-    margin-left: calc(var(--page-padding) + 15rem);
-
+    @include respond-desktop-vsmall() {
+        margin-bottom: 2.5rem;
+    }
     &__title {
         margin-bottom: 2rem;
-        font-size: 2.4rem;
+        font-size: 1.8rem;
         color: $color-text-primary;
+
+        @include respond-desktop-medium() {
+            margin-bottom: 1rem;
+        }
+        @include respond-desktop-vsmall() {
+            display: flex;
+            // justify-content: center;
+            margin-bottom: 1.5rem;
+        }
     }
     &__list {
         display: flex;
         align-items: center;
+
+        @include respond-desktop-medium() {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        @include respond-desktop-vsmall() {
+            flex-direction: row;
+            align-items: center;
+        }
     }
     &__item {
         display: flex;
         align-items: center;
-        font-size: 1.8rem;
+        font-size: 1.6rem;
         color: $color-secondary;
+        cursor: pointer;
     }
     &__item:not(:first-of-type) {
         margin-left: 2rem;
+        @include respond-desktop-medium() {
+            margin-left: 0;
+        }
+        @include respond-desktop-vsmall() {
+            margin-left: 2rem;
+        }
     }
     &__item:not(:last-of-type) {
         margin-right: 2rem;
+        @include respond-desktop-medium() {
+            margin-right: 0;
+            margin-bottom: .7rem;
+        }
+        @include respond-desktop-vsmall(){
+            margin-right: 2rem;
+            margin-bottom: 0;
+        }
     }
     &__divider {
         border-left: 1px solid $color-primary;
         height: 2rem;
+
+        @include respond-desktop-medium() {
+            height: 0;
+            border-left: none;
+        }
+        @include respond-desktop-vsmall() {
+            border-left: 1px solid $color-primary;
+            height: 2rem;
+        }
     }
 
     &__icon {
@@ -81,42 +142,504 @@
     }
 
     &__id-card {
-        height: 3.4rem;
+        height: 2.5rem;
         width: 3.4rem;
         margin-right: 1.2rem;
+        @include respond-desktop-medium() {
+            width: 3rem;
+            margin-right: 1.2rem;
+        }
     }
     &__interim {
         height: 2.5rem;
         width: 2.5rem;
         margin-right: .8rem;
+
+        @include respond-desktop-medium() {
+            margin-right: 1.7rem;
+        }
     
     }
     &__location {
         height: 2.3rem;
         width: 2.3rem;
         margin-right: .4rem;
+
+        @include respond-desktop-medium() {
+            margin-right: 1.9rem;
+            margin-top: .2rem;
+        }
     }
 }
 
 .search {
     display: flex;
-    background-color: #F3F3F3;
-    padding: 1.5rem 2rem;
-    margin-right: calc(var(--page-padding) + 15rem);
-
+    background-color: #f5f5f5;
+    padding: 1.3rem 2rem;
+    border: 1px solid #E3E3E3;
+    border-radius: 3px ;
 
     &__field:not(:first-of-type) {
         margin-left: 2rem;
     }
 
     &__label {
-        font-size: 1.4rem;
-        margin-bottom: .5rem;
+        font-size: 1.3rem;
+        margin-bottom: .7rem;
     }
 
     &__input {
         width: 20rem;
-        padding: .8rem .4rem;
+        padding: .6rem .4rem;
+        border-color: #E3E3E3;
+
+
+        &:focus {
+            border-color: #E3E3E3;
+            outline: none;
+        }
+    }
+
+    @include respond-desktop-medium() {
+        align-self: flex-end;
+    }
+    @include respond-desktop-vsmall() {
+        align-self: auto;
     }
 }
 
+/* ABOUT SECTION */
+.about {
+    display: flex;
+    background-color: #F3F3F3;
+    padding-top: $padding-section--m;
+    padding-bottom: $padding-section--m;
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        margin: 0 auto;
+    }
+
+    &__title-wrapper {
+        display: flex;
+        align-items: center;
+        margin-bottom: 3.5rem;
+
+    }
+
+    &__title {
+        font-size: 2.2rem;
+        font-weight: 400;
+        color: $color-secondary;
+
+        @include respond-desktop-vsmall() {
+            font-size: 2rem;
+        }
+    }
+
+    &__image {
+        height: 4rem;
+        width: 4rem;
+        margin-right: 3rem;
+    }
+
+    &__description {
+        width: 100rem;
+        font-size: 1.8rem;
+        line-height: 3.5rem;
+        text-align: center;
+
+        @include respond-desktop-small() {
+            width: 90rem;
+        }
+        @include respond-desktop-vsmall() {
+            width: 85rem;
+            font-size: 1.7rem;
+        }
+        @include respond-tablet() {
+            width: 70rem;
+            font-size: 1.65rem;
+            line-height: 2.8rem;
+        }
+    }
+    // Button wrapper found in components/buttons.scss
+}
+
+/* FEATURED JOBS SECTION */
+// Card styling in _job-card.scss
+.featured-jobs {
+    padding-top: $padding-section--m;
+    padding-bottom: $padding-section--l;
+
+    &__header {
+        margin-bottom: 4rem;
+    }
+    &__title {
+        font-size: 2.2rem;
+    }
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        padding: 0 var(--page-padding--m);
+
+        @include respond-desktop-large() {
+            padding: 0 var(--page-padding--s);
+        }
+        @include respond-desktop-small() {
+            padding: 0 var(--page-padding--m);
+        }
+        @include respond-tablet() {
+            padding: 0 5rem;
+
+        }
+        @include respond-tablet-small() {
+            align-items: center;
+        }
+        
+    }
+
+    &__jobs-list {
+        display: flex;
+        justify-content: space-between;
+        @include respond-desktop-small() {
+            justify-content: space-around;
+        }
+        @include respond-tablet-small() {
+            flex-direction: column;
+        }
+        
+    }
+
+
+}
+
+/* WHY US SECTION */
+.why-us {
+    // why-us section layout defined in _page-grid.scss
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: $padding-section--m;
+    padding-bottom: $padding-section--l;
+    background-color: #F3F3F3;
+
+
+    &__title {
+        margin-bottom: 6rem;
+        font-size: 2.2rem;
+        font-weight: 400;
+        color: $color-secondary;
+    }
+}
+
+.why-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 40rem;
+    padding: 0 5rem;
+
+    &__image {
+        position:relative;
+        height: 20rem;
+        width: 20rem;
+        margin-bottom: 3rem;
+
+        border-radius: 100%;
+        border: 1px solid #0000001a;
+        background-image: url('/src/assets/select.png');
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+
+        &-2 {
+            background-image: url('/src/assets/jj.jpg');
+
+        }
+    }
+    
+    &__title {
+        margin-bottom: 3rem;
+        font-size: 1.8rem;
+        font-weight: 400;
+        color: $color-secondary;
+    }
+
+    &__text {
+        font-size: 1.3rem;
+        font-weight: 400;
+        line-height: 1.8rem;
+        text-align: center;
+    }
+
+    &-wrapper {
+        display: flex;
+
+    }
+}
+
+/* TESTIMONIAL SECTION */
+.testimonials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 70vh;
+
+    &__content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    &__cards {
+        display: flex;
+        justify-content: center;
+    }
+
+    &__quote {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        top: -8rem;
+        width: 80rem;
+        height: 10rem;
+        padding: 3rem;
+        background-color: $color-logo;
+        font-size: 1.6rem;
+        color: $color-white;
+
+        @include respond-desktop-small() {
+            width:70rem;
+        }
+
+        @include respond-tablet() {
+            left: 8rem;
+            top: -13rem;
+            width: 40rem;
+            height: auto;
+        }
+    
+        &-triangle {
+            position: absolute;
+            bottom: -1.5rem;
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 20px solid $color-logo;
+        }
+    }
+}
+
+.testimonial {
+    display: flex;
+    align-items: flex-end;
+    width: 40rem;
+    padding: 5rem 2rem 3.5rem 2rem;
+    background-color: white;
+
+    &-3 {
+        @include respond-desktop-small() {
+            display: none;
+        }
+    }
+
+    &-2 {
+        @include respond-tablet() {
+            display: none;
+        }
+    }
+    &:not(:first-of-type) {
+        margin-left: 5rem;
+    }
+
+    &__image {
+        width: 11rem;
+        height: 11rem;
+        border-radius: 50%;
+        border: 2px solid #0000001a;
+
+        &-1{
+            background-image: url('/src/assets/julian.jpg');
+            background-size:cover;
+        }
+        &-2 {
+            background-image: url('/src/assets/fi.jpg');
+            background-size: cover;
+        }
+        &-3 {
+            background-image: url('/src/assets/rumbo.jpg');
+            background-size: cover;
+        }
+    }
+
+    &__details {
+        margin-left: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    &__name {
+        font-size: 1.4rem;
+    }
+
+    &__company {
+        font-size: 1.8rem;
+        color: $color-secondary;
+    }
+    &__highlight {
+        height: 2rem;
+        width: 100%;
+        background-color: $color-secondary;
+    }
+}
+
+/* FOOTER */
+
+.footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    background-color: $color-logo;
+    color: $color-white;
+    
+
+    &__content {
+        border: 1px solid green;
+        display: flex;
+        justify-content: center;
+        height: 100%;
+        padding: $padding-section;
+        font-size: 1.4rem;
+
+        @include respond-tablet() {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+
+    &__details {
+        display: flex;
+        flex-direction: column;
+        width: 30rem;
+        padding: 3.5rem 2.8rem;
+        line-height: 1.8rem;
+        background-color:  #556B83;
+
+        @include respond-tablet() {
+            flex-direction: row;
+            width: 50rem;
+            margin-bottom: 1rem;
+        }
+    }
+        &__address, &__phone {
+            margin-bottom: 1.2rem;
+        }
+        &__address, &__phone {
+            display: flex;
+        }
+        &__address-icon, 
+        &__phone-icon,
+        &__email-icon {
+            display: flex;
+            margin-right: 1.5rem;
+        }
+        &__address-svg, 
+        &__phone-svg,
+        &__email-svg {
+            fill: $color-secondary-highlight;
+            width: 2rem;
+            height: 2rem;
+        }
+
+        &__phone-column {
+            // Width set so the phone numbers can be aligned with space-between
+            width: 68%;
+            margin-top: .1rem;
+
+            @include respond-tablet() {
+                width: 100%;
+            }
+        }
+        &__phone-row {
+            display: flex;
+            justify-content: space-between;
+        }
+        &__phone-label {
+            margin-right: 1rem;
+        }
+
+        &__email {
+            display: flex;
+        }
+
+        &__phone-email-wrapper {
+            @include respond-tablet() {
+                margin-left: 6rem;
+
+            }
+        }
+
+    &__contact {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 60rem;
+        padding: 3rem 2.8rem;
+        margin-left: 5rem;
+        background-color:  #556B83;
+
+        @include respond-tablet() {
+            margin-left: 0;
+            width: 50rem;
+        }
+
+        &-row {
+            display: flex;
+
+            &:not(&--message){
+                margin-bottom: 1rem;
+            }
+            &--message {
+                flex-grow: 1;
+            }
+        }
+    }
+    &__contact-item {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+        &:not(:first-of-type) {
+            margin-left: 3rem;
+        }
+    }
+
+    &__email-label, 
+    &__subject-label,
+    &__message-label {
+        margin-bottom: .5rem;
+    }
+
+    &__input {
+        background-color: #667C94;
+        border: 1px solid #56708C;
+        padding: .6rem .4rem;
+        
+        &--message {
+            height: 100%;
+            background-color: $color-logo;
+            border: 1px solid #56708C;
+        }
+    }
+
+    &__copyright {
+        width: 100%;
+        height: 4rem;
+        background-color:  #556B83;
+    }
+}

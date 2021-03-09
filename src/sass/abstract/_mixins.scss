@@ -3,3 +3,28 @@
 @mixin respond-phone {
     @media (max-width: 750px) { @content };
 }
+
+@mixin respond-desktop-large {
+    @media (max-width: 1700px) { @content };
+}
+
+@mixin respond-desktop-medium {
+    @media (max-width: 1500px) { @content };
+
+}
+
+@mixin respond-desktop-small {
+    @media (max-width: 1350px) { @content };
+}
+
+@mixin respond-desktop-vsmall {
+    @media (max-width: 1200px) { @content };
+}
+
+@mixin respond-tablet {
+    @media (max-width: 1050px) { @content };
+}
+
+@mixin respond-tablet-small {
+    @media (max-width: 950px) { @content };
+}

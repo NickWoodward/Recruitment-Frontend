@@ -3,6 +3,7 @@
     z-index: -1;
 
     &-wrapper {
+        border:1px solid red;
         position: relative;
         height: 100vh;
         overflow-y: auto;
@@ -27,7 +28,7 @@
          * Because the pseudo-element is further away, it appears to move more slowly */
         transform: translateZ(-1px) scale(1.5);
         /* Force the background image to fill the whole element. */
-        // background-size: 100%;
+        background-size: 100%;
         background-repeat: no-repeat;
         /* Keep the image from overlapping sibling elements. */
         z-index: -1;
@@ -39,7 +40,6 @@
 }
 
 .bg1::after {
-    background-color: royalblue;
     background-image: linear-gradient(
         to bottom right,
         rgba(black, .6),
@@ -53,3 +53,8 @@
     background-position: center;
     background-position: 50% 35%;
   }
+
+  .bg2::after {
+    background-image: url('/src/assets/parallax2.jpg');
+  }
+  

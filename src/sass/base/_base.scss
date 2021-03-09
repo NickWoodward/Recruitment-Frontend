@@ -11,7 +11,15 @@
     // --header-height: 8rem;
     --header-height: 11rem;
 
-    --page-padding: 5%;
+    --hero-height: 75%;
+    @include respond-desktop-vsmall() {
+        --hero-height: 70%;
+    }
+
+    --page-padding--s: 5%;
+    --page-padding--m: 10%;
+    --page-padding--l: 12%;
+    --page-padding--content: 15%;
 }
 
 html {

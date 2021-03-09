@@ -12,9 +12,7 @@ import { elementStrings } from "./views/base";
 import "../sass/jobs.scss";
 import '../assets/icons/list-icon-test.svg';
 import '../assets/icons/grid-icon-test.svg';
-import '../assets/icons/identity-card.svg';
-import '../assets/icons/clock.svg';
-import '../assets/icons/location.svg';
+
 // import "../assets/search-jobs.png";
 
 export default class JobsController {

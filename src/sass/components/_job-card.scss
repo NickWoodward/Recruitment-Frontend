@@ -1,4 +1,39 @@
 .job-card {
+    // Featured job card width set explicitly on landing page
+    &--featured {
+        width: 43rem;
+        height: 41rem;
+
+        @include respond-desktop-medium() {
+            width: 38rem;
+            // height: 37rem;
+        }
+        @include respond-desktop-small() {
+            width: 43rem;
+            height: 41rem;
+        }
+        @include respond-desktop-vsmall() {
+            width: 38rem;
+        }
+
+        @include respond-tablet-small() {
+            width: 45rem;
+            height: 38rem;
+            &:not(:last-of-type) {
+                margin-bottom: 5rem;
+            }
+        }
+
+        &-last {
+            @include respond-desktop-small() {
+                display: none;
+            }
+            @include respond-tablet-small() {
+                display: flex;
+            }
+        }
+    }
+
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -42,6 +77,10 @@
             width: 4px;
             background-color: $color-primary;
         }
+
+        &--featured {
+            font-size: var(--job-card-title--featured);
+        }
     }
 
     &__pin {
@@ -55,6 +94,16 @@
 
         &:hover {
             fill: rgb(231, 231, 63);
+        }
+
+        &--featured {
+            width: 1.8rem;
+            height: 1.8rem;
+
+            @include respond-desktop-large() {
+                width: 1.7rem;
+                height: 1.7rem;
+            }
         }
     }
 
@@ -75,6 +124,11 @@
         color: $color-secondary;
         font-size: var(--job-card-wage);
         font-weight: 700;
+
+        &--featured {
+            margin: 0 0 2.3rem 1.8rem;
+            font-size: var(--job-card-wage--featured);
+        }
     }
     &__location {
         padding-left: .2rem;
@@ -82,6 +136,11 @@
         font-size: var(--job-card-location);
         font-weight: 700;
         color: $color-secondary;
+
+        &--featured {
+            margin: 1.7rem 0 .8rem 1.8rem;
+            font-size: var(--job-card-location--featured);
+        }
     }
     &__description {
         padding-left: 1rem;
@@ -92,6 +151,10 @@
         font-weight: 400;
         line-height: 2.4rem;
         color: rgb(54, 54, 54);
+
+        &--featured {
+            font-size: var(--job-card-content--featured);
+        }
     }
 
     &__footer {

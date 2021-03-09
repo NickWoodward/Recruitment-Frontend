@@ -1,21 +1,8 @@
-/* HEADER */
-// (16 cols, set the --width to the same as the central grid below it)
+/* HOME PAGE */
 
-.header {
-
-    // &__content {
-    //     flex-basis: 100%;
-    //     justify-content: space-between;
-
-    /* USE TO MAKE HEADER CONTENT ALIGN WITH THE MIDDLE COLUMN OF THE CONTENT */ 
-    //     --gap-constant: .15%;
-    //     --gap: calc((var(--columns, 16) - var(--width, 0)) * var(--gap-constant, 0.3%));
-
-    //     --width: 10;
-    //     --initialbasis: calc(var(--width) / var(--columns) * 100%);
-    //     flex-basis: calc(var(--initialbasis) - var(--gap));
-    //     margin: 0 auto;
-    // }
+.why-card {
+    --initialbasis: calc(var(--width) / var(--columns) * 100%);
+    flex-basis: var(--initialbasis);
 }
 
 /* JOBS PAGE */

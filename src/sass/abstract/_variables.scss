@@ -25,9 +25,12 @@ $height-hero: 75%;
 
 /* WIDTH */
 
+// @TODO: 2 types of padding (css variables and sass vars)
 /* PADDING */
 $padding-page: 5rem;
-$padding-section: 3rem;
+$padding-section: 5rem;
+$padding-section--m: 10rem;
+$padding-section--l: 12rem;
 $padding-mobile-li: 2rem;
 
 /* MARGINS */
