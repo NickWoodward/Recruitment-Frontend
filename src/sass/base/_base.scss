@@ -15,6 +15,9 @@
     @include respond-desktop-vsmall() {
         --hero-height: 70%;
     }
+    @include respond-phone() {
+        --hero-height: 53%;
+    }
 
     --page-padding--s: 5%;
     --page-padding--m: 10%;

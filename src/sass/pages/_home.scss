@@ -65,6 +65,7 @@
 }
 
 .roles {
+    padding: 0 2rem 0 0;
     @include respond-desktop-vsmall() {
         margin-bottom: 2.5rem;
     }
@@ -80,6 +81,9 @@
             display: flex;
             // justify-content: center;
             margin-bottom: 1.5rem;
+        }
+        @include respond-phone() {
+            font-size: 1.6rem;
         }
     }
     &__list {
@@ -101,6 +105,10 @@
         font-size: 1.6rem;
         color: $color-secondary;
         cursor: pointer;
+
+        @include respond-phone() {
+            font-size: 1.5rem;
+        }
     }
     &__item:not(:first-of-type) {
         margin-left: 2rem;
@@ -181,6 +189,15 @@
 
     &__field:not(:first-of-type) {
         margin-left: 2rem;
+
+        @include respond-phone() {
+            margin-left: 0;
+        }
+    }
+    &__field:not(:last-of-type) {
+        @include respond-phone() {
+            margin-bottom: 1rem;
+        }
     }
 
     &__label {
@@ -198,6 +215,10 @@
             border-color: #E3E3E3;
             outline: none;
         }
+
+        @include respond-phone() {
+            width: 100%;
+        }
     }
 
     @include respond-desktop-medium() {
@@ -205,6 +226,12 @@
     }
     @include respond-desktop-vsmall() {
         align-self: auto;
+    }
+    @include respond-phone() {
+        flex-direction: column;
+        width: 100%;
+        padding: 2.5rem 2.5rem;
+
     }
 }
 
@@ -265,6 +292,11 @@
             font-size: 1.65rem;
             line-height: 2.8rem;
         }
+        @include respond-tablet-small() {
+            width: 55rem;
+            font-size: 1.6rem;
+            line-height: 2.5rem;
+        }
     }
     // Button wrapper found in components/buttons.scss
 }
@@ -322,14 +354,25 @@
 .why-us {
     // why-us section layout defined in _page-grid.scss
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-flow: row wrap;
     padding-top: $padding-section--m;
     padding-bottom: $padding-section--l;
+    padding-left: var(--page-padding--m);
+    padding-right: var(--page-padding--m);
+
     background-color: #F3F3F3;
+
+    // @TODO: change to either sass or css vars
+    @include respond-desktop-medium() {
+        padding: $padding-section--m var(--page-padding--s) $padding-section--l var(--page-padding--s) ;
+    }
+    @include respond-desktop-small() {
+        padding: $padding-section--m var(--page-padding--m) $padding-section--l var(--page-padding--m) ;
+    }
 
 
     &__title {
+        text-align: center;
         margin-bottom: 6rem;
         font-size: 2.2rem;
         font-weight: 400;
@@ -337,12 +380,25 @@
     }
 }
 
+// The wrappers are given grid widths, the cards stay centered at a fixed width
+.why-card__wrapper {
+    display: flex;
+    justify-content: center;
+    background-color:   rgb(255, 255, 255);
+
+
+}
 .why-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 40rem;
-    padding: 0 5rem;
+    width: 35rem;
+    padding: 5rem;
+    
+    &:not(:last-of-type) {
+        margin-bottom: 10rem;
+
+    }
 
     &__image {
         position:relative;
@@ -375,11 +431,6 @@
         font-weight: 400;
         line-height: 1.8rem;
         text-align: center;
-    }
-
-    &-wrapper {
-        display: flex;
-
     }
 }
 

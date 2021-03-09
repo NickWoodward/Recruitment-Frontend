@@ -4,6 +4,7 @@ import JRS from './api/jrs';
 
 /* ASSETS */
 import '../sass/index.scss';
+
 import '../assets/hero.webp';
 import '../assets/legal.png';
 import '../assets/search-jobs.png';
