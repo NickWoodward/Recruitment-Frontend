@@ -60,9 +60,6 @@
         color: rgb(221, 221, 221);
         z-index: 1;
 
-        &--login {
-        }
-
         &::before {
             position: absolute;
             content: '';

@@ -15,6 +15,10 @@
             margin-top: 5rem;
         }
     }
+
+    &--admin {
+        margin-top: 5rem;
+    }
 }
 
 .signup-btn {
@@ -47,4 +51,16 @@
         background: $color-logo;
         font-size: 1.5rem;
     }
+}
+
+.create-job-btn {
+    color: $color-white;
+    background: $color-logo;
+    font-size: 1.5rem;
+}
+
+.create-user-btn {
+    color: $color-white;
+    background-color: $color-secondary;
+    font-size: 1.5rem;
 }

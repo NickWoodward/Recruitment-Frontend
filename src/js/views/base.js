@@ -2,7 +2,13 @@ export const elements = {
 
     /* Page Layout */
     body: document.querySelector('body'),
+
+    /* Header */
+
+    /* Index.html */
     parallaxWrapper: document.querySelector('.parallax-wrapper'),
+
+
 
     /* Jobs.html */
     jobsMain: document.querySelector('.jobs__main'),
@@ -21,6 +27,10 @@ export const elements = {
 export const elementStrings = {
     loader: 'loader',
     header: '.header',
+
+    // Header
+    loginLink: '.nav__a--login',
+
 
     // Jobs.html
     // (NB: checkboxAll strings used in classList search so no '.')

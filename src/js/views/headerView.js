@@ -44,7 +44,7 @@ export const renderHeader = (page) => {
 
                 <ul class="nav">
                     <li class="nav__link">
-                        <a href="./about.html" class="nav__a nav__a--about ${page === "about"? "nav__a--active":""}">About</a>
+                        <a href="./admin.html" class="nav__a nav__a--about ${page === "about"? "nav__a--active":""}">About</a>
                     </li>
                     <li class="nav__link">
                         <a href="./jobs.html" class="nav__a nav__a--jobs ${page === "jobs"? "nav__a--active":""}">Find a Job</a>
@@ -66,3 +66,9 @@ export const renderHeader = (page) => {
     
     elements.body.insertAdjacentHTML('afterbegin', markup);
 };
+
+export const addHeaderListeners = ({ renderLogin }) => {
+    const loginLink = document.querySelector('.nav__a--login');
+    
+    loginLink.addEventListener('click', renderLogin);
+}
