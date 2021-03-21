@@ -24,6 +24,20 @@ export const elements = {
     jobsMenuTypes: document.querySelector('.jobs-menu__content--types'),
 
     /* Admin.html */
+    adminMenuItem: document.querySelector('.sidebar__item'),
+
+    adminMenuJobsItem: document.querySelector('.sidebar__item--jobs'),
+    adminMenuJobsLink: document.querySelector('.sidebar__link--jobs'),
+    adminMenuJobsIcon: document.querySelector('.sidebar__icon--jobs'),
+
+    adminMenuUsersItem: document.querySelector('.sidebar__item--users'),
+    adminMenuUsersLink: document.querySelector('.sidebar__link--users'),
+    adminMenuUsersIcon: document.querySelector('.sidebar__icon--users'),
+
+    // adminMenuJobItem: document.querySelector('.sidebar__item--jobs'),
+    // adminMenuJobLink: document.querySelector('.sidebar__link--jobs'),
+    // adminMenuJobIcon: document.querySelector('.sidebar__icon--jobs'),
+
     adminTableWrapper: document.querySelector('.admin__table-wrapper'),
     createUser: document.querySelector('.create-user-btn'),
     createJob: document.querySelector('.create-job-btn'),
@@ -61,5 +75,11 @@ export const elementStrings = {
 
     vacanciesMenu: '.jobs-menu__item--vacancies',
     vacanciesContent: '.jobs-menu__content--vacancies',
+
+
+    /* ADMIN */
+    adminMenuItem: '.sidebar__item',
+
+    adminJobsTable: '.table--jobs',
 
 };

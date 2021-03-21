@@ -3,16 +3,21 @@ import '../sass/common.scss';
 import '../sass/admin.scss';
 
 import * as headerView from './views/headerView';
+import * as adminView from './views/adminView';
 import * as tableView from './views/tableView';
 import * as createUserView from './views/createUserForm';
 import * as createJobView from './views/createJobForm';
+import * as utils from './utils/utils';
 
 import JobList from './models/JobList';
 import UserList from './models/User';
-import { elements } from './views/base';
+
+import { elements, elementStrings } from './views/base';
 
 class AdminController {
     constructor() {
+        this.content = 'jobs';
+
         this.addEventListeners();
 
         // @TODO: Add defaults on the back end?
@@ -25,7 +30,6 @@ class AdminController {
             orderField: "title",
             orderDirection: "ASC"
         };
-
     }
 
     addEventListeners() {
@@ -48,22 +52,30 @@ class AdminController {
                 console.log(e);
             }
 
-            // tableView.renderTable(
-            //     'jobs',
-            //     Object.keys(this.jobs[0]),  // An array of job attributes
-            //     this.jobs,
-            //     elements.adminTableWrapper
-            // );
-            // tableView.renderTable(
-            //     'users',
-            //     Object.keys(this.users[0]),  // An array of job attributes
-            //     this.users,
-            //     elements.adminContent
-            // );
+            this.renderJobsTable();
+
+   
         });
 
         // MODALS
         document.body.addEventListener('click', this.checkModals);
+
+        // MENU LISTENERS
+        elements.adminMenuJobsItem.addEventListener('click', (e) => {
+            // Change the active menu item
+            adminView.changeActiveMenuItem(e);
+
+            // Change the content displayed
+            this.renderJobsTable();
+            
+
+        });
+        elements.adminMenuUsersItem.addEventListener('click', (e) => {
+            adminView.changeActiveMenuItem(e);
+            this.renderUsersTable();
+        });
+
+
 
         // BUTTON LISTENERS
         elements.createUser.addEventListener('click', (e) => {
@@ -100,6 +112,39 @@ class AdminController {
 
     getUsers() {
         return new UserList().getUsers();
+    }
+
+    renderJobsTable() {
+        // If the table doesn't exist
+        if(!document.querySelector(elementStrings.adminJobsTable)) {
+            // Clear the table wrapper
+            utils.clearElement(elements.adminTableWrapper);
+            // Render the table
+            adminView.renderContent(
+                tableView.createTable(
+                    'jobs',
+                    Object.keys(this.jobs[0]),  
+                    this.jobs
+                ),
+                elements.adminTableWrapper
+            );
+        }
+    }
+
+    renderUsersTable() {
+        if(!document.querySelector(elementStrings.adminUsersTable)) {
+             // Clear the table wrapper
+             utils.clearElement(elements.adminTableWrapper);
+             // Render the table
+            adminView.renderContent(
+                tableView.createTable(
+                    'users',
+                    Object.keys(this.users[0]),  
+                    this.users
+                ),
+                elements.adminTableWrapper
+            );
+        }
     }
 }
 

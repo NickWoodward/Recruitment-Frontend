@@ -1,8 +1,8 @@
-.table {
-    &--jobs {
-        width: 50%;
-    }
-}
+// .table {
+    // &--jobs {
+        // width: 50%;
+    // }
+// }
 
 caption {
     text-align: left;
@@ -88,11 +88,11 @@ td:nth-of-type(8)::before {
     th, td {
         display: table-cell;
         text-align: left;
-        padding: 1.8rem 2rem;
+        padding: 1.5rem 2.5rem;
 
     }
     th {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
         font-weight: normal;
 
     }

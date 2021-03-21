@@ -6,12 +6,12 @@
  * @param {*} container 
  */
 
-export const renderTable = (title, theads, rows, container) => {
+export const createTable = (title, theads, rows, container) => {
     const markup = `
         <table class="table table--${title}">
         <caption class="table">${title}</caption>
 
-            <thead>
+            <thead class="thead--${title}">
                 <tr>${theads.map((thead) => `<th>${thead}</th>`).join('')} </tr>
             </thead>
             <tbody>
@@ -22,5 +22,5 @@ export const renderTable = (title, theads, rows, container) => {
         </table>
     `;
 
-    container.insertAdjacentHTML("afterbegin", markup);
+    return markup;
 };
