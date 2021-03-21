@@ -1,4 +1,4 @@
-.login {
+.modal {
     position: fixed;
     display: flex;
     justify-content: center;
@@ -9,8 +9,10 @@
     width: 100%;
 
     background-color: rgba($color-logo, 0.8);
-    z-index: 100;
+    // z-index: 100;
+}
 
+.login, .create-user, .create-job {
     &__content {
         background-color: white;
         padding: 20rem 15rem;

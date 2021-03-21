@@ -50,7 +50,7 @@ export const renderHeader = (page) => {
                         <a href="./jobs.html" class="nav__a nav__a--jobs ${page === "jobs"? "nav__a--active":""}">Find a Job</a>
                     </li>
                     <li class="nav__link">
-                        <a href="#" class="nav__a nav__a--contact">Contact Us</a>
+                        <a href="./contact.html" class="nav__a nav__a--contact">Contact Us</a>
                     </li>
                     <li class="nav__link">
                         <a href="#" class="nav__a nav__a--login">Login</a>

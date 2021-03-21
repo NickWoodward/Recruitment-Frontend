@@ -3,15 +3,39 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Rufina&display=swap" rel="stylesheet"> 
         <title>JRS: Admin</title>
     </head>
     <body>
         <section class="section--first admin-wrapper">
-            <div class="admin-menu"></div>
-            <div class="admin-content">
-                <div class="btn-wrapper btn-wrapper--admin">
-                    <button class="create-user-btn btn">Create User</button>
-                    <button class="create-job-btn btn">Create Job</button>
+            <div class="sidebar">
+                <ul class="sidebar__menu">
+                    <li class="sidebar__item sidebar__item--jobs sidebar__item--active">
+                        <a href="#" class="sidebar__link sidebar__link--active">
+                            <svg class="sidebar__icon sidebar__icon--jobs sidebar__icon--active" aria-hidden="true">
+                                <use xlink:href="svg/spritesheet.svg#location">
+                            </svg>
+                            <div class="sidebar__text">Jobs</div>
+                        </a>
+                    </li>
+                    <li class="sidebar__item sidebar__item--users">
+                        <a href="#" class="sidebar__link">
+                            <svg class="sidebar__icon" aria-hidden="true">
+                                <use xlink:href="svg/spritesheet.svg#permanent">
+                            </svg>
+                            <div class="sidebar__text">Users</div>
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+            <div class="admin__content">
+                <div class="admin__table-wrapper">
+                    <div class="btn-wrapper btn-wrapper--admin">
+                        <button class="create-user-btn btn">Create User</button>
+                        <button class="create-job-btn btn">Create Job</button>
+                    </div>
                 </div>
             </div>
         </section>

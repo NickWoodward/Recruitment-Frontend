@@ -8,8 +8,8 @@
 
 :root {
     --columns: 16;
-    // --header-height: 8rem;
-    --header-height: 11rem;
+    --header-height: 13rem;
+    // --header-height: 11rem;
 
     --hero-height: 75%;
     @include respond-desktop-vsmall() {

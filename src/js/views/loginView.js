@@ -1,10 +1,9 @@
 import { elements } from './base'; 
 
 export const getAction = (e) => {
-    const modal = e.target.closest('.modal');
     const submit = e.target.closest('.login__submit');
     // Background or cancel button clicked
-    const cancel = (e.target.closest('.modal') && !e.target.closest('.login__content')) || e.target.closest('.login__cancel');
+    const cancel = !e.target.closest('.login__content') || e.target.closest('.login__cancel');
 
     if(submit) return 'submit';
     if(cancel) return 'cancel';

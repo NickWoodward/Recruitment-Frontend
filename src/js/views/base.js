@@ -22,6 +22,11 @@ export const elements = {
     jobsMenuSalaries: document.querySelector('.jobs-menu__content--salaries'),
     jobsMenuLocations: document.querySelector('.jobs-menu__content--locations'),
     jobsMenuTypes: document.querySelector('.jobs-menu__content--types'),
+
+    /* Admin.html */
+    adminTableWrapper: document.querySelector('.admin__table-wrapper'),
+    createUser: document.querySelector('.create-user-btn'),
+    createJob: document.querySelector('.create-job-btn'),
 };
 
 export const elementStrings = {

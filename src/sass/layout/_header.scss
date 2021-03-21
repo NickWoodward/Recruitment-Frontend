@@ -10,6 +10,9 @@
     height: var(--header-height);
 
     padding: 0 var(--page-padding--l) 0 var(--page-padding--l);
+    &--admin {
+        padding: 0 6rem 0 3.5rem;
+    }
 
     font-size: 1.4rem;
     font-weight: 700;

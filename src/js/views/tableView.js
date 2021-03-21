@@ -9,6 +9,8 @@
 export const renderTable = (title, theads, rows, container) => {
     const markup = `
         <table class="table table--${title}">
+        <caption class="table">${title}</caption>
+
             <thead>
                 <tr>${theads.map((thead) => `<th>${thead}</th>`).join('')} </tr>
             </thead>

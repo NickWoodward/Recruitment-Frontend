@@ -8,7 +8,8 @@ module.exports = {
         index: './src/js/index.js',
         about: './src/js/about.js',
         admin: './src/js/admin.js',
-        jobs: './src/js/jobs.js'
+        jobs: './src/js/jobs.js',
+        contact: './src/js/contact.js'
     },
     module: {
         rules: [
@@ -56,6 +57,11 @@ module.exports = {
             filename: 'jobs.html',
             template: './src/jobs.html',
             chunks: ['jobs', 'common']
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'contact.html',
+            template: './src/contact.html',
+            chunks: ['contact', 'common']
         }),
         new SpriteLoaderPlugin(),
     ]
