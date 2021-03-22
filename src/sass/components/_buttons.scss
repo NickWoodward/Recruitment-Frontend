@@ -46,6 +46,12 @@
     }
 }
 
+.cancel-btn {
+    &--warn {
+        margin-left: 2rem;
+    }
+}
+
 .contact-btn {
     &--about {
         color: $color-white;
@@ -64,4 +70,30 @@
     color: $color-white;
     background-color: $color-secondary;
     font-size: 1.5rem;
+}
+
+.edit-btn {
+    &--table {
+        display: flex;
+        margin-left: auto;
+        width: 3rem;
+        height: 3rem;
+        fill: $color-primary;
+        cursor: pointer;
+    }
+}
+.delete-btn {
+    &--table {
+        display: flex;
+        margin-left: auto;
+        width: 3rem;
+        height: 3rem;
+        fill: $color-secondary;
+        cursor: pointer;
+
+    }
+    &--warn {
+        color: $color-white;
+        background-color: $color-secondary;
+    }
 }

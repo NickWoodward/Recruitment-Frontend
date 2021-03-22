@@ -81,5 +81,13 @@ export const elementStrings = {
     adminMenuItem: '.sidebar__item',
 
     adminJobsTable: '.table--jobs',
+    adminUsersTable: '.table--users',
 
+    
+    /* TABLES */
+    editJobsBtn: '.edit-btn--table',
+    deleteJobsBtn: '.delete-btn--table',
+
+    editUsersBtn: '.edit-btn--table',
+    deleteUsersBtn: '.delete-btn--table',
 };

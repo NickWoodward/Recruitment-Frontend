@@ -1,6 +1,8 @@
 /* ASSETS */
 import '../sass/common.scss';
 import '../sass/admin.scss';
+import '../assets/icons/edit-solid.svg';
+import '../assets/icons/delete-solid.svg';
 
 import * as headerView from './views/headerView';
 import * as adminView from './views/adminView';
@@ -52,9 +54,7 @@ class AdminController {
                 console.log(e);
             }
 
-            this.renderJobsTable();
-
-   
+            this.renderJobsTable();   
         });
 
         // MODALS
@@ -73,6 +73,8 @@ class AdminController {
         elements.adminMenuUsersItem.addEventListener('click', (e) => {
             adminView.changeActiveMenuItem(e);
             this.renderUsersTable();
+            // Add table listeners
+            adminView.addTableListeners(e, ()=>console.log('delete'), ()=>console.log('edit'));
         });
 
 
@@ -115,6 +117,23 @@ class AdminController {
     }
 
     renderJobsTable() {
+        const editBtn = [
+            'edit', 
+            `<div class="edit-btn edit-btn--table">
+                <svg class="edit-icon">
+                    <use xlink:href="svg/spritesheet.svg#edit-solid">
+                </svg>
+            </div>`
+        ]
+        const deleteBtn = [
+            'delete', 
+            `<div class="delete-btn delete-btn--table">
+                <svg class="delete-icon">
+                    <use xlink:href="svg/spritesheet.svg#delete-solid">
+                </svg>
+            </div>`
+        ]
+
         // If the table doesn't exist
         if(!document.querySelector(elementStrings.adminJobsTable)) {
             // Clear the table wrapper
@@ -124,7 +143,9 @@ class AdminController {
                 tableView.createTable(
                     'jobs',
                     Object.keys(this.jobs[0]),  
-                    this.jobs
+                    this.jobs,
+                    false,
+                    [editBtn, deleteBtn]
                 ),
                 elements.adminTableWrapper
             );
@@ -132,15 +153,34 @@ class AdminController {
     }
 
     renderUsersTable() {
+        const editBtn = [
+            'edit', 
+            `<div class="edit-btn edit-btn--table">
+                <svg class="edit-icon">
+                    <use xlink:href="svg/spritesheet.svg#edit-solid">
+                </svg>
+            </div>`
+        ]
+        const deleteBtn = [
+            'delete', 
+            `<div class="delete-btn delete-btn--table">
+                <svg class="delete-icon">
+                    <use xlink:href="svg/spritesheet.svg#delete-solid">
+                </svg>
+            </div>`
+        ]
+
         if(!document.querySelector(elementStrings.adminUsersTable)) {
              // Clear the table wrapper
              utils.clearElement(elements.adminTableWrapper);
-             // Render the table
+            // Render the table
             adminView.renderContent(
                 tableView.createTable(
                     'users',
                     Object.keys(this.users[0]),  
-                    this.users
+                    this.users,
+                    false,
+                    [editBtn, deleteBtn]
                 ),
                 elements.adminTableWrapper
             );

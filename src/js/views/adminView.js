@@ -1,4 +1,5 @@
 import { elements, elementStrings } from './base';
+import * as utils from '../utils/utils';
 
 export const renderContent = (content, container) => {
     container.insertAdjacentHTML('afterbegin', content);
@@ -22,4 +23,36 @@ export const changeActiveMenuItem = (e) => {
             item.childNodes[1].classList.remove('sidebar__link--active');
         }
     });
+}
+
+export const addTableListeners = (e, deleteUser, editUser) => {
+    // const jobsTable = e.target.closest('.table--jobs');
+    const usersTable = e.target.closest('.table--users');
+
+    const deleteUserButtons = document.querySelectorAll(elementStrings.deleteUsersBtn);
+
+    deleteUserButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Create delete modal
+            const warningModal = utils.warn(
+                'Are you sure you want to delete this user?',
+                ['delete', 'cancel']
+            );
+            // Insert the delete modal
+            document.body.insertAdjacentHTML('afterbegin', warningModal);
+    
+            // Select and add listeners 
+            const modal = document.querySelector('.modal--warn');
+            
+            modal.addEventListener('click', (e) => {
+                const confirmDelete = e.target.closest('.delete-btn--warn');
+                const cancel = e.target.closest('.cancel-btn--warn') || !e.target.closest('.modal__content');
+    
+                if(confirmDelete) deleteUser();
+                if(cancel) utils.removeElement(modal);
+            });
+        });
+    })
+    
+    // document.querySelector(elementStrings.editUsersBtn).addEventListener('click', cb2);
 }
