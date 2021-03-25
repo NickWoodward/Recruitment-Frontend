@@ -39,7 +39,7 @@ export const elements = {
     // adminMenuJobIcon: document.querySelector('.sidebar__icon--jobs'),
 
     adminTableWrapper: document.querySelector('.admin__table-wrapper'),
-    createUser: document.querySelector('.create-user-btn'),
+    deleteUser: document.querySelector('.delete-user-btn'),
     createJob: document.querySelector('.create-job-btn'),
 };
 

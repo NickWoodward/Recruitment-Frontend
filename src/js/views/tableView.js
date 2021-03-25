@@ -30,7 +30,7 @@ export const createTable = (title, theads = [], rows, displayIndex = false, rowC
                         const cols = [...Object.entries(row), ...rowControls];
                         
                         return (
-                                `<tr data-id=${row.id}> 
+                                `<tr class="table-row table-row--${title}" data-id=${row.id}> 
                                     ${cols
                                         .map(([title, value], index) => {
                                             // skip the id col

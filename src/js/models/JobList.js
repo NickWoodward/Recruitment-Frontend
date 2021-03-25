@@ -2,7 +2,6 @@ import JRS from '../api/jrs';
 
 export default class JobList {
 
-
     getJobs({ 
         limit, 
         index,
