@@ -1,9 +1,14 @@
 import { elements, elementStrings } from './base';
 import * as utils from '../utils/utils';
 import * as userForm from './userForm';
+import * as jobForm from './jobForm';
+
 
 export const renderContent = (content, container) => {
-    container.insertAdjacentHTML('afterbegin', content);
+    content.forEach(item => {
+        container.insertAdjacentHTML('beforeend', item);
+
+    });
 };
 
 export const changeActiveMenuItem = (e) => {
@@ -24,32 +29,63 @@ export const changeActiveMenuItem = (e) => {
     });
 }
 
-export const addUserTableListeners = (e) => {
-    const deleteUserButtons = document.querySelectorAll(elementStrings.deleteUsersBtn);
-    const editUserButtons = document.querySelectorAll(elementStrings.editUsersBtn);
+export const addTableListeners = (type) => {
+    const deleteButtons = type==='jobs'? 
+                            document.querySelectorAll(elementStrings.deleteJobsBtn):
+                            document.querySelectorAll(elementStrings.deleteUsersBtn);
 
-    deleteUserButtons.forEach(button => {
+    const editButtons = type==='users'?
+                            document.querySelectorAll(elementStrings.editUsersBtn):
+                            document.querySelectorAll(elementStrings.editJobsBtn);
+
+
+
+    // Row buttons
+    deleteButtons.forEach(button => {
         button.addEventListener('click', (e) => {
-            const user = getUser(e);
-            if(user)
-                displayModal('delete', user);
+            const item = type==='jobs'? getJob(e): getUser(e);
+            if(item) {
+                // Change the display info for the modal based on the table
+                const modalParams = type === 'jobs'? [item.id, item.title]: [item.id, `${item.fName} ${item.lName}`];
+                displayModal('delete', type, modalParams);
+            }
+        });
+    });
+    editButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const item = type==='jobs'? getJob(e): getUser(e);
+            if(item)
+                if(type === 'jobs') {
+                    jobForm.renderJobForm(e, 'edit', item)
+                } else {
+                    userForm.renderUserForm(e, 'edit', item);
+                }
         });
     });
 
-    editUserButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            const user = getUser(e);
-            if(user)
-                userForm.renderUserForm(e, 'edit', user);
-        });
-    });
+    // Table controls
+    if(type === 'jobs') {
+        document.querySelector('.create-job-btn')
+        .addEventListener('click', (e) => {
+            jobForm.renderJobForm(e, 'create')
+        })
+    } else if (type === 'users') {
+        document.querySelector('.create-user-btn')
+            .addEventListener('click', (e) => {
+                userForm.renderUserForm(e, 'create')
+            })
+    }
 }
 
+// This is for the warning modal
 export const getAction = (e) => {
-    const confirm = e.target.closest(`.delete-btn--warn`);
+    const confirmJob = e.target.closest(`.delete-btn--jobs`);
+    const confirmUser = e.target.closest(`.delete-btn--users`);
+    // @TODO: This logic doesn't work
     const cancel = e.target.closest('.cancel-btn--warn') || !e.target.closest('.modal__content');
 
-    if(confirm) return 'delete';
+    if(confirmJob) return 'deleteJob';
+    if(confirmUser) return 'deleteUser';
     if(cancel) return 'cancel';
 }
 
@@ -58,6 +94,7 @@ const getUser = (e) => {
     const row = e.target.closest('.table-row');
     let user = {};
     if(row) {
+        console.log(row.dataset.id)
         user.id = row.dataset.id;
         user.fName = row.querySelector('.td--firstName').innerText;
         user.lName = row.querySelector('.td--lastName').innerText;
@@ -67,13 +104,27 @@ const getUser = (e) => {
     return user;
 }
 
+const getJob = (e) => {
+    const row = e.target.closest('.table-row');
+    let job = {};
+    if(row) {
+        job.id = row.dataset.id;
+        job.title = row.querySelector('.td--title').innerText;
+        job.wage = row.querySelector('.td--wage').innerText;
+        job.location = row.querySelector('.td--location').innerText;
+        job.description = row.querySelector('.td--description').innerText;
+    }
+    return job;
+}
+
 // @TODO: move to modal module
-const displayModal = (type, user) => {
+const displayModal = (action, type, item) => {
     // Create modal and insert into DOM
     const warningModal = utils.warn(
-        `Are you sure you want to ${type} ${user.fName} ${user.lName} (id: ${user.id})?`,
-        [`${type}`, 'cancel'],
-        user.id
+        `Are you sure you want to ${action} ${item[1]} (id: ${item[0]})?`,
+        [`${action}`, 'cancel'],
+        type,
+        item[0]
     );
     document.body.insertAdjacentHTML('afterbegin', warningModal);
 };

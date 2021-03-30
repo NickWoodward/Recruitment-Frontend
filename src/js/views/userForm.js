@@ -67,7 +67,7 @@ export const renderUserForm = (e, type, data) => {
                             <input class="user-form__input--confirm user-form__input" id="user-form__input--confirm" type="file"/>
                         </div>
 
-                        <button class="user-form__submit user-form__submit--${type}" ${type === 'edit'? `data-id= ${data.id}`: ''}">Submit</button>
+                        <button class="user-form__submit user-form__submit--${type}" ${type === 'edit'? `data-id= ${data.id}`: ''}>Submit</button>
                         <button class="user-form__cancel user-form__cancel--${type}">Cancel</button>
                     </form>
                 

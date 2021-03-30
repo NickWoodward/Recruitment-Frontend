@@ -23,6 +23,18 @@ export default class JobList {
         });
     }
 
+    createJob(job) {
+        return JRS.post('/jobs/create', job);
+    }
+
+    deleteJob(id) {
+        return JRS.delete(`/jobs/delete/${id}`);
+    }
+
+    editJob(id, job) {
+        return JRS.post(`/jobs/edit/${id}`, job);
+    }
+
     // Get unique entries for Job attributes (to be made into filter options)
     getMenuData() {
         return JRS.get('/jobs/menudata', {

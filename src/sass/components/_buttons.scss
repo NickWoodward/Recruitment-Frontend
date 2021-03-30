@@ -18,6 +18,8 @@
     }
 
     &--admin {
+        display: flex;
+        justify-content: flex-end;
         margin-top: 5rem;
     }
 }
@@ -66,7 +68,7 @@
     font-size: 1.5rem;
 }
 
-.create-user-btn {
+.create-user-btn, .create-job-btn {
     color: $color-white;
     background-color: $color-secondary;
     font-size: 1.5rem;
