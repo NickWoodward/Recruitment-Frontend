@@ -1,8 +1,8 @@
-// .table {
-    // &--jobs {
-        // width: 50%;
-    // }
-// }
+.table {
+    &--jobs, &--users {
+        width: 150rem;
+    }
+}
 
 caption {
     text-align: left;

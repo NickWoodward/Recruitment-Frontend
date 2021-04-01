@@ -35,7 +35,7 @@
     &__menu-wrapper,
     &__wrapper,
     &__aside {
-        --gap-constant: .15%;
+        --gap-constant: .12%;
         --gap: calc((var(--columns, 16) - var(--width, 0)) * var(--gap-constant, 0.3%));
 
         --initialbasis: calc(var(--width) / var(--columns) * 100%);
@@ -46,10 +46,10 @@
         --width: 16;    
     }
     &__menu-wrapper {
-        --width: 3.5;
+        --width: 2.5;
     }
     &__wrapper {
-        --width: 9;
+        --width: 9.5;
     }
     &__aside {
         --width: 3.5;

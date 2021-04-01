@@ -1,8 +1,8 @@
 import { elementStrings } from './base';
 
-export const renderLoader = parent => {
+export const renderLoader = (parent, type) => {
     const loader = `
-        <div class="${elementStrings.loader}">
+        <div class="${elementStrings.loader} ${elementStrings.loader}--${type}">
             <svg>
                 <use href="svg/spritesheet.svg#loader"></use>
             </svg>

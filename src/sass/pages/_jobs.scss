@@ -16,7 +16,7 @@
     justify-content: space-between;
     min-height: 100%;
     width: calc(100% - var(--page-padding) * 2);
-    padding-top: 6rem;
+    // padding-top: 6rem;
  
 }
 
@@ -25,6 +25,7 @@
 .jobs__menu-wrapper {
     display: flex;
     justify-content: center;
+    background-color: $color-logo;
 }
 
 .jobs-menu {
@@ -32,59 +33,81 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
+    padding-top: 2rem;
+    // For the icons
+    fill: $color-secondary-highlight;
+
     
     &__item {
         // position for stacking context (prevent collapsed list items covering submenus below)
         position: relative;
         width: 100%;
-        border-bottom: 1px solid $color-jobs-background;
+        // border-bottom: 1px solid $color-secondary-highlight;
+
+
     }
 
     &__title {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        height: 6rem;
-        padding-left: 2rem;
-        padding-right: 1.5rem;
-        background-color: rgb(211, 211, 211);
+        justify-content: flex-start;
+        
+        padding: 2.5rem 0 2.5rem 3rem;
 
-        font-weight: 700;
-        font-size: var(--menu-title); 
-        color: $color-secondary;
+        font-size: 1.6rem;
+        color: $color-white;
         cursor: pointer;
+
+        &--active {
+            background-color: $color-secondary-highlight;
+            color: #042950;
+            fill: #042950;
+        }
     }   
+    &__title-text{
+        margin-left: 2rem;
+    }
+    &__title-icon {
+        height: 2rem;
+        width: 2rem;
+
+        &--active {
+            transform:rotate(90deg);
+        }
+    }
     
     &__count {
         display: flex;
         justify-content: center;
         align-items: center;
-        color: rgb(117,53,53);
+        color: $color-secondary-highlight;
         font-size: var(--tiny);
         width: 2rem;
         height: 1.7rem;
         border-radius: 20%;
         margin-left: auto;
+        display: none;
     }
     
     &__content {
-        display: none;
+        // display: none;
         flex-direction: column;
         align-items: center;
-        margin-bottom: .8rem;
-
-        max-height: 0;
-        opacity: 0;
-
-        background-color: rgb(231, 231, 231);
-
+        // padding-bottom: 3rem;
+        // padding-top: 2.2rem;
+        height: 0px;
+        // max-height: 0;
+        // opacity: 0;
+        visibility: hidden;
         font-size: var(--menu-content);
         
         &--open {
             display: flex;
             max-height: 100%;
-            opacity: 1;
+            // opacity: 1;
         }
+
+
     }
 
     &__input-wrapper {
@@ -92,16 +115,12 @@
         align-items: center;
         justify-content: flex-start;
         width: 100%;
-        padding: 1.7rem 2.1rem 1.7rem 2rem;
-        border-bottom: 3px solid $color-jobs-background;
-
-        &--all {
-            border-top:3px solid $color-jobs-background;
-        }
+        padding: 1rem 3.5rem 1rem 3rem;
+        color: $color-white;
     }
 
     &__description {
-        margin-left: 1.2rem;
+        margin-left: 2rem;
     }
 }
 
@@ -169,7 +188,8 @@
 }
 
 .jobs__wrapper {
-    padding-bottom: 5rem;
+    padding-top: 6rem;
+    padding-bottom: 10rem;
 }
 
 .jobs__grid {
@@ -192,6 +212,8 @@
     flex-flow: row wrap;
     align-content: flex-start;
     justify-content: center;
+    padding-top: 6rem;
+    padding-right: 5rem;
 }
 
 .jobs__blog-title {

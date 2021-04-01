@@ -12,6 +12,7 @@ import { elementStrings } from "./views/base";
 import "../sass/jobs.scss";
 import '../assets/icons/list-icon-test.svg';
 import '../assets/icons/grid-icon-test.svg';
+import '../assets/icons/arrow-right.svg';
 
 // import "../assets/search-jobs.png";
 
@@ -65,7 +66,8 @@ export default class JobsController {
 
         // Menu Accordion
         elements.jobsMenu.addEventListener("click", (e) => {
-            jobsMenuView.toggleMenu(e);
+            // jobsMenuView.toggleMenu(e);
+            jobsMenuView.toggleMenuAnimated(e);
         });
 
         // Job Controls
@@ -123,10 +125,8 @@ export default class JobsController {
     }
 
     getJobs() {
-        console.log(this.searchOptions);
         this.JobList.getJobs(this.searchOptions)
             .then(({ data, data: { jobs, totalJobs, message } } = {}) => {
-                console.log(data);
                 this.totalJobs = totalJobs;
                 this.searchOptions.index += this.limit;
                 // Passing the index to the render and animate functions allow gsap to animate only the most recent elements added to the page
@@ -143,7 +143,7 @@ export default class JobsController {
     initialiseJobsMenu() {
         // Insert loader while data is retrieved
         elements.jobsMenuContents.forEach((item) => {
-            loader.renderLoader(item);
+            loader.renderLoader(item, 'jobs-menu');
         });
 
         this.JobList.getMenuData()
@@ -155,6 +155,7 @@ export default class JobsController {
 
                 // Render content
                 jobsMenuView.populateMenu(items);
+                jobsMenuView.animateMenu();
 
                 // Store menu items in the controller & add to the suggested search arrays
                 this.menuItems.titles = items.uniqueTitles;

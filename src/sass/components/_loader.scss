@@ -10,6 +10,10 @@
     transform-origin: 44% 50%;
 
     animation: rotate 1.5s infinite linear;
+
+    &--jobs-menu {
+      fill: $color-secondary-highlight;
+    }
 }
 
 @keyframes rotate {

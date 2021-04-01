@@ -4,7 +4,6 @@ import { gsap } from 'gsap';
 var tl;
 
 export const animateJobs = (batchNum) => {
-    console.log('animate');
     // Use autoAlpha to stop FOUC
     // tl.from(elements.jobsMain, { ease: 'linear', autoAlpha: 0})
     // .from('.logo--header', {duration: 3.5})

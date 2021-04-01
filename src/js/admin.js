@@ -30,7 +30,7 @@ class AdminController {
         // Search options for jobs query
         this.searchOptions = {
             index: 0,
-            limit: 4,
+            limit: 6,
             titles: [],
             locations: [],
             orderField: "title",
