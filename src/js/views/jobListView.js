@@ -12,7 +12,7 @@ export const animateJobs = (batchNum) => {
     // .from('.tagline__sub', {duration:1}, "<.05")
     // .from('.tagline__date', {y:80, duration: 1.3}, "<.24")
 
-    tl.from(`.job-card-${batchNum}`, { opacity: 0, transformOrigin: "50% 50%", stagger: { amount: 1.6 }, ease: 'ease-out'})
+    tl.from(`.job-card-${batchNum}`, { opacity: 0, transformOrigin: "50% 50%", stagger: { amount: 2.6 }, ease: 'ease-out'})
         .from('.box', {opacity: 0, transformOrigin: "50% 50%", ease: "ease-out"}, "<");
 
 }
