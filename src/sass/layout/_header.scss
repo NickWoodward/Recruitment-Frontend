@@ -9,6 +9,9 @@
     width: 100%;
     height: var(--header-height);
 
+    // Visibility initially hidden before gsap loads
+    visibility: hidden;
+
     padding: 0 var(--page-padding--l) 0 var(--page-padding--l);
     &--admin, &--jobs {
         padding: 0 6rem 0 3.5rem;

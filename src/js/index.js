@@ -1,4 +1,5 @@
 import * as headerView from './views/headerView';
+import * as homeView from './views/homeView';
 import JRS from './api/jrs';
 
 import { elementStrings } from './views/base';
@@ -20,10 +21,25 @@ import '../assets/icons/ios-location.svg';
 import '../assets/icons/ios-telephone.svg';
 import '../assets/icons/ios-email.svg';
 
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
+
+// Register ScrollTrigger
+gsap.registerPlugin(ScrollTrigger);
+
+
+
 class IndexController {
     constructor() {
+
+
         this.User = new User();
         this.addEventListeners();
+        // homeView.test();
+        console.log(ScrollTrigger);
+        gsap.from('.about__title', {
+            duration: 3, x: '-500px', ease: 'linear', scrollTrigger:'.about__title'
+          });
     }
 
     addEventListeners() {

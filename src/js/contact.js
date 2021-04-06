@@ -1,22 +1,20 @@
 import * as headerView from './views/headerView'; 
 import UserModel from './models/User';
+import * as homeView from './views/homeView';
 
 // import '../sass/common.scss';
-import '../sass/contact.scss';
+import '../sass/index.scss';
 import axios from 'axios';
 
 class ContactController {
     constructor() {
         this.UserModel = new UserModel();
+
         headerView.renderHeader('contact');
-        this.test();
+        homeView.loadedAnimation();
+        homeView.initParallax();
     }
 
-    test() {
-    
-
-
-    }
 
     // getUsers() {
     //     return axios.get('http://localhost:8080/users/all', {headers: { 'Content-Type':  'application/json' }});

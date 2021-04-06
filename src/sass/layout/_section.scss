@@ -1,10 +1,4 @@
-// #TODO: apply to all page sections
 .section--first {
     padding-top: var(--header-height);
 }
 
-.section {
-    position: relative;
-    // Height might be needed if parallax effect breaks
-    // height: 100vh;
-}

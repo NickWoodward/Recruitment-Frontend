@@ -1,4 +1,3 @@
-import { elements } from './base';
 import { gsap } from 'gsap';
 
 var tl;
