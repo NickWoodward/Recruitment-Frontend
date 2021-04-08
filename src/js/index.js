@@ -41,8 +41,9 @@ class IndexController {
             }
             headerView.renderHeader('index');
             headerView.addHeaderListeners(cbs);
-            homeView.loadedAnimation();
-
+            homeView.loadingAnimation();
+            homeView.initialiseScrollAnimations();
+            homeView.initParallax();
 
             // Separated from the renderHeader method for page resizing
             headerView.setParallaxHeaderWidth();

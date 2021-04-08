@@ -2,6 +2,7 @@ import * as headerView from "./views/headerView";
 import * as JobListView from "./views/jobListView";
 import * as jobsMenuView from "./views/jobsMenuView";
 import * as loader from "./views/loader";
+import * as utils from "./utils/utils";
 
 import JobList from "./models/JobList";
 
@@ -49,9 +50,10 @@ export default class JobsController {
     }
 
     addEventListeners() {
-        window.addEventListener("DOMContentLoaded", () =>
-            headerView.renderHeader("jobs")
-        );
+        window.addEventListener("DOMContentLoaded", () => {
+            utils.pageFadeIn();
+            headerView.renderHeader("jobs");
+        });
 
         // #TODO: Debounce / change to GSAP
         window.addEventListener("scroll", (e) => {

@@ -34,6 +34,8 @@ body {
     font-weight: 400;
     box-sizing: border-box;
     height: 100%;
+    // For page fade in/animation
+    visibility: hidden;
 }
 
 main {

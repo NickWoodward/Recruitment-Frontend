@@ -42,6 +42,7 @@ class AdminController {
 
         // ONLOAD
         window.addEventListener('DOMContentLoaded', async e => {
+            utils.pageFadeIn();
             // Render Header
             headerView.renderHeader("admin")
         

@@ -11,7 +11,7 @@ class ContactController {
         this.UserModel = new UserModel();
 
         headerView.renderHeader('contact');
-        homeView.loadedAnimation();
+        homeView.loadingAnimation();
         homeView.initParallax();
     }
 

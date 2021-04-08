@@ -1,3 +1,5 @@
+import { gsap } from 'gsap';
+
 export const clearElement = (element) => {
     while(element.firstChild) element.removeChild(element.firstChild);
 }
@@ -21,3 +23,7 @@ export const warn = (message, controls, type, data) => {
     `;
     return markup;
 }
+
+export const pageFadeIn = () => {
+    return gsap.from('body', { autoAlpha: 0, ease: 'linear', duration: .5 });
+  }

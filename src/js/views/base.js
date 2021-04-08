@@ -50,6 +50,9 @@ export const elementStrings = {
     // Header
     loginLink: '.nav__a--login',
 
+    // Home
+    viewJobBtn: '.job-card__view-btn',
+
 
     // Jobs.html
     // (NB: checkboxAll strings used in classList search so no '.')
