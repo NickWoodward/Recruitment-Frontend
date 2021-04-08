@@ -34,7 +34,7 @@ export const renderJobs = (jobs, element, batchNum) => {
 
 const renderJob = ({id, title, wage, location, description}, element, batchNum) => {
     const markup =            
-    `<div class="job-card job-card-${batchNum}">
+    `<div class="job-card job-card-${batchNum}" data-id=${id}>
         <div class="job-card__title-wrapper">
             <h3 class="job-card__title">${title}</h3> 
             <div class="job-card__pin">
@@ -45,7 +45,6 @@ const renderJob = ({id, title, wage, location, description}, element, batchNum) 
             </div>
         </div>
         <div class="job-card__content">
-        ${id}
             <div class="job-card__location">${location}</div>
             <div class="job-card__wage">£${wage} per annum</div> 
             <div class="job-card__description">${description}</div>

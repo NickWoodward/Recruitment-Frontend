@@ -23,6 +23,10 @@ export default class JobList {
         });
     }
 
+    getJob(id) {
+        return JRS.get(`jobs/${id}`);
+    }
+
     createJob(job) {
         return JRS.post('/jobs/create', job);
     }

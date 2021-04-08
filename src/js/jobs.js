@@ -1,4 +1,5 @@
 import * as headerView from "./views/headerView";
+import * as jobView from "./views/jobView";
 import * as JobListView from "./views/jobListView";
 import * as jobsMenuView from "./views/jobsMenuView";
 import * as loader from "./views/loader";
@@ -94,6 +95,20 @@ export default class JobsController {
             // Return the suggestions to unfiltered menu items
             this.searchSuggestions.titles = this.menuItems.titles;
         });
+
+        // Job Details Modal 
+        document.body.addEventListener('click', (e) => {
+            const viewJobBtn = e.target.closest(elementStrings.viewJobBtn);
+            if(viewJobBtn) {
+                const jobCard = viewJobBtn.closest(elementStrings.jobCard);
+                this.JobList.getJob(jobCard.dataset.id)
+                .then(job => {
+                    jobView.renderJobDetails(job, elements.jobsContent);
+                })
+                .catch(err => console.log(err));
+            }
+        });
+
 //         elements.jobsSort.addEventListener('change', e => {
 
 // ******START HERE

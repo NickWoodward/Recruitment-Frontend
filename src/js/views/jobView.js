@@ -1,9 +1,11 @@
-export const renderJobDetails = (job) => {
+export const renderJobDetails = (job, container) => {
     const markup = `
         <div class="modal job-details">
-            ${job}
+            <div class="job-details__content">
+                
+            </div>
         </div>
     `;
 
-    body.insertAdjacentHTML('afterbegin', markup);
+    container.insertAdjacentHTML('afterbegin', markup);
 }

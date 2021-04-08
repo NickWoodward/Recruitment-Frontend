@@ -14,6 +14,7 @@ export const elements = {
     jobsMain: document.querySelector('.jobs__main'),
     jobsGrid: document.querySelector('.jobs__grid'),
     jobsMenu: document.querySelector('.jobs-menu'),
+    jobsContent: document.querySelector('.jobs__content'),
 
     jobsSort: document.querySelector('.sort'),
     jobsTitleSearch: document.querySelector('.search-input--title'),
@@ -56,6 +57,8 @@ export const elementStrings = {
 
     // Jobs.html
     // (NB: checkboxAll strings used in classList search so no '.')
+    jobCard: '.job-card',
+
     jobsMenuCheckbox: '.jobs-menu__checkbox',
 
     titlesCheckbox: '.jobs-menu__titles-checkbox',
