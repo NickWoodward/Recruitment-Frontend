@@ -1,11 +1,12 @@
 import * as headerView from './views/headerView';
 import * as homeView from './views/homeView';
-import JRS from './api/jrs';
 
-import { elementStrings } from './views/base';
+import { elements } from './views/base';
 import * as loginView from './views/loginView';
+import * as jobsListView from './views/jobListView';
 
 import User from './models/User';
+import JobList from './models/JobList';
 
 /* ASSETS */
 import '../sass/index.scss';
@@ -17,15 +18,17 @@ import '../assets/search-jobs.png';
 import '../assets/icons/permanent.svg';
 import '../assets/icons/clock.svg';
 import '../assets/icons/location.svg';
-import '../assets/icons/ios-location.svg';
 import '../assets/icons/ios-telephone.svg';
 import '../assets/icons/ios-email.svg';
+import '../assets/icons/sterling.svg';
+import '../assets/icons/location-solid.svg';
+import '../assets/icons/clock-solid.svg';
 
 
 class IndexController {
     constructor() {
 
-
+        this.JobList = new JobList();
         this.User = new User();
         this.addEventListeners();
         // homeView.initParallax();
@@ -47,6 +50,8 @@ class IndexController {
 
             // Separated from the renderHeader method for page resizing
             headerView.setParallaxHeaderWidth();
+
+            this.getFeaturedJobs();
         });  
 
         // RESIZE
@@ -99,6 +104,20 @@ class IndexController {
                 
             }
         });
+    }
+
+    getFeaturedJobs() {
+        this.JobList
+            .getFeaturedJobs()
+            .then(res => { 
+                // @TODO: add loader
+                if(res.data)
+                    jobsListView.renderJobs(res.data.jobs, elements.featuredJobsList, true);
+                    homeView.featuredAnimation();
+            })
+            .catch(err => {
+                console.log(err);
+            });
     }
 }
 

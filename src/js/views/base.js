@@ -7,7 +7,7 @@ export const elements = {
 
     /* Index.html */
     parallaxWrapper: document.querySelector('.parallax-wrapper'),
-
+    featuredJobsList: document.querySelector('.featured-jobs__jobs-list'),
 
 
     /* Jobs.html */

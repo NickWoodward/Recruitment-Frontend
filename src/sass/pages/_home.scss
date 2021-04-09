@@ -183,7 +183,7 @@
 
 .search {
     display: flex;
-    background-color: #f5f5f5;
+    background-color: rgb(245, 247, 250);
     padding: 1.3rem 2rem;
     border: 1px solid #E3E3E3;
     border-radius: 3px ;
@@ -239,7 +239,7 @@
 /* ABOUT SECTION */
 .about {
     display: flex;
-    background-color: #F3F3F3;
+    background-color: rgb(245, 247, 250);
     padding-top: $padding-section--m;
     padding-bottom: $padding-section--m;
 
@@ -318,7 +318,7 @@
     &__content {
         display: flex;
         flex-direction: column;
-        padding: 0 var(--page-padding--m);
+        padding: 0 var(--page-padding--l);
 
         @include respond-desktop-large() {
             padding: 0 var(--page-padding--s);
@@ -361,7 +361,7 @@
     padding-left: var(--page-padding--m);
     padding-right: var(--page-padding--m);
 
-    background-color: #F3F3F3;
+    background-color: rgb(245, 247, 250);
 
     // @TODO: change to either sass or css vars
     @include respond-desktop-medium() {
@@ -389,11 +389,15 @@
 
 }
 .why-card {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 35rem;
+    width: 45rem;
     padding: 5rem;
+    background-color: white;
+    border: none;
+    box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
     
     &:not(:last-of-type) {
         margin-bottom: 10rem;

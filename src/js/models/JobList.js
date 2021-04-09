@@ -23,6 +23,10 @@ export default class JobList {
         });
     }
 
+    getFeaturedJobs() {
+        return JRS.get(`jobs/featured`);
+    }
+
     getJob(id) {
         return JRS.get(`jobs/${id}`);
     }

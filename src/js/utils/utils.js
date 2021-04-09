@@ -26,4 +26,18 @@ export const warn = (message, controls, type, data) => {
 
 export const pageFadeIn = () => {
     return gsap.from('body', { autoAlpha: 0, ease: 'linear', duration: .5 });
-  }
+}
+
+export const limitText = (text, limit = 30) => {
+    const newText = [];
+    if(text.length < limit) return text;
+
+    text.split(' ').reduce((acc, current) => {
+        if(acc + current.length <= limit) {
+            newText.push(current);
+        }
+        return acc + current.length +1;
+    }, 0);
+
+    return `${newText.join(' ')}...`;
+};

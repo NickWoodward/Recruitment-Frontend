@@ -6,6 +6,17 @@ import * as utils from '../utils/utils';
 // Register ScrollTrigger
 gsap.registerPlugin(ScrollTrigger);
 
+
+////////// ANIMATIONS + PARALLAX //////////
+
+export const initialiseScrollAnimations = () => {
+  // Featured animation can't be called until after the api call
+  aboutAnimation();
+  whyUsAnimation();
+  testimonialAnimation();
+  footerAnimation();
+};
+
 export const loadingAnimation = () => {
     const tl = gsap.timeline({ 
       defaults: { opacity: 0, ease: 'back' }, 
@@ -41,14 +52,6 @@ const searchAnimation = () => {
     return tl;
 };
 
-export const initialiseScrollAnimations = () => {
-  aboutAnimation();
-  featuredAnimation();
-  whyUsAnimation();
-  testimonialAnimation();
-  footerAnimation();
-};
-
 const aboutAnimation = () => {
   const tl = gsap.timeline({ 
     defaults: {
@@ -69,7 +72,7 @@ const aboutAnimation = () => {
   return tl;
 };
 
-const featuredAnimation = () => {
+export const featuredAnimation = () => {
   const tl = gsap.timeline({ 
     defaults: { opacity: .2},
     scrollTrigger: {

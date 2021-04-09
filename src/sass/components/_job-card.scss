@@ -1,8 +1,8 @@
 .job-card {
     // Featured job card width set explicitly on landing page
     &--featured {
-        width: 43rem;
-        height: 41rem;
+        width: 65rem;
+        height: 33rem;
 
         @include respond-desktop-medium() {
             width: 38rem;
@@ -37,7 +37,6 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    // height: 36rem; // For 3 cards
     height: 45rem;
 
     
@@ -58,25 +57,14 @@
             justify-content:  space-between;
             height: 5.5rem;
             margin-top: 2.5rem;
-            padding-left: 2rem;
-
-            background-color: $color-primary;
-
+            margin-bottom: .8rem;
+            padding: 0 3.5rem;
         }
 
-        color: white;
+        color: $color-secondary;
         font-weight: 400;
         font-size: var(--job-card-title);  
 
-        &::before {
-            position: absolute;
-            content: '';
-            left: -4px;
-            top: 0;
-            height: 100%;
-            width: 4px;
-            background-color: $color-primary;
-        }
 
         &--featured {
             font-size: var(--job-card-title--featured);
@@ -89,8 +77,7 @@
         align-items: center;
         width: 2rem;
         height: 2rem;
-        margin-right: 2rem;
-        fill: $color-secondary-highlight;
+        fill: $color-logo;
 
         &:hover {
             fill: rgb(231, 231, 63);
@@ -112,41 +99,74 @@
     &__content {
         display: flex;
         flex-direction: column;
-        padding-left: 1rem;
-        padding-right: 1.5rem;
-
+        padding: 0 4rem;
         flex-grow: 1;
     }
 
     &__wage {
-        margin: 0 0 2.5rem 1.8rem;
-        padding-left: .2rem;
-        color: $color-secondary;
-        font-size: var(--job-card-wage);
-        font-weight: 700;
+        display: flex;
+        align-items: center;
 
+        color: $color-text-primary;
+        font-size: var(--job-card-wage);
+        font-weight: 400;
+        margin-bottom: .5rem;
+
+        &-icon {
+            display: flex;
+            height: 1.6rem;
+            width: 1.6rem;
+            margin-left: .2rem;
+            margin-right: 1.7rem;
+            fill: rgb(44, 44, 44);
+        }
         &--featured {
-            margin: 0 0 2.3rem 1.8rem;
             font-size: var(--job-card-wage--featured);
         }
     }
     &__location {
-        padding-left: .2rem;
-        margin: 2.2rem 0 .8rem 1.8rem;
+        display: flex;
+        align-items: center;
+
         font-size: var(--job-card-location);
-        font-weight: 700;
-        color: $color-secondary;
+        font-weight: 400;
+        color: $color-text-primary;
+        margin-bottom: .5rem;
+
+        &-icon {
+            height: 2rem;
+            width: 1.9rem;
+            margin-right: 1.5rem;
+
+        }
 
         &--featured {
-            margin: 1.7rem 0 .8rem 1.8rem;
             font-size: var(--job-card-location--featured);
         }
     }
+    &__extra {
+
+        display: flex;
+        align-items: center;
+        font-size: var(--job-card-extra);
+        font-weight: 400;
+        color: $color-text-primary;
+        margin-bottom: 2rem;
+        &-icon {
+            height: 2rem;
+            width: 2rem;
+            margin-right: 1.5rem;
+        }
+
+        &--featured {
+            font-size: var(--job-card-extra--featured);
+        }
+    }
+    &__position, &__PQE {
+        margin-left: 2rem;
+    }
+
     &__description {
-        padding-left: 1rem;
-        padding-right: 2.4rem;
-        margin-left: 1rem;
-        border-left: 1px solid $color-primary;
         font-size: var(--job-card-content);
         font-weight: 400;
         line-height: 2.4rem;
@@ -158,17 +178,32 @@
     }
 
     &__footer {
-        height: 6rem;
+        display: flex; 
+        align-items: center;
+        justify-content: space-between;
         width: 100%;
-        padding-left: 1.5rem;
+        padding-left: 3rem;
+        padding-bottom: 3rem;
+        padding-right: 4rem;
+    }
+    &__btn-wrapper {
+        display: flex;
     }
 
-    &__view-btn {
+    &__view-btn, &__apply-btn {
         display: block;
-        padding: 1.3rem 2rem;
-        background-color: $color-primary;
-        color: white;
+        padding: 1.2rem 2rem;
+        background-color: white;
+        border: 1px solid $color-logo;
+        // color: $color-logo;
         font-size: var(--base-size);
     }
+    &__apply-btn{ margin-left: 2rem; }
+
+    &__date {
+        // align-self: flex-end;
+        font-size: 1.4rem;
+    }
+    
 }
 
