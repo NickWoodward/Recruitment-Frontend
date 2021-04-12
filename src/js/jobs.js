@@ -96,17 +96,31 @@ export default class JobsController {
             this.searchSuggestions.titles = this.menuItems.titles;
         });
 
-        // Job Details Modal 
+        // Open Job Details Modal 
         document.body.addEventListener('click', (e) => {
             const viewJobBtn = e.target.closest(elementStrings.viewJobBtn);
             if(viewJobBtn) {
                 const jobCard = viewJobBtn.closest(elementStrings.jobCard);
                 this.JobList.getJob(jobCard.dataset.id)
                 .then(job => {
-                    jobView.renderJobDetails(job, elements.jobsContent);
+                    if(job)
+                        jobView.renderJobDetails(job.data.job, elements.jobsMain);
                 })
                 .catch(err => console.log(err));
             }
+        });
+
+        // Handle Modal Events
+        document.body.addEventListener('click', (e) => {
+            const modal = e.target.closest('.modal');
+            if(modal) {
+                switch(jobView.getAction(e)) {
+                    case 'apply': console.log('apply'); break;
+                    case 'cancel': utils.removeElement(modal); break;
+                }
+            }
+            // Re-enable scrolling
+            document.body.style.overflow = "auto";
         });
 
 //         elements.jobsSort.addEventListener('change', e => {
@@ -147,8 +161,8 @@ export default class JobsController {
                 this.totalJobs = totalJobs;
                 this.searchOptions.index += this.limit;
                 // Passing the index to the render and animate functions allow gsap to animate only the most recent elements added to the page
-                JobListView.renderJobs(jobs, elements.jobsGrid, this.searchOptions.index);
-                JobListView.animateJobs(this.searchOptions.index);
+                JobListView.renderJobs(jobs, elements.jobsGrid, false, this.searchOptions.index);
+                // JobListView.animateJobs(this.searchOptions.index);
             })
             .catch((err) => console.log(err));
     }

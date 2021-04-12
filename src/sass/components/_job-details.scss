@@ -1,10 +1,63 @@
 .job-details {
-    position: absolute;
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     top: 0;
     left: 0;
-    height: 100%;
+    // height: calc(100vh - var(--header-height));
+    height: 100vh;
     width: 100%;
+    // margin-top: var(--header-height);
 
-    background-color: rgba($color-logo, .9);
+    background-color: rgba(51, 51, 51, 0.9);
     z-index: 100;
+
+    &__content {
+        // margin-top: calc(2rem + var(--header-height));
+        box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+        width: 50%;
+    }
+    
+    &__title {
+        padding: 4rem 8rem;
+
+        font-size: 2rem;
+        color: $color-secondary;
+        background-color: white;
+    }
+
+    &__row {
+        display: flex;
+        justify-content: space-between;
+        padding: 2.5rem 8rem;
+        background-color: rgb(249, 250, 251);
+        font-size: 1.6rem;
+
+
+        &:nth-child(odd) {
+            background-color: white;
+        }
+
+        &--btns {
+            justify-content: flex-start;
+            padding: 4rem 8rem;
+        }
+        
+    }
+    &__label {
+        // color: grey;
+        // font-weight: 700;
+    }
+    &__value {
+        flex-basis: 70%;
+    }
+    &__btn {
+        background-color: white;
+        border: 1px solid $color-logo;
+
+        &:first-of-type {
+            margin-right: 3rem;
+        }
+    }
 }

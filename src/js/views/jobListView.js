@@ -33,7 +33,7 @@ export const renderJobs = (jobs, element, batchNum = 0) => {
 }
 
 const renderJob = ({id, title, wage, location, description}, element, featured, batchNum) => {
-    description = featured? utils.limitText(description, 168): utils.limitText(description, 40);
+    description = featured? utils.limitText(description, 168): utils.limitText(description, 168);
     // const markup =            
     // `<div class="job-card job-card-${batchNum} ${featured? 'job-card--featured':''}" data-id=${id}>
     //     <div class="job-card__title-wrapper">
@@ -102,6 +102,7 @@ const renderJob = ({id, title, wage, location, description}, element, featured, 
 
 
     element.insertAdjacentHTML('beforeend', markupFeatured);
+
 }
 
 export const clearJobs = (element) => {

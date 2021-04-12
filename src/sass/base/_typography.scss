@@ -27,23 +27,23 @@
         --job-card-title--featured: 1.5rem;
     }
 
-    --job-card-content: 1.6rem;
+    --job-card-content: 1.5rem;
     --job-card-content--featured: 1.5rem;
     @include respond-desktop-medium() {
         --job-card-content--featured: 1.4rem;
     }
 
-    --job-card-location: 1.65rem;
+    --job-card-location: 1.7rem;
     --job-card-location--featured: 1.7rem;
     @include respond-desktop-medium() {
         --job-card-location--featured: 1.45rem;
     }
-    --job-card-wage: 1.65rem;
+    --job-card-wage: 1.7rem;
     --job-card-wage--featured: 1.7rem;
     @include respond-desktop-medium() {
         --job-card-wage--featured: 1.45rem;
     }
-    --job-card-extra: 1.65rem;
+    --job-card-extra: 1.7rem;
     --job-card-extra--featured: 1.7rem;
     @include respond-desktop-medium() {
         --job-card-extra--featured: 1.45rem;

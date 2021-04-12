@@ -10,6 +10,7 @@ import * as adminView from './views/adminView';
 import * as tableView from './views/tableView';
 import * as userForm from './views/userForm';
 import * as jobForm from './views/jobForm';
+import * as jobView from './views/jobView';
 import * as utils from './utils/utils';
 
 import JobList from './models/JobList';
@@ -55,7 +56,7 @@ class AdminController {
             this.JobList.getJobs(this.searchOptions)
                 .then(res => {
                     if(res.data.jobs) {
-                        this.jobs = res.data.jobs.map(({id, title, wage, location, description, createdAt}) => ({id, title, wage, location, description, createdAt}));
+                        this.jobs = res.data.jobs.map(({featured, id, title, wage, location, description, createdAt}) => ({featured, id, title, wage, location, description, createdAt}));
                         this.renderJobsTable();   
                         adminView.addTableListeners('jobs');
                     }
@@ -126,6 +127,11 @@ class AdminController {
                                         modal.parentElement.removeChild(modal);
                                         break;
                 }
+            } else if(e.target.closest('.job-details')){
+                switch(jobView.getAction(e)) {
+                    case 'apply': console.log('apply'); break;
+                    case 'cancel': utils.removeElement(modal); break;
+                }
             }
         }
     }
@@ -162,7 +168,7 @@ class AdminController {
             })
             .then(res => {
                 if(res) {
-                    this.jobs = res.data.jobs;
+                    this.jobs = res.data.jobs(({featured, id, title, wage, location, description, createdAt}) => ({featured, id, title, wage, location, description, createdAt}));;
                     // Clear table
                     utils.clearElement(elements.adminTableWrapper);
                     // Render table
@@ -317,6 +323,7 @@ class AdminController {
         if(!document.querySelector(elementStrings.adminJobsTable)) {
             // Clear the table wrapper
             utils.clearElement(elements.adminTableWrapper);
+            console.log(this.jobs);
             // Render the table
             adminView.renderContent(
                 [

@@ -4,12 +4,12 @@
     }
 }
 
-caption {
-    text-align: left;
-    padding: 2rem 1rem;
-    font-size: 2.2rem;
-    color: $color-secondary;
-}
+// caption {
+//     text-align: left;
+//     padding: 2rem 1rem;
+//     font-size: 2.2rem;
+//     color: $color-secondary;
+// }
 
 table, thead, tbody, th, td, tr {
     display: block;
@@ -33,11 +33,12 @@ tr {
     padding: 2rem;
 }
 
-tr:nth-child(even) {
-    background-color: #eee;
+tbody tr:nth-child(odd) {
+    background-color: rgb(249, 250, 251);
 }
+
 thead tr {
-    background-color: $color-logo;
+    background-color: white;
 }
 
 th, td {
@@ -79,7 +80,7 @@ td:nth-of-type(8)::before {
 @media (min-width: 600px) {
     thead tr {
         position: static;
-        color: rgb(255, 255, 255);
+        color: $color-secondary;
 
     }
     thead, tbody {
@@ -88,16 +89,18 @@ td:nth-of-type(8)::before {
     th, td {
         display: table-cell;
         text-align: left;
-        padding: 1.5rem 2.5rem;
-
+        padding: 2rem 2.5rem;
+        text-transform:initial;
     }
     th {
-        font-size: 1.6rem;
-        font-weight: normal;
-
+        font-size: 1.5rem;
+        font-weight: 700;
+        padding: 3rem 2.5rem;
     }
     tr {
+        position: relative;
         display: table-row;
+        cursor: pointer;
     }
     table {
         display: table;

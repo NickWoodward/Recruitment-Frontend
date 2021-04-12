@@ -29,13 +29,12 @@
 /* JOBS PAGE */
 // (16 cols, 2 rows)
 
-
-.jobs { // .jobs__content is the flex container
+.jobs { // .jobs__main is the flex container
+    // &__aside, 
     &__topbar,
     &__menu-wrapper,
-    &__wrapper,
-    &__aside {
-        --gap-constant: .12%;
+    &__wrapper{
+        --gap-constant: 0.4%;
         --gap: calc((var(--columns, 16) - var(--width, 0)) * var(--gap-constant, 0.3%));
 
         --initialbasis: calc(var(--width) / var(--columns) * 100%);
@@ -46,12 +45,12 @@
         --width: 16;    
     }
     &__menu-wrapper {
-        --width: 2.5;
+        --width: 3;
     }
     &__wrapper {
-        --width: 9.5;
+        --width: 13;
     }
-    &__aside {
-        --width: 3.5;
-    }
+    // &__aside {
+    //     --width: 16;
+    // }
 }

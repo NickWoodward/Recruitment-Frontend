@@ -14,12 +14,11 @@ export const createTable = (title, theads = [], rows, displayIndex = false, rowC
        
     const markup = `
         <table class="table table--${title}">
-        <caption class="table">${title}</caption>
 
             <thead class="thead--${title}">
                 <tr>${theadArr.map((thead) => {
                     if(thead === 'id' && !displayIndex) return;
-                    return `<th>${thead}</th>`;
+                    return `<th>${thead.toUpperCase()}</th>`;
                 }).join('')} </tr>
             </thead>
             <tbody>
@@ -30,11 +29,11 @@ export const createTable = (title, theads = [], rows, displayIndex = false, rowC
                         const cols = [...Object.entries(row), ...rowControls];
                         
                         return (
-                                `<tr class="table-row table-row--${title}" data-id=${row.id}> 
+                                `<tr class="table-row table-row--${row.id}" data-id=${row.id}> 
                                     ${cols
                                         .map(([title, value], index) => {
                                             // skip the id col
-                                            if(index === 0 && !displayIndex) return; 
+                                            if(title === 'id' && !displayIndex) return; 
                                             return `<td class="td td--${title}">${value}</td>`
                                         }).join('')
                                     }

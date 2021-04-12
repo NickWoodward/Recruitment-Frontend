@@ -2,6 +2,7 @@ import { elements, elementStrings } from './base';
 import * as utils from '../utils/utils';
 import * as userForm from './userForm';
 import * as jobForm from './jobForm';
+import { renderJobDetails } from './jobView';
 
 
 export const renderContent = (content, container) => {
@@ -34,11 +35,9 @@ export const addTableListeners = (type) => {
                             document.querySelectorAll(elementStrings.deleteJobsBtn):
                             document.querySelectorAll(elementStrings.deleteUsersBtn);
 
-    const editButtons = type==='users'?
-                            document.querySelectorAll(elementStrings.editUsersBtn):
-                            document.querySelectorAll(elementStrings.editJobsBtn);
-
-
+    const editButtons = type==='jobs'?
+                            document.querySelectorAll(elementStrings.editJobsBtn):
+                            document.querySelectorAll(elementStrings.editUsersBtn);
 
     // Row buttons
     deleteButtons.forEach(button => {
@@ -61,6 +60,17 @@ export const addTableListeners = (type) => {
                     userForm.renderUserForm(e, 'edit', item);
                 }
         });
+    });
+
+    // Row links
+    const table = document.querySelector('.table');
+    if(table) table.addEventListener('click', (e) => {
+        // If a row was clicked but not the edit or delete buttons
+        const row = e.target.closest('.table-row') && (!e.target.closest('.td--edit') && !e.target.closest('.td--delete'));
+        if(row) {
+            const job = getJob(e);
+            if(type === 'jobs') renderJobDetails(job, elements.adminContent);
+        }
     });
 
     // Table controls
@@ -94,7 +104,6 @@ const getUser = (e) => {
     const row = e.target.closest('.table-row');
     let user = {};
     if(row) {
-        console.log(row.dataset.id)
         user.id = row.dataset.id;
         user.fName = row.querySelector('.td--firstName').innerText;
         user.lName = row.querySelector('.td--lastName').innerText;

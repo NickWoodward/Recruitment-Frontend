@@ -36,8 +36,9 @@
 
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    height: 45rem;
+    // Width matches grid col width
+    width: 100%;
+    height: 33rem;
 
     
     @supports not (display: grid) {

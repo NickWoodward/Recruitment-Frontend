@@ -25,6 +25,8 @@ export const elements = {
     jobsMenuTypes: document.querySelector('.jobs-menu__content--types'),
 
     /* Admin.html */
+    adminContent: document.querySelector('.admin__content'),
+
     adminMenuItem: document.querySelector('.sidebar__item'),
 
     adminMenuJobsItem: document.querySelector('.sidebar__item--jobs'),

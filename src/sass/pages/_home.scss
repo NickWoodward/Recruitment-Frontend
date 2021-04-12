@@ -361,7 +361,7 @@
     padding-left: var(--page-padding--m);
     padding-right: var(--page-padding--m);
 
-    background-color: rgb(245, 247, 250);
+    background-color: $color-background;
 
     // @TODO: change to either sass or css vars
     @include respond-desktop-medium() {
