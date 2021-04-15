@@ -9,6 +9,9 @@ export const getAction = (e) => {
 };
 
 export const renderJobDetails = (job, container = document.body, admin) => {
+    const jobCoordinates = calculateJobModalPosition();    
+
+    console.log(jobCoordinates);
     const markup = `
         <div class="modal job-details">
             <div class="job-details__content">
@@ -59,6 +62,27 @@ export const renderJobDetails = (job, container = document.body, admin) => {
     `;
 
     container.insertAdjacentHTML('afterbegin', markup);
+    setJobModalPosition(jobCoordinates.x, jobCoordinates.y);
+
     // Prevent bg scrolling behind modal
     document.body.style.overflow = "hidden";
 }
+
+export const calculateJobModalPosition = () => {
+    // Check for menu on left of screen
+    const menu = document.querySelector('.jobs__menu-wrapper');
+    const header = document.querySelector('.header');
+    // If there's a menu and a header, offset the job modal by their width and height respectively
+    if(menu && header) {
+        const menuStyles = window.getComputedStyle(menu);
+        const headerStyles = window.getComputedStyle(header);
+        return { x: menuStyles.width, y: headerStyles.height }
+    } else {
+        return { x: 0, y: 0 }
+    }
+};
+
+export const setJobModalPosition = (x = 0, y = 0) => {
+    const content = document.querySelector('.job-details__content');
+    content.style.right = x;
+};

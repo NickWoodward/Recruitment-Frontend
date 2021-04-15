@@ -108,8 +108,9 @@ export default class JobsController {
                 const jobCard = viewJobBtn.closest(elementStrings.jobCard);
                 this.JobList.getJob(jobCard.dataset.id)
                 .then(job => {
-                    if(job)
+                    if(job) {
                         jobView.renderJobDetails(job.data.job, elements.jobsMain);
+                    }
                 })
                 .catch(err => console.log(err));
             } else if(applyBtn) {
@@ -157,7 +158,6 @@ export default class JobsController {
                                             forgotPassView.renderForgotModal(); break;
                     }
                 } else if(e.target.closest('.job-details')) {
-                    console.log('job deets');
                     switch(jobView.getAction(e)) {
                         case 'apply'    : modal.parentElement.removeChild(modal); applyView.renderApplyForm(); break;
                         case 'cancel'   : modal.parentElement.removeChild(modal); break;
