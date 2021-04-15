@@ -8,6 +8,11 @@ export const elements = {
     /* Index.html */
     parallaxWrapper: document.querySelector('.parallax-wrapper'),
     featuredJobsList: document.querySelector('.featured-jobs__jobs-list'),
+    signupBtns: document.querySelectorAll('.signup-btn'),
+    browseBtn: document.querySelector('.browse-btn'),
+    contactBtn: document.querySelector('.contact-btn'),
+    footerContent: document.querySelector('.footer__content'),
+    searchInputs: document.querySelectorAll('.search__input'),
 
 
     /* Jobs.html */
@@ -55,6 +60,7 @@ export const elementStrings = {
 
     // Home
     viewJobBtn: '.job-card__view-btn',
+    applyBtn: '.job-card__apply-btn',
 
 
     // Jobs.html

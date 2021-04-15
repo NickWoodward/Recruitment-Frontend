@@ -1,5 +1,9 @@
 import * as headerView from "./views/headerView";
 import * as jobView from "./views/jobView";
+import * as loginView from "./views/loginView";
+import * as applyView from "./views/applyView";
+import * as registerView from "./views/registerView";
+import * as forgotPassView from "./views/forgotPassView";
 import * as JobListView from "./views/jobListView";
 import * as jobsMenuView from "./views/jobsMenuView";
 import * as loader from "./views/loader";
@@ -96,9 +100,10 @@ export default class JobsController {
             this.searchSuggestions.titles = this.menuItems.titles;
         });
 
-        // Open Job Details Modal 
+        // Job Card btns
         document.body.addEventListener('click', (e) => {
             const viewJobBtn = e.target.closest(elementStrings.viewJobBtn);
+            const applyBtn = e.target.closest(elementStrings.applyBtn);
             if(viewJobBtn) {
                 const jobCard = viewJobBtn.closest(elementStrings.jobCard);
                 this.JobList.getJob(jobCard.dataset.id)
@@ -107,16 +112,78 @@ export default class JobsController {
                         jobView.renderJobDetails(job.data.job, elements.jobsMain);
                 })
                 .catch(err => console.log(err));
+            } else if(applyBtn) {
+                const jobCard = applyBtn.closest(elementStrings.jobCard);
+                applyView.renderApplyForm(jobCard.dataset.id);
             }
         });
 
         // Handle Modal Events
-        document.body.addEventListener('click', (e) => {
+        document.body.addEventListener('click', async (e) => {
             const modal = e.target.closest('.modal');
             if(modal) {
-                switch(jobView.getAction(e)) {
-                    case 'apply': console.log('apply'); break;
-                    case 'cancel': utils.removeElement(modal); break;
+                if(e.target.closest('.login')) {
+                    switch(loginView.getAction(e)) {
+                        case 'submit':      try {
+                                                // @TODO: REFRESH TOKENS
+                                                const res = await this.User.login(loginView.getLoginDetails());
+                                                // window.location.replace('http://localhost:8082');
+                                                console.log(res.data.token);
+                                            } catch(error) { 
+                                                if (error.response) {
+                                                    // Server responded with a status code that falls out of the range of 2xx
+                                                    if(!error.response.data.success) 
+                                                        console.log(error.response.data.message);
+
+                                                        // @TODO: REFRESH TOKENS
+                                                        // If the token is invalid send the refresh token
+                                                    
+                                                } else if (error.request) {
+                                                    // The request was made but no response was received
+                                                    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                                                    // http.ClientRequest in node.js
+                                                    console.log(error.request);
+                                                } else {
+                                                    // Something happened in setting up the request that triggered an Error
+                                                    console.log('Error', error.message);
+                                                }
+                                            }
+                                            break;
+                        case 'register':    modal.parentElement.removeChild(modal); 
+                                            registerView.renderRegisterModal();
+                                            break;
+                        case 'cancel':      modal.parentElement.removeChild(modal); break;
+                        case 'forgot':      modal.parentElement.removeChild(modal); 
+                                            forgotPassView.renderForgotModal(); break;
+                    }
+                } else if(e.target.closest('.job-details')) {
+                    console.log('job deets');
+                    switch(jobView.getAction(e)) {
+                        case 'apply'    : modal.parentElement.removeChild(modal); applyView.renderApplyForm(); break;
+                        case 'cancel'   : modal.parentElement.removeChild(modal); break;
+                        case 'sign-in'  : modal.parentElement.removeChild(modal); loginView.renderLogin(); break;  
+                    }
+                } else if(e.target.closest('.apply')) {
+                    switch(applyView.getAction(e)) {
+                        case 'request':     console.log('request'); break;
+                        case 'login':       console.log('login'); break;
+                        case 'forgot':      modal.parentElement.removeChild(modal);
+                                            forgotPassView.renderForgotModal(); break;
+                        case 'register':    modal.parentElement.removeChild(modal);
+                                            registerView.renderRegisterModal(); break;
+                        case 'cancel':      modal.parentElement.removeChild(modal);
+                    }
+                } else if(e.target.closest('.register')) {
+                    switch(registerView.getAction(e)) {
+                        case 'register':    console.log('register'); break; 
+                        case 'cancel':      modal.parentElement.removeChild(modal); break;
+                        case 'sign-in':       modal.parentElement.removeChild(modal); loginView.renderLogin(); break;
+                    }
+                } else if(e.target.closest('.forgot-password')) {
+                    switch(forgotPassView.getAction(e)) {
+                        case 'submit': console.log('submit'); break;
+                        case 'cancel': modal.parentElement.removeChild(modal); break;
+                    }
                 }
             }
             // Re-enable scrolling

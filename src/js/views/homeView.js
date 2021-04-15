@@ -1,10 +1,28 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 
+import { elements } from './base';
 import * as utils from '../utils/utils';
 
 // Register ScrollTrigger
 gsap.registerPlugin(ScrollTrigger);
+
+export const populateSearchInputs = (menuData) => {
+  elements.searchInputs.forEach(input => {
+    if(input.name === 'title') {
+      menuData.uniqueTitles.forEach(title => {
+        const option = new Option(title, title);
+        input.add(option, undefined);
+      });
+    } 
+    if(input.name === 'location') {
+      menuData.uniqueLocations.forEach(location => {
+        const option = new Option(location, location);
+        input.add(option, undefined);
+      });
+    }
+  });
+}
 
 
 ////////// ANIMATIONS + PARALLAX //////////
@@ -169,7 +187,6 @@ export const initParallax = () => {
         // the first image should be positioned against the top. Use px on the animating part to work with GSAP. 
         else {
           section.bg.style.backgroundPosition = "50% 0px"; 
-          console.log(section.querySelector('.hero__tagline'))
 
           gsap.to(section.bg, {
             backgroundPosition: `50% ${innerHeight / 2}px`,

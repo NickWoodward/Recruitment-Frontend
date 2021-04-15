@@ -42,6 +42,7 @@
     align-items: center;
     height: calc(100% - var(--hero-height));
 
+
     @include respond-desktop-vsmall() {
         justify-content: center;
     }
@@ -67,6 +68,8 @@
 
 .roles {
     padding: 0 2rem 0 0;
+    
+
     @include respond-desktop-vsmall() {
         margin-bottom: 2.5rem;
     }
@@ -182,11 +185,13 @@
 }
 
 .search {
+    position: relative;
     display: flex;
-    background-color: rgb(245, 247, 250);
+    align-items: flex-end;
     padding: 1.3rem 2rem;
     border: 1px solid #E3E3E3;
     border-radius: 3px ;
+    background-color: $color-background;
 
     &__field:not(:first-of-type) {
         margin-left: 2rem;
@@ -211,7 +216,6 @@
         padding: .6rem .4rem;
         border-color: #E3E3E3;
 
-
         &:focus {
             border-color: #E3E3E3;
             outline: none;
@@ -220,6 +224,26 @@
         @include respond-phone() {
             width: 100%;
         }
+    }
+
+    &__search-btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 5rem;
+        height: 3rem;
+        padding: .4rem;
+        margin-left: 2rem;
+        margin-bottom: .2rem;
+        // border-radius: 50%;
+        border: 1px solid $color-secondary-highlight;
+        background-color: $color-logo;
+        fill: $color-white;
+        cursor: pointer;
+    }
+    &__search-icon {
+        height: 2rem;
+        width: 2rem;
     }
 
     @include respond-desktop-medium() {
@@ -239,7 +263,7 @@
 /* ABOUT SECTION */
 .about {
     display: flex;
-    background-color: rgb(245, 247, 250);
+    background-color: $color-background;
     padding-top: $padding-section--m;
     padding-bottom: $padding-section--m;
 
@@ -640,6 +664,10 @@
         }
 
     &__contact {
+        &-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
         display: flex;
         flex-direction: column;
         height: 100%;
@@ -691,6 +719,19 @@
             border: 1px solid #56708C;
         }
     }
+
+    &__send-btn {
+        padding: 1rem 1rem;
+        width: 15rem;
+        align-self: flex-end;
+        margin-top: 1rem;
+        margin-left: 5rem;
+        background-color: #556B83;
+        border: 1px solid #56708C;
+
+        color: $color-white;
+    }
+  
 
     &__copyright {
         width: 100%;

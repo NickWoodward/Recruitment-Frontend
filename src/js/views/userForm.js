@@ -29,7 +29,14 @@ export const renderUserForm = (e, type, data) => {
     const markup = `
         <div class="modal user-form user-form--${type}">
             <div class="user-form__content">
-                <div class="user-form__title">${type === 'create'? 'Create': 'Edit'} a User</div>
+                <div class="user-form__header">
+                    <div class="user-form__title">${type === 'create'? 'Create': 'Edit'} a User</div>
+                    <button class="user-form__cancel-btn">
+                        <svg class="user-form__cancel-svg">
+                            <use xlink:href="svg/spritesheet.svg#close-icon">
+                        </svg>
+                    </button> 
+                </div>
                     <form class="user-form__form">
                         <div class="user-form__field">
                             <label class="user-form__label--fname user-form__label" for="user-form__input--fname">First Name</label>
@@ -68,7 +75,6 @@ export const renderUserForm = (e, type, data) => {
                         </div>
 
                         <button class="user-form__submit user-form__submit--${type}" ${type === 'edit'? `data-id= ${data.id}`: ''}>Submit</button>
-                        <button class="user-form__cancel user-form__cancel--${type}">Cancel</button>
                     </form>
                 
             </div>

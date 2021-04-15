@@ -196,8 +196,8 @@
         padding: 1.2rem 2rem;
         background-color: white;
         border: 1px solid $color-logo;
-        // color: $color-logo;
         font-size: var(--base-size);
+        cursor: pointer;
     }
     &__apply-btn{ margin-left: 2rem; }
 

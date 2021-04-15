@@ -23,7 +23,15 @@ export const renderJobForm = (e, type, data) => {
     const markup = `
         <div class="modal job-form job-form--${type}">
             <div class="job-form__content">
+                <div class="job-form__header">
                 <div class="job-form__title">${type === 'create'? 'Create':'Edit'} a Job</div>
+                    <button class="job-form__cancel-btn">
+                        <svg class="job-form__cancel-svg">
+                            <use xlink:href="svg/spritesheet.svg#close-icon">
+                        </svg>
+                    </button>    
+                </div>  
+
                 <form class="job-form__form">
                     <div class="job-form__field">
                         <label class="job-form__label job-form__label--title" for="job-form__input--title">Title: </label>
@@ -42,8 +50,7 @@ export const renderJobForm = (e, type, data) => {
                         <textarea  class="job-form__input--description job-form__input" id="job-form__input--description">${data? data.description: ''}</textarea>
                     </div>
 
-                    <button class="job-form__submit job-form__submit--${type}" ${type === 'edit'? `data-id= ${data.id}`: ''}>Submit</button>
-                    <button class="job-form__cancel job-form__cancel--${type}">Cancel</button>
+                    <button class="job-form__submit job-form__submit--${type}" ${type === 'edit'? `data-id= ${data.id}`: ''}>${type === 'edit'? 'Edit':'Create'}</button>
                 </form>
             </div>
         </div>

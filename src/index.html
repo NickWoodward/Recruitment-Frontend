@@ -68,37 +68,25 @@
                             <div class="search__label">Job Title</div>
                             <select name="title" id="" class="search__input">
                                 <option value="">----</option>
-                                <option value="dog">Dog</option>
-                                <option value="cat">Cat</option>
-                                <option value="hamster">Hamster</option>
-                                <option value="parrot">Parrot</option>
-                                <option value="spider">Spider</option>
-                                <option value="goldfish">Goldfish</option>
+                                <!-- options added in js -->
                             </select>
                         </div>
                         <div class="search__field">
                             <div class="search__label">Salary</div>
                             <select name="salary" id="" class="search__input">
                                 <option value="">----</option>
-                                <option value="dog">Dog</option>
-                                <option value="cat">Cat</option>
-                                <option value="hamster">Hamster</option>
-                                <option value="parrot">Parrot</option>
-                                <option value="spider">Spider</option>
-                                <option value="goldfish">Goldfish</option>
+                                <!-- options added in js -->
                             </select>
                         </div>
                         <div class="search__field">
                             <div class="search__label">Location</div>
                             <select name="location" id="" class="search__input">
                                 <option value="">----</option>
-                                <option value="dog">Dog</option>
-                                <option value="cat">Cat</option>
-                                <option value="hamster">Hamster</option>
-                                <option value="parrot">Parrot</option>
-                                <option value="spider">Spider</option>
-                                <option value="goldfish">Goldfish</option>
+                                <!-- options added in js -->
                             </select>
+                        </div>
+                        <div class="search__search-btn">
+                            <svg class="search__search-icon"><use xlink:href="svg/spritesheet.svg#search"></svg>
                         </div>
                     </div>
                 </div>
@@ -140,72 +128,7 @@
                                     </svg>
                                 </div>
                             </div>
-                            <div class="job-card__content job-card__content--featured">
-                                <div class="job-card__location job-card__location--featured">
-                                    <svg class="job-card__location-icon"><use xlink:href="svg/spritesheet.svg#location"></svg>
-                                    <div class="job-card__location-text">Glasgow</div>
-                                </div>
-                                <div class="job-card__wage job-card__wage--featured">
-                                    <svg class="job-card__wage-icon"><use xlink:href="svg/spritesheet.svg#sterling"></use></svg>
-                                    <div class="job-card__wage-text">£35,000</div>
-
-                                </div> 
-                                <div class="job-card__extra job-card__extra--featured">
-                                    <svg class="job-card__extra-icon"><use xlink:href="svg/spritesheet.svg#clock"></svg>
-                                    <div class="job-card__type job-card__type--featured">Permanent</div>
-                                    <div class="job-card__position job-card__position--featured">In House</div>
-                                    <div class="job-card__PQE job-card__PQE--featured">PQE: 3+</div>
-                                </div> 
-
-                                <div class="job-card__description job-card__description--featured">This is a great opportunity for a corporate/generalist lawyer to work for an entrepreneurial, growing and leading business across Europe</div>
-                            </div>    
-                            <div class="job-card__footer">
-                                <div class="job-card__btn-wrapper">
-                                    <button class="job-card__view-btn">View More</button>
-                                    <button class="job-card__apply-btn">Apply</button>
-                                </div>
-                                <div class="job-card__date">Posted: 3+ days ago</div>
-                            </div>
-                        </div>
-                        
-                        <div class="job-card job-card--featured ">
-                            <div class="job-card__title-wrapper job-card__title-wrapper--featured">
-                                <h3 class="job-card__title job-card__title--featured">Junior Legal Counsel</h3> 
-                                <div class="job-card__pin job-card__pin--featured">
-                                    <svg class="pin-icon">
-                                    <use xlink:href="svg/spritesheet.svg#pin-angle"></use>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="job-card__content job-card__content--featured">
-                                <div class="job-card__location job-card__location--featured">
-                                    <svg class="job-card__location-icon"><use xlink:href="svg/spritesheet.svg#location"></svg>
-                                    <div class="job-card__location-text">London</div>
-                                </div>
-                                <div class="job-card__wage job-card__wage--featured">
-                                    <svg class="job-card__wage-icon"><use xlink:href="svg/spritesheet.svg#sterling"></use></svg>
-                                    <div class="job-card__wage-text">£70,000 per annum</div>
-
-                                </div> 
-                                <div class="job-card__extra job-card__extra--featured">
-                                    <svg class="job-card__extra-icon"><use xlink:href="svg/spritesheet.svg#clock"></svg>
-                                    <div class="job-card__type job-card__type--featured">Permanent</div>
-                                    <div class="job-card__position job-card__position--featured">In House</div>
-                                    <div class="job-card__PQE job-card__PQE--featured">PQE: 5+</div>
-                                </div> 
-
-                                <div class="job-card__description job-card__description--featured">This highly recommended Top 100 firm in the UK is about to move into the Top 50 after 30 years of trading. Currently working from 3 offices, notably in Manchester and London they often act on the largest matters outside of Magic circle firms</div>
-                            </div>    
-                            <div class="job-card__footer">
-                                <div class="job-card__btn-wrapper">
-                                    <button class="job-card__view-btn">View More</button>
-                                    <button class="job-card__apply-btn">Apply</button>
-                                </div>
-                                <div class="job-card__date">Posted: 3+ days ago</div>
-                            </div>
                         </div> -->
-                        
-                       
                     </div>
                 </div>
 
@@ -317,23 +240,29 @@
                             </div>
                         </div>
                     </div>
-                    <div class="footer__contact">
-                        <div class="footer__contact-row footer__contact-row--subject">
-                            <div class="footer__contact-item">
-                                <label for="email" class="footer__email-label">Email</label>
-                                <input type="text" id="email" class="footer__input"></input>
+
+                    <div class="footer__contact-wrapper">
+                        <div class="footer__contact">
+                            <div class="footer__contact-row footer__contact-row--subject">
+                                <div class="footer__contact-item">
+                                    <label for="email" class="footer__email-label">Email</label>
+                                    <input type="text" id="email" class="footer__input"></input>
+                                </div>
+                                <div class="footer__contact-item">
+                                    <label for="subject" class="footer__subject-label">Subject</label>
+                                    <input type="text" id="subject" class="footer__input" ></input>
+                                </div>
                             </div>
-                            <div class="footer__contact-item">
-                                <label for="subject" class="footer__subject-label">Subject</label>
-                                <input type="text" id="subject" class="footer__input" ></input>
+                            <div class="footer__contact-row footer__contact-row--message">
+                                <div class="footer__contact-item">
+                                    <label for="message" class="footer__message-label">Message</label>
+                                    <textarea type="text" id="message" class="footer__input--message"></textarea>
+                                </div>
                             </div>
                         </div>
-                        <div class="footer__contact-row footer__contact-row--message">
-                            <div class="footer__contact-item">
-                                <label for="message" class="footer__message-label">Message</label>
-                                <textarea type="text" id="message" class="footer__input--message"></textarea>
-                            </div>
-                        </div>
+                        <!-- <button class="footer__send-btn btn">
+                            Send
+                        </button> -->
                     </div>
                 </div>
                 <div class="footer__copyright">

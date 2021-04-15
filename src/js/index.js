@@ -1,9 +1,13 @@
 import * as headerView from './views/headerView';
 import * as homeView from './views/homeView';
 
-import { elements } from './views/base';
+import { elements, elementStrings } from './views/base';
 import * as loginView from './views/loginView';
+import * as registerView from './views/registerView';
+import * as forgotPassView from './views/forgotPassView';
+import * as applyView from './views/applyView';
 import * as jobsListView from './views/jobListView';
+import * as jobView from './views/jobView';
 
 import User from './models/User';
 import JobList from './models/JobList';
@@ -23,6 +27,7 @@ import '../assets/icons/ios-email.svg';
 import '../assets/icons/sterling.svg';
 import '../assets/icons/location-solid.svg';
 import '../assets/icons/clock-solid.svg';
+import '../assets/icons/search.svg';
 
 
 class IndexController {
@@ -48,6 +53,12 @@ class IndexController {
             homeView.initialiseScrollAnimations();
             homeView.initParallax();
 
+            this.JobList.getMenuData()
+                .then(data => {
+                    homeView.populateSearchInputs(data.data.response);
+                })
+                .catch(err => console.log(err));
+
             // Separated from the renderHeader method for page resizing
             headerView.setParallaxHeaderWidth();
 
@@ -64,46 +75,93 @@ class IndexController {
         document.body.addEventListener('click', async (e) => {
             const modal = e.target.closest('.modal');
             if(modal) {
-
+                e.preventDefault();
                 // Login Modal Clicked
                 if(e.target.closest('.login')) {
                     switch(loginView.getAction(e)) {
-                        case 'submit':  console.log('login'); 
-                                        try {
-                                            // @TODO: REFRESH TOKENS
-                                            const res = await this.User.login(loginView.getLoginDetails());
-                                            // window.location.replace('http://localhost:8082');
-                                            console.log(res.data.token);
-                                        } catch(error) { 
-                                            if (error.response) {
-                                                // Server responded with a status code that falls out of the range of 2xx
-                                                if(!error.response.data.success) 
-                                                    console.log(error.response.data.message);
+                        case 'submit':      try {
+                                                // @TODO: REFRESH TOKENS
+                                                const res = await this.User.login(loginView.getLoginDetails());
+                                                // window.location.replace('http://localhost:8082');
+                                                console.log(res.data.token);
+                                            } catch(error) { 
+                                                if (error.response) {
+                                                    // Server responded with a status code that falls out of the range of 2xx
+                                                    if(!error.response.data.success) 
+                                                        console.log(error.response.data.message);
 
-                                                    // @TODO: REFRESH TOKENS
-                                                    // If the token is invalid send the refresh token
-                                                
-                                              } else if (error.request) {
-                                                // The request was made but no response was received
-                                                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                                                // http.ClientRequest in node.js
-                                                console.log(error.request);
-                                              } else {
-                                                // Something happened in setting up the request that triggered an Error
-                                                console.log('Error', error.message);
-                                              }
-                                        }
-                                        break;
-                        case 'cancel':  modal.parentElement.removeChild(modal);
+                                                        // @TODO: REFRESH TOKENS
+                                                        // If the token is invalid send the refresh token
+                                                    
+                                                } else if (error.request) {
+                                                    // The request was made but no response was received
+                                                    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                                                    // http.ClientRequest in node.js
+                                                    console.log(error.request);
+                                                } else {
+                                                    // Something happened in setting up the request that triggered an Error
+                                                    console.log('Error', error.message);
+                                                }
+                                            }
+                                            break;
+                        case 'register':    modal.parentElement.removeChild(modal); 
+                                            registerView.renderRegisterModal();
+                                            break;
+                        case 'cancel':      modal.parentElement.removeChild(modal); break;
+                        case 'forgot':      modal.parentElement.removeChild(modal); 
+                                            forgotPassView.renderForgotModal(); break;
                     }
 
                 // Register Modal Clicked
                 } else if(e.target.closest('.register')) {
+                    switch(registerView.getAction(e)) {
+                        case 'register':    console.log('register'); break; 
+                        case 'cancel':      modal.parentElement.removeChild(modal); break;
+                        case 'sign-in':       modal.parentElement.removeChild(modal); loginView.renderLogin(); break;
+                    }
+                } else if(e.target.closest('.forgot-password')) {
+                    switch(forgotPassView.getAction(e)) {
+                        case 'submit': console.log('submit'); break;
+                        case 'cancel': modal.parentElement.removeChild(modal); break;
+                    }
+                } else if(e.target.closest('.job-details')) {
+                    switch(jobView.getAction(e)) {
+                        case 'apply'    : modal.parentElement.removeChild(modal); applyView.renderApplyForm(); break;
+                        case 'cancel'   : modal.parentElement.removeChild(modal); break;
+                        case 'sign-in'  : modal.parentElement.removeChild(modal); loginView.renderLogin(); break;  
+                    }
+                    document.body.style.overflow = "auto";
+                } else if(e.target.closest('.apply')) {
 
+                    switch(applyView.getAction(e)) {
+                        case 'request':     console.log('request'); break;
+                        case 'login':       console.log('login'); break;
+                        case 'forgot':      modal.parentElement.removeChild(modal);
+                                            forgotPassView.renderForgotModal(); break;
+                        case 'register':    modal.parentElement.removeChild(modal);
+                                            registerView.renderRegisterModal(); break;
+                        case 'cancel':      modal.parentElement.removeChild(modal);
+                    }
                 }
                 
             }
         });
+
+        // BUTTONS
+        elements.signupBtns.forEach(btn => btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerView.renderRegisterModal();
+        }));
+        elements.browseBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'http://localhost:8081/jobs.html';
+        });
+        elements.contactBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            elements.footerContent.scrollIntoView({ behavior: 'smooth' });
+        });
+        // Job card button listeners set after the request is made below
+
     }
 
     getFeaturedJobs() {
@@ -114,6 +172,26 @@ class IndexController {
                 if(res.data)
                     jobsListView.renderJobs(res.data.jobs, elements.featuredJobsList, true);
                     homeView.featuredAnimation();
+                    // Add listeners to the cards
+                    document.querySelectorAll(`${elementStrings.jobCard}`)
+                            .forEach(card => {
+                                card.addEventListener('click', (e) => {
+                                    const viewMoreBtn = e.target.closest(`${elementStrings.viewJobBtn}`);
+                                    const applyBtn = e.target.closest(`${elementStrings.applyBtn}`);
+
+                                    if(viewMoreBtn) {
+                                        this.JobList.getJob(card.dataset.id)
+                                            .then(res => {
+                                                if(res.data.job) {
+                                                    jobView.renderJobDetails(res.data.job, document.body)
+                                                }
+                                            })
+                                            .catch(err => console.log(err));
+                                    } else if(applyBtn) {
+                                        applyView.renderApplyForm(card.dataset.id);
+                                    }
+                                });
+                            });
             })
             .catch(err => {
                 console.log(err);
