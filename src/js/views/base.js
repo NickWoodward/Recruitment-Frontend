@@ -49,6 +49,7 @@ export const elements = {
     adminTableWrapper: document.querySelector('.admin__table-wrapper'),
     deleteUser: document.querySelector('.delete-user-btn'),
     createJob: document.querySelector('.create-job-btn'),
+
 };
 
 export const elementStrings = {
@@ -96,6 +97,9 @@ export const elementStrings = {
 
     adminJobsTable: '.table--jobs',
     adminUsersTable: '.table--users',
+
+    pagination: '.pagination',
+
 
     
     /* TABLES */

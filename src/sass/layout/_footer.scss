@@ -1,9 +1,169 @@
-footer {
-    height: 15rem;
-    // background: $color-primary;
-    background-color: $color-logo;
+// footer {
+//     height: 15rem;
+//     // background: $color-primary;
+//     background-color: $color-logo;
 
-    &--jobs {
-        background-color: $color-logo;
+//     &--jobs {
+//         background-color: $color-logo;
+//     }
+// }
+
+
+.footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    background-color: $color-logo;
+    color: $color-white;
+
+    &__content {
+        display: flex;
+        justify-content: center;
+        height: 100%;
+        padding: $padding-section;
+        font-size: 1.4rem;
+
+        @include respond-tablet() {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+
+    &__details {
+        display: flex;
+        flex-direction: column;
+        width: 30rem;
+        padding: 3.5rem 2.8rem;
+        line-height: 1.8rem;
+        background-color:  #556B83;
+
+        @include respond-tablet() {
+            flex-direction: row;
+            width: 50rem;
+            margin-bottom: 1rem;
+        }
+    }
+        &__address, &__phone {
+            margin-bottom: 1.2rem;
+        }
+        &__address, &__phone {
+            display: flex;
+        }
+        &__address-icon, 
+        &__phone-icon,
+        &__email-icon {
+            display: flex;
+            margin-right: 1.5rem;
+        }
+        &__address-svg, 
+        &__phone-svg,
+        &__email-svg {
+            fill: $color-secondary-highlight;
+            width: 2rem;
+            height: 2rem;
+        }
+
+        &__phone-column {
+            // Width set so the phone numbers can be aligned with space-between
+            width: 68%;
+            margin-top: .1rem;
+
+            @include respond-tablet() {
+                width: 100%;
+            }
+        }
+        &__phone-row {
+            display: flex;
+            justify-content: space-between;
+        }
+        &__phone-label {
+            margin-right: 1rem;
+        }
+
+        &__email {
+            display: flex;
+        }
+
+        &__phone-email-wrapper {
+            @include respond-tablet() {
+                margin-left: 6rem;
+
+            }
+        }
+
+    &__contact {
+        &-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 60rem;
+        padding: 3rem 2.8rem;
+        margin-left: 5rem;
+        background-color:  #556B83;
+
+        @include respond-tablet() {
+            margin-left: 0;
+            width: 50rem;
+        }
+
+        &-row {
+            display: flex;
+
+            &:not(&--message){
+                margin-bottom: 1rem;
+            }
+            &--message {
+                flex-grow: 1;
+            }
+        }
+    }
+    &__contact-item {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+        &:not(:first-of-type) {
+            margin-left: 3rem;
+        }
+    }
+
+    &__email-label, 
+    &__subject-label,
+    &__message-label {
+        margin-bottom: .5rem;
+    }
+
+    &__input {
+        background-color: #667C94;
+        border: 1px solid #56708C;
+        padding: .6rem .4rem;
+        
+        &--message {
+            height: 100%;
+            background-color: $color-logo;
+            border: 1px solid #56708C;
+        }
+    }
+
+    &__send-btn {
+        padding: 1rem 1rem;
+        width: 15rem;
+        align-self: flex-end;
+        margin-top: 1rem;
+        margin-left: 5rem;
+        background-color: #556B83;
+        border: 1px solid #56708C;
+
+        color: $color-white;
+    }
+  
+
+    &__copyright {
+        width: 100%;
+        height: 4rem;
+        background-color:  #556B83;
     }
 }

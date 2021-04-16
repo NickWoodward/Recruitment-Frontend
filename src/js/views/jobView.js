@@ -1,29 +1,37 @@
 export const getAction = (e) => {
     const apply = e.target.closest('.job-details__btn--apply');
-    const cancel = e.target.closest('.modal') && (!e.target.closest('.job-details__content') || e.target.closest('.job-details__cancel-btn'));
+    const cancel = e.target.closest('.modal') && (!e.target.closest('.job-details__content') || e.target.closest('.job-details__back-btn') || e.target.closest('.job-details__close-btn'));
     const signIn = e.target.closest('.job-details__sign-in-btn')
-
+    console.log(apply, cancel, signIn);
     if(apply) return 'apply';
     if(cancel) return 'cancel';
     if(signIn) return 'sign-in';
 };
 
-export const renderJobDetails = (job, container = document.body, admin) => {
-    const jobCoordinates = calculateJobModalPosition();    
+export const renderJobDetails = (job, container = document.body, featured, admin) => {
 
-    console.log(jobCoordinates);
     const markup = `
         <div class="modal job-details">
-            <div class="job-details__content">
-                <button class="job-details__cancel-btn">
-                    <svg class="job-details__cancel-svg">
-                        <use xlink:href="svg/spritesheet.svg#close-icon">
-                    </svg>
-                </button>
+            <div class="job-details__content ${featured? 'job-details__content--featured':''}">
+            ${featured? '':`<button class="job-details__back-btn">
+                            <svg class="job-details__back-svg">
+                                <use xlink:href="svg/spritesheet.svg#arrow-left">
+                            </svg>
+                            <div class="job-details__back-text">Back</div>
+                         </button>`}
 
                 <div class="job-details__table">
+                    <div class="job-details__header">
+                        <div class="job-details__title">${job.title}</div>
 
-                    <div class="job-details__title">${job.title}</div>
+                        ${featured? `
+                                <button class="job-details__close-btn">
+                                    <svg class="job-details__close-svg">
+                                        <use xlink:href="svg/spritesheet.svg#close-icon">
+                                    </svg>
+                                </button>
+                        `:''}
+                    </div>
                     <div class="job-details__row">
                         <div class="job-details__location-label job-details__label">Location</div>
                         <div class="job-details__location-value job-details__value">${job.location}</div>
@@ -62,27 +70,30 @@ export const renderJobDetails = (job, container = document.body, admin) => {
     `;
 
     container.insertAdjacentHTML('afterbegin', markup);
-    setJobModalPosition(jobCoordinates.x, jobCoordinates.y);
+    setJobModalPosition();
 
     // Prevent bg scrolling behind modal
     document.body.style.overflow = "hidden";
 }
 
-export const calculateJobModalPosition = () => {
-    // Check for menu on left of screen
+export const setJobModalPosition = () => {
+    const modal = document.querySelector('.modal');
     const menu = document.querySelector('.jobs__menu-wrapper');
     const header = document.querySelector('.header');
-    // If there's a menu and a header, offset the job modal by their width and height respectively
-    if(menu && header) {
-        const menuStyles = window.getComputedStyle(menu);
-        const headerStyles = window.getComputedStyle(header);
-        return { x: menuStyles.width, y: headerStyles.height }
-    } else {
-        return { x: 0, y: 0 }
-    }
-};
+    const { height: headerHeight } = header? header.getBoundingClientRect() : {};
+    const { width: menuWidth } = menu? menu.getBoundingClientRect() : {};
+    const {width: viewPortWidth, height: viewPortHeight} = document.body.getBoundingClientRect() || {};
+    
+    console.log(headerHeight, menuWidth);
 
-export const setJobModalPosition = (x = 0, y = 0) => {
-    const content = document.querySelector('.job-details__content');
-    content.style.right = x;
+    // If there's a menu shift the modal to the right and adjust width
+    if(menuWidth) {
+        modal.style.left = `${menuWidth}px`;
+        modal.style.width = `${viewPortWidth - menuWidth}px`;
+    }
+    // If there's a header, move down and shrink height
+    if(headerHeight) {
+        modal.style.top = `${headerHeight}px`;
+        modal.style.height = `${viewPortHeight - headerHeight}px`;
+    }
 };

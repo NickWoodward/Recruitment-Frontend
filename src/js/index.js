@@ -74,6 +74,9 @@ class IndexController {
         // CHECK MODAL CLICKED
         document.body.addEventListener('click', async (e) => {
             const modal = e.target.closest('.modal');
+            const header = e.target.closest('.header');
+            // if there's a modal and the header is clicked, close it
+            if(header && document.querySelector('.modal')) this.closeModal(document.querySelector('.modal'));
             if(modal) {
                 e.preventDefault();
                 // Login Modal Clicked
@@ -104,11 +107,11 @@ class IndexController {
                                                 }
                                             }
                                             break;
-                        case 'register':    modal.parentElement.removeChild(modal); 
+                        case 'register':    this.closeModal(modal); 
                                             registerView.renderRegisterModal();
                                             break;
-                        case 'cancel':      modal.parentElement.removeChild(modal); break;
-                        case 'forgot':      modal.parentElement.removeChild(modal); 
+                        case 'cancel':      this.closeModal(modal); break;
+                        case 'forgot':      this.closeModal(modal); 
                                             forgotPassView.renderForgotModal(); break;
                     }
 
@@ -116,31 +119,30 @@ class IndexController {
                 } else if(e.target.closest('.register')) {
                     switch(registerView.getAction(e)) {
                         case 'register':    console.log('register'); break; 
-                        case 'cancel':      modal.parentElement.removeChild(modal); break;
-                        case 'sign-in':       modal.parentElement.removeChild(modal); loginView.renderLogin(); break;
+                        case 'cancel':      this.closeModal(modal); break;
+                        case 'sign-in':       this.closeModal(modal); loginView.renderLogin(); break;
                     }
                 } else if(e.target.closest('.forgot-password')) {
                     switch(forgotPassView.getAction(e)) {
                         case 'submit': console.log('submit'); break;
-                        case 'cancel': modal.parentElement.removeChild(modal); break;
+                        case 'cancel': this.closeModal(modal); break;
                     }
                 } else if(e.target.closest('.job-details')) {
                     switch(jobView.getAction(e)) {
-                        case 'apply'    : modal.parentElement.removeChild(modal); applyView.renderApplyForm(); break;
-                        case 'cancel'   : modal.parentElement.removeChild(modal); break;
-                        case 'sign-in'  : modal.parentElement.removeChild(modal); loginView.renderLogin(); break;  
+                        case 'apply'    : applyView.renderApplyForm(); break;
+                        case 'cancel'   : this.closeModal(modal); break;
+                        case 'sign-in'  : this.closeModal(modal); loginView.renderLogin(); break;  
                     }
-                    document.body.style.overflow = "auto";
                 } else if(e.target.closest('.apply')) {
 
                     switch(applyView.getAction(e)) {
                         case 'request':     console.log('request'); break;
                         case 'login':       console.log('login'); break;
-                        case 'forgot':      modal.parentElement.removeChild(modal);
+                        case 'forgot':      this.closeModal(modal);
                                             forgotPassView.renderForgotModal(); break;
-                        case 'register':    modal.parentElement.removeChild(modal);
+                        case 'register':    this.closeModal(modal);
                                             registerView.renderRegisterModal(); break;
-                        case 'cancel':      modal.parentElement.removeChild(modal);
+                        case 'cancel':      this.closeModal(modal);
                     }
                 }
                 
@@ -164,6 +166,11 @@ class IndexController {
 
     }
 
+    closeModal(modal) {
+        modal.parentElement.removeChild(modal);
+        document.body.style.overflow = "auto";
+    }
+
     getFeaturedJobs() {
         this.JobList
             .getFeaturedJobs()
@@ -183,7 +190,7 @@ class IndexController {
                                         this.JobList.getJob(card.dataset.id)
                                             .then(res => {
                                                 if(res.data.job) {
-                                                    jobView.renderJobDetails(res.data.job, document.body)
+                                                    jobView.renderJobDetails(res.data.job, document.body, true);
                                                 }
                                             })
                                             .catch(err => console.log(err));

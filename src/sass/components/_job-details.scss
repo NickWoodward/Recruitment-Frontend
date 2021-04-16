@@ -1,60 +1,76 @@
 .job-details {
     position: fixed;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     top: 0;
     left: 0;
-    // height: 100vh;
-    width: 100%;
-
     z-index: 100;
 
     &__content {
-        position: relative;
         display: flex;
         flex-direction: column;
-        align-items: center;
-        align-self: center;
-        width: 50%;
-        // height: calc(100% - var(--header-height));
-        // border-radius: 5px;
-
-        padding: 3rem 5rem 5rem 5rem;
+        justify-content: flex-start;
+        align-items: flex-start;
+        // padding: 3rem 5rem 5rem 5rem;
+        padding-top: 5rem;
+        padding-left: 10%;
+        height: 100%;
+        width: 100%;
         background-color: rgb(245, 247, 250);
+
+        &--featured {
+            align-items: center;
+            padding-left: 0%;
+        }
     }
-    &__cancel-btn {
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 1px solid #d4d4d5;
+        background-color: white;
+    }
+
+    &__back-btn, &__close-btn {
         display: flex;
         justify-content: center;
         align-items: center;
         height: 2rem;
-        width: 2rem;
-        margin-bottom: 2rem;
-        margin-left: auto;
+        margin-bottom: 2.5rem;
+        // margin-left: auto;
         margin-right: .5rem;
         background-color: rgb(245, 247, 250);
         cursor: pointer;
     }
-    &__cancel-svg {
-        height: 2rem;
-        width: 2rem;
+    &__close-btn { margin-top: 1rem; margin-right: 1rem; background-color: white;}
+
+    &__back-svg, &__close-svg {
+        height: 1.9rem;
+        width: 1.9rem;
     }
     
+    &__back-text {
+        margin-left: .5rem;
+        font-size: 1.5rem;
+    }
+
     &__title {
-        padding: 4rem 8rem;
-        border-bottom: 1px solid #d4d4d5;
+        padding: 3rem 8rem;
+        // border-bottom: 1px solid #d4d4d5;
         font-size: 2rem;
         color: $color-secondary;
         background-color: white;
     }
     &__table {
+        width: 70%;
         box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
-        border-radius: 5px;
+        border-radius: 15px;
     }
     &__row {
         display: flex;
         justify-content: space-between;
-        padding: 2.5rem 8rem;
+        padding: 2.2rem 8rem;
         background-color: rgb(249, 250, 251);
         font-size: 1.6rem;
 
@@ -66,7 +82,7 @@
         &--btns {
             justify-content: flex-start;
             align-items: baseline;
-            padding: 4rem 8rem;
+            padding: 3rem 8rem;
         }
         
     }

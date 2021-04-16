@@ -69,6 +69,6 @@ export const renderHeader = (page) => {
 
 export const addHeaderListeners = ({ renderLogin }) => {
     const loginLink = document.querySelector('.nav__a--login');
-    
+    console.log(renderLogin);
     loginLink.addEventListener('click', renderLogin);
 }

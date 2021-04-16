@@ -19,6 +19,7 @@ import "../sass/jobs.scss";
 import '../assets/icons/list-icon-test.svg';
 import '../assets/icons/grid-icon-test.svg';
 import '../assets/icons/arrow-right.svg';
+import '../assets/icons/arrow-left.svg';
 
 // import "../assets/search-jobs.png";
 
@@ -122,6 +123,14 @@ export default class JobsController {
         // Handle Modal Events
         document.body.addEventListener('click', async (e) => {
             const modal = e.target.closest('.modal');
+            const header = e.target.closest('.header');
+            const menu = e.target.closest('.jobs__menu-wrapper');
+            // If there's a modal, but the user has clicked on the menu or header, close it
+            if((header || menu) && document.querySelector('.modal')) {
+                document.querySelector('.modal').parentElement.removeChild(document.querySelector('.modal'));
+            }
+           
+            // Handle events generated inside the modals
             if(modal) {
                 if(e.target.closest('.login')) {
                     switch(loginView.getAction(e)) {
@@ -159,7 +168,7 @@ export default class JobsController {
                     }
                 } else if(e.target.closest('.job-details')) {
                     switch(jobView.getAction(e)) {
-                        case 'apply'    : modal.parentElement.removeChild(modal); applyView.renderApplyForm(); break;
+                        case 'apply'    : applyView.renderApplyForm(); break;
                         case 'cancel'   : modal.parentElement.removeChild(modal); break;
                         case 'sign-in'  : modal.parentElement.removeChild(modal); loginView.renderLogin(); break;  
                     }

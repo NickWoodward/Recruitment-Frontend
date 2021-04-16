@@ -4,6 +4,8 @@ import '../sass/admin.scss';
 import '../assets/icons/edit-solid.svg';
 import '../assets/icons/delete-solid.svg';
 import '../assets/icons/hubspot.svg';
+import '../assets/icons/tick.svg';
+import '../assets/icons/cross.svg';
 
 import * as headerView from './views/headerView';
 import * as adminView from './views/adminView';
@@ -17,13 +19,16 @@ import JobList from './models/JobList';
 import UserModel from './models/User';
 
 import { elements, elementStrings } from './views/base';
-import User from './models/User';
 
 class AdminController {
     constructor() {
         // JobList and UserModel return axios methods CRUD ops
         this.JobList = new JobList();
         this.UserModel = new UserModel();
+        this.state = {
+            page: 1,
+            totalJobs: 0
+        }
 
         this.addEventListeners();
 
@@ -57,8 +62,10 @@ class AdminController {
                 .then(res => {
                     if(res.data.jobs) {
                         this.jobs = res.data.jobs.map(({featured, id, title, wage, location, description, createdAt}) => ({featured, id, title, wage, location, description, createdAt}));
+                        this.state.totalJobs = res.data.totalJobs;
                         this.renderJobsTable();   
                         adminView.addTableListeners('jobs');
+
                     }
                 })
                 .catch(err => console.log(err));
@@ -82,6 +89,32 @@ class AdminController {
             this.renderUsersTable();
             // Add table listeners
             adminView.addTableListeners('users');
+        });
+
+        // PAGINATION CONTROLS
+        document.body.addEventListener('click', (e) => {
+            const btn = e.target.closest('.pagination__item');
+            const previous = e.target.closest('.pagination__previous');
+            const next = e.target.closest('.pagination__next');
+            console.log(document.querySelector(`.pagination`));
+
+            if(btn) {
+                this.searchOptions.index = btn.dataset.id * this.searchOptions.limit;
+                this.JobList.getJobs(this.searchOptions)
+                    .then(res => {
+                        if(res.data.jobs) {
+                            this.jobs = res.data.jobs.map(({featured, id, title, wage, location, description, createdAt}) => ({featured, id, title, wage, location, description, createdAt}));
+                            this.state.totalJobs = res.data.totalJobs;
+                            // Remove the table
+                            utils.clearElement(elements.adminTableWrapper);
+                            
+                            this.renderJobsTable();   
+                            adminView.addTableListeners('jobs');
+
+                        }
+                    })
+                    .catch(err => console.log(err));
+                }
         });
     }
 
@@ -141,7 +174,6 @@ class AdminController {
         this.JobList
             .createJob(job)
             .then(res => {
-                console.log(res.data.job);
                 if(res.status === 201) {
                     // Update job list
                     this.jobs.unshift(res.data.job);
@@ -323,14 +355,18 @@ class AdminController {
         if(!document.querySelector(elementStrings.adminJobsTable)) {
             // Clear the table wrapper
             utils.clearElement(elements.adminTableWrapper);
-            console.log(this.jobs);
+            // Add HTML for the Featured column
+            const formattedJobs = this.jobs.map(job => {
+                if(job.featured) return { ...job, featured: '<svg class="featured-icon featured-icon--tick"><use xlink:href="svg/spritesheet.svg#tick"></svg>' }
+                else return { ...job, featured: '<svg class="featured-icon featured-icon--cross"><use xlink:href="svg/spritesheet.svg#cross"></svg>' }
+            });
             // Render the table
             adminView.renderContent(
                 [
                     tableView.createTable(
                         'jobs',
                         Object.keys(this.jobs[0]),  
-                        this.jobs,
+                        formattedJobs,
                         false,
                         [editBtn, deleteBtn]
                     ),
@@ -338,6 +374,7 @@ class AdminController {
                 ],
                 elements.adminTableWrapper
             );
+            adminView.renderPagination(this.searchOptions.index, this.searchOptions.limit, this.state.totalJobs, document.querySelector('.btn-wrapper--admin'));
         }
     }
 

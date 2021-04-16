@@ -1,4 +1,3 @@
-import { elementStrings } from './base';
 
 /**
  * 

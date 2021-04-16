@@ -138,3 +138,31 @@ const displayModal = (action, type, item) => {
     document.body.insertAdjacentHTML('afterbegin', warningModal);
 };
  
+
+export const renderPagination = (current, limit, totalItems, container) => {
+    // Work out how many pages
+    const pages = Math.ceil(totalItems / limit);
+
+    const itemMarkup = generatePaginationMarkup(pages, current);
+    
+    const markup = `
+        <div class="pagination">
+            <div class="pagination__previous ${current === 1? 'pagination__previous--inactive':''}">Previous</div>
+            ${itemMarkup}
+            <div class="pagination__next ${current === pages? 'pagination__next--inactive':''}">Next</div>
+        </div>
+    `;
+    container.insertAdjacentHTML('afterbegin', markup);
+};
+
+const generatePaginationMarkup = (pages, current) => {
+    let markup = '';
+    for(let x = 0; x < pages; x++) {
+        const temp = `
+            <div class="pagination__item pagination__item--${x+1} ${x+1 === current? 'pagination__item--active':''}" data-id=${x+1}>
+                ${x+1}
+            </div>`;
+        markup += temp;
+    }
+    return markup;
+};
