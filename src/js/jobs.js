@@ -25,6 +25,8 @@ import '../assets/icons/arrow-left.svg';
 
 export default class JobsController {
     constructor() {
+        this.searchParams = new URLSearchParams(window.location.search);
+
         this.JobList = new JobList();
         this.menuItems = {
             titles: []
@@ -37,6 +39,8 @@ export default class JobsController {
             orderField: "title",
             orderDirection: "ASC"
         };
+        if(this.searchParams.get('title')) this.searchOptions.titles.push(this.searchParams.get('title'));
+        if(this.searchParams.get('location')) this.searchOptions.locations.push(this.searchParams.get('location'));
 
         this.searchSuggestions = {
             titles: [],

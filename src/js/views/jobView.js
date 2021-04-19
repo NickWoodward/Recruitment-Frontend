@@ -78,7 +78,7 @@ export const renderJobDetails = (job, container = document.body, featured, admin
 
 export const setJobModalPosition = () => {
     const modal = document.querySelector('.modal');
-    const menu = document.querySelector('.jobs__menu-wrapper');
+    const menu = document.querySelector('.jobs__menu-wrapper') || document.querySelector('.sidebar');
     const header = document.querySelector('.header');
     const { height: headerHeight } = header? header.getBoundingClientRect() : {};
     const { width: menuWidth } = menu? menu.getBoundingClientRect() : {};
