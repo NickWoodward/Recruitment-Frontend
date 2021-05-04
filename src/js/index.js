@@ -3,12 +3,14 @@ import * as homeView from './views/homeView';
 
 import { elements, elementStrings } from './views/base';
 import * as loginView from './views/loginView';
+import * as chatView from './views/chatView';
 import * as registerView from './views/registerView';
 import * as forgotPassView from './views/forgotPassView';
 import * as applyView from './views/applyView';
 import * as jobsListView from './views/jobListView';
 import * as jobView from './views/jobView';
 
+import { initSocket } from './socket';
 import User from './models/User';
 import JobList from './models/JobList';
 
@@ -28,6 +30,10 @@ import '../assets/icons/sterling.svg';
 import '../assets/icons/location-solid.svg';
 import '../assets/icons/clock-solid.svg';
 import '../assets/icons/search.svg';
+import '../assets/icons/info.svg';
+import '../assets/icons/chatbubble.svg';
+import '../assets/icons/arrow-up.svg';
+import '../assets/icons/paperplane.svg';
 
 
 class IndexController {
@@ -35,8 +41,9 @@ class IndexController {
 
         this.JobList = new JobList();
         this.User = new User();
+        this.socket = initSocket();
+
         this.addEventListeners();
-        // homeView.initParallax();
     }
 
     addEventListeners() {
@@ -49,6 +56,7 @@ class IndexController {
             }
             headerView.renderHeader('index');
             headerView.addHeaderListeners(cbs);
+            chatView.renderChat();
             homeView.loadingAnimation();
             homeView.initialiseScrollAnimations();
             homeView.initParallax();
@@ -149,6 +157,30 @@ class IndexController {
             }
         });
 
+        // CHATBOX
+        document.body.addEventListener('click', (e) => {
+            const chatboxHeader = e.target.closest('.chatbox__header');
+            const chatboxHistory = e.target.closest('.chatbox__history');
+            const chatboxInput = e.target.closest('.chatbox__input');
+
+            switch(e.target) {
+                case chatboxHeader : console.log('header'); chatView.closeChatbox(); break;
+                case chatboxHistory: console.log('his'); break;
+                case chatboxInput  : console.log('in'); break;
+            }
+        });
+        document.body.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const chatboxForm = e.target.closest('.chatbox__form');
+            if(chatboxForm) {
+                const message = document.querySelector('.chatbox__input').value;
+                console.log(message);
+                chatView.addChatResponse(message, true);
+                this.socket.emit('chatbox', message );
+            }
+        });
+
+
         // BUTTONS
         elements.signupBtns.forEach(btn => btn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -163,6 +195,16 @@ class IndexController {
             elements.footerContent.scrollIntoView({ behavior: 'smooth' });
         });
         // Job card button listeners set after the request is made below
+
+        // SOCKETS
+        this.socket.on('job', ({job}) => {
+            jobView.renderJobNotification(job);
+        });
+        this.socket.on('response', (res) => {
+            chatView.addChatResponse(res.message, false);
+        })
+
+        // jobView.renderJobNotification();
 
     }
 

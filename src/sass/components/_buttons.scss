@@ -99,3 +99,11 @@
         background-color: $color-secondary;
     }
 }
+.hubspot-add-btn {
+    display: flex;
+    margin-left: auto;
+    width: 3rem;
+    height: 3rem;
+    fill: $color-secondary;
+    cursor: pointer;
+}

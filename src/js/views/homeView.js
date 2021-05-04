@@ -41,8 +41,8 @@ export const loadingAnimation = () => {
     });
     tl.add(utils.pageFadeIn());
     tl.add(headerLoadingAnimation(), '>');
+    tl.add(searchAnimation(), '<');
     tl.add(heroAnimation(), '<');
-    tl.add(searchAnimation(), '<0.2');
 };
 
 const headerLoadingAnimation = () => {
@@ -53,20 +53,20 @@ const headerLoadingAnimation = () => {
   return tl;
 };
 const heroAnimation = () => {
-  const tl = gsap.timeline({ defaults: { opacity: 0, duration: 2, ease: 'ease-in' } });
-  tl.from('.hero__tagline--head', { y: 40 })
+  const tl = gsap.timeline({ defaults: { opacity: 0, duration: 1.5, ease: 'ease-in' } });
+  tl.from('.hero__tagline--head', { x: 40 })
     .from('.hero__tagline--sub', { x: -40 }, '<')
     .from('.signup-btn--hero', {  }, '<0.3')
     .from('.browse-btn--hero', {  }, '<0.3');
   return tl;
 };
 const searchAnimation = () => {
-    const tl = gsap.timeline({ defaults: { opacity: 0, duration: 1, ease: 'ease-out' } });
-    tl.from('.roles__title', { x: -20, duration: 1.2 })
+    const tl = gsap.timeline({ defaults: { opacity: 0, duration: .8, ease: 'ease-out' } });
+    tl.from('.roles__title', { x: -20 })
       .from('.roles__divider', { y: 20 }, '<')
       .from('.search', { duration: 2 }, '<')
-      .from('.roles__item', { y: 20, stagger: 0.3 }, '<0.5')
-      .from('.search__field', { y: 20, stagger: 0.3 }, '<0.5');
+      .from('.roles__item', { y: 20, stagger: 0.3 }, '<')
+      .from('.search__field', { y: 20, stagger: 0.3 }, '<');
     return tl;
 };
 

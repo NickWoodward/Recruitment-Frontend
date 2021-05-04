@@ -26,6 +26,8 @@ import '../assets/icons/arrow-left.svg';
 export default class JobsController {
     constructor() {
         this.searchParams = new URLSearchParams(window.location.search);
+        this.titleParam = this.searchParams.get('title');
+        this.locationParam = this.searchParams.get('location');
 
         this.JobList = new JobList();
         this.menuItems = {
@@ -39,8 +41,9 @@ export default class JobsController {
             orderField: "title",
             orderDirection: "ASC"
         };
-        if(this.searchParams.get('title')) this.searchOptions.titles.push(this.searchParams.get('title'));
-        if(this.searchParams.get('location')) this.searchOptions.locations.push(this.searchParams.get('location'));
+        // If the page has search params from the search form on index.html add them to the seachParams (update menus once populated)
+        if(this.titleParam) this.searchOptions.titles.push(this.titleParam);
+        if(this.locationParam) this.searchOptions.locations.push(this.locationParam);
 
         this.searchSuggestions = {
             titles: [],
@@ -265,7 +268,7 @@ export default class JobsController {
                 });
 
                 // Render content
-                jobsMenuView.populateMenu(items);
+                jobsMenuView.populateMenu(items, { titleParam: this.titleParam, locationParam: this.locationParam });
                 jobsMenuView.animateMenu();
 
                 // Store menu items in the controller & add to the suggested search arrays

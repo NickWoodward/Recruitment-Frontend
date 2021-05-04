@@ -72,6 +72,12 @@
     &--cross { fill: red }
 }
 
+.admin__table-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
 .pagination {
     display: flex;
     align-items: center;

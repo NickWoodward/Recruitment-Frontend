@@ -60,7 +60,9 @@ a {
 
 button {
     border: none;
- 
+    &:focus {
+        border: 1px solid $color-logo;
+    }
 }
 
 fieldset {

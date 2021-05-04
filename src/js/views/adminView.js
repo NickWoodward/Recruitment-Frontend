@@ -39,6 +39,10 @@ export const addTableListeners = (type) => {
                             document.querySelectorAll(elementStrings.editJobsBtn):
                             document.querySelectorAll(elementStrings.editUsersBtn);
 
+    const hubspotButtons = type === 'users'? 
+                            document.querySelectorAll(elementStrings.hubspotBtn):
+                            [];
+
     // Row buttons
     deleteButtons.forEach(button => {
         button.addEventListener('click', (e) => {
@@ -61,13 +65,21 @@ export const addTableListeners = (type) => {
                 }
         });
     });
+    if(type === 'users') {
+        hubspotButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const {id, fName, lName} = getUser(e);
+                displayModal('add', type, [id, `${fName} ${lName}`]);
+            });
+        });
+    }
 
     // Row links
     const table = document.querySelector('.table');
     if(table) table.addEventListener('click', (e) => {
         // If a row was clicked but not the edit or delete buttons
         const row = e.target.closest('.table-row') && (!e.target.closest('.td--edit') && !e.target.closest('.td--delete'));
-        if(row) {
+        if(row && type === 'jobs') {
             const job = getJob(e);
             if(type === 'jobs') renderJobDetails(job, elements.adminContent);
         }
@@ -91,9 +103,11 @@ export const addTableListeners = (type) => {
 export const getAction = (e) => {
     const confirmJob = e.target.closest(`.delete-btn--jobs`);
     const confirmUser = e.target.closest(`.delete-btn--users`);
+    const addUser = e.target.closest(`.add-btn--users`);
     // @TODO: This logic doesn't work
     const cancel = e.target.closest('.cancel-btn--warn') || !e.target.closest('.modal__content');
 
+    if(addUser) return 'addUser';
     if(confirmJob) return 'deleteJob';
     if(confirmUser) return 'deleteUser';
     if(cancel) return 'cancel';
@@ -142,14 +156,15 @@ const displayModal = (action, type, item) => {
 export const renderPagination = (current, limit, totalItems, container) => {
     // Work out how many pages
     const pages = Math.ceil(totalItems / limit);
-
+    // Current is the first (zero indexed) item on the page. current/limit = zero index page number
+    current = current/limit;
     const itemMarkup = generatePaginationMarkup(pages, current);
     
     const markup = `
         <div class="pagination">
-            <div class="pagination__previous ${current === 1? 'pagination__previous--inactive':''}">Previous</div>
+            <div class="pagination__previous ${current === 0? 'pagination__previous--inactive':''}">Previous</div>
             ${itemMarkup}
-            <div class="pagination__next ${current === pages? 'pagination__next--inactive':''}">Next</div>
+            <div class="pagination__next ${current === pages-1? 'pagination__next--inactive':''}">Next</div>
         </div>
     `;
     container.insertAdjacentHTML('afterbegin', markup);
@@ -159,7 +174,7 @@ const generatePaginationMarkup = (pages, current) => {
     let markup = '';
     for(let x = 0; x < pages; x++) {
         const temp = `
-            <div class="pagination__item pagination__item--${x+1} ${x+1 === current? 'pagination__item--active':''}" data-id=${x+1}>
+            <div class="pagination__item pagination__item--${x+1} ${x === current? 'pagination__item--active':''}" data-id=${x}>
                 ${x+1}
             </div>`;
         markup += temp;

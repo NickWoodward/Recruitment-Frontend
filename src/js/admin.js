@@ -15,6 +15,7 @@ import * as jobForm from './views/jobForm';
 import * as jobView from './views/jobView';
 import * as utils from './utils/utils';
 
+import { initSocket } from './socket';
 import JobList from './models/JobList';
 import UserModel from './models/User';
 
@@ -29,6 +30,8 @@ class AdminController {
             page: 1,
             totalJobs: 0
         }
+        
+        // initSocket();
 
         this.addEventListeners();
 
@@ -96,7 +99,6 @@ class AdminController {
             const btn = e.target.closest('.pagination__item');
             const previous = e.target.closest('.pagination__previous');
             const next = e.target.closest('.pagination__next');
-            console.log(document.querySelector(`.pagination`));
 
             if(btn) {
                 this.searchOptions.index = btn.dataset.id * this.searchOptions.limit;
@@ -159,6 +161,8 @@ class AdminController {
                     case 'deleteJob':   this.deleteJobAndUpdate(e.target.dataset.id);
                                         modal.parentElement.removeChild(modal);
                                         break;
+                    case 'addUser':     modal.parentElement.removeChild(modal); 
+                                        this.addHubspotUser(e.target.dataset.id); break;
                 }
             } else if(e.target.closest('.job-details')){
                 switch(jobView.getAction(e)) {
@@ -167,6 +171,10 @@ class AdminController {
                 }
             }
         }
+    }
+
+    addHubspotUser(id) {
+        this.JobList.addHubspotUser(id).then(res => console.log(res)).catch(err => console.log(err));
     }
 
     createJobAndUpdate() {
@@ -200,7 +208,8 @@ class AdminController {
             })
             .then(res => {
                 if(res) {
-                    this.jobs = res.data.jobs(({featured, id, title, wage, location, description, createdAt}) => ({featured, id, title, wage, location, description, createdAt}));;
+                    console.log(res.data.jobs);
+                    this.jobs = res.data.jobs.map(({featured, id, title, wage, location, description, createdAt}) => ({featured, id, title, wage, location, description, createdAt}));
                     // Clear table
                     utils.clearElement(elements.adminTableWrapper);
                     // Render table
@@ -403,8 +412,8 @@ class AdminController {
         ]
         const hubspotBtn = [
             'upload',
-            `<div class="delete-btn delete-btn--table">
-                <svg class="delete-icon">
+            `<div class="hubspot-add-btn hubspot-btn--table">
+                <svg class="hubspot-icon">
                     <use xlink:href="svg/spritesheet.svg#hubspot">
                 </svg>
             </div>`

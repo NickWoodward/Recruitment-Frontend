@@ -1,3 +1,5 @@
+import gsap from 'gsap';
+
 export const getAction = (e) => {
     const apply = e.target.closest('.job-details__btn--apply');
     const cancel = e.target.closest('.modal') && (!e.target.closest('.job-details__content') || e.target.closest('.job-details__back-btn') || e.target.closest('.job-details__close-btn'));
@@ -74,6 +76,28 @@ export const renderJobDetails = (job, container = document.body, featured, admin
 
     // Prevent bg scrolling behind modal
     document.body.style.overflow = "hidden";
+}
+
+export const renderJobNotification = (job = {jobId: 20, title: 'Corporate Commercial Partner', wage: 20000, location: 'Devizes'}) => {
+    const markup = `
+        <div class="job-notification" data-id=${job.jobId}>
+            <div class="job-notification__header job-notification__item">
+                <svg class="job-notification__icon"><use xlink:href="svg/spritesheet.svg#info"></svg>
+                <div class="job-notification__text">New job added: </div> 
+            </div>
+            <div class="job-notification__title job-notification__item">${job.title} in&nbsp;</div>
+            <div class="job-notification__location job-notification__item">${job.location}&nbsp;</div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', markup);
+    gsap.from(document.querySelector('.job-notification'), { opacity: 0, y: '100%', duration: 1, ease: 'ease-out' });
+
+    // Remove element after 5 seconds
+    // setTimeout(()=> {
+    //     const jobNotification = document.querySelector('.job-notification');
+    //     jobNotification.parentElement.removeChild(jobNotification);
+    // }, 5000);
 }
 
 export const setJobModalPosition = () => {

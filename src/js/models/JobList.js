@@ -2,6 +2,10 @@ import JRS from '../api/jrs';
 
 export default class JobList {
 
+    addHubspotUser(id) {
+        return JRS.post(`/users/addHubspotUser/${id}`);
+    };
+
     getJobs({ 
         limit, 
         index,

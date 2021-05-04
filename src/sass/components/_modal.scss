@@ -15,6 +15,153 @@
     z-index: 100;
 }
 
+.job-notification {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 1rem var(--page-padding--m);
+    background-color: $color-logo;
+    color: $color-white;
+    font-size: 1.6rem;
+
+    &__item {
+        // padding: 0 2rem;
+    }
+    &__title {
+        margin-left: 1rem;
+    }
+    &__header {
+        display: flex;
+        align-items: center;
+    }
+    &__icon {
+        fill: $color-secondary-highlight;
+        width: 3rem;
+        height: 3rem;
+        margin-right: 1.5rem;
+    }
+}
+
+.chatbox {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+
+    width: 35rem;
+    margin-left: 2rem;
+
+    border: 1px solid lightgray;
+    border-radius: 1.5rem 1.5rem 0 0;
+    border-bottom: none;
+    background-color: $color-logo;
+    font-size: 1.6rem;
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        color: $color-white;
+        padding: 1.3rem 2.5rem;
+        cursor: pointer;
+
+    }
+    &__close-icon {
+        width: 2rem;
+        height: 2rem;
+        fill: white;
+    }
+    &__content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        max-height: 100%;
+        height: 40rem;
+        width: 100%;
+        background-color: $color-background;
+    }
+    &__signup {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        display: none;
+        flex-direction: column;
+
+
+        padding: 3rem 4rem;
+        background-color: rgba($color-background, 0.7);
+
+        &-item {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1.5rem;
+        }
+        &-label {
+            color: $color-secondary;
+            margin-bottom: .5rem;
+        }
+        &-input {
+            padding: .4rem;
+        }
+        &-submit {
+            padding: .8rem;
+            margin-top: auto;
+            background-color: $color-logo;
+            color: $color-white;
+            cursor: pointer;
+        }
+    }
+
+    &__history {
+        display: flex;
+        flex-direction: column-reverse;
+        flex-basis: 100%;
+        padding: 1rem 2rem;
+        overflow-y: auto;
+    }
+    &__bubble {
+        display: inline-flex;
+        padding: 1rem 2rem;
+        border-radius: 1rem;
+        margin-top: 1rem;
+        &--client {
+            align-self: flex-end;
+            background-color: $color-primary;
+            color: white;
+        }
+        &--server {
+            background-color: $color-secondary-highlight;
+        }
+    }
+
+    &__form {
+        display: flex;
+        height: 3.2rem;
+        border: none;
+        border-top: 1px solid lightgray;
+    }
+    &__input {
+        padding: 1rem;
+        flex-grow: 1;
+        border: none;
+    }
+    &__submit-icon {
+        width: 4rem;
+        height: 100%;
+        padding: .3rem;
+        border-left: 1px solid lightgray;
+        fill: $color-logo;
+        cursor: pointer;
+    }
+}
+
 .register, .request, .forgot-password, .user-form, .job-form, .create-job {
     &__content {
         background-color: white;

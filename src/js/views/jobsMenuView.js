@@ -14,21 +14,29 @@ export const animateMenu = () => {
 /**
  * Dynamically create menu options for each menu section from unique db entries
  * 
- * @param {Object}  content An object containing arrays of the unique entries in the db for use as menu items (eg: {uniqueTitles, uniqueSalaries, ...}) 
+ * @param {Object} content An object containing arrays of the unique entries in the db for use as menu items (eg: {uniqueTitles, uniqueSalaries, ...}) 
+ * @param {Object} params An object containing string params that may have been passed to the jobs page. Used to set the state of menu items
  */
 
-export const populateMenu = (content) => {
+export const populateMenu = (content, params) => {
 
     // Add menu items to the relevant menus
     const jobTitles = content.uniqueTitles;
     const jobLocations = content.uniqueLocations;
+    const titleParam = params['titleParam'];
+    const locationParam = params['locationParam'];
+
     // Render Job Titles
     jobTitles.forEach(title => {
-        renderItem(title, elements.jobsMenuJobTitles, "titles");
+        const checked = title === titleParam;
+        renderItem(title, elements.jobsMenuJobTitles, "titles", checked);
     });
 
     // Render Job Locations
-    jobLocations.forEach(location => renderItem(location, elements.jobsMenuLocations, "locations"));
+    jobLocations.forEach(location => {
+        const checked = location === locationParam;
+        renderItem(location, elements.jobsMenuLocations, "locations", checked);
+    });
 }
 
 /**
@@ -57,13 +65,17 @@ export const findSelectedSubmenu = e => {
  * @param {string} menuItem The menu item to be added.
  * @param {Object} htmlElement The menu section the item should be added to.
  * @param {string} menuType The type of item to be added (title/salary/location etc).
+ * @param {boolean} checked Should the element be pre-checked
  */
-export const renderItem = (menuItem, htmlElement, menuType) => {
+export const renderItem = (menuItem, htmlElement, menuType, checked) => {
+    // If there's a param then the 'all' checkbox isn't applicable
+    if(checked && menuType === 'titles') document.querySelector(`.${elementStrings.titlesCheckboxAll}`).checked = false;
+    if(checked && menuType === 'locations') document.querySelector(`.${elementStrings.locationsCheckboxAll}`).checked = false;
 
     const random = Math.floor(Math.random() * 10) +1;
     const markup = `
          <div class="jobs-menu__input-wrapper">
-             <input class="jobs-menu__${menuType}-checkbox jobs-menu__checkbox" type="checkbox" name="${menuType}" value="${menuItem}">
+             <input class="jobs-menu__${menuType}-checkbox jobs-menu__checkbox" type="checkbox" name="${menuType}" value="${menuItem}" ${checked? 'checked': ''}>
              <p class="jobs-menu__description">${menuItem}</p>
              <div class="jobs-menu__count">(${random})</div>
 
@@ -71,7 +83,7 @@ export const renderItem = (menuItem, htmlElement, menuType) => {
     `;
 
     htmlElement.insertAdjacentHTML('beforeend', markup);
-
+    
 };
 
 export const toggleMenu = (e) => {

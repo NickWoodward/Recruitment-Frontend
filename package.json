@@ -32,9 +32,10 @@
     "webpack-merge": "^5.0.9"
   },
   "dependencies": {
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
-    "gsap": "^3.5.1",
-    "regenerator-runtime": "^0.13.7"
+    "gsap": "^3.6.1",
+    "regenerator-runtime": "^0.13.7",
+    "socket.io-client": "^4.0.1"
   }
 }

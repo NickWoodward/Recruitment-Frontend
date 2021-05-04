@@ -105,6 +105,7 @@ export const elementStrings = {
     /* TABLES */
     editJobsBtn: '.edit-btn--table',
     deleteJobsBtn: '.delete-btn--table',
+    hubspotBtn: '.hubspot-btn--table',
 
     editUsersBtn: '.edit-btn--table',
     deleteUsersBtn: '.delete-btn--table',
