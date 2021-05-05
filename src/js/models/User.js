@@ -9,6 +9,10 @@ export default class User {
     login({ email, password }) {
         return JRS.post('/auth/login', { email, password });
     }
+    logout() {
+        console.log('logging out');
+        return JRS.post('/auth/logout');
+    }
 
     deleteUser(id) {
         return JRS.delete(`/users/delete/${id}`);

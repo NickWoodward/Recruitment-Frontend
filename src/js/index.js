@@ -38,7 +38,6 @@ import '../assets/icons/paperplane.svg';
 
 class IndexController {
     constructor() {
-
         this.JobList = new JobList();
         this.User = new User();
         this.socket = initSocket();
@@ -50,6 +49,7 @@ class IndexController {
 
         // ONLOAD
         window.addEventListener('DOMContentLoaded', (e) => {
+            e.preventDefault();
             // Create Listener callbacks for header links
             const cbs = {
                 renderLogin: loginView.renderLogin
@@ -91,10 +91,8 @@ class IndexController {
                 if(e.target.closest('.login')) {
                     switch(loginView.getAction(e)) {
                         case 'submit':      try {
-                                                // @TODO: REFRESH TOKENS
                                                 const res = await this.User.login(loginView.getLoginDetails());
                                                 // window.location.replace('http://localhost:8082');
-                                                console.log(res.data.token);
                                             } catch(error) { 
                                                 if (error.response) {
                                                     // Server responded with a status code that falls out of the range of 2xx
@@ -180,6 +178,10 @@ class IndexController {
             }
         });
 
+        // KEYCOMBO
+        document.addEventListener('keydown', (e) => {
+            if(e.ctrlKey && e.shiftKey && e.key === 'L' && !document.querySelector('.login')) loginView.renderLogin();
+        });
 
         // BUTTONS
         elements.signupBtns.forEach(btn => btn.addEventListener('click', (e) => {

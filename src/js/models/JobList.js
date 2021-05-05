@@ -24,7 +24,7 @@ export default class JobList {
                 orderField,
                 orderDirection
             }
-        });
+        }, {withCredentials:true});
     }
 
     getFeaturedJobs() {

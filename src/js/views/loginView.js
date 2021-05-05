@@ -23,6 +23,7 @@ export const getLoginDetails = () => {
 
 // Modal
 export const renderLogin = () => {
+    console.log('render');
     const markup = `
         <div class="modal login">
             <div class="login__content">   
@@ -55,6 +56,6 @@ export const renderLogin = () => {
     
         </div>
     `;
-
-    document.body.insertAdjacentHTML('beforeend', markup);
+    console.log(document.body);
+    document.body.insertAdjacentHTML('afterbegin', markup);
 }

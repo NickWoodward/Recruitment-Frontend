@@ -10,6 +10,7 @@ import * as loader from "./views/loader";
 import * as utils from "./utils/utils";
 
 import JobList from "./models/JobList";
+import User from './models/User';
 
 import { elements } from "./views/base";
 import { elementStrings } from "./views/base";
@@ -25,6 +26,8 @@ import '../assets/icons/arrow-left.svg';
 
 export default class JobsController {
     constructor() {
+        // TEST: LOG OUT USER
+        new User().logout();
         this.searchParams = new URLSearchParams(window.location.search);
         this.titleParam = this.searchParams.get('title');
         this.locationParam = this.searchParams.get('location');
