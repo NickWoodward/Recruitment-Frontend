@@ -12,12 +12,29 @@
             <div class="sidebar">
                 <ul class="sidebar__menu">
                     <!-- Sidebar__item must be the first class name in the class list -->
+                    <li class="sidebar__item sidebar__item--applications">
+                        <a href="#" class="sidebar__link sidebar__link--applications">
+                            <svg class="sidebar__icon sidebar__icon--applications" aria-hidden="true">
+                                <use xlink:href="svg/spritesheet.svg#copy">
+                            </svg>
+                            <div class="sidebar__text">Applications</div>
+                        </a>
+                    </li>
+                    
                     <li class="sidebar__item sidebar__item--jobs sidebar__item--active">
                         <a href="#" class="sidebar__link sidebar__link--jobs sidebar__link--active">
                             <svg class="sidebar__icon sidebar__icon--jobs sidebar__icon--active" aria-hidden="true">
                                 <use xlink:href="svg/spritesheet.svg#location">
                             </svg>
                             <div class="sidebar__text">Jobs</div>
+                        </a>
+                    </li>
+                    <li class="sidebar__item sidebar__item--companies">
+                        <a href="#" class="sidebar__link sidebar__link--companies">
+                            <svg class="sidebar__icon sidebar__icon--companies" aria-hidden="true">
+                                <use xlink:href="svg/spritesheet.svg#world">
+                            </svg>
+                            <div class="sidebar__text">Companies</div>
                         </a>
                     </li>
                     <li class="sidebar__item sidebar__item--users">
@@ -28,7 +45,14 @@
                             <div class="sidebar__text">Users</div>
                         </a>
                     </li>
-
+                    <li class="sidebar__item sidebar__item--settings">
+                        <a href="#" class="sidebar__link sidebar__link--settings">
+                            <svg class="sidebar__icon sidebar__icon--settings" aria-hidden="true">
+                                <use xlink:href="svg/spritesheet.svg#cog">
+                            </svg>
+                            <div class="sidebar__text">Settings</div>
+                        </a>
+                    </li>
                 </ul>
             </div>
             <div class="admin__content">

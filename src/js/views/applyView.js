@@ -12,6 +12,15 @@ export const getAction = (e) => {
     if(cancel) return 'cancel';
 }
 
+export const getApplicationDetails = () => {
+    return {
+        firstName: document.querySelector('.request__input--first-name').value,
+        lastName: document.querySelector('.request__input--surname').value,
+        email: document.querySelector('.request__input--email').value,
+        phone: document.querySelector('.request__input--phone').value
+    }
+}
+
 export const renderApplyForm = (id) => {
     const markup = `
         <div class="modal apply" data-id="${id}">
@@ -26,8 +35,8 @@ export const renderApplyForm = (id) => {
                             <input class="request__input--first-name request__input" id="request__input--first-name" />
                         </div>
                         <div class="request__field">
-                            <label class="request__label--surnname request__label" for="request__input--surnname">Surname</label>
-                            <input class="request__input--surnname request__input" id="request__input--surnname" />
+                            <label class="request__label--surname request__label" for="request__input--surname">Surname</label>
+                            <input class="request__input--surname request__input" id="request__input--surname" />
                         </div>
                         <div class="request__field">
                             <label class="request__label--email request__label" for="request__input--email request__input">Email</label>
@@ -82,3 +91,4 @@ export const renderApplyForm = (id) => {
 
     document.body.insertAdjacentHTML('beforeend', markup);
 };
+

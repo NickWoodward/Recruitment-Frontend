@@ -8,6 +8,17 @@ export const getAction = (e) => {
     if(signIn) return 'sign-in';
 };
 
+export const getFormData = () => {
+    return {
+        firstName: document.querySelector('.register__input--fname').value,
+        lastName: document.querySelector('.register__input--surname').value,
+        email: document.querySelector('.register__input--email').value,
+        phone: document.querySelector('.register__input--phone').value,
+        password: document.querySelector('.register__input--password').value,
+        confirmPassword: document.querySelector('.register__input--confirm-password').value,
+    }
+};
+
 export const renderRegisterModal = () => {
     const markup = `
         <div class="modal register">

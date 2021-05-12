@@ -4,7 +4,9 @@ export default class User {
     getUsers() {
         return JRS.get('/users/all');
     }
- 
+    getUserHeaders() {
+        return JRS.get('/users/headers');
+    }
 
     login({ email, password }) {
         return JRS.post('/auth/login', { email, password });
@@ -26,7 +28,7 @@ export default class User {
         return JRS.post(`/users/edit/${id}`, { firstName, lastName, email, phone, url });
     }
 
-    createUser(firstName, lastName, email, phone, password, confirmPassword, url) {
+    createUser({firstName, lastName, email, phone, password, confirmPassword, url}) {
         return JRS.post('/users/register', { firstName, lastName, email, phone, password, confirmPassword, url });
     }
 }

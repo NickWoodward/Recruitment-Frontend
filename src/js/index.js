@@ -13,6 +13,7 @@ import * as jobView from './views/jobView';
 import { initSocket } from './socket';
 import User from './models/User';
 import JobList from './models/JobList';
+import Applications from './models/Applications';
 
 /* ASSETS */
 import '../sass/index.scss';
@@ -34,12 +35,15 @@ import '../assets/icons/info.svg';
 import '../assets/icons/chatbubble.svg';
 import '../assets/icons/arrow-up.svg';
 import '../assets/icons/paperplane.svg';
-
+import '../assets/icons/world.svg';
+import '../assets/icons/copy.svg';
+import '../assets/icons/cog.svg';
 
 class IndexController {
     constructor() {
         this.JobList = new JobList();
         this.User = new User();
+        this.Applications = new Applications();
         this.socket = initSocket();
 
         this.addEventListeners();
@@ -124,7 +128,9 @@ class IndexController {
                 // Register Modal Clicked
                 } else if(e.target.closest('.register')) {
                     switch(registerView.getAction(e)) {
-                        case 'register':    console.log('register'); break; 
+                        case 'register':    console.log('register'); 
+                                            this.createUser(e.target.closest('.register'));
+                                            break; 
                         case 'cancel':      this.closeModal(modal); break;
                         case 'sign-in':       this.closeModal(modal); loginView.renderLogin(); break;
                     }
@@ -140,14 +146,17 @@ class IndexController {
                         case 'sign-in'  : this.closeModal(modal); loginView.renderLogin(); break;  
                     }
                 } else if(e.target.closest('.apply')) {
-
+                    
                     switch(applyView.getAction(e)) {
-                        case 'request':     console.log('request'); break;
-                        case 'login':       console.log('login'); break;
-                        case 'forgot':      this.closeModal(modal);
-                                            forgotPassView.renderForgotModal(); break;
-                        case 'register':    this.closeModal(modal);
-                                            registerView.renderRegisterModal(); break;
+                        case 'request':     const jobId = e.target.closest('.apply').dataset.id;
+                                            const applicationDetails = applyView.getApplicationDetails();
+                                            this.applyForJob(jobId, applicationDetails);
+                                            break;
+                        // case 'login':       console.log('login'); break;
+                        // case 'forgot':      this.closeModal(modal);
+                        //                     forgotPassView.renderForgotModal(); break;
+                        // case 'register':    this.closeModal(modal);
+                        //                     registerView.renderRegisterModal(); break;
                         case 'cancel':      this.closeModal(modal);
                     }
                 }
@@ -213,6 +222,30 @@ class IndexController {
     closeModal(modal) {
         modal.parentElement.removeChild(modal);
         document.body.style.overflow = "auto";
+    }
+
+    applyForJob(jobId, details) {
+        console.log(jobId, details);
+        this.Applications.applyForJob(jobId, details)
+    }
+
+    createUser(modal) {
+        this.User
+            .createUser(registerView.getFormData())
+            .then(res => {
+                console.log(res);
+                if(res.status === 201) {
+                    // Close register Modal
+                    this.closeModal(modal);
+                    // @TODO: display success modal
+                    console.log('User created!');
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                // @TODO: Implement form validation
+            });
+        
     }
 
     getFeaturedJobs() {

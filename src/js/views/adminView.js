@@ -14,7 +14,7 @@ export const renderContent = (content, container) => {
 
 export const changeActiveMenuItem = (e) => {
     // Items contain the highlight, the links contain the fill and color for the text/icon
-    const items = [ elements.adminMenuJobsItem, elements.adminMenuUsersItem ];
+    const items = [ elements.adminMenuJobsItem, elements.adminMenuUsersItem, elements.adminMenuApplicationsItem, elements.adminMenuCompaniesItem, elements.adminMenuSettingsItem ];
 
     const newActiveItem = e.target.closest(elementStrings.adminMenuItem);
     const newActiveLink = newActiveItem.childNodes[1];
@@ -150,6 +150,25 @@ const displayModal = (action, type, item) => {
         item[0]
     );
     document.body.insertAdjacentHTML('afterbegin', warningModal);
+};
+
+export const renderCompanies = (companies) => {
+    const markup = `
+        ${companies.map(company => {
+            return renderCompany(company);
+        })}
+    `;
+    utils.clearElement(elements.adminContent);
+
+    document.querySelector('.admin__content').insertAdjacentHTML('afterbegin', markup);
+};
+const renderCompany = (company) => {
+    return `
+        <div class="company-wrapper" data-set="${company.id}">
+                <div class="company-item company-item--${company.name}">${company.name}</div>
+                <div class="company-item company-item--${company.address}">${company.address}</div>
+        </div>
+        `
 };
  
 

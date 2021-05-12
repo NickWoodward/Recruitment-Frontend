@@ -18,6 +18,8 @@ import * as utils from './utils/utils';
 import { initSocket } from './socket';
 import JobList from './models/JobList';
 import UserModel from './models/User';
+import Applications from './models/Applications';
+import Companies from './models/Companies';
 
 import { elements, elementStrings } from './views/base';
 
@@ -26,6 +28,9 @@ class AdminController {
         // JobList and UserModel return axios methods CRUD ops
         this.JobList = new JobList();
         this.UserModel = new UserModel();
+        this.Applications = new Applications();
+        this.Companies = new Companies();
+
         this.state = {
             page: 1,
             totalJobs: 0
@@ -55,11 +60,6 @@ class AdminController {
             // Render Header
             headerView.renderHeader("admin")
         
-            // Get User data
-            this.UserModel.getUsers()
-                .then(res => this.users = res.data.users)
-                .catch(err => console.log(err));
-
             // Get Job data and render table
             this.JobList.getJobs(this.searchOptions)
                 .then(res => {
@@ -78,21 +78,65 @@ class AdminController {
         document.body.addEventListener('click', this.checkModals.bind(this));
 
         // MENU LISTENERS
-        elements.adminMenuJobsItem.addEventListener('click', (e) => {
-            // Change the active menu item
+        elements.adminSidebar.addEventListener('click', (e) => {
+            const applications = e.target.closest('.sidebar__item--applications');
+            const jobs = e.target.closest('.sidebar__item--jobs');
+            const companies = e.target.closest('.sidebar__item--companies');
+            const users = e.target.closest('.sidebar__item--users');
+            const settings = e.target.closest('.sidebar__item--settings');
+
             adminView.changeActiveMenuItem(e);
 
-            // Change the content displayed
-            this.renderJobsTable();
-            adminView.addTableListeners('jobs');
-            
+            if(jobs) {
+                // Jobs data initially loaded on DOMLoaded
+                this.renderJobsTable();
+                adminView.addTableListeners('jobs');
+            }
+            if(users) {
+                // Get User data
+                this.UserModel.getUsers()
+                    .then(res => {
+                        // Store and render data
+                        this.users = res.data.users;
+
+                        if(this.users.length > 0) {
+                            this.headers = Object.keys(this.users[0]);
+                            this.renderUsersTable();
+                            adminView.addTableListeners('users');
+                        } else {
+                            this.UserModel.getUserHeaders().then(result => {
+                                this.headers = result.data.headers;
+                                this.renderUsersTable();
+
+                            });
+
+                        }
+                    })
+                    .catch(err => console.log(err));
+                
+            }
+            if(applications) {
+                this.Applications
+                    .getApplications()
+                    .then(res => {
+                            this.applications = res.data.applications;
+                        if(this.applications.length > 0) {
+                            this.renderApplicationsTable();
+                        }
+
+                    })
+                    .catch(err => console.log(err));
+            }
+            if(companies) {
+                this.Companies
+                    .getCompanies()
+                    .then(res => {
+                        this.companies = res.data.companies;
+                        if(this.companies.length > 0) adminView.renderCompanies(this.companies)
+                    })
+            }
         });
-        elements.adminMenuUsersItem.addEventListener('click', (e) => {
-            adminView.changeActiveMenuItem(e);
-            this.renderUsersTable();
-            // Add table listeners
-            adminView.addTableListeners('users');
-        });
+
 
         // PAGINATION CONTROLS
         document.body.addEventListener('click', (e) => {
@@ -336,6 +380,29 @@ class AdminController {
             .catch(err => console.log(err));
     }
 
+    renderApplicationsTable() {
+        if(!document.querySelector(elementStrings.adminApplicationsTable)) {
+            // Clear the table wrapper
+            utils.clearElement(elements.adminTableWrapper);
+            
+            // Render the table
+            adminView.renderContent(
+                [
+                    tableView.createTable(
+                        'applications',
+                        Object.keys(this.applications[0]),  
+                        this.applications,
+                        false,
+                        []
+                    ),
+                    ''
+                ],
+                elements.adminTableWrapper
+            );
+            // adminView.renderPagination(this.searchOptions.index, this.searchOptions.limit, this.state.totalJobs, document.querySelector('.btn-wrapper--admin'));
+        }
+    }
+
     renderJobsTable() {
         // Table controls
         const tableControls = `
@@ -427,7 +494,7 @@ class AdminController {
                 [
                     tableView.createTable(
                         'users',
-                        Object.keys(this.users[0]),  
+                        this.headers,  
                         this.users,
                         false,
                         [editBtn, deleteBtn, hubspotBtn]

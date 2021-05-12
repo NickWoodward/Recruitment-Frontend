@@ -31,6 +31,10 @@ export default class JobList {
         return JRS.get(`jobs/featured`);
     }
 
+    applyForJob(id, details) {
+        return JRS.post(`jobs/apply/${id}`, details);
+    }
+
     getJob(id) {
         return JRS.get(`jobs/${id}`);
     }

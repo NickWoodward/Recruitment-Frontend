@@ -32,6 +32,7 @@ export const elements = {
     /* Admin.html */
     adminContent: document.querySelector('.admin__content'),
 
+    adminSidebar: document.querySelector('.sidebar__menu'),
     adminMenuItem: document.querySelector('.sidebar__item'),
 
     adminMenuJobsItem: document.querySelector('.sidebar__item--jobs'),
@@ -41,6 +42,15 @@ export const elements = {
     adminMenuUsersItem: document.querySelector('.sidebar__item--users'),
     adminMenuUsersLink: document.querySelector('.sidebar__link--users'),
     adminMenuUsersIcon: document.querySelector('.sidebar__icon--users'),
+
+    adminMenuApplicationsItem: document.querySelector('.sidebar__item--applications'),
+    adminMenuApplicationsLink: document.querySelector('.sidebar__link--applications'),
+    adminMenuApplicationsIcon: document.querySelector('.sidebar__icon--applications'),
+
+    adminMenuCompaniesItem: document.querySelector('.sidebar__item--companies'),
+
+    adminMenuSettingsItem: document.querySelector('.sidebar__item--settings'),
+
 
     // adminMenuJobItem: document.querySelector('.sidebar__item--jobs'),
     // adminMenuJobLink: document.querySelector('.sidebar__link--jobs'),
@@ -97,6 +107,7 @@ export const elementStrings = {
 
     adminJobsTable: '.table--jobs',
     adminUsersTable: '.table--users',
+    adminApplicationsTable: '.table--applications',
 
     pagination: '.pagination',
 
