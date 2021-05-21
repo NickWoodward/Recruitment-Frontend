@@ -329,16 +329,63 @@
         border-radius: 5px;
         box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
         background-color: white;
+
     }
     &__label {
+        position: relative;
+        display: inline;
         font-size: 1.4rem;
         margin-bottom: .8rem;
+       
+        // the CV label is actually styled as the button
+        &--cv {
+            padding: 1rem 2rem;
+            background-color: $color-secondary-highlight;
+            color: white;
+            cursor: pointer;
+        }
+        // Required asterisk 
+        &:not(&--cv):not(&--dummy){
+            &::after {
+                position: absolute;
+                content: '\204E';
+                top: -.8rem;
+                right: -1.5rem;
+                color: $color-secondary;
+            }
+        }
+       
     }
     &__input {
+        width: 100%;
         padding: .5rem .5rem;
+
+        &--cv {
+            position: absolute;
+            left: -9999px;
+
+        }
+        &-path {
+            font-size: 1.4rem;
+            margin-left: 2rem;
+        }
     }
     &__field {
+        display: flex;
+        align-items: flex-start;
+
         margin-bottom: 1rem;
+
+        &--cv {
+            flex-direction: column;
+            // justify-content: space-between;
+            align-items: baseline;
+            margin-top: 1rem;
+        }
+    }
+    &__file-picker {
+        display: flex;
+        align-items: baseline;
     }
     &__submit {
         width: 100%;

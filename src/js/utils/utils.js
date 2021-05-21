@@ -8,6 +8,13 @@ export const removeElement = (element) => {
     element.parentElement.removeChild(element);
 }
 
+export const changeActiveRow = (row, rows) => {
+    rows.forEach(row => {
+        if(row.classList.contains('row--active')) row.classList.remove('row--active'); 
+    });
+    row.classList.add('row--active');
+};
+
 export const warn = (message, controls, type, data) => {
     const markup = `
         <div class="modal modal--warn warn">
@@ -40,4 +47,13 @@ export const limitText = (text, limit = 30) => {
     }, 0);
 
     return `${newText.join(' ')}...`;
+};
+
+export const capitalise = (text, all) => {
+    if(typeof text !== 'string') return text;
+    if(!all) return text.charAt(0).toUpperCase() + text.slice(1);
+    const words = text.split(' ').map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
+    return words;
 };

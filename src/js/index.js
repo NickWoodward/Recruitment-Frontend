@@ -53,6 +53,7 @@ class IndexController {
 
         // ONLOAD
         window.addEventListener('DOMContentLoaded', (e) => {
+            // this.applyForJob(1, { firstName: 'a', lastName: 'b', phone: '07384838238', email: 'nick@gmail', cv: {} })
             e.preventDefault();
             // Create Listener callbacks for header links
             const cbs = {
@@ -90,7 +91,7 @@ class IndexController {
             // if there's a modal and the header is clicked, close it
             if(header && document.querySelector('.modal')) this.closeModal(document.querySelector('.modal'));
             if(modal) {
-                e.preventDefault();
+                // e.preventDefault();
                 // Login Modal Clicked
                 if(e.target.closest('.login')) {
                     switch(loginView.getAction(e)) {
@@ -226,6 +227,7 @@ class IndexController {
 
     applyForJob(jobId, details) {
         console.log(jobId, details);
+        
         this.Applications.applyForJob(jobId, details)
     }
 
@@ -273,6 +275,14 @@ class IndexController {
                                             .catch(err => console.log(err));
                                     } else if(applyBtn) {
                                         applyView.renderApplyForm(card.dataset.id);
+                                        // Set a listener on the file picker that appears on the apply modal
+                                        const filePicker = document.querySelector('.request__input--cv');
+                                        filePicker.onchange = function() {
+                                            const path = document.querySelector('.request__input-path');
+                                            path.textContent = '';
+                                            path.insertAdjacentHTML('afterbegin', `<div>${filePicker.value.replace("C:\\fakepath\\", "")}</div>`);
+                                        }
+                                        
                                     }
                                 });
                             });

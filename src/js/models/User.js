@@ -2,7 +2,7 @@ import JRS from '../api/jrs';
 
 export default class User {
     getUsers() {
-        return JRS.get('/users/all');
+        return JRS.get('/admin/applicants');
     }
     getUserHeaders() {
         return JRS.get('/users/headers');

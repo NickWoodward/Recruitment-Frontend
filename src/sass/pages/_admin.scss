@@ -55,12 +55,87 @@
     margin-left: 1.8rem;
 }
 
+.admin-wrapper {
+    height: 100vh;
+}
+.admin__main {
+    display: flex;
+    height: 100%;
+}
 
 .admin__content {
     display: flex;
+    align-items: flex-start;
     justify-content: center;
     width: 100%;
-    // padding: 6rem 10rem;
+    height: 100%;
+    padding: 5rem;
+}
+
+// ********** USER CONTENT STYLING **********
+.user-summary {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    margin-right: 12rem;
+    // height: 20rem;
+    width: 40rem;
+    background-color: rgb(249, 250, 251);
+    
+    &__details {
+        align-self: flex-start;
+        padding: 2.5rem;
+    }
+    &__item {
+        margin-bottom: 1rem;
+        font-size: 1.6rem;
+    }
+
+    &__controls {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        width: 100%;
+        margin-top: auto;
+        padding: 2rem 2rem;
+        // border: 1px solid red;
+    }
+    &__btn {
+        display: flex;
+        align-items: flex-end;
+        margin-right: 1rem;
+    }
+    &__cv-btn {
+        margin-right: auto;
+    }
+    &__edit-icon {
+        height: 3.5rem;
+        width: 3.5rem;
+        fill: $color-logo;
+    }
+    &__delete-icon {
+        height: 3.3rem;
+        width: 3.3rem;
+        fill: $color-secondary;
+    }
+    &__hubspot-icon {
+        height: 2.7rem;
+        width: 2.7rem;
+        fill: $color-secondary;
+    }
+    &__cv-icon {
+        height: 3.2rem;
+        width: 3.2rem;
+    }
+}
+
+.row {
+    position: relative;
+
+    &--active {
+        border-left: 2px solid $color-secondary;
+    }
 }
 
 .featured-icon {

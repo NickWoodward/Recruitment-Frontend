@@ -1,6 +1,11 @@
 .table {
-    &--jobs, &--users {
+    &--jobs {
         width: 150rem;
+    }
+    &--users {
+        width: 40rem;
+        height: 90vh;
+        overflow-y: hidden;
     }
 }
 
@@ -30,7 +35,7 @@ table {
 
 
 tr {
-    padding: 2rem;
+    // padding: 2rem;
 }
 
 tbody tr:nth-child(odd) {
@@ -38,11 +43,12 @@ tbody tr:nth-child(odd) {
 }
 
 thead tr {
+    padding-top: 0;
     background-color: white;
 }
 
 th, td {
-    padding: .8rem 1rem;
+    // padding: .8rem 1rem;
 }
 
 td::before {
@@ -89,18 +95,21 @@ td:nth-of-type(8)::before {
     th, td {
         display: table-cell;
         text-align: left;
-        padding: 2rem 2.5rem;
+        // padding: 2rem 2.5rem;
         text-transform:initial;
+    }
+    td {
+        padding: 2rem 2.5rem;
+
     }
     th {
         font-size: 1.5rem;
         font-weight: 700;
-        padding: 3rem 2.5rem;
+        padding: 0 2.5rem 2rem 2.5rem;
     }
     tr {
         position: relative;
         display: table-row;
-        cursor: pointer;
     }
     table {
         display: table;

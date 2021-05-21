@@ -46,3 +46,30 @@ export const createTable = (title, theads = [], rows, displayIndex = false, rowC
 
     return markup;
 };
+
+// have to add the rowControls theads before passing
+export const createTableTest = (title, theads, rows, displayIndex = false) => {
+    const markup = `
+        <table class="table table--${title}">
+            <thead class="thead--${title}">
+                <tr>
+                    ${theads.map((thead) => {
+                        if(thead === 'id' && !displayIndex) return;
+                        return `<th>${thead.toUpperCase()}</th>`;
+                    }).join('')} 
+                </tr>
+            </thead>
+            <tbody>
+                ${
+                    rows.map(row => {
+                        return `<tr class="row row--${title}">${row.map(col => {
+                            return `<td>${col}</td>`
+                        }).join('')}</tr>`
+                    }).join('')
+
+                }
+            </tbody>
+        </table>
+    `
+    return markup;
+};

@@ -99,6 +99,15 @@
         background-color: $color-secondary;
     }
 }
+.cv-btn {
+    &--table {
+        display: flex;
+        width: 4rem;
+        height: 4rem;
+        fill: $color-logo;
+        cursor: pointer;
+    }
+}
 .hubspot-add-btn {
     display: flex;
     margin-left: auto;

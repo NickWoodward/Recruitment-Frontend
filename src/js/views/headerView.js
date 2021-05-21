@@ -11,6 +11,7 @@ export const setParallaxHeaderWidth = () => {
 export const renderHeader = (page) => {
     const markup = `
     <header class="header header--${page}">
+
         <div class="header__content header__content--${page}">
         <a href="./index.html" class="header__logo">
             <img class="logo" src="src/assets/logo-crop.jpg" alt="JRS Logo" />
@@ -69,6 +70,5 @@ export const renderHeader = (page) => {
 
 export const addHeaderListeners = ({ renderLogin }) => {
     const loginLink = document.querySelector('.nav__a--login');
-    console.log(renderLogin);
     loginLink.addEventListener('click', () => renderLogin());
 }

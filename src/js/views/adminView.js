@@ -12,6 +12,142 @@ export const renderContent = (content, container) => {
     });
 };
 
+export const forceDownload = (res, filename, ext) => {
+    const url = window.URL.createObjectURL(new Blob([res.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${filename}`);
+    document.body.appendChild(link);
+    link.click();
+};
+
+// { company, jobsId, applicantId, position, personId, firstName, lastName, cvUrl }
+// return div elements with the following datasets and add additional row controls:
+// controls: delete/create
+// firstName/lastName : personId
+// position : jobsId
+// 
+export const formatApplications = (applications) => {
+    // Headers should match the returned divs in createApplicationElement
+    const headers = ['', 'NAME','SURNAME','POSITION','COMPANY','CV']
+    const rows = applications.map(application => {
+        
+        return createApplicationElement(formatProperties(application, ['cvUrl']));
+    });
+    return { headers, rows };
+}; 
+const createApplicationElement = ({applicationId, company, companyId, firstName, lastName, personId, applicantId, position, jobId, cvUrl = ''}) => {
+    let cvType;
+    if(cvUrl) cvType = cvUrl.indexOf('doc') !== -1? 'doc':'pdf';
+
+    const row = [
+        `<div class="td-data--applicationId" data-application=${applicationId}>${applicationId}</div>`,
+        `<div class="td-data--firstName" data-id=${personId}>${firstName}</div>`,
+        `<div class="td-data--lastName" data-id=${personId}>${lastName}</div>`,
+        `<div class="td-data--position" data-id=${jobId}>${position}</div>`,
+        `<div class="td-data--company data-id=${companyId}">${company}</div>`,
+        `<div class="cv-btn--table" data-cvUrl=${applicantId}><svg class="cv-icon">
+            ${cvUrl? 
+                (cvType === 'doc'? 
+                    '<use xlink:href="svg/spritesheet.svg#doc">':
+                    '<use xlink:href="svg/spritesheet.svg#pdf">'
+                ): '<use xlink:href="svg/spritesheet.svg#upload">'}
+        </svg></div>`,
+        `<div class="td-data--delete"></div>`
+    ];
+    return row;
+};
+const formatProperties = (object, skip) => {
+    for(const key in object) {
+        const value = object[key];
+        if(!skip.includes(key)) object[key] = utils.capitalise(value);
+    }
+    return object;
+};
+
+export const formatUsers = (users) => {
+    // Headers should match the returned divs in createUserElement
+    const headers = ['ID', 'NAME', 'SURNAME', 'JOINED'];
+    const rows = users.map(user => {
+        return createUserElement(formatProperties(user, ['applicantId', 'createdAt', 'jobs']));
+    });
+    return { headers, rows };
+};
+const createUserElement = ({ applicantId, firstName, lastName, createdAt }) => {
+    const row = [
+        `<div class="td-data--applicantId">${applicantId}</div>`,
+        `<div class="td-data--first-name" data-id=${applicantId}>${firstName}</div>`,
+        `<div class="td-data--last-name" data-id=${applicantId}>${lastName}</div>`,
+        `<div class="td-data--date" data-id=${applicantId}>${createdAt}</div>`
+    ];
+    return row;
+}
+export const createUserSummary = () => {
+    const markup = `
+        <div class="user-summary">
+            <div class="user-summary__details">
+                <div class="user-summary__name user-summary__item"></div>
+                <div class="user-summary__phone user-summary__item"></div>
+                <div class="user-summary__email user-summary__item"></div>
+            </div>
+            <div class="user-summary__controls">
+                
+                <div class="user-summary__btn user-summary__btn--edit">
+                    <svg class="user-summary__edit-icon">
+                        <use xlink:href="svg/spritesheet.svg#edit-solid">
+                    </svg>
+                </div>
+                <div class="user-summary__btn user-summary__btn--delete">
+                    <svg class="user-summary__delete-icon">
+                        <use xlink:href="svg/spritesheet.svg#delete-solid">
+                    </svg>
+                </div>
+                <div class="user-summary__btn user-summary__btn--hubspot">
+                    <svg class="user-summary__hubspot-icon">
+                        <use xlink:href="svg/spritesheet.svg#hubspot">
+                    </svg>
+                </div>
+                
+            </div>
+        </div>
+    `;
+    return markup;
+};
+export const populateUserSummary = (user) => {
+    document.querySelector('.user-summary__name').innerText = `${user.firstName} ${user.lastName}`;
+    document.querySelector('.user-summary__phone').innerText = user.phone;
+    document.querySelector('.user-summary__email').innerText = user.email;
+    const cvBtn = document.querySelector('.user-summary__btn--cv') || document.querySelector('.user-summary__btn--upload');
+    const cvType = user.cvType;
+    if(cvBtn) utils.removeElement(cvBtn);
+    const cvElement = `
+        <div class="user-summary__btn--${cvType === null ? 'upload':'cv'}" data-id=${user.applicantId}>
+            <svg class="user-summary__cv-icon">
+                <use xlink:href="svg/spritesheet.svg#${cvType === '.pdf'? 'pdf':(cvType === '.doc' || cvType === '.docx'? 'doc':'upload')}">
+            </svg>
+        </div>
+    `;
+
+    document.querySelector('.user-summary__controls').insertAdjacentHTML('afterbegin', cvElement);
+}
+
+export const formatJobs = (jobs) => {
+    // Headers should match the returned divs in createJobsElement
+    const headers = ['COMPANY','TITLE','LOCATION'];
+    const rows = jobs.map(job => {
+        return createJobElement(job);
+    });
+    return { headers, rows };
+};
+const createJobElement = (job) => {
+    const row = [
+        `<div class="td-data--company">Company</div>`,
+        `<div class="td-data--title">${job.title}</div>`,
+        `<div class="td-data--location">${job.location}</div>`
+    ];
+    return row;
+}; 
+
 export const changeActiveMenuItem = (e) => {
     // Items contain the highlight, the links contain the fill and color for the text/icon
     const items = [ elements.adminMenuJobsItem, elements.adminMenuUsersItem, elements.adminMenuApplicationsItem, elements.adminMenuCompaniesItem, elements.adminMenuSettingsItem ];

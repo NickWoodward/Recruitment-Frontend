@@ -26,8 +26,6 @@ import '../assets/icons/arrow-left.svg';
 
 export default class JobsController {
     constructor() {
-        // TEST: LOG OUT USER
-        new User().logout();
         this.searchParams = new URLSearchParams(window.location.search);
         this.titleParam = this.searchParams.get('title');
         this.locationParam = this.searchParams.get('location');

@@ -13,17 +13,27 @@ export const getAction = (e) => {
 }
 
 export const getApplicationDetails = () => {
-    return {
-        firstName: document.querySelector('.request__input--first-name').value,
-        lastName: document.querySelector('.request__input--surname').value,
-        email: document.querySelector('.request__input--email').value,
-        phone: document.querySelector('.request__input--phone').value
-    }
+    const formData = new FormData();
+    formData.append('firstName', document.querySelector('.request__input--first-name').value);
+    formData.append('lastName', document.querySelector('.request__input--surname').value);
+    formData.append('email', document.querySelector('.request__input--email').value);
+    formData.append('phone', document.querySelector('.request__input--phone').value);
+    formData.append('cv', document.querySelector('.request__input--cv').files[0]);
+    return formData;
+    // return {
+    //     firstName: document.querySelector('.request__input--first-name').value,
+    //     lastName: document.querySelector('.request__input--surname').value,
+    //     email: document.querySelector('.request__input--email').value,
+    //     phone: document.querySelector('.request__input--phone').value,
+    //     cv: document.querySelector('.request__input--cv').files[0]
+    // }
 }
 
 export const renderApplyForm = (id) => {
     const markup = `
+
         <div class="modal apply" data-id="${id}">
+
             <div class="apply__content">
                 <div class="request">
                     <div class="request__header">
@@ -46,7 +56,20 @@ export const renderApplyForm = (id) => {
                             <label class="request__label--phone request__label" for="request__input--phone">Phone</label>
                             <input class="request__input--phone request__input" id="request__input--phone" />
                         </div>
+                        <div class="request__field request__field--cv">
+                        <!-- Input inside label for custom styling -->
+                            <div class="request__label request__label--dummy">CV</div>
+                            <div class="request__file-picker">
+                                <label class="request__label--cv request__label" for="request__input--cv">
+                                Upload
+                                    <input class="request__input--cv request__input" id="request__input--cv" name="cv" type=file />
+                                </label>
+                                <div class="request__input-path"><span>No file chosen</span></div>
+                            </div>
+
+                        </div>
                         <button class="request__submit btn">Submit</button>
+
                     </form>
                 </div>
 
