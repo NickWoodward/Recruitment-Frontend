@@ -1,8 +1,8 @@
 import JRS from '../api/jrs';
 
 export default class User {
-    getUsers() {
-        return JRS.get('/admin/applicants');
+    getUsers({index, limit}) {
+        return JRS.get('/admin/applicants', { params: { index, limit } });
     }
     getUserHeaders() {
         return JRS.get('/users/headers');

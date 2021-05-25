@@ -79,7 +79,6 @@
     justify-content: flex-start;
     align-items: center;
     margin-right: 12rem;
-    // height: 20rem;
     width: 40rem;
     background-color: rgb(249, 250, 251);
     
@@ -88,8 +87,33 @@
         padding: 2.5rem;
     }
     &__item {
-        margin-bottom: 1rem;
+        margin-bottom: .3rem;
         font-size: 1.6rem;
+        padding: .8rem 2.5rem .8rem .8rem;
+        border: 1px solid transparent;
+        &:hover {
+            cursor: default;
+        }
+    }
+    &__item--editable {
+        -moz-appearance: textfield;
+        -webkit-appearance: textfield;
+        background-color: white;
+        background-color: -moz-field;
+        border: 1px solid darkgray;
+        box-shadow: 1px 1px 1px 0 lightgray inset;  
+        &:hover {
+            cursor: auto;
+        }
+    }
+    &__cv-wrapper {
+        display: flex;
+        align-items: center;
+        margin-top: 2rem;
+        font-size: 1.3rem;
+    }
+    &__cv-path {
+        margin-left: 1.5rem;
     }
 
     &__controls {
@@ -104,11 +128,21 @@
     &__btn {
         display: flex;
         align-items: flex-end;
-        margin-right: 1rem;
+        margin-right: 1.5rem;
+        cursor:pointer;
     }
-    &__cv-btn {
-        margin-right: auto;
+    
+    &__btn--upload {
+        fill: $color-secondary;
+        align-items: center;
     }
+    &__btn--edit, &__btn--save {
+        transform: translateY(3px);
+    }
+    &__btn--hubspot {
+        margin-right: 2rem;
+    }
+
     &__edit-icon {
         height: 3.5rem;
         width: 3.5rem;
@@ -119,15 +153,33 @@
         width: 3.3rem;
         fill: $color-secondary;
     }
+    &__save-icon {
+        height: 3.5rem;
+        width: 3.5rem;
+        fill: red;
+    }
     &__hubspot-icon {
-        height: 2.7rem;
-        width: 2.7rem;
+        height: 2.9rem;
+        width: 2.9rem;
         fill: $color-secondary;
     }
     &__cv-icon {
-        height: 3.2rem;
-        width: 3.2rem;
+        height: 4rem;
+        width: 4rem;
     }
+    &__upload-icon {
+        height: 4rem;
+        width: 4rem;
+    }
+
+}
+
+// ********** USER TABLE STYLING **********
+.user-table__wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
 }
 
 .row {
@@ -148,13 +200,13 @@
     &--cross { fill: red }
 }
 
-.admin__table-wrapper {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 100%;
-    padding: 3rem 5rem 5rem 5rem ;
-}
+// .admin__table-wrapper {
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: space-between;
+//     width: 100%;
+//     padding: 3rem 5rem 5rem 5rem ;
+// }
 .table--jobs {
     width: 100%;
 }
@@ -163,7 +215,7 @@
 .pagination {
     display: flex;
     align-items: center;
-
+    padding-top: 1rem;
     &__item {
         display: flex;
         justify-content: center;

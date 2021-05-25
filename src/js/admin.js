@@ -5,10 +5,13 @@ import '../assets/icons/edit-solid.svg';
 import '../assets/icons/delete-solid.svg';
 import '../assets/icons/hubspot.svg';
 import '../assets/icons/tick.svg';
-import '../assets/icons/upload.svg';
+import '../assets/icons/upload-np.svg';
 import '../assets/icons/pdf.svg';
 import '../assets/icons/pdf.svg';
 import '../assets/icons/doc.svg';
+import '../assets/icons/save-np.svg';
+import '../assets/icons/delete-np1.svg';
+import '../assets/icons/edit-np1.svg';
 
 import * as headerView from './views/headerView';
 import * as adminView from './views/adminView';
@@ -48,7 +51,13 @@ class AdminController {
                 }
             },
             users: {
-                totalUsers: 0
+                totalUsers: 0,
+                currentUser: {},
+                currentPage: 0,
+                searchOptions: {
+                    index: 0,
+                    limit: 6,
+                }
             }
             
         }
@@ -79,6 +88,22 @@ class AdminController {
                 .catch(err => console.log(err));
         });
 
+        // Handle editable elements when a user clicks elsewhere
+        document.body.addEventListener('click', (e) => {
+            const userSummary = document.querySelector('.user-summary');
+            const editableContent = document.querySelector('.user-summary__item--editable');
+            const editBtnTarget = e.target.closest('.user-summary__btn--edit');
+            const itemTarget = e.target.closest('.user-summary__item');
+
+            // If user summary is present, editable, and neither the edit btn or editable elements have been clicked
+            if(userSummary && editableContent && !editBtnTarget && !itemTarget) {
+                adminView.makeEditable(userSummary.querySelectorAll('.user-summary__item'), false);
+                adminView.changeEditIcon('edit');
+            }
+            // Restore previous values
+            // adminView.populateUserSummary(this.state.users.currentUser);
+        })
+
         // MODALS
         document.body.addEventListener('click', this.checkModals.bind(this));
 
@@ -97,17 +122,21 @@ class AdminController {
                 this.renderJobsTable();
                 // adminView.addTableListeners('jobs');
             }
-            if(users) {
+            if(users && !document.querySelector('.admin__content--users')) {
+                // Render placeholders
+                adminView.renderUserPage();
+
+                // Calculate # of rows to render / api limit
+                this.state.users.searchOptions.limit = adminView.calculateUserRows();
+       
                 // Get User data
-                this.UserModel.getUsers()
+                this.UserModel.getUsers(this.state.users.searchOptions)
                     .then(res => {
                         // Store and render data
                         this.users = res.data.applicants;
-                        console.log(this.users)
+                        this.state.users.totalUsers = res.data.total;
                         if(this.users.length > 0) {
                             // this.headers = Object.keys(this.users[0]);
-
-
                             this.renderUsersTable();
                             // adminView.addTableListeners('users');
                         } else {
@@ -159,27 +188,57 @@ class AdminController {
 
         // PAGINATION CONTROLS
         document.body.addEventListener('click', (e) => {
-            const btn = e.target.closest('.pagination__item');
-            const previous = e.target.closest('.pagination__previous');
-            const next = e.target.closest('.pagination__next');
+            const userBtn = e.target.closest('.pagination__item--users');
+            const userPrevious = e.target.closest('.pagination__previous--users');
+            const userNext = e.target.closest('.pagination__next--users');
 
-            if(btn) {
-                this.state.jobs.searchOptions.index = btn.dataset.id * this.state.jobs.searchOptions.limit;
-                this.JobList.getJobs(this.state.jobs.searchOptions)
+            if(userBtn || userPrevious || userNext) {
+                const userState = this.state.users;
+                const pages = Math.ceil(userState.totalUsers / userState.searchOptions.limit);
+                if(userPrevious && !(userState.currentPage < 1)) {
+                    userState.currentPage--;
+                    userState.searchOptions.index -= userState.searchOptions.limit;
+                }
+                if(userNext && !(userState.currentPage >= pages-1) ) {
+                    userState.currentPage++;
+                    userState.searchOptions.index += userState.searchOptions.limit;
+                }
+                if(userBtn) {
+                    userState.searchOptions.index = userBtn.dataset.id * userState.searchOptions.limit;
+                    userState.currentPage = userState.searchOptions.index / userState.searchOptions.limit;
+                }
+                this.UserModel
+                    .getUsers(userState.searchOptions)
                     .then(res => {
-                        if(res.data.jobs) {
-                            this.jobs = res.data.jobs.map(({featured, id, title, wage, location, description, createdAt}) => ({featured, id, title, wage, location, description, createdAt}));
-                            this.state.jobs.totalJobs = res.data.totalJobs;
-                            // Remove the table
-                            utils.clearElement(elements.adminContent);
-                            
-                            this.renderJobsTable();   
-                            // adminView.addTableListeners('jobs');
+                        this.users = res.data.applicants;
+                        userState.totalUsers = res.data.total;
 
-                        }
+                        // Clear user table
+                        utils.clearElement(document.querySelector('.user-table__wrapper'));
+
+                        this.renderUsersTable();
                     })
                     .catch(err => console.log(err));
-                }
+            }
+
+
+            // if(btn) {
+            //     this.state.jobs.searchOptions.index = btn.dataset.id * this.state.jobs.searchOptions.limit;
+            //     this.JobList.getJobs(this.state.jobs.searchOptions)
+            //         .then(res => {
+            //             if(res.data.jobs) {
+            //                 this.jobs = res.data.jobs.map(({featured, id, title, wage, location, description, createdAt}) => ({featured, id, title, wage, location, description, createdAt}));
+            //                 this.state.jobs.totalJobs = res.data.totalJobs;
+            //                 // Remove the table
+            //                 utils.clearElement(elements.adminContent);
+                            
+            //                 this.renderJobsTable();   
+            //                 // adminView.addTableListeners('jobs');
+
+            //             }
+            //         })
+            //         .catch(err => console.log(err));
+            //     }
         });
     }
 
@@ -519,84 +578,62 @@ class AdminController {
     }
 
     renderUsersTable() {
-        // Table controls
-        const tableControls = `
-            <div class="btn-wrapper btn-wrapper--admin">
-                <button class="create-user-btn btn">Create User</button>
-            </div>`;
-        // Row buttons
-        const editBtn = [
-            'edit', 
-            `<div class="edit-btn edit-btn--table">
-                <svg class="edit-icon">
-                    <use xlink:href="svg/spritesheet.svg#edit-solid">
-                </svg>
-            </div>`
-        ]
-        const deleteBtn = [
-            'delete', 
-            `<div class="delete-btn delete-btn--table">
-                <svg class="delete-icon">
-                    <use xlink:href="svg/spritesheet.svg#delete-solid">
-                </svg>
-            </div>`
-        ]
-        const hubspotBtn = [
-            'upload',
-            `<div class="hubspot-add-btn hubspot-btn--table">
-                <svg class="hubspot-icon">
-                    <use xlink:href="svg/spritesheet.svg#hubspot">
-                </svg>
-            </div>`
-        ]
-
-
-        // Already on the users page, return
-        if(document.querySelector('.admin__content--users')) return;
-
-        // Remove existing content
-        utils.clearElement(elements.adminContent);
-
-        // Replace existing classname
-        elements.adminContent.className = "admin__content admin__content--users";
-        
-        // Create applicant table
+        const { totalUsers, searchOptions: {index, limit} } = this.state.users;
+        // Offset is subtracted from the user id to get the current item
+        const page = index / limit;
+        const offset = page * limit;
+        // Format users/headers into html elements
         const {headers, rows} = adminView.formatUsers(this.users);
-        console.log(this.users)
-        adminView.renderContent(
-            [
-                adminView.createUserSummary(), 
-                tableView.createTableTest('users', headers, rows, false)
-            ], 
-            elements.adminContent
-        );
+        const tableWrapper = document.querySelector('.user-table__wrapper');
+        // elements.adminContent.insertAdjacentHTML('afterbegin', tableView.createTableTest('users', headers, rows, false))
+        tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('users', headers, rows, false));
+        // Add pagination
+        adminView.renderPagination(index, limit, totalUsers, tableWrapper, 'users');
 
         // Initialise user summary
         adminView.populateUserSummary(this.users[0]);
 
         // Add listeners to rows in the user tables 
         const userRows = document.querySelectorAll('.row--users');
+        utils.changeActiveRow(userRows[0], userRows);
+
         userRows.forEach(row => {
             row.addEventListener('click', (e) => {
                 const targetRow = e.target.closest('.row');
                 const rowId = targetRow.querySelector('.td-data--first-name').dataset.id;
-                const user = this.users[rowId -1];
-
+                const user = this.users[rowId - offset -1];
                 utils.changeActiveRow(targetRow, userRows);
                 adminView.populateUserSummary(user);
-                
             });
         });
 
+        const userSummary = document.querySelector('.user-summary');
         // Listen for user-summary btn events
-        document.querySelector('.user-summary').addEventListener('click', (e) => {
+        userSummary.addEventListener('click', (e) => {
             const editBtn = e.target.closest('.user-summary__btn--edit');
             const deleteBtn = e.target.closest('.user-summary__btn--delete');
+            const saveBtn = e.target.closest('.user-summary__btn--save');
             const hubspotBtn = e.target.closest('.user-summary__btn--hubspot');
             const cvBtn = e.target.closest('.user-summary__btn--cv');
             const uploadBtn = e.target.closest('.user-summary__btn--upload');
 
-            if(editBtn) console.log('edit');
+            if(editBtn) {
+                const userId = document.querySelector('.user-summary').dataset.id;
+                // Track current user values
+                this.state.users.currentUser = this.users.find(user => user.applicantId === parseInt(userId));
+                
+                const userElements = userSummary.querySelectorAll('.user-summary__item');
+                // Set the elements to editable
+                // Removing contenteditable is done in a listener on the body
+                if(userElements[0].getAttribute('contenteditable') === 'false') {
+                    adminView.makeEditable(userElements, true); // 
+                    // Change the edit icon to a save icon
+                    adminView.changeEditIcon('save');
+                }
+            } 
+            if(saveBtn) {
+            }
+        
             if(deleteBtn) console.log('delete');
             if(hubspotBtn) console.log('hubspot');
             if(cvBtn) {

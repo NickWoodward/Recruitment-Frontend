@@ -3,6 +3,7 @@ import * as utils from '../utils/utils';
 import * as userForm from './userForm';
 import * as jobForm from './jobForm';
 import { renderJobDetails } from './jobView';
+import * as tableView from './tableView';
 
 
 export const renderContent = (content, container) => {
@@ -82,53 +83,160 @@ const createUserElement = ({ applicantId, firstName, lastName, createdAt }) => {
     ];
     return row;
 }
-export const createUserSummary = () => {
+const createUserSummary = () => {
     const markup = `
         <div class="user-summary">
             <div class="user-summary__details">
-                <div class="user-summary__name user-summary__item"></div>
-                <div class="user-summary__phone user-summary__item"></div>
-                <div class="user-summary__email user-summary__item"></div>
+                <div class="user-summary__item user-summary__first-name" contenteditable=false></div>
+                <div class="user-summary__item user-summary__last-name" contenteditable=false></div>
+                <div class="user-summary__item user-summary__phone" contenteditable=false></div>
+                <div class="user-summary__item user-summary__email" contenteditable=false></div>
             </div>
             <div class="user-summary__controls">
-                
-                <div class="user-summary__btn user-summary__btn--edit">
-                    <svg class="user-summary__edit-icon">
-                        <use xlink:href="svg/spritesheet.svg#edit-solid">
-                    </svg>
-                </div>
-                <div class="user-summary__btn user-summary__btn--delete">
-                    <svg class="user-summary__delete-icon">
-                        <use xlink:href="svg/spritesheet.svg#delete-solid">
-                    </svg>
-                </div>
                 <div class="user-summary__btn user-summary__btn--hubspot">
                     <svg class="user-summary__hubspot-icon">
                         <use xlink:href="svg/spritesheet.svg#hubspot">
                     </svg>
                 </div>
-                
+                <div class="user-summary__btn user-summary__btn--edit">
+                    <svg class="user-summary__edit-icon">
+                        <use xlink:href="svg/spritesheet.svg#edit-np1">
+                    </svg>
+                </div>
+                <div class="user-summary__btn user-summary__btn--delete">
+                    <svg class="user-summary__delete-icon">
+                        <use xlink:href="svg/spritesheet.svg#delete-np1">
+                    </svg>
+                </div>
             </div>
         </div>
     `;
     return markup;
 };
 export const populateUserSummary = (user) => {
-    document.querySelector('.user-summary__name').innerText = `${user.firstName} ${user.lastName}`;
+    const userSummary = document.querySelector('.user-summary');
+    userSummary.setAttribute('data-id', user.applicantId);
+    document.querySelector('.user-summary__first-name').innerText = user.firstName;
+    document.querySelector('.user-summary__last-name').innerText = user.lastName;
     document.querySelector('.user-summary__phone').innerText = user.phone;
     document.querySelector('.user-summary__email').innerText = user.email;
-    const cvBtn = document.querySelector('.user-summary__btn--cv') || document.querySelector('.user-summary__btn--upload');
+    const cvWrapper = document.querySelector('.user-summary__cv-wrapper');
+    const cvName = user.cvName;
     const cvType = user.cvType;
-    if(cvBtn) utils.removeElement(cvBtn);
+    if(cvWrapper) utils.removeElement(cvWrapper);
     const cvElement = `
-        <div class="user-summary__btn--${cvType === null ? 'upload':'cv'}" data-id=${user.applicantId}>
-            <svg class="user-summary__cv-icon">
-                <use xlink:href="svg/spritesheet.svg#${cvType === '.pdf'? 'pdf':(cvType === '.doc' || cvType === '.docx'? 'doc':'upload')}">
-            </svg>
+        <div class="user-summary__cv-wrapper">
+            <div class="user-summary__btn user-summary__btn--${cvType === null ? 'upload':'cv'}" data-id=${user.applicantId}>
+                <svg class="user-summary__icon user-summary__${cvType === null ? 'upload':'cv'}-icon">
+                    <use xlink:href="svg/spritesheet.svg#${cvType === '.pdf'? 'pdf':(cvType === '.doc' || cvType === '.docx'? 'doc':'upload-np')}">
+                </svg>
+            </div>
+            <div class="user-summary__cv-path">${cvName}</div>
         </div>
     `;
 
-    document.querySelector('.user-summary__controls').insertAdjacentHTML('afterbegin', cvElement);
+    document.querySelector('.user-summary__email').insertAdjacentHTML('afterend', cvElement);
+}
+export const makeEditable = (elements, makeEditable) => {
+    elements.forEach(element => {
+        const className = element.classList[0];
+
+        if(!makeEditable) {
+            element.classList.remove(`${className}--editable`);
+            element.setAttribute('contenteditable', false);
+            
+        } else {
+            element.classList.add(`${className}--editable`);
+            element.setAttribute('contenteditable', true);
+        }
+    });
+    // if(makeEditable) {
+    //     const cvWrapper = document.querySelector('.user-summary__cv-wrapper');
+    //     utils.removeElement(cvWrapper);
+    //     console.log(cvWrapper);
+
+    //     // const uploader = `
+    //     //     <div class="user-summary__btn user-summary__btn--upload">
+    //     //         <svg class="user-summary__icon user-summary__upload-icon">
+    //     //             <use xlink:href="svg/spritesheet.svg#upload-np">
+    //     //         </svg>
+    //     //     </div>
+    //     //     <div class="user-summary__cv-path">No CV selected</div>
+    //     // `;
+    //     // cvWrapper.insertAdjacentHTML('afterbegin', uploader);
+    //     // console.log(document.querySelector('.user-summary__btn'));
+    // }
+}
+
+export const changeEditIcon = (btnToDisplay) => {
+    const editBtn = document.querySelector('.user-summary__btn--edit');
+    const saveBtn = document.querySelector('.user-summary__btn--save');
+    const delBtn = document.querySelector('.user-summary__btn--delete');
+    let markup;
+    if(btnToDisplay === 'save') {
+        utils.removeElement(editBtn);
+        markup = `
+            <div class="user-summary__btn user-summary__btn--save">
+                <svg class="user-summary__save-icon">
+                    <use xlink:href="svg/spritesheet.svg#save-np">
+                </svg>
+            </div>
+        `;
+    } else if(btnToDisplay === 'edit') {
+        utils.removeElement(saveBtn);
+        markup = `
+            <div class="user-summary__btn user-summary__btn--edit">
+                <svg class="user-summary__edit-icon">
+                    <use xlink:href="svg/spritesheet.svg#edit-np1">
+                </svg>
+            </div>
+        `;
+    }
+    delBtn.insertAdjacentHTML('beforebegin', markup);
+}
+
+export const calculateUserRows = () => {
+    const { headerHeight, rowHeight, paginationHeight } = getUserRowHeight();
+    const tableHeight = document.querySelector('.user-table__wrapper').offsetHeight;
+    const numOfRows = Math.floor((tableHeight - headerHeight - paginationHeight)/rowHeight);
+    
+    return numOfRows;
+}
+const getUserRowHeight = () => {
+    // Create dummy table to get row height
+    const userTable = `
+            <table class="table--test">
+                <thead class="thead thead--users"><tr><th>Test</th></tr></thead>
+                <tbody><tr class="row row--users"><td>test</td></tr></tbody>
+            </table>
+            <div class="pagination pagination--users">
+                <div class="pagination__previous">Previous</div>
+                    <div class="pagination__item pagination__item--active">
+                        1
+                    </div>
+                <div class="pagination__next">Next</div>
+            </div>
+    `;
+
+    // Add table to DOM
+    elements.adminContent.insertAdjacentHTML('afterbegin', userTable);
+    const rowHeight = document.querySelector('.row--users').offsetHeight;
+    const headerHeight = document.querySelector('.thead--users').offsetHeight;
+    const paginationHeight = document.querySelector('.pagination--users').offsetHeight;
+    // Remove table
+    utils.removeElement(document.querySelector('.table--test'));
+    utils.removeElement(document.querySelector('.pagination--users'));
+    return { headerHeight, rowHeight, paginationHeight };
+}
+export const renderUserPage = () => {
+    // Remove existing content
+    utils.clearElement(elements.adminContent);
+
+    // Replace existing classname
+    elements.adminContent.className = "admin__content admin__content--users";
+    // Insert placeholders
+    elements.adminContent.insertAdjacentHTML('afterbegin', createUserSummary());
+    elements.adminContent.insertAdjacentHTML('beforeend', `<div class="user-table__wrapper"></div>`);
 }
 
 export const formatJobs = (jobs) => {
@@ -308,28 +416,28 @@ const renderCompany = (company) => {
 };
  
 
-export const renderPagination = (current, limit, totalItems, container) => {
+export const renderPagination = (current, limit, totalItems, container, table) => {
     // Work out how many pages
     const pages = Math.ceil(totalItems / limit);
     // Current is the first (zero indexed) item on the page. current/limit = zero index page number
     current = current/limit;
-    const itemMarkup = generatePaginationMarkup(pages, current);
+    const itemMarkup = generatePaginationMarkup(pages, current, table);
     
     const markup = `
-        <div class="pagination">
-            <div class="pagination__previous ${current === 0? 'pagination__previous--inactive':''}">Previous</div>
+        <div class="pagination pagination--${table}">
+            <div class="pagination__previous pagination__previous--${table} ${current === 0? 'pagination__previous--inactive':''}">Previous</div>
             ${itemMarkup}
-            <div class="pagination__next ${current === pages-1? 'pagination__next--inactive':''}">Next</div>
+            <div class="pagination__next pagination__next--${table} ${current === pages-1? 'pagination__next--inactive':''}">Next</div>
         </div>
     `;
-    container.insertAdjacentHTML('afterbegin', markup);
+    container.insertAdjacentHTML('beforeend', markup);
 };
 
-const generatePaginationMarkup = (pages, current) => {
+const generatePaginationMarkup = (pages, current, table) => {
     let markup = '';
     for(let x = 0; x < pages; x++) {
         const temp = `
-            <div class="pagination__item pagination__item--${x+1} ${x === current? 'pagination__item--active':''}" data-id=${x}>
+            <div class="pagination__item pagination__item--${table} pagination__item--${x+1} ${x === current? 'pagination__item--active':''}" data-id=${x}>
                 ${x+1}
             </div>`;
         markup += temp;
