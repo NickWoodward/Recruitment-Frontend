@@ -120,22 +120,8 @@ export const populateUserSummary = (user) => {
     document.querySelector('.user-summary__last-name').innerText = user.lastName;
     document.querySelector('.user-summary__phone').innerText = user.phone;
     document.querySelector('.user-summary__email').innerText = user.email;
-    const cvWrapper = document.querySelector('.user-summary__cv-wrapper');
-    const cvName = user.cvName;
-    const cvType = user.cvType;
-    if(cvWrapper) utils.removeElement(cvWrapper);
-    const cvElement = `
-        <div class="user-summary__cv-wrapper">
-            <div class="user-summary__btn user-summary__btn--${cvType === null ? 'upload':'cv'}" data-id=${user.applicantId}>
-                <svg class="user-summary__icon user-summary__${cvType === null ? 'upload':'cv'}-icon">
-                    <use xlink:href="svg/spritesheet.svg#${cvType === '.pdf'? 'pdf':(cvType === '.doc' || cvType === '.docx'? 'doc':'upload-np')}">
-                </svg>
-            </div>
-            <div class="user-summary__cv-path">${cvName}</div>
-        </div>
-    `;
-
-    document.querySelector('.user-summary__email').insertAdjacentHTML('afterend', cvElement);
+    
+    addCvElement(user);
 }
 export const makeEditable = (elements, makeEditable) => {
     elements.forEach(element => {
@@ -168,6 +154,49 @@ export const makeEditable = (elements, makeEditable) => {
     // }
 }
 
+export const addCvElement = user => {
+    const cvWrapper = document.querySelector('.user-summary__cv-wrapper');
+    const cvName = user.cvName;
+    const cvType = user.cvType;
+    if(cvWrapper) utils.removeElement(cvWrapper);
+    const cvElement = `
+        <div class="user-summary__cv-wrapper">
+            <div class="user-summary__btn user-summary__btn--${cvType === null ? 'upload':'cv'}" data-id=${user.applicantId}>
+                <svg class="user-summary__icon user-summary__${cvType === null ? 'upload':'cv'}-icon">
+                    <use xlink:href="svg/spritesheet.svg#${cvType === '.pdf'? 'pdf':(cvType === '.doc' || cvType === '.docx'? 'doc':'upload-np')}">
+                </svg>
+            </div>
+            <div class="user-summary__cv-path">${cvName}</div>
+        </div>
+    `;
+
+    document.querySelector('.user-summary__email').insertAdjacentHTML('afterend', cvElement);
+}
+
+export const addUploadElement = (cvName) => {
+    const cvWrapper = document.querySelector('.user-summary__cv-wrapper');
+
+    // Remove contents of cv wrapper
+    if(cvWrapper) utils.removeElement(cvWrapper);
+
+    const markup = `
+        <div class="user-summary__cv-wrapper">
+            <!-- Input inside label for custom styling -->
+            <div class="user-summary__file-picker">
+                <label class="user-summary__label user-summary__btn" for="user-summary__input">
+                    <svg class="user-summary__icon user-summary__upload-icon">
+                        <use xlink:href="svg/spritesheet.svg#upload-np">
+                    </svg>
+                    <input class="user-summary__input" id="user-summary__input" name="cv" type=file />
+                </label>
+                <div class="user-summary__cv-path">${cvName !== 'No CV uploaded'? 'Update existing CV?':'Add a CV'}</div>
+            </div>
+
+        </div>`
+
+    document.querySelector('.user-summary__email').insertAdjacentHTML('afterend', markup);
+}
+
 export const changeEditIcon = (btnToDisplay) => {
     const editBtn = document.querySelector('.user-summary__btn--edit');
     const saveBtn = document.querySelector('.user-summary__btn--save');
@@ -193,6 +222,30 @@ export const changeEditIcon = (btnToDisplay) => {
         `;
     }
     delBtn.insertAdjacentHTML('beforebegin', markup);
+}
+
+export const getUserEdits = (currentUser) => {
+    const formData = new FormData();
+
+    // Compare the current user to the edits made
+    const firstName = document.querySelector('.user-summary__first-name').innerText;
+    const lastName = document.querySelector('.user-summary__last-name').innerText;
+    const phone = document.querySelector('.user-summary__phone').innerText;
+    const email = document.querySelector('.user-summary__email').innerText;
+    const cv = document.querySelector('.user-summary__input').files[0];
+
+    let submit = false;
+    firstName !== currentUser.firstName && (submit = true) ? formData.append('firstName', firstName) : formData.append('firstName', currentUser.firstName);
+    lastName !== currentUser.lastName && (submit = true) ? formData.append('lastName', lastName) : formData.append('lastName', currentUser.lastName);
+    phone !== currentUser.phone && (submit = true) ? formData.append('phone', phone) : formData.append('phone', currentUser.phone);
+    email !== currentUser.email && (submit = true) ? formData.append('email', email) : formData.append('email', currentUser.email);
+    
+    if(cv) {
+        formData.append('cv', cv);
+        submit = true;
+    }
+    
+    return submit? formData : null;
 }
 
 export const calculateUserRows = () => {

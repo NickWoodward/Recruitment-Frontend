@@ -20,13 +20,6 @@ export const getApplicationDetails = () => {
     formData.append('phone', document.querySelector('.request__input--phone').value);
     formData.append('cv', document.querySelector('.request__input--cv').files[0]);
     return formData;
-    // return {
-    //     firstName: document.querySelector('.request__input--first-name').value,
-    //     lastName: document.querySelector('.request__input--surname').value,
-    //     email: document.querySelector('.request__input--email').value,
-    //     phone: document.querySelector('.request__input--phone').value,
-    //     cv: document.querySelector('.request__input--cv').files[0]
-    // }
 }
 
 export const renderApplyForm = (id) => {

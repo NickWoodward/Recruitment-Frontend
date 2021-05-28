@@ -89,16 +89,19 @@ class AdminController {
         });
 
         // Handle editable elements when a user clicks elsewhere
-        document.body.addEventListener('click', (e) => {
+        document.body.addEventListener('mousedown', (e) => {
             const userSummary = document.querySelector('.user-summary');
             const editableContent = document.querySelector('.user-summary__item--editable');
             const editBtnTarget = e.target.closest('.user-summary__btn--edit');
             const itemTarget = e.target.closest('.user-summary__item');
+            const saveTarget = e.target.closest('.user-summary__btn--save');
+            const uploadCv = e.target.closest('.user-summary__label');
 
-            // If user summary is present, editable, and neither the edit btn or editable elements have been clicked
-            if(userSummary && editableContent && !editBtnTarget && !itemTarget) {
+            // If user summary is present, editable, and the edit btn, editable elements, or save btn have been clicked
+            if(userSummary && editableContent && !editBtnTarget && !itemTarget && !saveTarget && !uploadCv) {
                 adminView.makeEditable(userSummary.querySelectorAll('.user-summary__item'), false);
                 adminView.changeEditIcon('edit');
+                adminView.addCvElement(this.state.users.currentUser);
             }
             // Restore previous values
             // adminView.populateUserSummary(this.state.users.currentUser);
@@ -136,16 +139,17 @@ class AdminController {
                         this.users = res.data.applicants;
                         this.state.users.totalUsers = res.data.total;
                         if(this.users.length > 0) {
-                            // this.headers = Object.keys(this.users[0]);
                             this.renderUsersTable();
-                            // adminView.addTableListeners('users');
+                            
+                            // Initialise user summary
+                            adminView.populateUserSummary(this.users[0]);
+                            this.addUserSummaryListeners();
+
                         } else {
                             this.UserModel.getUserHeaders().then(result => {
                                 // this.headers = result.data.headers;
                                 this.renderUsersTable();
-
                             });
-
                         }
                     })
                     .catch(err => console.log(err));
@@ -217,6 +221,10 @@ class AdminController {
                         utils.clearElement(document.querySelector('.user-table__wrapper'));
 
                         this.renderUsersTable();
+
+                        // Initialise user summary
+                        adminView.populateUserSummary(this.users[0]);
+                        this.addUserSummaryListeners();
                     })
                     .catch(err => console.log(err));
             }
@@ -395,6 +403,7 @@ class AdminController {
             .catch(err => console.log(err));
     }
 
+    // @TODO: Not used?
     editUserAndUpdate(id) {
         // Get data from modal
         const { fname, lname, email, phone } = userForm.getFormData('edit');
@@ -585,13 +594,17 @@ class AdminController {
         // Format users/headers into html elements
         const {headers, rows} = adminView.formatUsers(this.users);
         const tableWrapper = document.querySelector('.user-table__wrapper');
+
+        // removeUserTable & pagination if it exists
+        const table = document.querySelector('.table--users');
+        const pagination = document.querySelector('.pagination--users');
+        if(table) utils.removeElement(table);
+        if(pagination) utils.removeElement(pagination);
+
         // elements.adminContent.insertAdjacentHTML('afterbegin', tableView.createTableTest('users', headers, rows, false))
         tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('users', headers, rows, false));
         // Add pagination
         adminView.renderPagination(index, limit, totalUsers, tableWrapper, 'users');
-
-        // Initialise user summary
-        adminView.populateUserSummary(this.users[0]);
 
         // Add listeners to rows in the user tables 
         const userRows = document.querySelectorAll('.row--users');
@@ -606,32 +619,70 @@ class AdminController {
                 adminView.populateUserSummary(user);
             });
         });
+    }
 
+    addUserSummaryListeners() {
         const userSummary = document.querySelector('.user-summary');
-        // Listen for user-summary btn events
+
         userSummary.addEventListener('click', (e) => {
             const editBtn = e.target.closest('.user-summary__btn--edit');
             const deleteBtn = e.target.closest('.user-summary__btn--delete');
             const saveBtn = e.target.closest('.user-summary__btn--save');
             const hubspotBtn = e.target.closest('.user-summary__btn--hubspot');
             const cvBtn = e.target.closest('.user-summary__btn--cv');
-            const uploadBtn = e.target.closest('.user-summary__btn--upload');
+            const uploadBtn = e.target.closest('.user-summary__label');
+
+            const userElements = userSummary.querySelectorAll('.user-summary__item');
 
             if(editBtn) {
                 const userId = document.querySelector('.user-summary').dataset.id;
-                // Track current user values
+                // Save current user values
                 this.state.users.currentUser = this.users.find(user => user.applicantId === parseInt(userId));
-                
-                const userElements = userSummary.querySelectorAll('.user-summary__item');
+                console.log(this.state.users.currentUser);
                 // Set the elements to editable
                 // Removing contenteditable is done in a listener on the body
                 if(userElements[0].getAttribute('contenteditable') === 'false') {
-                    adminView.makeEditable(userElements, true); // 
+                    // Make the content divs editable
+                    adminView.makeEditable(userElements, true);
+                    // Change the cv element to a file picker
+                    adminView.addUploadElement(this.state.users.currentUser.cvName);
+
                     // Change the edit icon to a save icon
                     adminView.changeEditIcon('save');
                 }
             } 
             if(saveBtn) {
+                // Get edited values
+                const formData = adminView.getUserEdits(this.state.users.currentUser);
+                if(formData) {
+                    // Update the currentUser
+                    for(let [key, value] of formData.entries()){
+                        console.log(key, value);
+                        if(key !== 'cv')
+                            this.state.users.currentUser[key] = value;
+                        
+                        if(key === 'cv' && value) {
+                            this.state.users.currentUser.cvType = value.name.indexOf('doc') !== -1 ? 'doc':'pdf';
+                            this.state.users.currentUser.cvName = value.name;
+                        }
+                    }
+
+                   
+                    this.Admin
+                            .editApplicant(this.state.users.currentUser.applicantId, formData)
+                            .then(applicant => {
+                                this.renderUsersTable();
+                            })
+                            .catch(err => {
+                                console.log(err);
+                            });
+                }
+                else {
+                    console.log('dont save');
+                }
+                adminView.makeEditable(userElements, false);
+                adminView.changeEditIcon('edit');
+                adminView.addCvElement(this.state.users.currentUser);
             }
         
             if(deleteBtn) console.log('delete');
@@ -647,31 +698,6 @@ class AdminController {
              }
             if(uploadBtn) console.log('upload');
         });
-
-        // if(!document.querySelector(elementStrings.adminUsersTable)) {
-        //      // Clear the table wrapper
-        //      utils.clearElement(elements.adminContent);
-        //     // Render the table
-        //     // adminView.renderContent(
-        //     //     [
-        //     //         tableView.createTable(
-        //     //             'users',
-        //     //             this.headers,  
-        //     //             this.users,
-        //     //             false,
-        //     //             [editBtn, deleteBtn, hubspotBtn]
-        //     //         ),
-        //     //         tableControls
-        //     //     ],
-        //     //     elements.adminContent
-        //     // );
-
-        //     const {headers, rows} = adminView.formatUsers(this.users);
-        //     adminView.renderContent(
-        //         [userView.createUserSummary({name: 'Nick'}), tableView.createTableTest('users', headers, rows, false)], 
-        //         elements.adminContent
-        //     );
-        // }
     }
 }
 
