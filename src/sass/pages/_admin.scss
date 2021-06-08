@@ -191,7 +191,7 @@
 }
 
 // ********** USER TABLE STYLING **********
-.user-table__wrapper {
+.users-table__wrapper {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -205,6 +205,113 @@
         border-left: 2px solid $color-secondary;
     }
 }
+
+
+// ********** JOB SUMMARY STYLING ***********
+
+.job-summary {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    margin-right: 12rem;
+    width: 40rem;
+    background-color: rgb(249, 250, 251);
+    
+    &__details {
+        align-self: flex-start;
+        width: 100%;
+        padding: 2.5rem;
+    }
+    &__item {
+        display: block;
+        margin-bottom: .3rem;
+        font-size: 1.6rem;
+        width: 100%;
+        padding: 1rem 2.5rem .8rem 2rem;
+        border: 1px solid transparent;
+        &:hover {
+            cursor: default;
+        }
+    }
+    &__text-area {
+        margin-top: 2.5rem;
+        padding-top: 2rem;
+        background-color: white;
+        height: 20rem;
+    }
+    &__item--editable {
+        -moz-appearance: textfield;
+        -webkit-appearance: textfield;
+        background-color: white;
+        background-color: -moz-field;
+        border: 1px solid darkgray;
+        box-shadow: 1px 1px 1px 0 lightgray inset;  
+        &:hover {
+            cursor: auto;
+        }
+    }
+    &__select {
+        padding: 1rem 2.5rem .8rem 1.7rem;
+
+    }
+
+    &__controls {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        width: 100%;
+        margin-top: auto;
+        padding: 2rem 2rem;
+        // border: 1px solid red;
+    }
+    &__btn {
+        display: flex;
+        align-items: flex-end;
+        margin-right: 1.5rem;
+        cursor:pointer;
+    }
+    
+    &__btn--edit, &__btn--save {
+        transform: translateY(3px);
+    }
+    &__btn--hubspot {
+        margin-right: 2rem;
+    }
+    &__btn--new, &__btn--save-new {
+        margin-right: auto;
+    }
+
+    &__new-icon {
+        height: 3.5rem;
+        width: 3.5rem;
+        fill: $color-logo;
+    }
+
+    &__edit-icon {
+        height: 3.5rem;
+        width: 3.5rem;
+        fill: $color-logo;
+    }
+    &__delete-icon {
+        height: 3.3rem;
+        width: 3.3rem;
+        fill: $color-secondary;
+    }
+    &__save-icon {
+        height: 3.5rem;
+        width: 3.5rem;
+        fill: red;
+    }
+    &__hubspot-icon {
+        height: 2.9rem;
+        width: 2.9rem;
+        fill: $color-secondary;
+    }
+
+    
+}
+
 
 .featured-icon {
     display: flex;
