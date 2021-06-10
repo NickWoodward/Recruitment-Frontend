@@ -148,16 +148,32 @@ class AdminController {
                 console.log('edit jobs lost focus');
                 adminView.makeEditable(document.querySelectorAll('.job-summary__item'), false);
                 adminView.changeEditIcon('edit', 'job');
+                
+                adminView.toggleDropdown(
+                    false, 
+                    document.querySelector('.job-summary__select'), 
+                    `<div class="job-summary__item job-summary__company" contenteditable=false>
+                        ${this.state.jobs.currentJob.companyName}
+                    </div>`
+                )
                 adminView.addFeaturedCheckbox(false, this.state.jobs.currentJob.featured);
             }
             if(this.createJobLostFocus(e)) {
                 console.log('create jobs lost focus');
-                adminView.removeSelectElement(
+                
+                // Remove the dropdown + replace with company div
+                adminView.toggleDropdown(
+                    false, 
                     document.querySelector('.job-summary__select'), 
-                    '<div class="job-summary__item job-summary__company" contenteditable=false></div>'
+                    `<div class="job-summary__item job-summary__company" contenteditable=false>
+                        ${this.state.jobs.currentJob.companyName}
+                    </div>`
                 );
+
                 adminView.populateJobSummary(this.state.jobs.currentJob);
+
                 adminView.makeEditable(document.querySelectorAll('.job-summary__item'), false);
+
                 adminView.changeNewIcon('new', 'job');
             }
         })
@@ -644,20 +660,29 @@ class AdminController {
             const hubspotBtn = e.target.closest('.job-summary__btn--hubspot');
             const jobElements = jobSummary.querySelectorAll('.job-summary__item');
             const newBtn = e.target.closest('.job-summary__btn--new');
+            const companyItem = jobSummary.querySelector('.job-summary__company');
 
 
             if(editBtn) {
                 const jobId = jobSummary.dataset.id;
                 this.state.jobs.currentJob = this.jobs.find(job => job.id === parseInt(jobId));
+
                 if(jobElements[0].getAttribute('contenteditable') === 'false') {
                     adminView.changeEditIcon('save', 'job');
-                    adminView.makeEditable(jobElements, true, ['job-summary__featured']);
+                    adminView.makeEditable(jobElements, true, ['job-summary__featured', 'job-summary__company']);
+                    
+                    // Add a company name dropdown in place of the div
+                    const classNames = ['job-summary__item', 'job-summary__select', 'job-summary__item--editable', 'job-summary__company'];
+                    // const dropdown = adminView.createSelectElement(this.companies, 'Company Name', classNames, 'company-dropdown');
+                    const { dropdown, list } = adminView.createDataList(this.companies, 'Company Name', classNames, 'company-dropdown');
+                    adminView.toggleDropdown(true, dropdown, companyItem);
+
                     adminView.addFeaturedCheckbox(true, this.state.jobs.currentJob.featured);
                 }
             }
             if(saveBtn) {
                 const formData = adminView.getJobEdits(this.state.jobs.currentJob);
-                // for(let [key, value] of formData.entries()) { console.log(key, value);}
+                for(let [key, value] of formData.entries()) { console.log(key, value);}
 
                 if(formData) {
                     console.log('save data');
@@ -676,6 +701,13 @@ class AdminController {
                 }
                 adminView.changeEditIcon('edit', 'job');
                 adminView.makeEditable(jobElements, false, ['job-summary__featured']);
+                adminView.toggleDropdown(
+                    false, 
+                    document.querySelector('.job-summary__select'), 
+                    `<div class="job-summary__item job-summary__company" contenteditable=false>
+                        ${this.state.jobs.currentJob.companyName}
+                    </div>`
+                );
                 adminView.addFeaturedCheckbox(false, this.state.jobs.currentJob.featured);
             }
             if(newBtn) {
@@ -683,9 +715,19 @@ class AdminController {
                 const jobId = jobSummary.dataset.id;
                 this.state.jobs.currentJob = this.jobs.find(job => job.id === parseInt(jobId));
                 
+
+                // Make the items editable
                 adminView.makeEditable(jobElements, true, ['job-summary__featured']);
+
+                // Switch the company element to a dropdown
+                const classNames = ['job-summary__item', 'job-summary__select', 'job-summary__item--editable', 'job-summary__company'];
+                const dropdown = adminView.createSelectElement(this.companies, 'Company Name', classNames);
+                adminView.toggleDropdown(true, dropdown, companyItem);
+
+                // Change the new icon
                 adminView.changeNewIcon('save', 'job');
-                // Clear the summary (pass companies for select dropdown options)
+
+                // Clear the current summary
                 adminView.clearJobSummary(this.companies.map(company => { return { name: company.name, id: company.id } }));
             }
             if(saveNewBtn){
@@ -699,6 +741,12 @@ class AdminController {
                     for(let [key, value] of formData.entries()){
                         console.log(key,value)
                     }
+
+                    this.Admin.createJob(formData)
+                        .then(res => {
+                            console.log(res.data);
+                        })
+                        .catch(err => console.log(err));
 
                 } else {
                     console.log('dont save new job');

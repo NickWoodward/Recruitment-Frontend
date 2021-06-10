@@ -127,9 +127,10 @@ export const populateUserSummary = (user) => {
     addCvElement(user);
 }
 export const makeEditable = (elements, makeEditable, exclude) => {
+
     elements.forEach((element, index) => {
         // Return if the element classList includes an item in the exclude array
-        if(exclude && exclude.some(item => Array.from(element.classList).includes(item))) return;
+        if(exclude && exclude.some(item => Array.from(element.classList).includes(item)))  return;
         
         const className = element.classList[0];
 
@@ -164,7 +165,6 @@ export const addCvElement = user => {
     const cvWrapper = document.querySelector('.user-summary__cv-wrapper');
     const cvName = user.cvName;
     const cvType = user.cvType;
-    console.log(cvType);
     if(cvWrapper) utils.removeElement(cvWrapper);
     const cvElement = `
         <div class="user-summary__cv-wrapper">
@@ -358,7 +358,10 @@ export const populateJobSummary = (job) => {
     const jobSummary = document.querySelector('.job-summary');
     jobSummary.setAttribute('data-id', job.id);
 
-    document.querySelector('.job-summary__company').innerText = job.companyName;
+    const companyItem = document.querySelector('.job-summary__company');
+
+    companyItem.innerText = job.companyName;
+    companyItem.setAttribute('data-id', job.companyId);
     document.querySelector('.job-summary__title').innerText = job.title;
     document.querySelector('.job-summary__location').innerText = job.location;
 
@@ -371,16 +374,6 @@ export const populateJobSummary = (job) => {
 export const clearJobSummary = (companies) => {
     const items = document.querySelectorAll('.job-summary__item');
     items.forEach(item => {
-        if(item.className.includes('job-summary__company')) {
-            // Create a select element of the companies
-            const selectElement = createSelectElement(companies, 'Company Name', ['job-summary__item', 'job-summary__select', 'job-summary__item--editable', 'job-summary__company']);
-       
-            // Add to the job summary
-            item.insertAdjacentElement('beforebegin', selectElement);
-
-            // Remove the previous element
-            utils.removeElement(item);
-        }
         if(item.className.includes('job-summary__title')) item.innerText = 'Job Title';
         if(item.className.includes('job-summary__location')) item.innerText = 'Location';
         if(item.className.includes('job-summary__wage')) item.innerText = 'Wage';
@@ -389,29 +382,57 @@ export const clearJobSummary = (companies) => {
     });
 };
 
-const createSelectElement = (options, defaultText, classNames) => {
-    const input = document.createElement('select');
-    const placeholder = new Option(defaultText, '');
-    placeholder.setAttribute('disabled', 'disabled');
-    placeholder.setAttribute('selected', 'selected');
+export const toggleDropdown = (flag, dropdown, item) => {
+    if(flag) {
+        console.log(dropdown.input);
+        item.insertAdjacentElement('beforebegin', dropdown);
+        item.insertAdjacentElement('beforebegin', dropdown.list);
+        utils.removeElement(item);
+    } else {
+        dropdown.insertAdjacentHtml('beforebegin', item);
+        utils.removeElement(dropdown);
+    }
+}
 
-    classNames.forEach(name => input.classList.add(name));
-    input.add(placeholder);
+// Options formatted as { id, name/value }
+// export const createSelectElement = (options, defaultText, classNames) => {
+//     const input = document.createElement('select');
+//     const placeholder = new Option(defaultText, '');
+//     placeholder.setAttribute('disabled', 'disabled');
+//     placeholder.setAttribute('selected', 'selected');
 
-    options.forEach(option => {
-        const selectOption = new Option(option.name, option.name);
-        selectOption.setAttribute('id', option.id);
-        selectOption.setAttribute('style', 'font-weight:bold');
-        input.add(selectOption);
+//     classNames.forEach(name => input.classList.add(name));
+//     input.add(placeholder);
+
+//     options.forEach(option => {
+//         const selectOption = new Option(option.name, option.name);
+//         selectOption.setAttribute('id', option.id);
+//         selectOption.setAttribute('style', 'font-weight:bold');
+//         input.add(selectOption);
+//     });
+
+//     return input;
+// };
+export const createDataList = (options, defaultText, classNames, id) => {
+    const dropdown = document.createElement('input');
+    const list = document.createElement('datalist');
+
+    dropdown.setAttribute('list', id);
+    list.setAttribute('id', id);
+
+    classNames.forEach(name => dropdown.classList.add(name));
+
+    options.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item.name;
+        option.setAttribute('data-id', item.id);
+        console.log(option);
+
+        list.appendChild(option);
     });
 
-    return input;
+    return { dropdown, list };
 };
-
-export const removeSelectElement = (remove, element) => {
-    remove.insertAdjacentHTML('afterend', element);
-    utils.removeElement(remove);
-}
 
 export const addFeaturedCheckbox = (visible, featured) => {
     const checkbox = document.querySelector('.job-summary__featured-checkbox');
@@ -455,11 +476,16 @@ export const changeNewIcon = (btnToDisplay, summaryType) => {
 };
 
 export const getJobEdits = (currentJob) => {
-    const { companyName, title, location, wage, featured, description } = getJobFormValues();
+    const { companyId, companyName, title, location, wage, featured, description } = getJobFormValues();
     const formData = new FormData();
     let submit = false;
 
-    companyName !== currentJob.companyName && (submit = true) ? formData.append('companyName', companyName):formData.append('companyName', currentJob.companyName);
+    // The ID doesn't need comparison, just appending to the form
+    formData.append('companyId', parseInt(companyId));
+
+    // Compare the form values to the current values. Set submit to true if one varies
+    // Company (as a select element) also has to be compared to '' 
+    companyName && companyName !== currentJob.companyName && (submit = true) ? formData.append('companyName', companyName):formData.append('companyName', currentJob.companyName);
     title !== currentJob.title && (submit = true) ? formData.append('title', title):formData.append('title', currentJob.title);
     location !== currentJob.location && (submit = true) ? formData.append('location', location):formData.append('location', currentJob.location);
     parseInt(wage) !== currentJob.wage && (submit = true) ? formData.append('wage', wage):formData.append('wage', currentJob.wage);
@@ -471,7 +497,7 @@ export const getJobEdits = (currentJob) => {
 }; 
 
 export const getNewJob = () => {
-    const { companyName, title, location, wage, featured, description } = getJobFormValues();
+    const { companyId, companyName, title, location, wage, featured, description } = getJobFormValues();
 
     // Check the placeholders have been removed
     // @TODO FE validation here
@@ -484,6 +510,7 @@ export const getNewJob = () => {
     ) return null;
 
     const formData = new FormData();
+    formData.append('companyId', companyId);
     formData.append('companyName', companyName);
     formData.append('title', title);
     formData.append('location', location);
@@ -495,14 +522,16 @@ export const getNewJob = () => {
 }
 
 const getJobFormValues = () => {
-    const companyName = document.querySelector('.job-summary__company').value;
+    const selectElement = document.querySelector('.job-summary__company');
+    const companyName = selectElement.value;
+    const companyId = selectElement.options[selectElement.selectedIndex].getAttribute('id');
     const title = document.querySelector('.job-summary__title').innerText;
     const location = document.querySelector('.job-summary__location').innerText;
     const wage = document.querySelector('.job-summary__wage').innerText;
     const featured = document.querySelector('.job-summary__featured-checkbox').checked;
     const description = document.querySelector('.job-summary__description').innerText;
 
-    return { companyName, title, location, wage, featured, description };
+    return { companyId, companyName, title, location, wage, featured, description };
 }
 
 export const formatJobs = (jobs) => {
@@ -530,17 +559,19 @@ export const changeActiveMenuItem = (e) => {
     const items = [ elements.adminMenuJobsItem, elements.adminMenuUsersItem, elements.adminMenuApplicationsItem, elements.adminMenuCompaniesItem, elements.adminMenuSettingsItem ];
 
     const newActiveItem = e.target.closest(elementStrings.adminMenuItem);
-    const newActiveLink = newActiveItem.childNodes[1];
+    if(newActiveItem) {
+        const newActiveLink = newActiveItem.childNodes[1];
     
-    if(!newActiveItem.classList.contains('sidebar__item--active')) newActiveItem.classList.add('sidebar__item--active');
-    if(!newActiveLink.classList.contains('sidebar__link--active')) newActiveLink.classList.add('sidebar__link--active');
-
-    items.forEach(item => {
-        if(item !== newActiveItem) {
-            item.classList.remove('sidebar__item--active');
-            item.childNodes[1].classList.remove('sidebar__link--active');
-        }
-    });
+        if(!newActiveItem.classList.contains('sidebar__item--active')) newActiveItem.classList.add('sidebar__item--active');
+        if(!newActiveLink.classList.contains('sidebar__link--active')) newActiveLink.classList.add('sidebar__link--active');
+    
+        items.forEach(item => {
+            if(item !== newActiveItem) {
+                item.classList.remove('sidebar__item--active');
+                item.childNodes[1].classList.remove('sidebar__link--active');
+            }
+        });
+    }
 }
 
 export const addTableListeners = (type) => {

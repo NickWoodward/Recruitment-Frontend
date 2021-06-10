@@ -19,9 +19,11 @@ export default class Admin {
     }
 
     editJob(jobId, formData) {
-                        for(let [key, value] of formData.entries()) { console.log(key, value);}
-
         return JRS.post(`/admin/edit/job/${jobId}`, formData);
+    }
+
+    createJob(formData) {
+        return JRS.post(`/admin/create/job`, formData);
     }
 
 

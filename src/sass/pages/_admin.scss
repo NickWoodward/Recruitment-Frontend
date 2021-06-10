@@ -201,8 +201,15 @@
 .row {
     position: relative;
 
+    cursor: pointer;
+
     &--active {
         border-left: 2px solid $color-secondary;
+    }
+
+    &:hover{
+        background-color: $color-secondary-highlight;
+        color: white;
     }
 }
 
@@ -323,13 +330,6 @@
     &--cross { fill: red }
 }
 
-// .admin__table-wrapper {
-//     display: flex;
-//     flex-direction: column;
-//     justify-content: space-between;
-//     width: 100%;
-//     padding: 3rem 5rem 5rem 5rem ;
-// }
 .table--jobs {
     width: 100%;
 }
