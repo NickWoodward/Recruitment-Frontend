@@ -277,6 +277,15 @@
         align-items: flex-end;
         margin-right: 1.5rem;
         cursor:pointer;
+
+        &--disabled {
+            pointer-events: none;
+        }
+    }
+    &__icon {
+        &--disabled {
+            fill: rgb(197, 197, 197) !important;
+        }
     }
     
     &__btn--edit, &__btn--save {
@@ -313,21 +322,14 @@
     &__hubspot-icon {
         height: 2.9rem;
         width: 2.9rem;
-        fill: $color-secondary;
+        fill: #f8761f
     }
 
     
 }
 
-
-.featured-icon {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 4rem;
-    width: 4rem;
-    &--tick { fill: green }
-    &--cross { fill: red }
+.jobs-table__wrapper {
+    height: 100%;
 }
 
 .table--jobs {

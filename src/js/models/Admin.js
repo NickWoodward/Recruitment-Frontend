@@ -14,8 +14,18 @@ export default class Admin {
     }
 
     ///////////  Job Methods  ///////////
-    getJobs() {
-        return JRS.get('/admin/jobs');
+    getJobs({limit, index, titles, locations, orderField, orderDirection} = {}) {
+        return JRS.get('/admin/jobs', {
+            params: {
+                limit,
+                index,
+                titles,
+                locations,
+                orderField,
+                orderDirection,
+               
+            }
+        });
     }
 
     editJob(jobId, formData) {
@@ -24,6 +34,10 @@ export default class Admin {
 
     createJob(formData) {
         return JRS.post(`/admin/create/job`, formData);
+    }
+
+    deleteJob(jobId) {
+        return JRS.delete(`/admin/delete/job/${jobId}`);
     }
 
 

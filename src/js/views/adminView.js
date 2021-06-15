@@ -229,7 +229,29 @@ export const changeEditIcon = (btnToDisplay, summaryType) => {
         `;
     }
     delBtn.insertAdjacentHTML('beforebegin', markup);
+
+    // Disable other btns if save is active
+    if(btnToDisplay === 'save') toggleActiveBtns(false, summaryType, [document.querySelector(`.${summaryType}-summary__btn--save`)]);
+    else toggleActiveBtns(true, summaryType, [document.querySelector(`.${summaryType}-summary__btn--save`)]);
 }
+
+const toggleActiveBtns = (active, summaryType, skip) => {
+    const btns = document.querySelectorAll(`.${summaryType}-summary__btn`);
+    btns.forEach(btn => {
+        if(!skip.includes(btn)) {
+            const btnIcon = btn.firstElementChild;
+            if(!active) { 
+                btn.classList.add(`${summaryType}-summary__btn--disabled`); 
+                btnIcon.classList.add(`${summaryType}-summary__icon--disabled`);
+            }
+            else {
+                btn.classList.remove(`${summaryType}-summary__btn--disabled`);
+                btnIcon.classList.remove(`${summaryType}-summary__icon--disabled`);
+
+            }
+        }
+    });
+};
 
 export const getUserEdits = (currentUser) => {
     const formData = new FormData();
@@ -260,7 +282,8 @@ export const calculateRows = (tableName) => {
     const { headerHeight, rowHeight, paginationHeight } = getRowHeight(tableName);
     const tableHeight = document.querySelector(`.${tableName}-table__wrapper`).offsetHeight;
     const numOfRows = Math.floor((tableHeight - headerHeight - paginationHeight)/rowHeight);
-    
+    console.log(document.querySelector(`.${tableName}-table__wrapper`));
+    console.log(tableHeight, rowHeight, paginationHeight);
     return numOfRows;
 }
 const getRowHeight = (tableName) => {
@@ -284,11 +307,13 @@ const getRowHeight = (tableName) => {
     const rowHeight = document.querySelector(`.row--${tableName}`).offsetHeight;
     const headerHeight = document.querySelector(`.thead--${tableName}`).offsetHeight;
     const paginationHeight = document.querySelector(`.pagination--${tableName}`).offsetHeight;
+
     // Remove table
     utils.removeElement(document.querySelector('.table--test'));
     utils.removeElement(document.querySelector(`.pagination--${tableName}`));
     return { headerHeight, rowHeight, paginationHeight };
 }
+
 export const initialiseUserPage = () => {
     // Remove existing content
     utils.clearElement(elements.adminContent);
@@ -329,22 +354,22 @@ const createJobSummary = () => {
             </div>
             <div class="job-summary__controls">
                 <div class="job-summary__btn job-summary__btn--new">
-                    <svg class="job-summary__new-icon">
+                    <svg class="job-summary__new-icon job-summary__icon">
                         <use xlink:href="svg/spritesheet.svg#add">
                     </svg>
                 </div>
                 <div class="job-summary__btn job-summary__btn--hubspot">
-                    <svg class="job-summary__hubspot-icon">
+                    <svg class="job-summary__hubspot-icon job-summary__icon">
                         <use xlink:href="svg/spritesheet.svg#hubspot">
                     </svg>
                 </div>
                 <div class="job-summary__btn job-summary__btn--edit">
-                    <svg class="job-summary__edit-icon">
+                    <svg class="job-summary__edit-icon job-summary__icon">
                         <use xlink:href="svg/spritesheet.svg#edit-np1">
                     </svg>
                 </div>
                 <div class="job-summary__btn job-summary__btn--delete">
-                    <svg class="job-summary__delete-icon">
+                    <svg class="job-summary__delete-icon job-summary__icon">
                         <use xlink:href="svg/spritesheet.svg#delete-np1">
                     </svg>
                 </div>
@@ -382,56 +407,35 @@ export const clearJobSummary = (companies) => {
     });
 };
 
-export const toggleDropdown = (flag, dropdown, item) => {
+export const toggleDropdown = (flag, item, dropdown) => {
     if(flag) {
-        console.log(dropdown.input);
         item.insertAdjacentElement('beforebegin', dropdown);
-        item.insertAdjacentElement('beforebegin', dropdown.list);
         utils.removeElement(item);
     } else {
-        dropdown.insertAdjacentHtml('beforebegin', item);
+        dropdown.insertAdjacentHTML('beforebegin', item);
         utils.removeElement(dropdown);
     }
 }
 
-// Options formatted as { id, name/value }
-// export const createSelectElement = (options, defaultText, classNames) => {
-//     const input = document.createElement('select');
-//     const placeholder = new Option(defaultText, '');
-//     placeholder.setAttribute('disabled', 'disabled');
-//     placeholder.setAttribute('selected', 'selected');
-
-//     classNames.forEach(name => input.classList.add(name));
-//     input.add(placeholder);
-
-//     options.forEach(option => {
-//         const selectOption = new Option(option.name, option.name);
-//         selectOption.setAttribute('id', option.id);
-//         selectOption.setAttribute('style', 'font-weight:bold');
-//         input.add(selectOption);
-//     });
-
-//     return input;
-// };
-export const createDataList = (options, defaultText, classNames, id) => {
-    const dropdown = document.createElement('input');
-    const list = document.createElement('datalist');
-
-    dropdown.setAttribute('list', id);
-    list.setAttribute('id', id);
+export const createSelectElement = (options, defaultText, classNames, companyId) => {
+    
+    const dropdown = document.createElement('select'); 
 
     classNames.forEach(name => dropdown.classList.add(name));
 
     options.forEach(item => {
-        const option = document.createElement('option');
-        option.value = item.name;
+        const option = new Option(item.name, item.name);
         option.setAttribute('data-id', item.id);
-        console.log(option);
 
-        list.appendChild(option);
+        if(parseInt(option.dataset.id) === companyId) {
+            option.selected = true;
+        }
+
+        dropdown.add(option);
     });
 
-    return { dropdown, list };
+
+    return dropdown;
 };
 
 export const addFeaturedCheckbox = (visible, featured) => {
@@ -473,6 +477,10 @@ export const changeNewIcon = (btnToDisplay, summaryType) => {
         `;
     }
     summaryControls.insertAdjacentHTML('afterbegin', markup);
+
+    // Disable other btns if save is active
+    if(btnToDisplay === 'save') toggleActiveBtns(false, summaryType, [document.querySelector(`.${summaryType}-summary__btn--save-new`)]);
+    else toggleActiveBtns(true, summaryType, [document.querySelector(`.${summaryType}-summary__btn--save-new`)]);
 };
 
 export const getJobEdits = (currentJob) => {
@@ -524,7 +532,7 @@ export const getNewJob = () => {
 const getJobFormValues = () => {
     const selectElement = document.querySelector('.job-summary__company');
     const companyName = selectElement.value;
-    const companyId = selectElement.options[selectElement.selectedIndex].getAttribute('id');
+    const companyId = selectElement.options[selectElement.selectedIndex].getAttribute('data-id');
     const title = document.querySelector('.job-summary__title').innerText;
     const location = document.querySelector('.job-summary__location').innerText;
     const wage = document.querySelector('.job-summary__wage').innerText;
