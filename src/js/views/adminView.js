@@ -90,12 +90,17 @@ const createUserSummary = () => {
     const markup = `
         <div class="user-summary">
             <div class="user-summary__details">
-                <div class="user-summary__item user-summary__first-name" contenteditable=false></div>
-                <div class="user-summary__item user-summary__last-name" contenteditable=false></div>
-                <div class="user-summary__item user-summary__phone" contenteditable=false></div>
-                <div class="user-summary__item user-summary__email" contenteditable=false></div>
+                <div class="user-summary__item user-summary__first-name" data-placeholder="First Name" contenteditable=false></div>
+                <div class="user-summary__item user-summary__last-name" data-placeholder="Last Name" contenteditable=false></div>
+                <div class="user-summary__item user-summary__phone" data-placeholder="Phone" contenteditable=false></div>
+                <div class="user-summary__item user-summary__email" data-placeholder="Email" contenteditable=false></div>
             </div>
             <div class="user-summary__controls">
+                <div class="user-summary__btn user-summary__btn--new">
+                    <svg class="user-summary__new-icon user-summary__icon">
+                        <use xlink:href="svg/spritesheet.svg#add">
+                    </svg>
+                </div>
                 <div class="user-summary__btn user-summary__btn--hubspot">
                     <svg class="user-summary__hubspot-icon">
                         <use xlink:href="svg/spritesheet.svg#hubspot">
@@ -126,6 +131,7 @@ export const populateUserSummary = (user) => {
     
     addCvElement(user);
 }
+// @TODO: move from user section
 export const makeEditable = (elements, makeEditable, exclude) => {
 
     elements.forEach((element, index) => {
@@ -137,28 +143,11 @@ export const makeEditable = (elements, makeEditable, exclude) => {
         if(!makeEditable) {
             element.classList.remove(`${className}--editable`);
             element.setAttribute('contenteditable', false);
-            
         } else {
             element.classList.add(`${className}--editable`);
             element.setAttribute('contenteditable', true);
         }
     });
-    // if(makeEditable) {
-    //     const cvWrapper = document.querySelector('.user-summary__cv-wrapper');
-    //     utils.removeElement(cvWrapper);
-    //     console.log(cvWrapper);
-
-    //     // const uploader = `
-    //     //     <div class="user-summary__btn user-summary__btn--upload">
-    //     //         <svg class="user-summary__icon user-summary__upload-icon">
-    //     //             <use xlink:href="svg/spritesheet.svg#upload-np">
-    //     //         </svg>
-    //     //     </div>
-    //     //     <div class="user-summary__cv-path">No CV selected</div>
-    //     // `;
-    //     // cvWrapper.insertAdjacentHTML('afterbegin', uploader);
-    //     // console.log(document.querySelector('.user-summary__btn'));
-    // }
 }
 
 export const addCvElement = user => {
@@ -173,7 +162,7 @@ export const addCvElement = user => {
                     <use xlink:href="svg/spritesheet.svg#${cvType === '.pdf'? 'pdf':(cvType === '.doc' || cvType === '.docx'? 'doc':'upload-np')}">
                 </svg>
             </div>
-            <div class="user-summary__cv-path">${cvName}</div>
+            <div class="user-summary__cv-path" data-id=${user.applicantId}>${cvName}</div>
         </div>
     `;
 
@@ -190,7 +179,7 @@ export const addUploadElement = (cvName) => {
         <div class="user-summary__cv-wrapper">
             <!-- Input inside label for custom styling -->
             <div class="user-summary__file-picker">
-                <label class="user-summary__label user-summary__btn" for="user-summary__input">
+                <label class="user-summary__label user-summary__btn user-summary__btn--upload" for="user-summary__input">
                     <svg class="user-summary__icon user-summary__upload-icon">
                         <use xlink:href="svg/spritesheet.svg#upload-np">
                     </svg>
@@ -204,7 +193,7 @@ export const addUploadElement = (cvName) => {
     document.querySelector('.user-summary__email').insertAdjacentHTML('afterend', markup);
 }
 
-export const changeEditIcon = (btnToDisplay, summaryType) => {
+export const changeEditIcon = (btnToDisplay, summaryType, skip) => {
     const editBtn = document.querySelector(`.${summaryType}-summary__btn--edit`);
     const saveBtn = document.querySelector(`.${summaryType}-summary__btn--save`);
     const delBtn = document.querySelector(`.${summaryType}-summary__btn--delete`);
@@ -228,17 +217,17 @@ export const changeEditIcon = (btnToDisplay, summaryType) => {
             </div>
         `;
     }
-    delBtn.insertAdjacentHTML('beforebegin', markup);
 
-    // Disable other btns if save is active
-    if(btnToDisplay === 'save') toggleActiveBtns(false, summaryType, [document.querySelector(`.${summaryType}-summary__btn--save`)]);
-    else toggleActiveBtns(true, summaryType, [document.querySelector(`.${summaryType}-summary__btn--save`)]);
+    delBtn.insertAdjacentHTML('beforebegin', markup);
+    if(btnToDisplay === 'save') toggleActiveBtns(false, summaryType, skip);
+    else toggleActiveBtns(true, summaryType, skip);
 }
 
 const toggleActiveBtns = (active, summaryType, skip) => {
     const btns = document.querySelectorAll(`.${summaryType}-summary__btn`);
     btns.forEach(btn => {
-        if(!skip.includes(btn)) {
+        // If none of the names in the skip list match any of those in the btn classList, or no list exists
+        if(!skip || !skip.some(element => Array.from(btn.classList).includes(element))) {
             const btnIcon = btn.firstElementChild;
             if(!active) { 
                 btn.classList.add(`${summaryType}-summary__btn--disabled`); 
@@ -257,11 +246,7 @@ export const getUserEdits = (currentUser) => {
     const formData = new FormData();
 
     // Compare the current user to the edits made
-    const firstName = document.querySelector('.user-summary__first-name').innerText;
-    const lastName = document.querySelector('.user-summary__last-name').innerText;
-    const phone = document.querySelector('.user-summary__phone').innerText;
-    const email = document.querySelector('.user-summary__email').innerText;
-    const cv = document.querySelector('.user-summary__input').files[0];
+    const { firstName, lastName, phone, email, cv } = getUserFormValues();
 
     let submit = false;
     firstName !== currentUser.firstName && (submit = true) ? formData.append('firstName', firstName) : formData.append('firstName', currentUser.firstName);
@@ -276,6 +261,55 @@ export const getUserEdits = (currentUser) => {
     
     return submit? formData : null;
 }
+
+export const getNewUser = () => {
+    const { firstName, lastName, phone, email, cv } = getUserFormValues();
+
+
+    // Check the placeholders have been removed
+    // @TODO FE validation here
+    if(
+        firstName === 'Name' ||
+        lastName === 'Surname' ||
+        phone === 'Phone' ||
+        email === 'Email'
+    ) return null;
+
+    const formData = new FormData();
+    formData.append('firstName', firstName);
+    formData.append('lastName', lastName);
+    formData.append('email', email);
+    formData.append('phone', phone);
+ 
+    if(cv) formData.append('cv', cv);
+    return formData;
+}
+
+const getUserFormValues = () => {
+    const firstName = document.querySelector('.user-summary__first-name').innerText;
+    const lastName = document.querySelector('.user-summary__last-name').innerText;
+    const phone = document.querySelector('.user-summary__phone').innerText;
+    const email = document.querySelector('.user-summary__email').innerText;
+    const cv = document.querySelector('.user-summary__input').files[0];
+
+    return { firstName, lastName, phone, email, cv };
+};
+
+// export const clearUserSummary = () => {
+//     console.log('called');
+//     const items = document.querySelectorAll('.user-summary__item');
+//     items.forEach(item => {
+//         console.log(item);
+//         if(item.className.includes('user-summary__first-name')) item.innerText = 'First Name';
+//         if(item.className.includes('user-summary__last-name')) item.innerText = 'Last Name';
+//         if(item.className.includes('user-summary__phone')) item.innerText = 'Phone #';
+//         if(item.className.includes('user-summary__email')) item.innerText = 'Email';
+//         if(item.className.includes('user-summary__featured')) addFeaturedCheckbox(false, false);
+//         if(item.className.includes('user-summary__input')) item.files = [];
+
+//     });
+// };
+
 
 // table name, function to get row height
 export const calculateRows = (tableName) => {
@@ -314,6 +348,42 @@ const getRowHeight = (tableName) => {
     return { headerHeight, rowHeight, paginationHeight };
 }
 
+
+/////////////////////////////////////////////////////
+// export const clearText = (e, text) => {
+//     // e.currentTarget === this
+//     console.log(e.currentTarget);
+//     // e.target === the element clicked
+//     console.log(e.target);
+//     // undefined?
+//     console.log(text);
+//     console.log(this);
+// };
+
+// let focusInHandler;
+
+// //@TODO: add listeners when editable + remove them
+// export const addFocusInListeners = (items, cb) => {
+//     items.forEach(item => {
+//         focusInHandler = cb.bind(item, 'text');
+//         item.addEventListener('focusin', focusInHandler);
+//     });
+// };
+// export const removeFocusInListeners = (items, cb) => {
+//     items.forEach(item => {
+//         focusInHandler = cb;
+//         item.removeEventListener('focusin', focusInHandler);
+//     });
+// }
+
+export const focusInUserHandler = (e) => {
+    e.target.innerText = '';
+};
+export const focusOutUserHandler = (e) => {
+    e.target.innerText = e.target.dataset.placeholder;
+    console.log(e.target);
+};
+
 export const initialiseUserPage = () => {
     // Remove existing content
     utils.clearElement(elements.adminContent);
@@ -324,6 +394,7 @@ export const initialiseUserPage = () => {
     // Insert placeholders
     elements.adminContent.insertAdjacentHTML('afterbegin', createUserSummary());
     elements.adminContent.insertAdjacentHTML('beforeend', `<div class="users-table__wrapper"></div>`);
+
 };
 
 
@@ -396,7 +467,7 @@ export const populateJobSummary = (job) => {
     document.querySelector('.job-summary__description').innerText = job.description;
 
 };
-export const clearJobSummary = (companies) => {
+export const clearJobSummary = () => {
     const items = document.querySelectorAll('.job-summary__item');
     items.forEach(item => {
         if(item.className.includes('job-summary__title')) item.innerText = 'Job Title';
@@ -451,7 +522,8 @@ export const addFeaturedCheckbox = (visible, featured) => {
     featuredDiv.insertAdjacentHTML('beforeend', markup);   
 };
 
-export const changeNewIcon = (btnToDisplay, summaryType) => {
+// @TODO: move from job section
+export const changeNewIcon = (btnToDisplay, summaryType, skip) => {
     const newBtn = document.querySelector(`.${summaryType}-summary__btn--new`);
     const saveBtn = document.querySelector(`.${summaryType}-summary__btn--save-new`);
     const summaryControls = document.querySelector(`.${summaryType}-summary__controls`);
@@ -479,8 +551,8 @@ export const changeNewIcon = (btnToDisplay, summaryType) => {
     summaryControls.insertAdjacentHTML('afterbegin', markup);
 
     // Disable other btns if save is active
-    if(btnToDisplay === 'save') toggleActiveBtns(false, summaryType, [document.querySelector(`.${summaryType}-summary__btn--save-new`)]);
-    else toggleActiveBtns(true, summaryType, [document.querySelector(`.${summaryType}-summary__btn--save-new`)]);
+    if(btnToDisplay === 'save') toggleActiveBtns(false, summaryType, skip);
+    else toggleActiveBtns(true, summaryType, skip);
 };
 
 export const getJobEdits = (currentJob) => {
@@ -582,6 +654,7 @@ export const changeActiveMenuItem = (e) => {
     }
 }
 
+// @TODO: delete?
 export const addTableListeners = (type) => {
     const deleteButtons = type==='jobs'? 
                             document.querySelectorAll(elementStrings.deleteJobsBtn):

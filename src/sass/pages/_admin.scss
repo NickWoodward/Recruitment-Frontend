@@ -114,11 +114,13 @@
     }
     &__cv-path {
         margin-left: 1.5rem;
+        cursor: pointer;
     }
     // CV upload elements //
     &__file-picker {
         display: flex;
         align-items: center;
+        cursor: pointer;
     }
     &__input {
         position: absolute;
@@ -127,6 +129,7 @@
     &__label {
         height: 4rem;
         margin-right: 1.5rem;
+        cursor: pointer;
     }
 
     // end
@@ -145,18 +148,37 @@
         align-items: flex-end;
         margin-right: 1.5rem;
         cursor:pointer;
+
+        &--disabled {
+            pointer-events: none;
+        }
+    }
+    &__icon {
+        &--disabled {
+            fill: rgb(197, 197, 197) !important;
+        }
     }
     
     &__btn--upload {
         fill: $color-secondary;
         align-items: center;
-        cursor: default;
+        // cursor: default;
     }
     &__btn--edit, &__btn--save {
         transform: translateY(3px);
     }
     &__btn--hubspot {
         margin-right: 2rem;
+    }
+
+    &__btn--new, &__btn--save-new {
+        margin-right: auto;
+    }
+
+    &__new-icon {
+        height: 3.5rem;
+        width: 3.5rem;
+        fill: $color-logo;
     }
 
     &__edit-icon {

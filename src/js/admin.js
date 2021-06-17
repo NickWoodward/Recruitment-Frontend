@@ -59,6 +59,8 @@ class AdminController {
                 searchOptions: {
                     index: 0,
                     limit: 6,
+                    orderField: "createdAt",
+                    orderDirection: "ASC"
                 }
             },
             jobsTable: {
@@ -107,47 +109,29 @@ class AdminController {
             this.Admin.getCompanies().then(res => {
                 this.companies = res.data.companies;
             }).catch(err => console.log(err));
-        
-            // Get Job data and render table
-        //     this.JobList.getJobs(this.state.jobs.searchOptions)
-        //         .then(res => {
-        //             if(res.data.jobs) {
-        //                 console.log(res.data.jobs);
-        //                 adminView.initialiseJobPage();
-
-        //                 this.jobs = res.data.jobs.map(({featured, id, title, wage, location, description, createdAt}) => ({featured, id, title, wage, location, description, createdAt}));
-        //                 this.state.jobs.totalJobs = res.data.totalJobs;
-
-        //                 // Calculate # of rows to render
-        //                 this.state.jobs.searchOptions.limit = adminView.calculateRows('jobs');
-        //                 console.log('ew'+this.state.users.searchOptions.limit);
-
-        //                 this.renderJobsTable(); 
-        //                 if(this.jobs.length > 0)
-        //                     adminView.populateJobSummary(this.jobs[0]); 
-        //                 else 
-        //                     // @TODO Placeholder for no jobs
-                        
-        //                 if(this.jobs.length > 0) {
-        //                     adminView.populateJobSummary(this.jobs[0]);
-        //                     // adminView.addTableListeners('jobs');
-        //                 } else {
-        //                     // @TODO: Render placeholder
-                            
-        //                 }
-                        
-
-        //             }
-        //         })
-        //         .catch(err => console.log(err));
         });
 
         // Handle editable elements when a user clicks elsewhere
         document.body.addEventListener('mousedown', (e) => {
+                        
             if(this.editUserLostFocus(e)) {
                 console.log('edit user lost focus');
                 adminView.makeEditable(document.querySelectorAll('.user-summary__item'), false);
+
                 adminView.changeEditIcon('edit', 'user');
+                adminView.addCvElement(this.state.users.currentUser);
+            }
+            if(this.createUserLostFocus(e)) {
+                const items = document.querySelectorAll('.user-summary__item');
+                console.log('create user lost focus');
+                adminView.makeEditable(items, false);
+
+                // Remove the item listeners
+                // adminView.removeFocusInListeners(items, adminView.clearText);
+                // Add the original user values
+                adminView.populateUserSummary(this.state.users.currentUser);
+
+                adminView.changeNewIcon('new', 'user');
                 adminView.addCvElement(this.state.users.currentUser);
             }
             if(this.editJobLostFocus(e)) {
@@ -182,6 +166,7 @@ class AdminController {
 
                 adminView.changeNewIcon('new', 'job');
             }
+
         })
 
         // MODALS
@@ -219,11 +204,12 @@ class AdminController {
                 this.state.users.searchOptions.limit = adminView.calculateRows('users');
 
                 // Get User data
-                this.getUsers()
+                this.Admin.getUsers(this.state.users.searchOptions)
                     .then((res) => {
                         // Store and render data
                         this.users = res.data.applicants;
                         this.state.users.totalUsers = res.data.total;
+                        console.log(this.users);
 
                         this.renderUsersTable();
                         if(this.users.length > 0) {
@@ -295,7 +281,7 @@ class AdminController {
                     userState.searchOptions.index = userBtn.dataset.id * userState.searchOptions.limit;
                     userState.currentPage = userState.searchOptions.index / userState.searchOptions.limit;
                 }
-                this.getUsers()
+                this.Admin.getUsers(this.state.users.searchOptions)
                     .then((res) => {
                         if(res.data.applicants) {
                             // Store and render data
@@ -306,6 +292,7 @@ class AdminController {
                             // Clear user table
                             // utils.clearElement(document.querySelector('.user-table__wrapper'));
 
+                            
                             this.renderUsersTable();
 
                             // Initialise user summary
@@ -338,6 +325,8 @@ class AdminController {
                         this.jobs = res.data.jobs;
                         this.state.jobs.totalJobs = res.data.total;
 
+                        // Set the table index to 0
+                        this.state.jobsTable.index = 0;
                         this.renderJobsTable();
 
                         adminView.populateJobSummary(this.jobs[0]);
@@ -628,6 +617,7 @@ class AdminController {
         adminView.renderPagination(index, limit, totalJobs, tableWrapper, 'jobs');
 
         const jobRows = document.querySelectorAll('.row--jobs');
+
         utils.changeActiveRow(jobRows[this.state.jobsTable.index], jobRows);
 
         // Add table row listeners
@@ -640,46 +630,7 @@ class AdminController {
                 })[0];
 
                 adminView.populateJobSummary(job);
-                console.log(row, jobRows);
                 utils.changeActiveRow(row, jobRows);
-            });
-        });
-    }
-
-    renderUsersTable() {
-        const { totalUsers, searchOptions: {index, limit} } = this.state.users;
-        // Offset is subtracted from the user id to get the current item
-        const page = index / limit;
-        const offset = page * limit;
-        // Format users/headers into html elements
-        const {headers, rows} = adminView.formatUsers(this.users);
-        const tableWrapper = document.querySelector('.users-table__wrapper');
-
-        // removeUserTable & pagination if it exists
-        const table = document.querySelector('.table--users');
-        const pagination = document.querySelector('.pagination--users');
-        if(table) utils.removeElement(table);
-        if(pagination) utils.removeElement(pagination);
-
-        // elements.adminContent.insertAdjacentHTML('afterbegin', tableView.createTableTest('users', headers, rows, false))
-        tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('users', headers, rows, false));
-        // Add pagination
-        adminView.renderPagination(index, limit, totalUsers, tableWrapper, 'users');
-
-        // Add listeners to rows in the user tables 
-        const userRows = document.querySelectorAll('.row--users');
-        utils.changeActiveRow(userRows[0], userRows);
-
-        userRows.forEach(row => {
-            row.addEventListener('click', (e) => {
-                const targetRow = e.target.closest('.row');
-                const rowId = targetRow.querySelector('.td-data--first-name').dataset.id;
-                const user = this.users.filter(user => {
-                    return parseInt(rowId) === user.applicantId;
-                });
-
-                utils.changeActiveRow(targetRow, userRows);
-                adminView.populateUserSummary(user[0]);
             });
         });
     }
@@ -706,8 +657,13 @@ class AdminController {
                 this.state.jobs.currentJob = this.jobs.find(job => job.id === parseInt(jobId));
                 const companyId = this.state.jobs.currentJob.companyId;
 
+
                 if(jobElements[0].getAttribute('contenteditable') === 'false') {
-                    adminView.changeEditIcon('save', 'job');
+
+                    // Icons not to alter when the edit state is changed
+                    const iconsToIgnore = ['job-summary__btn--save'];
+
+                    adminView.changeEditIcon('save', 'job', iconsToIgnore);
                     adminView.makeEditable(jobElements, true, ['job-summary__featured', 'job-summary__company']);
                     
                     // Add a company name dropdown in place of the div
@@ -744,7 +700,6 @@ class AdminController {
                             this.state.jobs.totalJobs = response.data.total;
 
                             const jobId = jobSummary.dataset.id;
-                            console.log(jobId);
                             this.state.jobs.currentJob = this.jobs.find(job => job.id === parseInt(jobId));
                             this.renderJobsTable();
                             console.log(this.state.jobs.currentJob);
@@ -755,7 +710,12 @@ class AdminController {
                 } else {
                     console.log('dont save');
                 }
-                adminView.changeEditIcon('edit', 'job');
+
+                // Technically unnecessary as the edit button never had the disabled class added
+                // but used for consistency
+                const iconsToIgnore = ['job-summary__btn--edit'];
+
+                adminView.changeEditIcon('edit', 'job', iconsToIgnore);
                 adminView.makeEditable(jobElements, false, ['job-summary__featured']);
                 adminView.toggleDropdown(
                     false, 
@@ -771,21 +731,23 @@ class AdminController {
                 const jobId = jobSummary.dataset.id;
                 this.state.jobs.currentJob = this.jobs.find(job => job.id === parseInt(jobId));
                 const companyId = this.state.jobs.currentJob.companyId;
-                console.log(this.state.jobs.currentJob);
 
                 // Make the items editable
                 adminView.makeEditable(jobElements, true, ['job-summary__featured', 'job-summary__company']);
+             
 
                 // Switch the company element to a dropdown
                 const classNames = ['job-summary__item', 'job-summary__select', 'job-summary__item--editable', 'job-summary__company'];
                 const dropdown = adminView.createSelectElement(this.companies, 'Company Name', classNames, companyId);
                 adminView.toggleDropdown(true, companyItem, dropdown);
 
+                const iconsToIgnore = ['job-summary__btn--save-new'];
+
                 // Change the new icon
-                adminView.changeNewIcon('save', 'job');
+                adminView.changeNewIcon('save', 'job', iconsToIgnore);
 
                 // Clear the current summary
-                adminView.clearJobSummary(this.companies.map(company => { return { name: company.name, id: company.id } }));
+                adminView.clearJobSummary();
             }
             if(saveNewBtn){
                 console.log('saveBtn');
@@ -848,7 +810,10 @@ class AdminController {
                     console.log('dont save new job');
                 }
 
-                adminView.changeNewIcon('new', 'job');
+                // Technically not needed as the 'new' btn was never disabled, but used for consistency
+                const iconsToIgnore = ['job-summary__btn--new'];
+
+                adminView.changeNewIcon('new', 'job', iconsToIgnore);
                 adminView.makeEditable(jobElements, false, ['job-summary__featured']);
                 adminView.toggleDropdown(
                     false, 
@@ -864,7 +829,6 @@ class AdminController {
             if(deleteBtn) {
                 const jobId = jobSummary.dataset.id;
                 this.Admin.deleteJob(jobId).then(response => {
-                    console.log(response);
                     if(response.status === 200)
                         return this.Admin.getJobs();
                 }).then(response => {
@@ -890,6 +854,43 @@ class AdminController {
         });
     }
 
+    renderUsersTable() {
+        const { totalUsers, searchOptions: {index, limit} } = this.state.users;
+        // Offset is subtracted from the user id to get the current item
+        const page = index / limit;
+        const offset = page * limit;
+        // Format users/headers into html elements
+        const {headers, rows} = adminView.formatUsers(this.users);
+        const tableWrapper = document.querySelector('.users-table__wrapper');
+
+        // removeUserTable & pagination if it exists
+        const table = document.querySelector('.table--users');
+        const pagination = document.querySelector('.pagination--users');
+        if(table) utils.removeElement(table);
+        if(pagination) utils.removeElement(pagination);
+
+        // elements.adminContent.insertAdjacentHTML('afterbegin', tableView.createTableTest('users', headers, rows, false))
+        tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('users', headers, rows, false));
+        // Add pagination
+        adminView.renderPagination(index, limit, totalUsers, tableWrapper, 'users');
+
+        // Add listeners to rows in the user tables 
+        const userRows = document.querySelectorAll('.row--users');
+        utils.changeActiveRow(userRows[0], userRows);
+
+        userRows.forEach(row => {
+            row.addEventListener('click', (e) => {
+                const targetRow = e.target.closest('.row');
+                const rowId = targetRow.querySelector('.td-data--first-name').dataset.id;
+                const user = this.users.filter(user => {
+                    return parseInt(rowId) === user.applicantId;
+                });
+
+                utils.changeActiveRow(targetRow, userRows);
+                adminView.populateUserSummary(user[0]);
+            });
+        });
+    }
     addUserSummaryListeners() {
         const userSummary = document.querySelector('.user-summary');
 
@@ -897,15 +898,55 @@ class AdminController {
             // Ignore synthetic clicks from the offscreen input element
             if(e.target === document.querySelector('.user-summary__input')) return;
 
+            const newBtn = e.target.closest('.user-summary__btn--new');
             const editBtn = e.target.closest('.user-summary__btn--edit');
             const deleteBtn = e.target.closest('.user-summary__btn--delete');
             const saveBtn = e.target.closest('.user-summary__btn--save');
             const hubspotBtn = e.target.closest('.user-summary__btn--hubspot');
-            const cvBtn = e.target.closest('.user-summary__btn--cv');
+            const cvBtn = e.target.closest('.user-summary__btn--cv') || e.target.closest('.user-summary__cv-path');
             const uploadBtn = e.target.closest('.user-summary__label');
+            const saveNewBtn = e.target.closest('.user-summary__btn--save-new');
 
             const userElements = userSummary.querySelectorAll('.user-summary__item');
+            
+            if(newBtn) {
+                // Save current user values
+                const userId = document.querySelector('.user-summary').dataset.id;
+                this.state.users.currentUser = this.users.find(user => user.applicantId === parseInt(userId));
 
+                const iconsToIgnore = [
+                    'user-summary__btn--upload',
+                    'user-summary__btn--save-new'
+                ];
+                // Alter the summary form
+                adminView.changeNewIcon('save', 'user', iconsToIgnore);
+                adminView.makeEditable(userElements, true);
+                // adminView.addFocusInListeners(userElements, adminView.clearText);
+
+
+                userSummary.addEventListener('focusin', adminView.focusInUserHandler);
+                userSummary.addEventListener('focusout', adminView.focusOutUserHandler);
+
+                // Change the cv element to a file picker
+                adminView.addUploadElement(this.state.users.currentUser.cvName);
+                // Clear current user
+                // adminView.clearUserSummary();
+
+            }
+            if(saveNewBtn) {
+                // Get edited values
+                const formData = adminView.getNewUser(this.state.users.currentUser);
+
+                this.Admin.createApplicant(formData).then(res => {
+                    if(res.status !== 201) // @TODO: show error message
+                    // @TODO: show success message
+                    console.log('user created')
+                    for(const [key, value] of formData.entries()) {
+                        console.log(key, value);
+                    }
+                }).catch(err => console.log(err));
+
+            }
             if(editBtn) {
                 const userId = document.querySelector('.user-summary').dataset.id;
                 // Save current user values
@@ -918,8 +959,15 @@ class AdminController {
                     // Change the cv element to a file picker
                     adminView.addUploadElement(this.state.users.currentUser.cvName);
 
+                    
+                    // Btns to ignore if the edit state is changed
+                    const elementsToSkip = [
+                        'user-summary__btn--save', 
+                        'user-summary__btn--upload'
+                    ];
+
                     // Change the edit icon to a save icon
-                    adminView.changeEditIcon('save', 'user');
+                    adminView.changeEditIcon('save', 'user', elementsToSkip);
                 }
             } 
             if(saveBtn) {
@@ -951,7 +999,12 @@ class AdminController {
                     console.log('dont save');
                 }
                 adminView.makeEditable(userElements, false);
-                adminView.changeEditIcon('edit', 'user');
+
+                const iconsToIgnore = [
+                    'user-summary__btn--upload',
+                    'user-summary__btn--edit'
+                ];
+                adminView.changeEditIcon('edit', 'user', iconsToIgnore);
             }
         
             if(deleteBtn) {
@@ -962,13 +1015,12 @@ class AdminController {
                 this.Admin
                     .deleteApplicant(userId)
                     .then(response => {
-                        console.log(response);
                         // @TODO: Both getUsers and remove from local array?
                         // Remove the current user from the local array
                         this.users = this.users.filter(user => {
                             return user !== this.state.users.currentUser;
                         }) 
-                        return this.getUsers();                      
+                        return this.Admin.getUsers(this.state.users.searchOptions);                      
                     }).then((res) => {
                         // Store and render data
                         this.users = res.data.applicants;
@@ -991,8 +1043,23 @@ class AdminController {
         });
     }
 
+    // saveBtn + newBtn = currently editing
+    // saveBtn + editBtn = currently creating
+    createUserLostFocus(e) {
+        const userSummary = document.querySelector('.user-summary');
+        const editableContent = document.querySelector('.user-summary__item--editable');
 
+        // Targets are items that are ok to click on (ie won't return true)
+        const editBtnTarget = e.target.closest('.user-summary__btn--edit');
+        const itemTarget = e.target.closest('.user-summary__item');
+        const saveTarget = e.target.closest('.user-summary__btn--save-new');
+        const uploadTarget = e.target.closest('.user-summary__btn--upload');
 
+        
+        const editBtn = document.querySelector('.user-summary__btn--edit');
+        if(userSummary && editableContent && !editBtnTarget && !itemTarget && !saveTarget && !uploadTarget && editBtn) return true;
+        return false;
+    }
     editUserLostFocus(e) {
         const userSummary = document.querySelector('.user-summary');
         const editableContent = document.querySelector('.user-summary__item--editable');
@@ -1001,27 +1068,29 @@ class AdminController {
         const saveTarget = e.target.closest('.user-summary__btn--save');
         const uploadCv = e.target.closest('.user-summary__label');
 
+        const newBtn = document.querySelector('.user-summary__btn--new');
+
         // If user summary is present, editable, and the edit btn, editable elements, or save btn have not been clicked
-        if(userSummary && editableContent && !editBtnTarget && !itemTarget && !saveTarget && !uploadCv) {
+        if(userSummary && editableContent && !editBtnTarget && !itemTarget && !saveTarget && !uploadCv && newBtn) {
             return true;
         } 
         
         return false;
     }
-
-
     createJobLostFocus(e) {
         const jobSummary = document.querySelector('.job-summary');
         const editableContent = document.querySelector('.job-summary__item--editable');
         const editBtnTarget = e.target.closest('.job-summary__btn--edit');
         const itemTarget = e.target.closest('.job-summary__item');
         const saveTarget = e.target.closest('.job-summary__btn--save-new');
-        // The prescence of 'newBtn' distinguishes this from 'editJobLostFocus' & vice versa
-        const newBtn = document.querySelector('.job-summary__btn--new');
+        // Returns false if present, ie if the newBtn is on screen 
+        // The newBtn is present when both adding a new job && editing a current job
+        const editBtn = document.querySelector('.job-summary__btn--edit');
 
-        if(jobSummary && editableContent && !editBtnTarget && !itemTarget && !saveTarget & !newBtn) {
+        if(jobSummary && editableContent && !editBtnTarget && !itemTarget && !saveTarget && editBtn) {
             return true;
-        }
+        } 
+        return false;
     }
     editJobLostFocus(e) {
         const jobSummary = document.querySelector('.job-summary');
@@ -1029,12 +1098,14 @@ class AdminController {
         const editBtnTarget = e.target.closest('.job-summary__btn--edit');
         const itemTarget = e.target.closest('.job-summary__item');
         const saveTarget = e.target.closest('.job-summary__btn--save');
-        const editBtn = document.querySelector('.job-summary__btn--edit');
 
-        if(jobSummary && editableContent && !editBtnTarget && !itemTarget && !saveTarget & !editBtn) {
+        // Returns false if present, ie if editBtn on screen
+        // Present whenever not editing
+        const newBtn = document.querySelector('.job-summary__btn--new');
+
+        if(jobSummary && editableContent && !editBtnTarget && !itemTarget && !saveTarget && newBtn) {
             return true;
         }
-        
         return false;
     }
 }

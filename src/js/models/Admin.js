@@ -3,6 +3,9 @@ import JRS from '../api/jrs';
 export default class Admin {
     
     //////////  Applicant Methods  ///////////
+    getUsers({index, limit, orderField, orderDirection}) {
+        return JRS.get('/admin/applicants', { params: { index, limit, orderField, orderDirection } });
+    }
     getCv (applicantId) {
         return JRS.get(`/admin/cvs/${applicantId}`, { responseType: 'blob' });
     }
@@ -10,7 +13,10 @@ export default class Admin {
         return JRS.post(`/admin/edit/applicant/${applicantId}`, formData);
     }
     deleteApplicant(applicantId) {
-        return JRS.delete(`/admin/edit/applicant/${applicantId}`);
+        return JRS.delete(`/admin/delete/applicant/${applicantId}`);
+    }
+    createApplicant(formData) {
+        return JRS.post('/admin/create/applicant', formData);
     }
 
     ///////////  Job Methods  ///////////
