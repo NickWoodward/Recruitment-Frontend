@@ -169,7 +169,7 @@ export const addCvElement = user => {
     document.querySelector('.user-summary__email').insertAdjacentHTML('afterend', cvElement);
 }
 
-export const addUploadElement = (cvName) => {
+export const addUploadElement = (cvName, chosen) => {
     const cvWrapper = document.querySelector('.user-summary__cv-wrapper');
 
     // Remove contents of cv wrapper
@@ -185,7 +185,7 @@ export const addUploadElement = (cvName) => {
                     </svg>
                     <input class="user-summary__input" id="user-summary__input" name="cv" type=file />
                 </label>
-                <div class="user-summary__cv-path">${cvName !== 'No CV uploaded'? 'Update existing CV?':'Add a CV'}</div>
+                <label class="user-summary__cv-path" for="user-summary__input">${cvName !== 'No CV uploaded'? (chosen? `${cvName}`:'Update existing CV?') :'Add a CV'} <label/>
             </div>
 
         </div>`
@@ -292,6 +292,7 @@ const getUserFormValues = () => {
     const email = document.querySelector('.user-summary__email').innerText;
     const cv = document.querySelector('.user-summary__input').files[0];
 
+    console.log('getting firstname'+firstName);
     return { firstName, lastName, phone, email, cv };
 };
 
@@ -376,12 +377,43 @@ const getRowHeight = (tableName) => {
 //     });
 // }
 
-export const focusInUserHandler = (e) => {
+// toggle = true, insert placeholder
+export const togglePlaceholders = (elements, toggle, values) => {
+    elements.forEach((element, index) => {
+        element.innerText = toggle? element.dataset.placeholder : values[index];
+    });
+};
+
+export const inputChangeHandler = (e) => {
+    const cvPath = document.querySelector('.user-summary__cv-path');
+    cvPath.innerText = `${e.target.files[0].name}`;
+};
+
+export const focusInNewUserHandler = (e) => {
     e.target.innerText = '';
 };
-export const focusOutUserHandler = (e) => {
-    e.target.innerText = e.target.dataset.placeholder;
-    console.log(e.target);
+export const focusOutNewUserHandler = (e) => {
+    e.target.innerText = e.target.innerText || e.target.dataset.placeholder;
+};
+
+export const focusInEditUserHandler = (e) => {
+    window.getSelection().selectAllChildren(e.target);
+};
+
+export const focusOutEditUserHandler = (user, e) => {
+    let value;
+
+    //@TODO: This should be validation
+    // If blank, replace with original value
+    if(!e.target.innerText) {
+        switch(e.target.dataset.placeholder) {
+            case 'First Name':  value = user['firstName']; break;
+            case 'Last Name':   value = user['lastName']; break;
+            case 'Phone':       value = user['phone']; break;
+            case 'Email':       value = user['email']; break;
+        }
+    }
+    e.target.innerText = value? value : e.target.innerText;
 };
 
 export const initialiseUserPage = () => {

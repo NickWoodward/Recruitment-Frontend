@@ -116,18 +116,27 @@ class AdminController {
                         
             if(this.editUserLostFocus(e)) {
                 console.log('edit user lost focus');
+                const userSummary = document.querySelector('.user-summary');
+
                 adminView.makeEditable(document.querySelectorAll('.user-summary__item'), false);
+
+                // Remove input listeners
+                userSummary.removeEventListener('focusin', adminView.focusInEditUserHandler);
+                userSummary.removeEventListener('focusout', this.boundFocusOutEditUserHandler);
 
                 adminView.changeEditIcon('edit', 'user');
                 adminView.addCvElement(this.state.users.currentUser);
             }
             if(this.createUserLostFocus(e)) {
+                const userSummary = document.querySelector('.user-summary');
                 const items = document.querySelectorAll('.user-summary__item');
                 console.log('create user lost focus');
                 adminView.makeEditable(items, false);
 
                 // Remove the item listeners
-                // adminView.removeFocusInListeners(items, adminView.clearText);
+                userSummary.removeEventListener('focusin', adminView.focusInNewUserHandler);
+                userSummary.removeEventListener('focusout', adminView.focusOutNewUserHandler);
+
                 // Add the original user values
                 adminView.populateUserSummary(this.state.users.currentUser);
 
@@ -257,82 +266,8 @@ class AdminController {
 
 
         // PAGINATION CONTROLS
-        document.body.addEventListener('click', (e) => {
-            const userBtn = e.target.closest('.pagination__item--users');
-            const userPrevious = e.target.closest('.pagination__previous--users');
-            const userNext = e.target.closest('.pagination__next--users');
-
-            const jobBtn = e.target.closest('.pagination__item--jobs');
-            const jobPrevious = e.target.closest('.pagination__previous--jobs');
-            const jobNext = e.target.closest('.pagination__next--jobs');
-
-            if(userBtn || userPrevious || userNext) {
-                const userState = this.state.users;
-                const pages = Math.ceil(userState.totalUsers / userState.searchOptions.limit);
-                if(userPrevious && !(userState.currentPage < 1)) {
-                    userState.currentPage--;
-                    userState.searchOptions.index -= userState.searchOptions.limit;
-                }
-                if(userNext && !(userState.currentPage >= pages-1) ) {
-                    userState.currentPage++;
-                    userState.searchOptions.index += userState.searchOptions.limit;
-                }
-                if(userBtn) {
-                    userState.searchOptions.index = userBtn.dataset.id * userState.searchOptions.limit;
-                    userState.currentPage = userState.searchOptions.index / userState.searchOptions.limit;
-                }
-                this.Admin.getUsers(this.state.users.searchOptions)
-                    .then((res) => {
-                        if(res.data.applicants) {
-                            // Store and render data
-                            this.users = res.data.applicants;
-                            this.state.users.totalUsers = res.data.total;
-
-                            // @TODO: Is this needed?
-                            // Clear user table
-                            // utils.clearElement(document.querySelector('.user-table__wrapper'));
-
-                            
-                            this.renderUsersTable();
-
-                            // Initialise user summary
-                            adminView.populateUserSummary(this.users[0]);
-                        }
-
-                        
-                    })
-                    .catch(err => console.log(err));
-            } else if(jobBtn || jobPrevious || jobNext){
-                const jobState = this.state.jobs;
-                const pages = Math.ceil(jobState.totalJobs / jobState.searchOptions.limit);
-
-                if(jobPrevious && !(jobState.currentPage < 1)) {
-                    jobState.currentPage--;
-                    jobState.searchOptions.index -= jobState.searchOptions.limit;
-                }
-                if(jobNext && !(jobState.currentPage >= pages-1)) {
-                    jobState.currentPage++;
-                    jobState.searchOptions.index += jobState.searchOptions.limit;
-                }
-                if(jobBtn) {
-                    jobState.searchOptions.index = jobBtn.dataset.id * jobState.searchOptions.limit;
-                    jobState.currentPage = jobState.searchOptions.index / jobState.searchOptions.limit;
-
-                }
-
-                this.Admin.getJobs(this.state.jobs.searchOptions)
-                    .then(res => {
-                        this.jobs = res.data.jobs;
-                        this.state.jobs.totalJobs = res.data.total;
-
-                        // Set the table index to 0
-                        this.state.jobsTable.index = 0;
-                        this.renderJobsTable();
-
-                        adminView.populateJobSummary(this.jobs[0]);
-                    }).catch(err => console.log(err));
-            }
-        });
+        document.body.addEventListener('click', this.handlePaginationEvent.bind(this));
+            
     }
 
     checkModals(e) {
@@ -666,6 +601,7 @@ class AdminController {
                     adminView.changeEditIcon('save', 'job', iconsToIgnore);
                     adminView.makeEditable(jobElements, true, ['job-summary__featured', 'job-summary__company']);
                     
+
                     // Add a company name dropdown in place of the div
                     const classNames = ['job-summary__item', 'job-summary__select', 'job-summary__item--editable', 'job-summary__company'];                    
                     const dropdown = adminView.createSelectElement(this.companies, 'Company Name', classNames, companyId);
@@ -876,7 +812,9 @@ class AdminController {
 
         // Add listeners to rows in the user tables 
         const userRows = document.querySelectorAll('.row--users');
-        utils.changeActiveRow(userRows[0], userRows);
+        const activeRow = Array.from(userRows).find(row => row.querySelector(`[data-id="${this.state.users.currentUser.applicantId}"]`)) || userRows[0];
+        console.log(activeRow);
+        utils.changeActiveRow(activeRow, userRows);
 
         userRows.forEach(row => {
             row.addEventListener('click', (e) => {
@@ -887,6 +825,8 @@ class AdminController {
                 });
 
                 utils.changeActiveRow(targetRow, userRows);
+                this.state.users.currentUser = user[0];
+                console.log(this.state.users.currentUser);
                 adminView.populateUserSummary(user[0]);
             });
         });
@@ -895,8 +835,8 @@ class AdminController {
         const userSummary = document.querySelector('.user-summary');
 
         userSummary.addEventListener('click', (e) => {
-            // Ignore synthetic clicks from the offscreen input element
-            if(e.target === document.querySelector('.user-summary__input')) return;
+
+
 
             const newBtn = e.target.closest('.user-summary__btn--new');
             const editBtn = e.target.closest('.user-summary__btn--edit');
@@ -904,10 +844,14 @@ class AdminController {
             const saveBtn = e.target.closest('.user-summary__btn--save');
             const hubspotBtn = e.target.closest('.user-summary__btn--hubspot');
             const cvBtn = e.target.closest('.user-summary__btn--cv') || e.target.closest('.user-summary__cv-path');
-            const uploadBtn = e.target.closest('.user-summary__label');
+            const uploadBtn = e.target.closest('.user-summary__file-picker');
             const saveNewBtn = e.target.closest('.user-summary__btn--save-new');
+            const offScreenInput = document.querySelector('.user-summary__input');
 
             const userElements = userSummary.querySelectorAll('.user-summary__item');
+
+            // Ignore synthetic clicks from the offscreen input element
+            if(e.target === offScreenInput) return;
             
             if(newBtn) {
                 // Save current user values
@@ -921,11 +865,12 @@ class AdminController {
                 // Alter the summary form
                 adminView.changeNewIcon('save', 'user', iconsToIgnore);
                 adminView.makeEditable(userElements, true);
+                adminView.togglePlaceholders(userElements, true, []);
                 // adminView.addFocusInListeners(userElements, adminView.clearText);
 
 
-                userSummary.addEventListener('focusin', adminView.focusInUserHandler);
-                userSummary.addEventListener('focusout', adminView.focusOutUserHandler);
+                userSummary.addEventListener('focusin', adminView.focusInNewUserHandler);
+                userSummary.addEventListener('focusout', adminView.focusOutNewUserHandler);
 
                 // Change the cv element to a file picker
                 adminView.addUploadElement(this.state.users.currentUser.cvName);
@@ -936,26 +881,78 @@ class AdminController {
             if(saveNewBtn) {
                 // Get edited values
                 const formData = adminView.getNewUser(this.state.users.currentUser);
+                let formUser;
 
+                // Flow: 
+                    // Create user > post to server > get and store updated user list > render jobs table 
+                    // If the newly created user is in the paginated list of jobs returned, make it the currentJob/active row
                 this.Admin.createApplicant(formData).then(res => {
-                    if(res.status !== 201) // @TODO: show error message
+                    if(res.status !== 201) { 
+                        console.log(res.status);
+                        throw new Error('Applicant not created') 
+                    }// @TODO: show error message
                     // @TODO: show success message
-                    console.log('user created')
-                    for(const [key, value] of formData.entries()) {
-                        console.log(key, value);
+                    console.log(res.data.user);
+                    formUser = res.data.user;
+
+                    return this.Admin.getUsers(this.state.users.searchOptions);
+                    
+                }).then(res => {
+                    // @TODO: show error msg
+                    if(res.status !== 200) {
+                        console.log(res.status);
+                        throw new Error('Problem displaying applicants');
+                    } 
+                    this.users = res.data.applicants;
+                    this.state.users.totalUsers = res.data.total;
+
+                    // Look for the recently created user in the visible users array
+                    const user = this.users.find(user => user.applicantId === formUser.applicantId);
+
+
+                    if(user) {
+                        // Means the newly created user is visible
+                        this.state.users.currentUser = user;
+
+                    } else {
+                        // If the newly created user isn't visible, set the current user to the first in the array + populate summary
+                        this.state.users.currentUser = this.users[0];
+                        adminView.populateUserSummary(this.state.users.currentUser);
                     }
-                }).catch(err => console.log(err));
+                    
+                    this.renderUsersTable();
+
+                    const iconsToIgnore = [
+                        'user-summary__btn--upload',
+                        'user-summary__btn--save-new'
+                    ];
+                    adminView.changeNewIcon('new', 'user', iconsToIgnore);
+                    adminView.makeEditable(userElements, false);
+
+                })
+                .catch(err => console.log(err));
+                
+
+                // Remove focus listeners
+                userSummary.removeEventListener('focusin', adminView.focusInNewUserHandler);
+                userSummary.removeEventListener('focusout', adminView.focusOutNewUserHandler);
 
             }
             if(editBtn) {
                 const userId = document.querySelector('.user-summary').dataset.id;
                 // Save current user values
                 this.state.users.currentUser = this.users.find(user => user.applicantId === parseInt(userId));
+
                 // Set the elements to editable
                 // Removing contenteditable is done in a listener on the body
                 if(userElements[0].getAttribute('contenteditable') === 'false') {
                     // Make the content divs editable
                     adminView.makeEditable(userElements, true);
+                    // Add focusin/focusout listeners
+                    userSummary.addEventListener('focusin', adminView.focusInEditUserHandler);
+                    this.boundFocusOutEditUserHandler = adminView.focusOutEditUserHandler.bind(this, this.state.users.currentUser);
+                    userSummary.addEventListener('focusout', this.boundFocusOutEditUserHandler);
+
                     // Change the cv element to a file picker
                     adminView.addUploadElement(this.state.users.currentUser.cvName);
 
@@ -973,6 +970,12 @@ class AdminController {
             if(saveBtn) {
                 // Get edited values
                 const formData = adminView.getUserEdits(this.state.users.currentUser);
+
+                //Remove input listeners
+                userSummary.removeEventListener('focusin', adminView.focusInEditUserHandler);
+                userSummary.removeEventListener('focusout', this.boundFocusOutEditUserHandler);
+
+
                 if(formData) {                    
                     this.Admin
                             .editApplicant(this.state.users.currentUser.applicantId, formData)
@@ -990,6 +993,7 @@ class AdminController {
                                 }
                                 this.renderUsersTable();
                                 adminView.addCvElement(this.state.users.currentUser);
+
                             })
                             .catch(err => {
                                 console.log(err);
@@ -1017,20 +1021,32 @@ class AdminController {
                     .then(response => {
                         // @TODO: Both getUsers and remove from local array?
                         // Remove the current user from the local array
-                        this.users = this.users.filter(user => {
-                            return user !== this.state.users.currentUser;
-                        }) 
+                        // this.users = this.users.filter(user => {
+                        //     return user !== this.state.users.currentUser;
+                        // }) 
+
+                        // If the local array only has 1 element left in it, move the pagination (which updates searchOptions)
+                        console.log('Array length' + this.users.length);
+                        //@TODO: handle 0 users here
+                        if(this.users.length <= 1) {
+                            this.movePageBackwards(this.state.users);
+                        }
+
                         return this.Admin.getUsers(this.state.users.searchOptions);                      
                     }).then((res) => {
                         // Store and render data
                         this.users = res.data.applicants;
                         this.state.users.totalUsers = res.data.total;
+
                         this.renderUsersTable();
+                        
+                        adminView.populateUserSummary(this.users[0]);
+
                     })
                     .catch(err => console.log(err));
             }
             if(hubspotBtn) console.log('hubspot');
-            if(cvBtn) {
+            if(cvBtn && !uploadBtn) {
                 this.Admin.getCv(cvBtn.dataset.id)
                     .then(res => {
                         const contentDisposition = res.headers['content-disposition'];
@@ -1039,7 +1055,11 @@ class AdminController {
                      })
                      .catch(err => console.log(err));
              }
-            if(uploadBtn) console.log('upload');
+            if(uploadBtn) {
+                console.log('upload');
+                // OffScreenInput is explicitly removed from the dom so the listener is removed 
+                offScreenInput.addEventListener('change', adminView.inputChangeHandler);
+            }
         });
     }
 
@@ -1053,7 +1073,7 @@ class AdminController {
         const editBtnTarget = e.target.closest('.user-summary__btn--edit');
         const itemTarget = e.target.closest('.user-summary__item');
         const saveTarget = e.target.closest('.user-summary__btn--save-new');
-        const uploadTarget = e.target.closest('.user-summary__btn--upload');
+        const uploadTarget = e.target.closest('.user-summary__file-picker');
 
         
         const editBtn = document.querySelector('.user-summary__btn--edit');
@@ -1066,7 +1086,7 @@ class AdminController {
         const editBtnTarget = e.target.closest('.user-summary__btn--edit');
         const itemTarget = e.target.closest('.user-summary__item');
         const saveTarget = e.target.closest('.user-summary__btn--save');
-        const uploadCv = e.target.closest('.user-summary__label');
+        const uploadCv = e.target.closest('.user-summary__file-picker');
 
         const newBtn = document.querySelector('.user-summary__btn--new');
 
@@ -1107,6 +1127,94 @@ class AdminController {
             return true;
         }
         return false;
+    }
+
+    handlePaginationEvent(e) {
+        const userBtn = e.target.closest('.pagination__item--users');
+        const userPrevious = e.target.closest('.pagination__previous--users');
+        const userNext = e.target.closest('.pagination__next--users');
+
+        const jobBtn = e.target.closest('.pagination__item--jobs');
+        const jobPrevious = e.target.closest('.pagination__previous--jobs');
+        const jobNext = e.target.closest('.pagination__next--jobs');
+
+        if(userBtn || userPrevious || userNext) {
+            this.handleUserPagination(userBtn, userPrevious, userNext);
+        } else if(jobBtn || jobPrevious || jobNext){
+            this.handleJobPagination(jobBtn, jobPrevious, jobNext);
+        }
+    };
+    handleUserPagination(userBtn, userPrevious, userNext) {
+        const userState = this.state.users;
+        const pages = Math.ceil(userState.totalUsers / userState.searchOptions.limit);
+        console.log(`User pagination: CurrentPage: ${userState.currentPage}`);
+
+        if(userPrevious && !(userState.currentPage < 1)) {
+            this.movePageBackwards(userState);
+        }
+        if(userNext && !(userState.currentPage >= pages-1) ) {
+            this.movePageForwards(userState);
+        }
+        if(userBtn) {
+            this.movePage(userState, userBtn);
+        }
+        this.Admin.getUsers(this.state.users.searchOptions)
+            .then((res) => {
+                if(res.data.applicants) {
+                    // Store and render data
+                    this.users = res.data.applicants;
+                    this.state.users.totalUsers = res.data.total;
+
+                    this.renderUsersTable();
+
+                    // Initialise user summary
+                    adminView.populateUserSummary(this.users[0]);
+                }
+            })
+            .catch(err => console.log(err));
+    };
+    handleJobPagination(jobBtn, jobPrevious, jobNext) {
+        const jobState = this.state.jobs;
+        const pages = Math.ceil(jobState.totalJobs / jobState.searchOptions.limit);
+
+        if(jobPrevious && !(jobState.currentPage < 1)) {
+            this.movePageBackwards(jobState);
+        }
+        if(jobNext && !(jobState.currentPage >= pages-1)) {
+            this.movePageForwards(jobState);
+        }
+        if(jobBtn) {
+            this.movePage(jobState, jobBtn);
+        }
+
+        this.Admin.getJobs(this.state.jobs.searchOptions)
+            .then(res => {
+                this.jobs = res.data.jobs;
+                this.state.jobs.totalJobs = res.data.total;
+
+                // Set the table index to 0
+                this.state.jobsTable.index = 0;
+                this.renderJobsTable();
+
+                adminView.populateJobSummary(this.jobs[0]);
+            }).catch(err => console.log(err));
+    };
+    movePageBackwards(state) {
+        state.currentPage--;
+        state.searchOptions.index -= state.searchOptions.limit;
+        console.log(`User pagination: CurrentPageNow: ${state.currentPage}`);
+
+    }
+    movePageForwards(state) {
+        state.currentPage++;
+        state.searchOptions.index += state.searchOptions.limit;
+        console.log(`User pagination: CurrentPageNow: ${state.currentPage}`);
+    }
+    movePage(state, btn) {
+        state.searchOptions.index = btn.dataset.id * state.searchOptions.limit;
+        state.currentPage = state.searchOptions.index / state.searchOptions.limit;
+
+        console.log(`User pagination: CurrentPageNow: ${state.currentPage}`);
     }
 }
 
