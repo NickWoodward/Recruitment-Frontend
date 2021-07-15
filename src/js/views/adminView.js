@@ -77,12 +77,12 @@ export const formatUsers = (users) => {
     });
     return { headers, rows };
 };
-const createUserElement = ({ applicantId, firstName, lastName, createdAt }) => {
+const createUserElement = ({ applicantId, firstName, lastName, userDate }) => {
     const row = [
         `<div class="td-data--applicantId">${applicantId}</div>`,
         `<div class="td-data--first-name" data-id=${applicantId}>${firstName}</div>`,
         `<div class="td-data--last-name" data-id=${applicantId}>${lastName}</div>`,
-        `<div class="td-data--date" data-id=${applicantId}>${createdAt}</div>`
+        `<div class="td-data--date" data-id=${applicantId}>${userDate}</div>`
     ];
     return row;
 }
@@ -157,19 +157,21 @@ export const addCvElement = user => {
     if(cvWrapper) utils.removeElement(cvWrapper);
     const cvElement = `
         <div class="user-summary__cv-wrapper">
-            <div class="user-summary__btn user-summary__btn--${cvType === null ? 'upload':'cv'}" data-id=${user.applicantId}>
-                <svg class="user-summary__icon user-summary__${cvType === null ? 'upload':'cv'}-icon">
-                    <use xlink:href="svg/spritesheet.svg#${cvType === '.pdf'? 'pdf':(cvType === '.doc' || cvType === '.docx'? 'doc':'upload-np')}">
-                </svg>
+            <div class="user-summary__cv-download">
+                <div class="user-summary__btn user-summary__btn--${cvType === null ? 'upload':'cv'}" data-id=${user.applicantId}>
+                    <svg class="user-summary__icon user-summary__${cvType === null ? 'upload':'cv'}-icon">
+                        <use xlink:href="svg/spritesheet.svg#${cvType === '.pdf'? 'pdf':(cvType === '.doc' || cvType === '.docx'? 'doc':'upload-np')}">
+                    </svg>
+                </div>
+                <div class="user-summary__cv-path" data-id=${user.applicantId}>${cvName}</div>
             </div>
-            <div class="user-summary__cv-path" data-id=${user.applicantId}>${cvName}</div>
         </div>
     `;
 
     document.querySelector('.user-summary__email').insertAdjacentHTML('afterend', cvElement);
 }
 
-export const addUploadElement = (cvName, chosen) => {
+export const addUploadElement = (cvName) => {
     const cvWrapper = document.querySelector('.user-summary__cv-wrapper');
 
     // Remove contents of cv wrapper
@@ -185,7 +187,7 @@ export const addUploadElement = (cvName, chosen) => {
                     </svg>
                     <input class="user-summary__input" id="user-summary__input" name="cv" type=file />
                 </label>
-                <label class="user-summary__cv-path" for="user-summary__input">${cvName !== 'No CV uploaded'? (chosen? `${cvName}`:'Update existing CV?') :'Add a CV'} <label/>
+                <label class="user-summary__upload-path" for="user-summary__input">${cvName !== 'No CV uploaded'? 'Update existing CV?' :'Add a CV'} <label/>
             </div>
 
         </div>`
@@ -296,20 +298,6 @@ const getUserFormValues = () => {
     return { firstName, lastName, phone, email, cv };
 };
 
-// export const clearUserSummary = () => {
-//     console.log('called');
-//     const items = document.querySelectorAll('.user-summary__item');
-//     items.forEach(item => {
-//         console.log(item);
-//         if(item.className.includes('user-summary__first-name')) item.innerText = 'First Name';
-//         if(item.className.includes('user-summary__last-name')) item.innerText = 'Last Name';
-//         if(item.className.includes('user-summary__phone')) item.innerText = 'Phone #';
-//         if(item.className.includes('user-summary__email')) item.innerText = 'Email';
-//         if(item.className.includes('user-summary__featured')) addFeaturedCheckbox(false, false);
-//         if(item.className.includes('user-summary__input')) item.files = [];
-
-//     });
-// };
 
 
 // table name, function to get row height
@@ -317,8 +305,7 @@ export const calculateRows = (tableName) => {
     const { headerHeight, rowHeight, paginationHeight } = getRowHeight(tableName);
     const tableHeight = document.querySelector(`.${tableName}-table__wrapper`).offsetHeight;
     const numOfRows = Math.floor((tableHeight - headerHeight - paginationHeight)/rowHeight);
-    console.log(document.querySelector(`.${tableName}-table__wrapper`));
-    console.log(tableHeight, rowHeight, paginationHeight);
+
     return numOfRows;
 }
 const getRowHeight = (tableName) => {
@@ -350,33 +337,6 @@ const getRowHeight = (tableName) => {
 }
 
 
-/////////////////////////////////////////////////////
-// export const clearText = (e, text) => {
-//     // e.currentTarget === this
-//     console.log(e.currentTarget);
-//     // e.target === the element clicked
-//     console.log(e.target);
-//     // undefined?
-//     console.log(text);
-//     console.log(this);
-// };
-
-// let focusInHandler;
-
-// //@TODO: add listeners when editable + remove them
-// export const addFocusInListeners = (items, cb) => {
-//     items.forEach(item => {
-//         focusInHandler = cb.bind(item, 'text');
-//         item.addEventListener('focusin', focusInHandler);
-//     });
-// };
-// export const removeFocusInListeners = (items, cb) => {
-//     items.forEach(item => {
-//         focusInHandler = cb;
-//         item.removeEventListener('focusin', focusInHandler);
-//     });
-// }
-
 // toggle = true, insert placeholder
 export const togglePlaceholders = (elements, toggle, values) => {
     elements.forEach((element, index) => {
@@ -384,76 +344,44 @@ export const togglePlaceholders = (elements, toggle, values) => {
     });
 };
 
-export const inputChangeHandler = (e) => {
-    const cvPath = document.querySelector('.user-summary__cv-path');
-    cvPath.innerText = `${e.target.files[0].name}`;
-};
 
-export const focusInNewUserHandler = (e) => {
-    e.target.innerText = '';
-};
-export const focusOutNewUserHandler = (e) => {
-    e.target.innerText = e.target.innerText || e.target.dataset.placeholder;
-};
+// export const initialiseUserPage = () => {
+//     // Remove existing content
+//     utils.clearElement(elements.adminContent);
 
-export const focusInEditUserHandler = (e) => {
-    window.getSelection().selectAllChildren(e.target);
-};
+//     // Replace existing classname
+//     elements.adminContent.className = "admin__content admin__content--users";
 
-export const focusOutEditUserHandler = (user, e) => {
-    let value;
+//     // Insert placeholders
+//     elements.adminContent.insertAdjacentHTML('afterbegin', createUserSummary());
+//     elements.adminContent.insertAdjacentHTML('beforeend', `<div class="users-table__wrapper"></div>`);
 
-    //@TODO: This should be validation
-    // If blank, replace with original value
-    if(!e.target.innerText) {
-        switch(e.target.dataset.placeholder) {
-            case 'First Name':  value = user['firstName']; break;
-            case 'Last Name':   value = user['lastName']; break;
-            case 'Phone':       value = user['phone']; break;
-            case 'Email':       value = user['email']; break;
-        }
-    }
-    e.target.innerText = value? value : e.target.innerText;
-};
-
-export const initialiseUserPage = () => {
-    // Remove existing content
-    utils.clearElement(elements.adminContent);
-
-    // Replace existing classname
-    elements.adminContent.className = "admin__content admin__content--users";
-
-    // Insert placeholders
-    elements.adminContent.insertAdjacentHTML('afterbegin', createUserSummary());
-    elements.adminContent.insertAdjacentHTML('beforeend', `<div class="users-table__wrapper"></div>`);
-
-};
-
+// };
 
 
 //////////  JOBS PAGE  ///////////
 
-export const initialiseJobPage =  () => {
-    utils.clearElement(elements.adminContent);
+// export const initialiseJobPage =  () => {
+//     utils.clearElement(elements.adminContent);
 
-    // Replace admin content class name
-    elements.adminContent.className = "admin__content admin__content--jobs";
+//     // Replace admin content class name
+//     elements.adminContent.className = "admin__content admin__content--jobs";
 
-    // Insert placeholders
-    elements.adminContent.insertAdjacentHTML('afterbegin', createJobSummary());
-    elements.adminContent.insertAdjacentHTML('beforeend', `<div class="jobs-table__wrapper"></div>`);
-};
+//     // Insert placeholders
+//     elements.adminContent.insertAdjacentHTML('afterbegin', createJobSummary());
+//     elements.adminContent.insertAdjacentHTML('beforeend', `<div class="jobs-table__wrapper"></div>`);
+// };
 
 const createJobSummary = () => {
     const markup = `
         <div class="job-summary">
             <div class="job-summary__details">
-                <div class="job-summary__item job-summary__company" contenteditable=false></div>
-                <div class="job-summary__item job-summary__title" contenteditable=false></div>
-                <div class="job-summary__item job-summary__location" contenteditable=false></div>
-                <div class="job-summary__item job-summary__wage" contenteditable=false></div>
+                <div class="job-summary__item job-summary__company" data-placeholder="company" contenteditable=false></div>
+                <div class="job-summary__item job-summary__title" data-placeholder="title" contenteditable=false></div>
+                <div class="job-summary__item job-summary__location" data-placeholder="location" contenteditable=false></div>
+                <div class="job-summary__item job-summary__wage" data-placeholder="wage" contenteditable=false></div>
                 <label class="job-summary__item job-summary__featured" for="job-summary__featured-checkbox"></label>
-                <div class="job-summary__item job-summary__description job-summary__text-area" contenteditable=false></div>
+                <div class="job-summary__item job-summary__description job-summary__text-area" data-placeholder="description" contenteditable=false></div>
             </div>
             <div class="job-summary__controls">
                 <div class="job-summary__btn job-summary__btn--new">
@@ -494,7 +422,7 @@ export const populateJobSummary = (job) => {
     document.querySelector('.job-summary__location').innerText = job.location;
 
     document.querySelector('.job-summary__wage').innerText = job.wage;
-    document.querySelector('.job-summary__featured').innerText = `${job.description? 'Featured': 'Not Featured'}`;
+    document.querySelector('.job-summary__featured').innerText = `${job.featured? 'Featured': 'Not Featured'}`;
 
     document.querySelector('.job-summary__description').innerText = job.description;
 
@@ -797,17 +725,259 @@ const getJob = (e) => {
     return job;
 }
 
-// @TODO: move to modal module
-const displayModal = (action, type, item) => {
-    // Create modal and insert into DOM
-    const warningModal = utils.warn(
-        `Are you sure you want to ${action} ${item[1]} (id: ${item[0]})?`,
-        [`${action}`, 'cancel'],
-        type,
-        item[0]
-    );
-    document.body.insertAdjacentHTML('afterbegin', warningModal);
+
+
+//////////  COMPANIES PAGE  ///////////
+
+export const formatCompanies = (companies) => {
+    // Headers should match the returned divs in createCompanyElement
+    const headers = ['ID', 'NAME', 'CREATED'];
+    const rows = companies.map(company => {
+        return createCompanyElement(formatProperties(company, ['companyId', 'companyDate']));
+    });
+    return { headers, rows };
 };
+const createCompanyElement = ({ id, name, companyDate }) => {
+    const row = [
+        `<div class="td-data--company-id">${id}</div>`,
+        `<div class="td-data--company-name" data-id=${id}>${name}</div>`,
+        `<div class="td-data--date" data-id=${id}>${companyDate}</div>`
+    ];
+    return row;
+}
+
+
+const createCompanySummary = (company) => {
+    const markup  = `
+        <div class="summary-wrapper">
+            <div class="company-summary summary">
+                <div class="company-summary__details">
+                    <div class="company-summary__item company-summary__company" data-placeholder="Company" contenteditable=false></div>
+                </div>
+                <div class="company-summary__controls">
+                    <div class="company-summary__btn company-summary__btn--new">
+                        <svg class="company-summary__new-icon company-summary__icon">
+                            <use xlink:href="svg/spritesheet.svg#add">
+                        </svg>
+                    </div>
+                    <div class="company-summary__btn company-summary__btn--hubspot">
+                        <svg class="company-summary__hubspot-icon company-summary__icon">
+                            <use xlink:href="svg/spritesheet.svg#hubspot">
+                        </svg>
+                    </div>
+                    <div class="company-summary__btn company-summary__btn--edit">
+                        <svg class="company-summary__edit-icon company-summary__icon">
+                            <use xlink:href="svg/spritesheet.svg#edit-np1">
+                        </svg>
+                    </div>
+                    <div class="company-summary__btn company-summary__btn--delete">
+                        <svg class="company-summary__delete-icon company-summary__icon">
+                            <use xlink:href="svg/spritesheet.svg#delete-np1">
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            ${createAddressSummary()}
+
+            ${createContactSummary()}
+        </div>
+    `;
+
+    return markup;
+};
+
+export const populateCompanySummary = ({ id, name, addresses = [] }) => {
+    const companySummary = document.querySelector('.company-summary');
+    companySummary.setAttribute('data-id', id);
+    
+    document.querySelector('.company-summary__company').innerText = name;
+
+};
+
+export const getNewCompany = () => {
+    const companyName = document.querySelector('.company-summary__company').innerText;
+    
+    // @TODO: Add validation
+    if(companyName === 'Company') return null;
+
+    const formData = new FormData();
+    formData.append('companyName', companyName);
+    return formData;
+};
+export const getNewAddress = () => {
+    const { firstLine, secondLine, city, county, postcode } = getAddressFormValues();
+
+    // @TODO: Add validation
+    if(
+        firstLine === 'First Line' ||
+        secondLine === 'Second Line' ||
+        city === 'City' ||
+        county === 'County' ||
+        postcode === 'Postcode'
+    ) return null;
+
+    const formData = new FormData();
+    formData.append('firstLine', firstLine);
+    formData.append('secondLine', secondLine);
+    formData.append('city', city);
+    formData.append('county', county);
+    formData.append('postcode', postcode);
+
+    return formData;
+};
+const getAddressFormValues = () => {
+    const firstLine = document.querySelector('.address-summary__first-line').innerText;
+    const secondLine = document.querySelector('.address-summary__second-line').innerText;
+    const city = document.querySelector('.address-summary__city').innerText;
+    const county = document.querySelector('.address-summary__county').innerText;
+    const postcode = document.querySelector('.address-summary__postcode').innerText;
+
+    return { firstLine, secondLine, city, county, postcode };
+};
+export const getNewContact = () => {
+    const { firstName, lastName, position, email, phone } = getContactFormValues();
+
+    // @TODO: Add validation
+    if(
+        firstName === 'First Name' ||
+        lastName === 'Last Name' ||
+        position === 'Position' ||
+        email === 'Email' ||
+        phone === 'Phone'
+    ) return null;
+
+    const formData = new FormData();
+
+    formData.append('firstName', firstName);
+    formData.append('lastName', lastName);
+    formData.append('position', position);
+    formData.append('email', email);
+    formData.append('phone', phone);
+
+    return formData;
+};
+const getContactFormValues = () => {
+    const firstName = document.querySelector('.contact-summary__firstname').innerText;
+    const lastName = document.querySelector('.contact-summary__lastname').innerText;
+    const position = document.querySelector('.contact-summary__position').innerText;
+    const phone = document.querySelector('.contact-summary__phone').innerText;
+    const email = document.querySelector('.contact-summary__email').innerText;
+
+    return { firstName, lastName, position, phone, email };
+};
+
+export const createAddressSummary = () => {
+    const markup  = `
+        <div class="address-summary summary">
+            <div class="address-summary__details">
+                <div class="address-summary__item address-summary__address" data-placeholder="Address" contenteditable=false></div>
+            </div>
+            <div class="address-summary__controls">
+                <div class="address-summary__btn address-summary__btn--new">
+                    <svg class="address-summary__new-icon address-summary__icon">
+                        <use xlink:href="svg/spritesheet.svg#add">
+                    </svg>
+                </div>
+                <div class="address-summary__btn address-summary__btn--edit">
+                    <svg class="address-summary__edit-icon address-summary__icon">
+                        <use xlink:href="svg/spritesheet.svg#edit-np1">
+                    </svg>
+                </div>
+                <div class="address-summary__btn address-summary__btn--delete">
+                    <svg class="address-summary__delete-icon address-summary__icon">
+                        <use xlink:href="svg/spritesheet.svg#delete-np1">
+                    </svg>
+                </div>
+            </div>
+        </div>
+    `;
+
+    return markup;
+};
+export const populateAddressSummary = (id, address) => {
+    console.log(address);
+    const addressSummary = document.querySelector('.address-summary__details');
+    addressSummary.setAttribute('data-id', address.id);
+    addressSummary.setAttribute('data-company-id', id);
+    
+    populateAddress(address);
+};
+
+export const makeAddressEditable = (editable, address) => {
+    const addressDetails = document.querySelector('.address-summary__details');
+    utils.clearElement(addressDetails);
+
+    if(editable) {
+        const markup = `
+            <div class="address-summary__item address-summary__item--editable address-summary__first-line" data-placeholder="First Line" contenteditable=false></div>
+            <div class="address-summary__item address-summary__item--editable address-summary__second-line" data-placeholder="Second Line" contenteditable=false></div>
+            <div class="address-summary__item address-summary__item--editable address-summary__city" data-placeholder="City" contenteditable=false></div>
+            <div class="address-summary__item address-summary__item--editable address-summary__county" data-placeholder="County" contenteditable=false></div>
+            <div class="address-summary__item address-summary__item--editable address-summary__postcode" data-placeholder="Postcode" contenteditable=false></div>
+        `;
+        addressDetails.insertAdjacentHTML('afterbegin', markup);
+        makeEditable(document.querySelectorAll('.address-summary__item'), true, []);
+    } else {
+        addressDetails.insertAdjacentHTML('afterbegin', '<div class="address-summary__item address-summary__address" data-placeholder="Address" contenteditable=false></div>');
+        populateAddress(address);
+    }
+};
+
+export const populateAddress = ({firstLine, secondLine, city, county, postcode} = {}) => {
+    const address = 
+        firstLine? `${firstLine} ${secondLine? `\n${secondLine}`:'\ '} ${city? `\n${city}`:'\ '} ${county? `\n${county}`:'\ '} ${postcode? `\n${postcode}`: ''}`
+        : 'Please add an address';
+    document.querySelector('.address-summary__address').innerText = address;
+};
+
+export const createContactSummary = () => {
+    const markup  = `
+        <div class="contact-summary summary">
+            <div class="contact-summary__details">
+                <div class="contact-summary__item contact-summary__firstname" data-placeholder="First Name" contenteditable=false></div>
+                <div class="contact-summary__item contact-summary__lastname" data-placeholder="Last Name" contenteditable=false></div>
+                <div class="contact-summary__item contact-summary__position" data-placeholder="Position" contenteditable=false></div>
+                <div class="contact-summary__item contact-summary__email" data-placeholder="Email" contenteditable=false></div>
+                <div class="contact-summary__item contact-summary__phone" data-placeholder="Phone" contenteditable=false></div>
+            </div>
+            <div class="contact-summary__controls">
+                <div class="contact-summary__btn contact-summary__btn--new">
+                    <svg class="contact-summary__new-icon contact-summary__icon">
+                        <use xlink:href="svg/spritesheet.svg#add">
+                    </svg>
+                </div>
+                <div class="contact-summary__btn contact-summary__btn--edit">
+                    <svg class="contact-summary__edit-icon contact-summary__icon">
+                        <use xlink:href="svg/spritesheet.svg#edit-np1">
+                    </svg>
+                </div>
+                <div class="contact-summary__btn contact-summary__btn--delete">
+                    <svg class="contact-summary__delete-icon contact-summary__icon">
+                        <use xlink:href="svg/spritesheet.svg#delete-np1">
+                    </svg>
+                </div>
+            </div>
+        </div>
+    `;
+
+    return markup;
+};
+
+export const populateContactSummary = (id, contact) => {
+    console.log(id, contact);
+    const contactSummary = document.querySelector('.contact-summary__details');
+    contactSummary.setAttribute('data-id', contact.id);
+    contactSummary.setAttribute('data-company-id', id);
+    
+    document.querySelector('.contact-summary__firstname').innerText = contact.firstName;
+    document.querySelector('.contact-summary__lastname').innerText = contact.lastName;
+    document.querySelector('.contact-summary__position').innerText = contact.position;
+    document.querySelector('.contact-summary__position').innerText = contact.position;
+    document.querySelector('.contact-summary__email').innerText = contact.email;
+    document.querySelector('.contact-summary__phone').innerText = contact.phone;
+};
+
 
 export const renderCompanies = (companies) => {
     const markup = `
@@ -830,8 +1000,10 @@ const renderCompany = (company) => {
  
 
 export const renderPagination = (current, limit, totalItems, container, table) => {
+    console.log(current, limit, totalItems, container, table);
     // Work out how many pages
     const pages = Math.ceil(totalItems / limit);
+    console.log(`pages: ${pages}`);
     // Current is the first (zero indexed) item on the page. current/limit = zero index page number
     current = current/limit;
     const itemMarkup = generatePaginationMarkup(pages, current, table);
@@ -856,4 +1028,108 @@ const generatePaginationMarkup = (pages, current, table) => {
         markup += temp;
     }
     return markup;
+};
+
+export const initialiseAdminPage = (page) => {
+    // Remove existing content
+    utils.clearElement(elements.adminContent);
+
+    // Replace existing classname
+    elements.adminContent.className = `admin__content admin__content--${page}`;
+
+    let createSummary;
+
+    switch(page) {
+        case 'users':       createSummary = createUserSummary; break;
+        case 'jobs':        createSummary = createJobSummary; break;
+        case 'companies':   createSummary = createCompanySummary; break;
+    }
+
+    // Insert placeholders
+    elements.adminContent.insertAdjacentHTML('afterbegin', createSummary());
+    elements.adminContent.insertAdjacentHTML('beforeend', `<div class="${page}-table__wrapper"></div>`);
+};
+
+
+
+
+// @TODO: move to modal module
+const displayModal = (action, type, item) => {
+    // Create modal and insert into DOM
+    const warningModal = utils.warn(
+        `Are you sure you want to ${action} ${item[1]} (id: ${item[0]})?`,
+        [`${action}`, 'cancel'],
+        type,
+        item[0]
+    );
+    document.body.insertAdjacentHTML('afterbegin', warningModal);
+};
+
+
+////////// Event Handlers //////////
+
+export const inputChangeHandler = (e) => {
+    const cvPath = document.querySelector('.user-summary__upload-path');
+    cvPath.innerText = `${e.target.files[0].name}`;
+};
+
+export const focusInNewUserHandler = (e) => {
+    e.target.innerText = '';
+};
+export const focusOutNewUserHandler = (e) => {
+    e.target.innerText = e.target.innerText || e.target.dataset.placeholder;
+};
+
+export const focusInEditUserHandler = (e) => {
+    window.getSelection().selectAllChildren(e.target);
+};
+
+export const focusOutEditUserHandler = (user, e) => {
+    let value;
+
+    //@TODO: This should be validation
+    // If blank, replace with original value
+    if(!e.target.innerText) {
+        switch(e.target.dataset.placeholder) {
+            case 'First Name':  value = user['firstName']; break;
+            case 'Last Name':   value = user['lastName']; break;
+            case 'Phone':       value = user['phone']; break;
+            case 'Email':       value = user['email']; break;
+        }
+    }
+    e.target.innerText = value? value : e.target.innerText;
+};
+
+export const focusInNewJobHandler = (e) => {
+    if(e.target.nodeName !== 'DIV') return;
+    e.target.innerText = '';
+};
+export const focusOutNewJobHandler = (e) => {
+    if(e.target.nodeName !== 'DIV') return;
+    e.target.innerText = e.target.innerText || e.target.dataset.placeholder;
+};
+export const focusInEditJobHandler = (e) => {
+    if(e.target.nodeName !== 'DIV') return;
+    e.target.innerText = '';
+};
+export const focusOutEditJobHandler = (job, e) => {
+    if(e.target.nodeName !== 'DIV') return;
+    let value;
+    // @TODO: put validation here
+    if(!e.target.innerText) {
+        switch(e.target.dataset.placeholder) {
+            //case 'company':    
+            case 'title':       value = job['title']; break;
+            case 'location':    value = job['location']; break;
+            case 'wage':        value = job['wage']; break;
+            case 'description': value = job['description']; break;
+        }
+    }
+    e.target.innerText = value? value : e.target.innerText;
+};
+export const focusInNewCompanyHandler = (e) => {
+    e.target.innerText = '';
+};
+export const focusOutNewCompanyHandler = (e) => {
+    e.target.innerText = e.target.innerText || e.target.dataset.placeholder;
 };

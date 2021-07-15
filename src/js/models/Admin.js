@@ -48,7 +48,19 @@ export default class Admin {
 
 
     ////////// Company Methods ///////////
-    getCompanies() {
-        return JRS.get('/admin/companies');
+    getCompanies({limit, index, orderField, orderDirection} = {}) {
+        console.log(limit, index, orderField, orderDirection);
+        return JRS.get('/admin/companies', {
+            params: {
+                limit,
+                index,
+                orderDirection,
+                orderField
+            }
+        });
+    }
+
+    createCompany(formData) {
+        return JRS.post('/admin/create/company', formData);
     }
 }

@@ -5,6 +5,10 @@
     &--users {
         width: 40rem;
     }
+    &--companies {
+        width: 100%;
+        
+    }
 }
 
 // caption {
@@ -26,7 +30,6 @@ thead tr {
 }
 
 table {
-    // border: 1px solid rgb(228, 228, 228);
     border-collapse: collapse;
 }
 
@@ -85,7 +88,6 @@ td:nth-of-type(8)::before {
     thead tr {
         position: static;
         color: $color-secondary;
-
     }
     thead, tbody {
         display: table-row-group;
@@ -108,6 +110,7 @@ td:nth-of-type(8)::before {
     tr {
         position: relative;
         display: table-row;
+        width: 100%;
     }
     table {
         display: table;

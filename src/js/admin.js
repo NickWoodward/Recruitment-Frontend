@@ -39,6 +39,18 @@ class AdminController {
         this.Companies = new Companies();
         this.Admin = new Admin();
         this.state= {
+            companies: {
+                totalCompanies: 0,
+                currentCompany: {},
+                currentAddressIndex: 0,
+                currentContactIndex: 0,
+                searchOptions: {
+                    index: 0,
+                    limit: 6,
+                    orderField: "createdAt",
+                    orderDirection: "DESC"
+                }
+            },
             jobs: {
                 totalJobs: 0,
                 currentJob: {},
@@ -49,7 +61,7 @@ class AdminController {
                     titles: [],
                     locations: [],
                     orderField: "createdAt",
-                    orderDirection: "ASC"
+                    orderDirection: "DESC"
                 }
             },
             users: {
@@ -60,7 +72,7 @@ class AdminController {
                     index: 0,
                     limit: 6,
                     orderField: "createdAt",
-                    orderDirection: "ASC"
+                    orderDirection: "DESC"
                 }
             },
             jobsTable: {
@@ -81,18 +93,16 @@ class AdminController {
             // Render Header
             headerView.renderHeader("admin");
 
-            adminView.initialiseJobPage();
+            adminView.initialiseAdminPage('jobs');
 
             // Calculate # of rows to render
             this.state.jobs.searchOptions.limit = adminView.calculateRows('jobs');
 
-
             this.Admin.getJobs(this.state.jobs.searchOptions)
                 .then(res => {
-
+                    console.log(res);
                     this.jobs = res.data.jobs;
                     this.state.jobs.totalJobs = res.data.total;
-
                     
                     this.renderJobsTable();
                     if(this.jobs.length > 0) {
@@ -145,6 +155,12 @@ class AdminController {
             }
             if(this.editJobLostFocus(e)) {
                 console.log('edit jobs lost focus');
+
+                const jobSummary = document.querySelector('.job-summary');
+                // Remove element listeners
+                jobSummary.removeEventListener('focusin', adminView.focusInEditJobHandler);
+                jobSummary.removeEventListener('focusout', adminView.focusOutEditJobHandler);
+
                 adminView.makeEditable(document.querySelectorAll('.job-summary__item'), false);
                 adminView.changeEditIcon('edit', 'job');
                 
@@ -159,6 +175,11 @@ class AdminController {
             }
             if(this.createJobLostFocus(e)) {
                 console.log('create jobs lost focus');
+
+                const jobSummary = document.querySelector('.job-summary');
+                // Remove element listeners
+                jobSummary.removeEventListener('focusin', adminView.focusInNewJobHandler);
+                jobSummary.removeEventListener('focusout', adminView.focusOutNewJobHandler);
                 
                 // Remove the dropdown + replace with company div
                 adminView.toggleDropdown(
@@ -174,6 +195,29 @@ class AdminController {
                 adminView.makeEditable(document.querySelectorAll('.job-summary__item'), false);
 
                 adminView.changeNewIcon('new', 'job');
+
+            }
+            if(this.createCompanyLostFocus(e)) {
+                console.log('create company lost focus');
+
+                const summaryWrapper = document.querySelector('.summary-wrapper');
+                const companyItems = document.querySelectorAll('.company-summary__item');
+                const contactItems = document.querySelectorAll('.contact-summary__item');
+
+                adminView.makeEditable(companyItems, false);
+                adminView.makeEditable(contactItems, false);
+
+                // Remove the item listeners
+                summaryWrapper.removeEventListener('focusin', adminView.focusInNewCompanyHandler);
+                summaryWrapper.removeEventListener('focusout', adminView.focusOutNewCompanyHandler);
+
+                // Add the original user values
+                adminView.populateCompanySummary(this.state.companies.currentCompany);
+                adminView.populateContactSummary(this.state.companies.currentCompany, this.state.companies.currentCompany.people[0]);
+                adminView.makeAddressEditable(false, this.state.companies.currentCompany.addresses[0]);
+                adminView.changeNewIcon('new', 'company');
+                adminView.changeNewIcon('new', 'address');
+                adminView.changeNewIcon('new', 'contact');
             }
 
         })
@@ -193,7 +237,7 @@ class AdminController {
 
             if(jobs && !document.querySelector('.admin__content--jobs')) {
                 // Clear admin page / rename content class / render placeholders
-                adminView.initialiseJobPage();
+                adminView.initialiseAdminPage('jobs');
 
                 // Jobs data initially loaded on DOMLoaded (+company data for editing)
                 this.renderJobsTable();
@@ -207,7 +251,7 @@ class AdminController {
             }
             if(users && !document.querySelector('.admin__content--users')) {
                 // Clear admin page / rename content class / render placeholders
-                adminView.initialiseUserPage();
+                adminView.initialiseAdminPage('users');
 
                 // Calculate # of rows to render / api limit
                 this.state.users.searchOptions.limit = adminView.calculateRows('users');
@@ -215,10 +259,11 @@ class AdminController {
                 // Get User data
                 this.Admin.getUsers(this.state.users.searchOptions)
                     .then((res) => {
+                        console.log(res);
+
                         // Store and render data
                         this.users = res.data.applicants;
                         this.state.users.totalUsers = res.data.total;
-                        console.log(this.users);
 
                         this.renderUsersTable();
                         if(this.users.length > 0) {
@@ -255,11 +300,26 @@ class AdminController {
                     .catch(err => console.log(err));
             }
             if(companies) {
-                this.Companies
-                    .getCompanies()
+                adminView.initialiseAdminPage('companies');
+
+                // Calculate # of rows to render / api limit
+                this.state.companies.searchOptions.limit = adminView.calculateRows('companies');
+
+                console.log(this.state.companies.searchOptions.limit);
+
+                this.Admin
+                    .getCompanies(this.state.companies.searchOptions)
                     .then(res => {
+                        console.log(res);
                         this.companies = res.data.companies;
-                        if(this.companies.length > 0) adminView.renderCompanies(this.companies)
+                        this.state.companies.totalCompanies = res.data.total;
+                        if(this.companies.length > 0) {
+                            this.renderCompaniesTable();
+                            adminView.populateCompanySummary(this.companies[0]);
+                            adminView.populateAddressSummary(this.companies[0].id, this.companies[0].addresses[0]);
+                            adminView.populateContactSummary(this.companies[0].id, this.companies[0].people[0]);
+                            this.addCompanySummaryListeners();
+                        }
                     })
             }
         });
@@ -499,38 +559,6 @@ class AdminController {
                 tableView.createTableTest('applications', headers, rows, false),
             ],  elements.adminContent
         );
-
-        // if(!document.querySelector(elementStrings.adminApplicationsTable)) {
-        //     // Clear the table wrapper
-        //     utils.clearElement(elements.adminContent);
-            
-        //     // Render the table
-        //     // adminView.renderContent(
-        //     //     [
-        //     //         tableView.createTable(
-        //     //             'applications',
-        //     //             Object.keys(this.applications[0]),  
-        //     //             adminView.formatApplications(this.applications),
-        //     //             false,
-        //     //             []
-        //     //         ),
-        //     //         ''
-        //     //     ],
-        //     //     elements.adminContent
-        //     // );
-        //     // adminView.renderPagination(this.searchOptions.index, this.searchOptions.limit, this.state.jobs.totalJobs, document.querySelector('.btn-wrapper--admin'));
-
-            
-        //     const {headers, rows} = adminView.formatApplications(this.applications);
-        //     console.log(this.applications);
-  
-        //     adminView.renderContent([ 
-        //             tableView.createTableTest('applications', headers, rows, false),
-        //         ],  elements.adminContent
-        //     );
-            
-        //     // add
-        // }
     }
 
     renderJobsTable() {
@@ -552,8 +580,11 @@ class AdminController {
         adminView.renderPagination(index, limit, totalJobs, tableWrapper, 'jobs');
 
         const jobRows = document.querySelectorAll('.row--jobs');
+        const activeRow = Array.from(jobRows).find(row => row.querySelector(`[data-id="${this.state.jobs.currentJob.applicantId}"]`)) || jobRows[0];
+        utils.changeActiveRow(activeRow, jobRows);
 
-        utils.changeActiveRow(jobRows[this.state.jobsTable.index], jobRows);
+        // utils.changeActiveRow(jobRows[this.state.jobsTable.index], jobRows);
+        utils.changeActiveRow(activeRow, jobRows);
 
         // Add table row listeners
         jobRows.forEach(row => {
@@ -601,6 +632,10 @@ class AdminController {
                     adminView.changeEditIcon('save', 'job', iconsToIgnore);
                     adminView.makeEditable(jobElements, true, ['job-summary__featured', 'job-summary__company']);
                     
+                    // Add focus listeners
+                    this.boundFocusOutEditJobHandler = adminView.focusOutEditJobHandler.bind(this, this.state.jobs.currentJob);
+                    jobSummary.addEventListener('focusin', adminView.focusInEditJobHandler);
+                    jobSummary.addEventListener('focusout', this.boundFocusOutEditJobHandler);
 
                     // Add a company name dropdown in place of the div
                     const classNames = ['job-summary__item', 'job-summary__select', 'job-summary__item--editable', 'job-summary__company'];                    
@@ -614,8 +649,12 @@ class AdminController {
                 }
             }
             if(saveBtn) {
+
+                // Remove element listeners
+                jobSummary.removeEventListener('focusin', adminView.focusInEditJobHandler);
+                jobSummary.removeEventListener('focusout', this.boundFocusOutEditJobHandler);
+
                 const formData = adminView.getJobEdits(this.state.jobs.currentJob);
-                // for(let [key, value] of formData.entries()) { console.log(key, value);}
 
                 if(formData) {
                     console.log('save data');
@@ -638,7 +677,6 @@ class AdminController {
                             const jobId = jobSummary.dataset.id;
                             this.state.jobs.currentJob = this.jobs.find(job => job.id === parseInt(jobId));
                             this.renderJobsTable();
-                            console.log(this.state.jobs.currentJob);
                             adminView.populateJobSummary(this.state.jobs.currentJob);
                             
                         })
@@ -671,6 +709,9 @@ class AdminController {
                 // Make the items editable
                 adminView.makeEditable(jobElements, true, ['job-summary__featured', 'job-summary__company']);
              
+                // Add event listeners
+                jobSummary.addEventListener('focusin', adminView.focusInNewJobHandler);
+                jobSummary.addEventListener('focusout', adminView.focusOutNewJobHandler);
 
                 // Switch the company element to a dropdown
                 const classNames = ['job-summary__item', 'job-summary__select', 'job-summary__item--editable', 'job-summary__company'];
@@ -687,6 +728,11 @@ class AdminController {
             }
             if(saveNewBtn){
                 console.log('saveBtn');
+
+                // Remove element listeners
+                jobSummary.removeEventListener('focusin', adminView.focusInNewJobHandler);
+                jobSummary.removeEventListener('focusout', adminView.focusOutNewJobHandler);
+
                 // Get values from fields
                 const formData = adminView.getNewJob();
 
@@ -765,25 +811,30 @@ class AdminController {
             if(deleteBtn) {
                 const jobId = jobSummary.dataset.id;
                 this.Admin.deleteJob(jobId).then(response => {
-                    if(response.status === 200)
-                        return this.Admin.getJobs();
+                    if(response.status === 200) {
+                        // If the jobs array only has 1 item left, move the page back
+                        //@TODO: handle 0 jobs here
+                        if(this.jobs.length === 1) this.movePageBackwards(this.state.jobs);
+
+                        return this.Admin.getJobs(this.state.jobs.searchOptions);
+                    }
                 }).then(response => {
                     this.jobs = response.data.jobs;
                     this.state.jobs.totalJobs = response.data.total;
 
                     // Change the currentJob and table index
                     this.state.jobs.currentJob = this.jobs[0];
-                    this.state.jobsTable.index = 0;
-
-                    // Update the Job summary
-                    adminView.populateJobSummary(this.state.jobs.currentJob);
+                    // this.state.jobsTable.index = 0;
 
                     // Render the table
                     this.renderJobsTable();
 
+                    // Update the Job summary
+                    adminView.populateJobSummary(this.state.jobs.currentJob);
+
                     // Change the first row to active
-                    const rows = document.querySelectorAll('.row--jobs');
-                    utils.changeActiveRow(rows[0], rows);
+                    // const rows = document.querySelectorAll('.row--jobs');
+                    // utils.changeActiveRow(rows[0], rows);
 
                 }).catch(err => console.log(err));
             }
@@ -793,8 +844,8 @@ class AdminController {
     renderUsersTable() {
         const { totalUsers, searchOptions: {index, limit} } = this.state.users;
         // Offset is subtracted from the user id to get the current item
-        const page = index / limit;
-        const offset = page * limit;
+        // const page = index / limit;
+        // const offset = page * limit;
         // Format users/headers into html elements
         const {headers, rows} = adminView.formatUsers(this.users);
         const tableWrapper = document.querySelector('.users-table__wrapper');
@@ -810,10 +861,8 @@ class AdminController {
         // Add pagination
         adminView.renderPagination(index, limit, totalUsers, tableWrapper, 'users');
 
-        // Add listeners to rows in the user tables 
         const userRows = document.querySelectorAll('.row--users');
         const activeRow = Array.from(userRows).find(row => row.querySelector(`[data-id="${this.state.users.currentUser.applicantId}"]`)) || userRows[0];
-        console.log(activeRow);
         utils.changeActiveRow(activeRow, userRows);
 
         userRows.forEach(row => {
@@ -826,7 +875,6 @@ class AdminController {
 
                 utils.changeActiveRow(targetRow, userRows);
                 this.state.users.currentUser = user[0];
-                console.log(this.state.users.currentUser);
                 adminView.populateUserSummary(user[0]);
             });
         });
@@ -835,15 +883,13 @@ class AdminController {
         const userSummary = document.querySelector('.user-summary');
 
         userSummary.addEventListener('click', (e) => {
-
-
-
             const newBtn = e.target.closest('.user-summary__btn--new');
             const editBtn = e.target.closest('.user-summary__btn--edit');
             const deleteBtn = e.target.closest('.user-summary__btn--delete');
             const saveBtn = e.target.closest('.user-summary__btn--save');
             const hubspotBtn = e.target.closest('.user-summary__btn--hubspot');
-            const cvBtn = e.target.closest('.user-summary__btn--cv') || e.target.closest('.user-summary__cv-path');
+            const cvDownloadWrapper = e.target.closest('.user-summary__cv-download');
+            const cvBtn = document.querySelector('.user-summary__btn--cv');
             const uploadBtn = e.target.closest('.user-summary__file-picker');
             const saveNewBtn = e.target.closest('.user-summary__btn--save-new');
             const offScreenInput = document.querySelector('.user-summary__input');
@@ -888,11 +934,9 @@ class AdminController {
                     // If the newly created user is in the paginated list of jobs returned, make it the currentJob/active row
                 this.Admin.createApplicant(formData).then(res => {
                     if(res.status !== 201) { 
-                        console.log(res.status);
                         throw new Error('Applicant not created') 
                     }// @TODO: show error message
                     // @TODO: show success message
-                    console.log(res.data.user);
                     formUser = res.data.user;
 
                     return this.Admin.getUsers(this.state.users.searchOptions);
@@ -900,7 +944,6 @@ class AdminController {
                 }).then(res => {
                     // @TODO: show error msg
                     if(res.status !== 200) {
-                        console.log(res.status);
                         throw new Error('Problem displaying applicants');
                     } 
                     this.users = res.data.applicants;
@@ -1026,7 +1069,6 @@ class AdminController {
                         // }) 
 
                         // If the local array only has 1 element left in it, move the pagination (which updates searchOptions)
-                        console.log('Array length' + this.users.length);
                         //@TODO: handle 0 users here
                         if(this.users.length <= 1) {
                             this.movePageBackwards(this.state.users);
@@ -1046,7 +1088,8 @@ class AdminController {
                     .catch(err => console.log(err));
             }
             if(hubspotBtn) console.log('hubspot');
-            if(cvBtn && !uploadBtn) {
+            if(cvDownloadWrapper && cvBtn) {
+                // id on the child cv-btn
                 this.Admin.getCv(cvBtn.dataset.id)
                     .then(res => {
                         const contentDisposition = res.headers['content-disposition'];
@@ -1061,6 +1104,174 @@ class AdminController {
                 offScreenInput.addEventListener('change', adminView.inputChangeHandler);
             }
         });
+    }
+
+    renderCompaniesTable() {
+        console.log('repainting');
+        // Extract state
+        const { totalCompanies, searchOptions: { index, limit } } = this.state.companies;
+        console.log(totalCompanies);
+
+        // Format data into html elements
+        const { headers, rows } = adminView.formatCompanies(this.companies);
+
+        // Select html elements
+        const tableWrapper = document.querySelector('.companies-table__wrapper');
+        const table = document.querySelector('.table--companies');
+        const pagination = document.querySelector('.pagination--companies');
+
+        // If the elements exist, remove them
+        if(table) utils.removeElement(table);
+        if(pagination) utils.removeElement(pagination);
+
+        tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('companies', headers, rows, false));
+        
+        // Add pagination
+        adminView.renderPagination(index, limit, totalCompanies, tableWrapper, 'companies');
+
+        // Change active 
+        const companyRows = document.querySelectorAll('.row--companies');
+        const activeRow = Array.from(companyRows).find(row => row.querySelector(`[data-id="${this.state.companies.currentCompany.id}"]`)) || companyRows[0];
+        
+
+        utils.changeActiveRow(activeRow, companyRows);
+
+        companyRows.forEach(row => {
+            row.addEventListener('click', (e) => {
+                const targetRow = e.target.closest('.row');
+                const rowId = targetRow.querySelector('.td-data--company-name').dataset.id;
+                const company = this.companies.filter(company => {
+                    return parseInt(rowId) === company.id;
+                })[0];
+
+                utils.changeActiveRow(targetRow, companyRows);
+                this.state.companies.currentCompany = company;
+                adminView.populateCompanySummary(company);
+                adminView.populateAddressSummary(company.id, company.addresses[0]);
+                adminView.populateContactSummary(company.id, company.people[0])
+            });
+        });
+    }
+    addCompanySummaryListeners() {
+        const summaryWrapper = document.querySelector('.summary-wrapper');
+
+        summaryWrapper.addEventListener('click', e => {
+            const newBtn = e.target.closest('.company-summary__btn--new');
+            const editBtn = e.target.closest('.company-summary__btn--edit');
+            const deleteBtn = e.target.closest('.company-summary__btn--delete');
+            const saveBtn = e.target.closest('.company-summary__btn--save');
+            const hubspotBtn = e.target.closest('.company-summary__btn--hubspot');
+            const saveNewBtn = e.target.closest('.company-summary__btn--save-new');
+    
+            const companyElements = summaryWrapper.querySelectorAll('.company-summary__item');
+            const contactElements = summaryWrapper.querySelectorAll('.contact-summary__item');
+    
+            if(newBtn) {
+                console.log('newBtn');
+                // Save current company values
+                const companyId = document.querySelector('.company-summary').dataset.id;
+                this.state.companies.currentCompany = this.companies.find(company => company.id === parseInt(companyId));
+
+                const iconsToIgnore = [
+                    'company-summary__btn--save-new'
+                ];
+                // Alter the summary form
+                adminView.changeNewIcon('save', 'company', iconsToIgnore);
+                adminView.changeNewIcon('save', 'address', iconsToIgnore);
+                adminView.changeNewIcon('save', 'contact', iconsToIgnore);
+
+                adminView.makeEditable(companyElements, true, []);
+                adminView.makeAddressEditable(true);
+                adminView.makeEditable(contactElements, true, []);
+
+                adminView.togglePlaceholders(companyElements, true, []);
+                adminView.togglePlaceholders(document.querySelectorAll('.address-summary__item'), true, []);
+                adminView.togglePlaceholders(contactElements, true, []);
+
+                summaryWrapper.addEventListener('focusin', adminView.focusInNewCompanyHandler);
+                summaryWrapper.addEventListener('focusout', adminView.focusOutNewCompanyHandler);
+            };
+            if(editBtn) console.log('edit');
+            if(deleteBtn) console.log('delete');
+            if(saveBtn) console.log('save');
+            if(hubspotBtn) console.log('hub');
+            if(saveNewBtn) {
+                console.log('savenewBtn');
+                summaryWrapper.removeEventListener('focusin', adminView.focusInNewCompanyHandler);
+                summaryWrapper.removeEventListener('focusout', adminView.focusOutNewCompanyHandler);
+
+                // Get all user input
+                const companyForm = adminView.getNewCompany();
+                const addressForm = adminView.getNewAddress();
+                const contactForm = adminView.getNewContact();
+                
+                const formData = new FormData();
+
+                for(let [key, value] of companyForm.entries()) formData.append(`${key}`, value);
+                for(let [key, value] of addressForm.entries()) formData.append(`${key}`, value);
+                for(let [key, value] of contactForm.entries()) formData.append(`${key}`, value);
+
+                if(companyForm && addressForm && contactForm) {
+                    let formCompany;
+
+                    // Make API call here to create company
+                    this.Admin
+                        .createCompany(formData)
+                        .then(response => {
+                            if(response.status !== 201) {
+                                // @TODO: error handling
+                                console.log('error');
+                            }
+                            formCompany = response.data.company;
+
+                            return this.Admin.getCompanies(this.state.companies.searchOptions);
+                        })
+                        .then(response => {
+                            console.log(response);
+                            this.state.companies.totalCompanies = response.data.total;
+                            this.companies = response.data.companies;
+
+                            // Search for the recently created company in the returned company list
+                            const currentCompany = this.companies.find(company => {
+                                return formCompany.id === company.id;
+                            });
+
+                            this.state.companies.currentCompany = currentCompany? currentCompany : this.companies[0];
+
+                            // Change the address summary back to a text area
+                            // Change the contact and company summary inputs to non editable
+                            adminView.makeEditable(companyElements, false, []);
+                            adminView.makeAddressEditable(false);
+                            adminView.makeEditable(contactElements, false, []);
+
+                            // Repopulate the summaries
+                            adminView.populateCompanySummary(this.state.companies.currentCompany);
+                            adminView.populateAddressSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.addresses[0]);
+                            adminView.populateContactSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.people[0]);
+
+                            // Change the summary icons
+                            const iconsToIgnore = [
+                                'companies-summary__btn--save-new'
+                            ];
+                            adminView.changeNewIcon('new', 'company', iconsToIgnore);
+                            adminView.changeNewIcon('new', 'address', iconsToIgnore);
+                            adminView.changeNewIcon('new', 'contact', iconsToIgnore);
+
+                            this.renderCompaniesTable();
+
+                        })
+                        .catch(err => console.log(err));
+                    // Get companies and render companies table
+
+                    // Populate the summary forms with the created company if visible in the table, [0] if not
+                } else {
+                    // @TODO: handle validation problems here (make the form methods return an array with problem fields)
+                }
+            }
+    
+        });
+
+
     }
 
     // saveBtn + newBtn = currently editing
@@ -1128,26 +1339,46 @@ class AdminController {
         }
         return false;
     }
+    createCompanyLostFocus(e) {
+        const summaryWrapper = document.querySelector('.summary-wrapper');
+        const editableContent = document.querySelector('.company-summary__item--editable');
+        const editBtnTarget = e.target.closest('.company-summary__btn--edit');
+        const itemTarget = e.target.closest('.company-summary__item') || e.target.closest('.contact-summary__item') || e.target.closest('.address-summary__item');
+        const saveTarget = e.target.closest('.company-summary__btn--save-new');
+
+        const editBtn = document.querySelector('.company-summary__btn--edit');
+
+        if(summaryWrapper && editableContent && !editBtnTarget && !itemTarget && !saveTarget && editBtn) {
+            return true;
+        } 
+        return false;
+    }
 
     handlePaginationEvent(e) {
         const userBtn = e.target.closest('.pagination__item--users');
+        const jobBtn = e.target.closest('.pagination__item--jobs');
+        const companyBtn = e.target.closest('.pagination__item--companies');
+
         const userPrevious = e.target.closest('.pagination__previous--users');
         const userNext = e.target.closest('.pagination__next--users');
 
-        const jobBtn = e.target.closest('.pagination__item--jobs');
         const jobPrevious = e.target.closest('.pagination__previous--jobs');
         const jobNext = e.target.closest('.pagination__next--jobs');
+
+        const companyPrevious = e.target.closest('.pagination__previous--companies');
+        const companyNext = e.target.closest('.pagination__next--companies');
 
         if(userBtn || userPrevious || userNext) {
             this.handleUserPagination(userBtn, userPrevious, userNext);
         } else if(jobBtn || jobPrevious || jobNext){
             this.handleJobPagination(jobBtn, jobPrevious, jobNext);
+        } else if(companyBtn || companyPrevious || companyNext) {
+            this.handleCompanyPagination(companyBtn, companyPrevious, companyNext);
         }
     };
     handleUserPagination(userBtn, userPrevious, userNext) {
         const userState = this.state.users;
         const pages = Math.ceil(userState.totalUsers / userState.searchOptions.limit);
-        console.log(`User pagination: CurrentPage: ${userState.currentPage}`);
 
         if(userPrevious && !(userState.currentPage < 1)) {
             this.movePageBackwards(userState);
@@ -1199,22 +1430,50 @@ class AdminController {
                 adminView.populateJobSummary(this.jobs[0]);
             }).catch(err => console.log(err));
     };
+
+
+    handleCompanyPagination(companyBtn, companyPrevious, companyNext) {
+        const companyState = this.state.companies;
+        const pages = Math.ceil(companyState.totalCompanies / companyState.searchOptions.limit);
+
+        if(companyPrevious && !(companyState.currentPage < 1)) {
+            this.movePageBackwards(companyState);
+        }
+        if(companyNext && !(companyState.currentPage >= pages-1) ) {
+            this.movePageForwards(companyState);
+        }
+        if(companyBtn) {
+            this.movePage(companyState, companyBtn);
+        }
+        this.Admin.getCompanies(this.state.companies.searchOptions)
+            .then((res) => {
+                if(res.data.companies) {
+                    // Store and render data
+                    this.companies = res.data.companies;
+                    this.state.companies.totalCompanies = res.data.total;
+
+                    this.renderCompaniesTable();
+                    console.log(this.companies);
+                    // Initialise company summary
+                    adminView.populateCompanySummary(this.companies[0]);
+                }
+            })
+            .catch(err => console.log(err));
+    };
+
     movePageBackwards(state) {
         state.currentPage--;
         state.searchOptions.index -= state.searchOptions.limit;
-        console.log(`User pagination: CurrentPageNow: ${state.currentPage}`);
 
     }
     movePageForwards(state) {
         state.currentPage++;
         state.searchOptions.index += state.searchOptions.limit;
-        console.log(`User pagination: CurrentPageNow: ${state.currentPage}`);
     }
     movePage(state, btn) {
         state.searchOptions.index = btn.dataset.id * state.searchOptions.limit;
         state.currentPage = state.searchOptions.index / state.searchOptions.limit;
 
-        console.log(`User pagination: CurrentPageNow: ${state.currentPage}`);
     }
 }
 
