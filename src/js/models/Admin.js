@@ -49,7 +49,6 @@ export default class Admin {
 
     ////////// Company Methods ///////////
     getCompanies({limit, index, orderField, orderDirection} = {}) {
-        console.log(limit, index, orderField, orderDirection);
         return JRS.get('/admin/companies', {
             params: {
                 limit,
@@ -62,5 +61,9 @@ export default class Admin {
 
     createCompany(formData) {
         return JRS.post('/admin/create/company', formData);
+    }
+
+    deleteCompany(id) {
+        return JRS.delete(`/admin/delete/company/${id}`);
     }
 }

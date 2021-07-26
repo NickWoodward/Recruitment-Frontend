@@ -9,7 +9,7 @@ export const removeElement = (element) => {
 }
 
 export const changeActiveRow = (row, rows) => {
-    // console.log(row, rows);
+    console.log(row);
     rows.forEach(row => {
         if(row.classList.contains('row--active')) row.classList.remove('row--active'); 
     });

@@ -48,7 +48,7 @@ class AdminController {
                     index: 0,
                     limit: 6,
                     orderField: "createdAt",
-                    orderDirection: "DESC"
+                    orderDirection: "ASC"
                 }
             },
             jobs: {
@@ -100,7 +100,6 @@ class AdminController {
 
             this.Admin.getJobs(this.state.jobs.searchOptions)
                 .then(res => {
-                    console.log(res);
                     this.jobs = res.data.jobs;
                     this.state.jobs.totalJobs = res.data.total;
                     
@@ -259,7 +258,6 @@ class AdminController {
                 // Get User data
                 this.Admin.getUsers(this.state.users.searchOptions)
                     .then((res) => {
-                        console.log(res);
 
                         // Store and render data
                         this.users = res.data.applicants;
@@ -305,12 +303,9 @@ class AdminController {
                 // Calculate # of rows to render / api limit
                 this.state.companies.searchOptions.limit = adminView.calculateRows('companies');
 
-                console.log(this.state.companies.searchOptions.limit);
-
                 this.Admin
                     .getCompanies(this.state.companies.searchOptions)
                     .then(res => {
-                        console.log(res);
                         this.companies = res.data.companies;
                         this.state.companies.totalCompanies = res.data.total;
                         if(this.companies.length > 0) {
@@ -580,11 +575,11 @@ class AdminController {
         adminView.renderPagination(index, limit, totalJobs, tableWrapper, 'jobs');
 
         const jobRows = document.querySelectorAll('.row--jobs');
-        const activeRow = Array.from(jobRows).find(row => row.querySelector(`[data-id="${this.state.jobs.currentJob.applicantId}"]`)) || jobRows[0];
-        utils.changeActiveRow(activeRow, jobRows);
-
-        // utils.changeActiveRow(jobRows[this.state.jobsTable.index], jobRows);
-        utils.changeActiveRow(activeRow, jobRows);
+        // const activeRow = Array.from(jobRows).find(row => {
+        //     console.log(row.querySelector(`[data-id="${this.state.jobs.currentJob.applicantId}"]`));
+        //     return row.querySelector(`[data-id="${this.state.jobs.currentJob.applicantId}"]`)
+        // }) || jobRows[0];
+        utils.changeActiveRow(jobRows[0], jobRows);
 
         // Add table row listeners
         jobRows.forEach(row => {
@@ -861,6 +856,7 @@ class AdminController {
         // Add pagination
         adminView.renderPagination(index, limit, totalUsers, tableWrapper, 'users');
 
+        console.log(this.state.users.currentUser.applicantId);
         const userRows = document.querySelectorAll('.row--users');
         const activeRow = Array.from(userRows).find(row => row.querySelector(`[data-id="${this.state.users.currentUser.applicantId}"]`)) || userRows[0];
         utils.changeActiveRow(activeRow, userRows);
@@ -1062,6 +1058,8 @@ class AdminController {
                 this.Admin
                     .deleteApplicant(userId)
                     .then(response => {
+//@TODO: modal if not successful
+
                         // @TODO: Both getUsers and remove from local array?
                         // Remove the current user from the local array
                         // this.users = this.users.filter(user => {
@@ -1107,10 +1105,8 @@ class AdminController {
     }
 
     renderCompaniesTable() {
-        console.log('repainting');
         // Extract state
         const { totalCompanies, searchOptions: { index, limit } } = this.state.companies;
-        console.log(totalCompanies);
 
         // Format data into html elements
         const { headers, rows } = adminView.formatCompanies(this.companies);
@@ -1128,6 +1124,9 @@ class AdminController {
         
         // Add pagination
         adminView.renderPagination(index, limit, totalCompanies, tableWrapper, 'companies');
+
+        console.log(this.state.companies.currentCompany.id);
+
 
         // Change active 
         const companyRows = document.querySelectorAll('.row--companies');
@@ -1192,7 +1191,38 @@ class AdminController {
                 summaryWrapper.addEventListener('focusout', adminView.focusOutNewCompanyHandler);
             };
             if(editBtn) console.log('edit');
-            if(deleteBtn) console.log('delete');
+            if(deleteBtn) {
+                console.log('delete');
+                // Get company id
+                const companyId = document.querySelector('.company-summary').dataset.id;
+
+                this.Admin.deleteCompany(companyId).then(res => {
+                    console.log(res);
+                    // @TODO: handle success/failure
+                    
+                    // If it's the last company in the table, move back one page
+                    if(this.companies.length <= 1) {
+                        this.movePageBackwards(this.state.companies);
+                    }
+
+                    return this.Admin.getCompanies(this.state.companies.searchOptions);
+                }).then(res => {
+                    // @TODO: handle success/failure
+                    console.log(res);
+                    this.companies = res.data.companies;
+                    this.state.companies.totalCompanies = res.data.total;
+
+                    this.state.companies.currentCompany = this.companies[0];
+
+                    this.renderCompaniesTable();
+
+                    // Repopulate the summaries
+                    adminView.populateCompanySummary(this.state.companies.currentCompany);
+                    adminView.populateAddressSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.addresses[0]);
+                    adminView.populateContactSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.people[0]);
+                }).catch(err => console.log(err));
+
+            }
             if(saveBtn) console.log('save');
             if(hubspotBtn) console.log('hub');
             if(saveNewBtn) {
@@ -1227,7 +1257,6 @@ class AdminController {
                             return this.Admin.getCompanies(this.state.companies.searchOptions);
                         })
                         .then(response => {
-                            console.log(response);
                             this.state.companies.totalCompanies = response.data.total;
                             this.companies = response.data.companies;
 
@@ -1378,6 +1407,8 @@ class AdminController {
     };
     handleUserPagination(userBtn, userPrevious, userNext) {
         const userState = this.state.users;
+        // If the page changes the active user should be the first in the table
+        userState.currentUser = this.users[0];
         const pages = Math.ceil(userState.totalUsers / userState.searchOptions.limit);
 
         if(userPrevious && !(userState.currentPage < 1)) {
@@ -1406,6 +1437,9 @@ class AdminController {
     };
     handleJobPagination(jobBtn, jobPrevious, jobNext) {
         const jobState = this.state.jobs;
+        // Changing page = new current job
+        jobState.currentJob = this.jobs[0];
+
         const pages = Math.ceil(jobState.totalJobs / jobState.searchOptions.limit);
 
         if(jobPrevious && !(jobState.currentPage < 1)) {
@@ -1434,6 +1468,9 @@ class AdminController {
 
     handleCompanyPagination(companyBtn, companyPrevious, companyNext) {
         const companyState = this.state.companies;
+        // New page, new current company
+        companyState.currentCompany = this.companies[0];
+
         const pages = Math.ceil(companyState.totalCompanies / companyState.searchOptions.limit);
 
         if(companyPrevious && !(companyState.currentPage < 1)) {
@@ -1453,7 +1490,6 @@ class AdminController {
                     this.state.companies.totalCompanies = res.data.total;
 
                     this.renderCompaniesTable();
-                    console.log(this.companies);
                     // Initialise company summary
                     adminView.populateCompanySummary(this.companies[0]);
                 }

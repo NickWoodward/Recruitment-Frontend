@@ -693,6 +693,10 @@
         }
     }
 
+    &__item-wrapper {
+        display: flex;
+    }
+
     &__previous, &__next {
         display: flex;
         justify-content: center;

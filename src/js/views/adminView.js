@@ -294,7 +294,6 @@ const getUserFormValues = () => {
     const email = document.querySelector('.user-summary__email').innerText;
     const cv = document.querySelector('.user-summary__input').files[0];
 
-    console.log('getting firstname'+firstName);
     return { firstName, lastName, phone, email, cv };
 };
 
@@ -896,7 +895,6 @@ export const createAddressSummary = () => {
     return markup;
 };
 export const populateAddressSummary = (id, address) => {
-    console.log(address);
     const addressSummary = document.querySelector('.address-summary__details');
     addressSummary.setAttribute('data-id', address.id);
     addressSummary.setAttribute('data-company-id', id);
@@ -965,7 +963,6 @@ export const createContactSummary = () => {
 };
 
 export const populateContactSummary = (id, contact) => {
-    console.log(id, contact);
     const contactSummary = document.querySelector('.contact-summary__details');
     contactSummary.setAttribute('data-id', contact.id);
     contactSummary.setAttribute('data-company-id', id);
@@ -1000,10 +997,8 @@ const renderCompany = (company) => {
  
 
 export const renderPagination = (current, limit, totalItems, container, table) => {
-    console.log(current, limit, totalItems, container, table);
     // Work out how many pages
     const pages = Math.ceil(totalItems / limit);
-    console.log(`pages: ${pages}`);
     // Current is the first (zero indexed) item on the page. current/limit = zero index page number
     current = current/limit;
     const itemMarkup = generatePaginationMarkup(pages, current, table);
@@ -1011,7 +1006,7 @@ export const renderPagination = (current, limit, totalItems, container, table) =
     const markup = `
         <div class="pagination pagination--${table}">
             <div class="pagination__previous pagination__previous--${table} ${current === 0? 'pagination__previous--inactive':''}">Previous</div>
-            ${itemMarkup}
+            <div class="pagination__item-wrapper">${itemMarkup}</div>
             <div class="pagination__next pagination__next--${table} ${current === pages-1? 'pagination__next--inactive':''}">Next</div>
         </div>
     `;
