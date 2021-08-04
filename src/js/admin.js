@@ -1234,12 +1234,14 @@ class AdminController {
                 const companyForm = adminView.getNewCompany();
                 const addressForm = adminView.getNewAddress();
                 const contactForm = adminView.getNewContact();
-                
+
                 const formData = new FormData();
 
                 for(let [key, value] of companyForm.entries()) formData.append(`${key}`, value);
                 for(let [key, value] of addressForm.entries()) formData.append(`${key}`, value);
                 for(let [key, value] of contactForm.entries()) formData.append(`${key}`, value);
+
+                for(let [key, value] of addressForm.entries()) console.log(`${key}`, value);
 
                 if(companyForm && addressForm && contactForm) {
                     let formCompany;
@@ -1492,6 +1494,8 @@ class AdminController {
                     this.renderCompaniesTable();
                     // Initialise company summary
                     adminView.populateCompanySummary(this.companies[0]);
+                    adminView.populateAddressSummary(this.companies[0].id, this.companies[0].addresses[0]);
+                    adminView.populateContactSummary(this.companies[0].id, this.companies[0].people[0]);
                 }
             })
             .catch(err => console.log(err));
