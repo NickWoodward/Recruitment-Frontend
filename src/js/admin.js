@@ -213,10 +213,33 @@ class AdminController {
                 // Add the original user values
                 adminView.populateCompanySummary(this.state.companies.currentCompany);
                 adminView.populateContactSummary(this.state.companies.currentCompany, this.state.companies.currentCompany.people[0]);
-                adminView.makeAddressEditable(false, this.state.companies.currentCompany.addresses[0]);
+                adminView.makeAddressEditable(false, 'value', this.state.companies.currentCompany.addresses[0]);
                 adminView.changeNewIcon('new', 'company');
                 adminView.changeNewIcon('new', 'address');
                 adminView.changeNewIcon('new', 'contact');
+            }
+            if(this.editCompanyLostFocus(e)) {
+                console.log('edit company lost focus');
+
+                const summaryWrapper = document.querySelector('.summary-wrapper');
+                const companyItems = document.querySelectorAll('.company-summary__item');
+                const contactItems = document.querySelectorAll('.contact-summary__item');
+
+                adminView.makeEditable(companyItems, false);
+                adminView.makeEditable(contactItems, false);
+
+                // Remove the item listeners
+                summaryWrapper.removeEventListener('focusin', adminView.focusInNewCompanyHandler);
+                summaryWrapper.removeEventListener('focusout', adminView.focusOutNewCompanyHandler);
+                // Add the original user values
+                adminView.populateCompanySummary(this.state.companies.currentCompany);
+                adminView.populateContactSummary(this.state.companies.currentCompany, this.state.companies.currentCompany.people[0]);
+
+                adminView.makeAddressEditable(false, 'value', this.state.companies.currentCompany.addresses[0]);
+
+                adminView.changeEditIcon('edit', 'company');
+                adminView.changeEditIcon('edit', 'address');
+                adminView.changeEditIcon('edit', 'contact');
             }
 
         })
@@ -1180,7 +1203,7 @@ class AdminController {
                 adminView.changeNewIcon('save', 'contact', iconsToIgnore);
 
                 adminView.makeEditable(companyElements, true, []);
-                adminView.makeAddressEditable(true);
+                adminView.makeAddressEditable(true, 'placeholder', this.state.companies.currentCompany.addresses[0]);
                 adminView.makeEditable(contactElements, true, []);
 
                 adminView.togglePlaceholders(companyElements, true, []);
@@ -1190,7 +1213,33 @@ class AdminController {
                 summaryWrapper.addEventListener('focusin', adminView.focusInNewCompanyHandler);
                 summaryWrapper.addEventListener('focusout', adminView.focusOutNewCompanyHandler);
             };
-            if(editBtn) console.log('edit');
+            if(editBtn) {
+                console.log('edit');
+                // Save current company values
+                const companyId = document.querySelector('.company-summary').dataset.id;
+                this.state.companies.currentCompany = this.companies.find(company => company.id === parseInt(companyId));
+
+                const iconsToIgnore = [
+                    'company-summary__btn--save'
+                ];
+                // Alter the summary form
+                adminView.changeEditIcon('save', 'company', iconsToIgnore);
+                adminView.changeEditIcon('save', 'address', iconsToIgnore);
+                adminView.changeEditIcon('save', 'contact', iconsToIgnore);
+
+
+                adminView.makeEditable(companyElements, true, []);
+                adminView.makeAddressEditable(true, 'value', this.state.companies.currentCompany.addresses[0]);
+                adminView.makeEditable(contactElements, true, []);
+
+                // adminView.togglePlaceholders(companyElements, true, []);
+                // adminView.togglePlaceholders(document.querySelectorAll('.address-summary__item'), true, []);
+                // adminView.togglePlaceholders(contactElements, true, []);
+
+                this.boundFocusOutEditCompanyHandler = adminView.focusOutEditCompanyHandler.bind(this, this.state.companies.currentCompany);
+                summaryWrapper.addEventListener('focusin', adminView.focusInEditCompanyHandler);
+                summaryWrapper.addEventListener('focusout', this.boundFocusOutEditCompanyHandler);
+            }
             if(deleteBtn) {
                 console.log('delete');
                 // Get company id
@@ -1223,7 +1272,71 @@ class AdminController {
                 }).catch(err => console.log(err));
 
             }
-            if(saveBtn) console.log('save');
+            if(saveBtn) {
+                console.log('save');
+                // Remove the item listeners
+                summaryWrapper.removeEventListener('focusin', adminView.focusInNewCompanyHandler);
+                summaryWrapper.removeEventListener('focusout', adminView.focusOutNewCompanyHandler);
+
+                // Get all user input
+                const companyForm = adminView.getNewCompany();
+                const addressForm = adminView.getNewAddress();
+                const contactForm = adminView.getNewContact();
+                
+                const formData = new FormData();
+
+                for(let [key, value] of companyForm.entries()) formData.append(`${key}`, value);
+                for(let [key, value] of addressForm.entries()) formData.append(`${key}`, value);
+                for(let [key, value] of contactForm.entries()) formData.append(`${key}`, value);
+
+                for(let [key, value] of addressForm.entries()) console.log(`${key}`, value);
+                
+                if(companyForm && addressForm && contactForm) {
+                    let formCompany;
+
+                    // Make API call here to create company
+                    this.Admin.editCompany(1, 4, 1, formData)
+                        .then(response => {
+                            if(response.status !== 201) {
+                                // @TODO: error handling
+                                console.log('error');
+                            }
+                            formCompany = response.data.company;
+
+                            return this.Admin.getCompanies(this.state.companies.searchOptions);
+                        })
+                        .then(response => {
+                            this.state.companies.totalCompanies = response.data.total;
+                            this.companies = response.data.companies;
+
+                            // Search for the recently created company in the returned company list
+                            const currentCompany = this.companies.find(company => {
+                                return formCompany.id === company.id;
+                            });
+
+                            this.state.companies.currentCompany = currentCompany? currentCompany : this.companies[0];
+
+                            // Change the address summary back to a text area
+                            // Change the contact and company summary inputs to non editable
+                            adminView.makeEditable(companyElements, false, []);
+                            adminView.makeAddressEditable(false, '', this.state.companies.currentCompany.addresses[0]);
+                            adminView.makeEditable(contactElements, false, []);
+
+                            // Repopulate the summaries
+                            adminView.populateCompanySummary(this.state.companies.currentCompany);
+                            adminView.populateAddressSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.addresses[0]);
+                            adminView.populateContactSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.people[0]);
+
+                            adminView.changeEditIcon('save', 'company');
+                            adminView.changeEditIcon('save', 'address');
+                            adminView.changeEditIcon('save', 'contact');
+
+                            this.renderCompaniesTable();
+                        }).catch(err => {
+                            console.log(err);
+                        })
+                }
+            }
             if(hubspotBtn) console.log('hub');
             if(saveNewBtn) {
                 console.log('savenewBtn');
@@ -1272,7 +1385,7 @@ class AdminController {
                             // Change the address summary back to a text area
                             // Change the contact and company summary inputs to non editable
                             adminView.makeEditable(companyElements, false, []);
-                            adminView.makeAddressEditable(false);
+                            adminView.makeAddressEditable(false, '', this.state.companies.currentCompany.addresses[0]);
                             adminView.makeEditable(contactElements, false, []);
 
                             // Repopulate the summaries
@@ -1373,15 +1486,28 @@ class AdminController {
     createCompanyLostFocus(e) {
         const summaryWrapper = document.querySelector('.summary-wrapper');
         const editableContent = document.querySelector('.company-summary__item--editable');
-        const editBtnTarget = e.target.closest('.company-summary__btn--edit');
+        
         const itemTarget = e.target.closest('.company-summary__item') || e.target.closest('.contact-summary__item') || e.target.closest('.address-summary__item');
         const saveTarget = e.target.closest('.company-summary__btn--save-new');
 
         const editBtn = document.querySelector('.company-summary__btn--edit');
 
-        if(summaryWrapper && editableContent && !editBtnTarget && !itemTarget && !saveTarget && editBtn) {
+        if(summaryWrapper && editableContent && !itemTarget && !saveTarget && editBtn) {
             return true;
         } 
+        return false;
+    }
+    editCompanyLostFocus(e) {
+        const summaryWrapper = document.querySelector('.summary-wrapper');
+        const editableContent = document.querySelector('.company-summary__item--editable');
+        const companySummarySaveBtn = document.querySelector('.company-summary__btn--save');
+
+        const saveTarget = e.target.closest('.company-summary__btn--save');
+        const itemTarget = e.target.closest('.company-summary__item') || e.target.closest('.contact-summary__item') || e.target.closest('.address-summary__item');
+
+        if(summaryWrapper && editableContent && companySummarySaveBtn && !saveTarget && !itemTarget)
+            return true;
+        
         return false;
     }
 

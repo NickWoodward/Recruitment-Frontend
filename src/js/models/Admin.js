@@ -66,4 +66,8 @@ export default class Admin {
     deleteCompany(id) {
         return JRS.delete(`/admin/delete/company/${id}`);
     }
+
+    editCompany(companyId, addressId, contactId, formData) {
+        return JRS.post(`/admin/edit/company/${companyId}/${addressId}/${contactId}`, formData);
+    }
 }

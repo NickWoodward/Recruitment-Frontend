@@ -5,6 +5,7 @@ export const clearElement = (element) => {
 }
 
 export const removeElement = (element) => {
+    console.log(element);
     element.parentElement.removeChild(element);
 }
 

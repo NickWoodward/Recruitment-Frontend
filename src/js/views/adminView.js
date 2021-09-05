@@ -482,6 +482,7 @@ export const addFeaturedCheckbox = (visible, featured) => {
 };
 
 // @TODO: move from job section
+//@TODO: Same as the changeEditIcon?
 export const changeNewIcon = (btnToDisplay, summaryType, skip) => {
     const newBtn = document.querySelector(`.${summaryType}-summary__btn--new`);
     const saveBtn = document.querySelector(`.${summaryType}-summary__btn--save-new`);
@@ -902,17 +903,16 @@ export const populateAddressSummary = (id, address) => {
     populateAddress(address);
 };
 
-export const makeAddressEditable = (editable, address) => {
+export const makeAddressEditable = (editable, type, address) => {
     const addressDetails = document.querySelector('.address-summary__details');
     utils.clearElement(addressDetails);
-
     if(editable) {
         const markup = `
-            <div class="address-summary__item address-summary__item--editable address-summary__first-line" data-placeholder="First Line" contenteditable=false></div>
-            <div class="address-summary__item address-summary__item--editable address-summary__second-line" data-placeholder="Second Line" contenteditable=false></div>
-            <div class="address-summary__item address-summary__item--editable address-summary__city" data-placeholder="City" contenteditable=false></div>
-            <div class="address-summary__item address-summary__item--editable address-summary__county" data-placeholder="County" contenteditable=false></div>
-            <div class="address-summary__item address-summary__item--editable address-summary__postcode" data-placeholder="Postcode" contenteditable=false></div>
+            <div class="address-summary__item address-summary__item--editable address-summary__first-line" data-placeholder="First Line" contenteditable=false>${type === 'placeholder'? '':address.firstLine}</div>
+            <div class="address-summary__item address-summary__item--editable address-summary__second-line" data-placeholder="Second Line" contenteditable=false>${type === 'placeholder'? '':address.secondLine}</div>
+            <div class="address-summary__item address-summary__item--editable address-summary__city" data-placeholder="City" contenteditable=false>${type === 'placeholder'? '':address.city}</div>
+            <div class="address-summary__item address-summary__item--editable address-summary__county" data-placeholder="County" contenteditable=false>${type === 'placeholder'? '':address.county}</div>
+            <div class="address-summary__item address-summary__item--editable address-summary__postcode" data-placeholder="Postcode" contenteditable=false>${type === 'placeholder'? '':address.postcode}</div>
         `;
         addressDetails.insertAdjacentHTML('afterbegin', markup);
         makeEditable(document.querySelectorAll('.address-summary__item'), true, []);
@@ -1123,8 +1123,25 @@ export const focusOutEditJobHandler = (job, e) => {
     e.target.innerText = value? value : e.target.innerText;
 };
 export const focusInNewCompanyHandler = (e) => {
-    e.target.innerText = '';
+    window.getSelection().selectAllChildren(e.target);
+
 };
 export const focusOutNewCompanyHandler = (e) => {
     e.target.innerText = e.target.innerText || e.target.dataset.placeholder;
+};
+
+export const focusInEditCompanyHandler = (e) => {
+    window.getSelection().selectAllChildren(e.target);
+
+};
+export const focusOutEditCompanyHandler = (company, e) => {
+    let value;
+console.log('out');
+console.log(company);
+    if(!e.target.innerText) {
+        console.log('test');
+        value = company['name'];
+    }
+
+    e.target.innerText = value? value : e.target.innerText;
 };
