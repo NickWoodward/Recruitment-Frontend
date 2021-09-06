@@ -181,15 +181,8 @@
         margin-right: 1.5rem;
         cursor:pointer;
 
-        &--disabled {
-            pointer-events: none;
-        }
     }
-    &__icon {
-        &--disabled {
-            fill: rgb(197, 197, 197) !important;
-        }
-    }
+
     
     &__btn--upload {
         fill: $color-secondary;
@@ -332,15 +325,8 @@
         margin-right: 1.5rem;
         cursor:pointer;
 
-        &--disabled {
-            pointer-events: none;
-        }
     }
-    &__icon {
-        &--disabled {
-            fill: rgb(197, 197, 197) !important;
-        }
-    }
+
     
     &__btn--edit, &__btn--save {
         transform: translateY(3px);
@@ -436,15 +422,8 @@
         margin-right: 1.5rem;
         cursor:pointer;
 
-        &--disabled {
-            pointer-events: none;
-        }
     }
-    &__icon {
-        &--disabled {
-            fill: rgb(197, 197, 197) !important;
-        }
-    }
+
     
     &__btn--edit, &__btn--save {
         transform: translateY(3px);
@@ -536,14 +515,6 @@
         margin-right: 1.5rem;
         cursor:pointer;
 
-        &--disabled {
-            pointer-events: none;
-        }
-    }
-    &__icon {
-        &--disabled {
-            fill: rgb(197, 197, 197) !important;
-        }
     }
     
     &__btn--edit, &__btn--save {
@@ -625,15 +596,6 @@
         align-items: flex-end;
         margin-right: 1.5rem;
         cursor:pointer;
-
-        &--disabled {
-            pointer-events: none;
-        }
-    }
-    &__icon {
-        &--disabled {
-            fill: rgb(197, 197, 197) !important;
-        }
     }
     
     &__btn--edit, &__btn--save {
@@ -664,6 +626,16 @@
         height: 3.5rem;
         width: 3.5rem;
         fill: red;
+    }
+}
+
+.summary {
+    &__btn--disabled {
+        pointer-events: none;
+    }
+
+    &__icon--disabled {
+        fill: rgb(197, 197, 197) !important;
     }
 }
 

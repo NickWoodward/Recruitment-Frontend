@@ -195,6 +195,92 @@ export const addUploadElement = (cvName) => {
     document.querySelector('.user-summary__email').insertAdjacentHTML('afterend', markup);
 }
 
+export const changeSummaryIconState = (state, summaryType) => {
+    let sectionsToChange;
+
+    switch(summaryType) {
+        case 'company': sectionsToChange = [ 'company', 'address', 'contact' ]; break;
+    }
+
+    if(state === 'edited') {
+        const saveBtn = document.querySelector(`.${summaryType}-summary__btn--save`);
+        const btnsToSkip = [`${summaryType}-summary__btn--edit`];
+
+        addEditedStateIcons(saveBtn, summaryType);
+        toggleActiveBtns(true, summaryType, sectionsToChange, btnsToSkip);
+
+    } else if(state === 'editing') {
+        const editBtn = document.querySelector(`.${summaryType}-summary__btn--edit`);
+        const btnsToSkip = [`${summaryType}-summary__btn--save`];
+
+        addEditingStateIcons(editBtn, summaryType);
+        toggleActiveBtns(false, summaryType, sectionsToChange, btnsToSkip);
+
+    } else if(state === 'created') {
+        const saveNewBtn = document.querySelector(`.${summaryType}-summary__btn--save-new`);
+        const btnsToSkip = [`${summaryType}-summary__btn--new`];
+
+        addCreatedStateIcons(saveNewBtn, summaryType);
+        toggleActiveBtns(true, summaryType, sectionsToChange, btnsToSkip);
+
+    } else if(state === 'creating') {
+        const newBtn = document.querySelector(`.${summaryType}-summary__btn--new`);
+        const btnsToSkip = [`${summaryType}-summary__btn--save-new`];
+
+        addCreatingStateIcons(newBtn, summaryType);
+        toggleActiveBtns(false, summaryType, sectionsToChange, btnsToSkip);
+    }
+}
+
+const addCreatedStateIcons = (oldBtn, summaryType) => {
+    const newBtn = `
+        <div class="${summaryType}-summary__btn ${summaryType}-summary__btn--new">
+            <svg class="${summaryType}-summary__new-icon">
+                <use xlink:href="svg/spritesheet.svg#add">
+            </svg>
+        </div>
+    `;
+
+    utils.swapIcon(oldBtn, newBtn);
+};
+
+const addCreatingStateIcons = (oldBtn, summaryType) => {
+    console.log('HA');
+    const saveNewBtn = `
+        <div class="${summaryType}-summary__btn ${summaryType}-summary__btn--save-new">
+            <svg class="${summaryType}-summary__save-icon">
+                <use xlink:href="svg/spritesheet.svg#save-np">
+            </svg>
+        </div>
+    `;
+
+    utils.swapIcon(oldBtn, saveNewBtn);
+};
+
+const addEditedStateIcons = (oldBtn, summaryType) => {
+    const editBtn = `
+        <div class="${summaryType}-summary__btn ${summaryType}-summary__btn--edit">
+            <svg class="${summaryType}-summary__edit-icon">
+                <use xlink:href="svg/spritesheet.svg#edit-np1">
+            </svg>
+        </div>
+    `;
+
+    utils.swapIcon(oldBtn, editBtn);
+};
+
+const addEditingStateIcons = (oldBtn, summaryType) => {
+    const saveBtn = `
+        <div class="${summaryType}-summary__btn ${summaryType}-summary__btn--save">
+            <svg class="${summaryType}-summary__save-icon">
+                <use xlink:href="svg/spritesheet.svg#save-np">
+            </svg>
+        </div>
+    `;
+
+    utils.swapIcon(oldBtn, saveBtn);
+};
+
 export const changeEditIcon = (btnToDisplay, summaryType, skip) => {
     const editBtn = document.querySelector(`.${summaryType}-summary__btn--edit`);
     const saveBtn = document.querySelector(`.${summaryType}-summary__btn--save`);
@@ -225,19 +311,24 @@ export const changeEditIcon = (btnToDisplay, summaryType, skip) => {
     else toggleActiveBtns(true, summaryType, skip);
 }
 
-const toggleActiveBtns = (active, summaryType, skip) => {
-    const btns = document.querySelectorAll(`.${summaryType}-summary__btn`);
+const toggleActiveBtns = (active, summaryType, sections, skip ) => {
+    let btns = [];
+
+    sections.forEach(section => {
+        btns = [...document.querySelectorAll(`.${section}-summary__btn`), ...btns];
+    });
+
     btns.forEach(btn => {
         // If none of the names in the skip list match any of those in the btn classList, or no list exists
         if(!skip || !skip.some(element => Array.from(btn.classList).includes(element))) {
             const btnIcon = btn.firstElementChild;
             if(!active) { 
-                btn.classList.add(`${summaryType}-summary__btn--disabled`); 
-                btnIcon.classList.add(`${summaryType}-summary__icon--disabled`);
+                btn.classList.add(`summary__btn--disabled`); 
+                btnIcon.classList.add(`summary__icon--disabled`);
             }
             else {
-                btn.classList.remove(`${summaryType}-summary__btn--disabled`);
-                btnIcon.classList.remove(`${summaryType}-summary__icon--disabled`);
+                btn.classList.remove(`summary__btn--disabled`);
+                btnIcon.classList.remove(`summary__icon--disabled`);
 
             }
         }

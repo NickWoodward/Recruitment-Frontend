@@ -214,9 +214,8 @@ class AdminController {
                 adminView.populateCompanySummary(this.state.companies.currentCompany);
                 adminView.populateContactSummary(this.state.companies.currentCompany, this.state.companies.currentCompany.people[0]);
                 adminView.makeAddressEditable(false, 'value', this.state.companies.currentCompany.addresses[0]);
-                adminView.changeNewIcon('new', 'company');
-                adminView.changeNewIcon('new', 'address');
-                adminView.changeNewIcon('new', 'contact');
+
+                adminView.changeSummaryIconState('created', 'company');
             }
             if(this.editCompanyLostFocus(e)) {
                 console.log('edit company lost focus');
@@ -237,9 +236,8 @@ class AdminController {
 
                 adminView.makeAddressEditable(false, 'value', this.state.companies.currentCompany.addresses[0]);
 
-                adminView.changeEditIcon('edit', 'company');
-                adminView.changeEditIcon('edit', 'address');
-                adminView.changeEditIcon('edit', 'contact');
+                adminView.changeSummaryIconState('edited', 'company');    
+
             }
 
         })
@@ -1194,13 +1192,15 @@ class AdminController {
                 const companyId = document.querySelector('.company-summary').dataset.id;
                 this.state.companies.currentCompany = this.companies.find(company => company.id === parseInt(companyId));
 
-                const iconsToIgnore = [
-                    'company-summary__btn--save-new'
-                ];
+                // const iconsToIgnore = [
+                //     'company-summary__btn--save-new'
+                // ];
                 // Alter the summary form
-                adminView.changeNewIcon('save', 'company', iconsToIgnore);
-                adminView.changeNewIcon('save', 'address', iconsToIgnore);
-                adminView.changeNewIcon('save', 'contact', iconsToIgnore);
+                // adminView.changeNewIcon('save', 'company', iconsToIgnore);
+                // adminView.changeNewIcon('save', 'address', iconsToIgnore);
+                // adminView.changeNewIcon('save', 'contact', iconsToIgnore);
+
+                adminView.changeSummaryIconState('creating', 'company');
 
                 adminView.makeEditable(companyElements, true, []);
                 adminView.makeAddressEditable(true, 'placeholder', this.state.companies.currentCompany.addresses[0]);
@@ -1223,10 +1223,11 @@ class AdminController {
                     'company-summary__btn--save'
                 ];
                 // Alter the summary form
-                adminView.changeEditIcon('save', 'company', iconsToIgnore);
-                adminView.changeEditIcon('save', 'address', iconsToIgnore);
-                adminView.changeEditIcon('save', 'contact', iconsToIgnore);
+                // adminView.changeEditIcon('save', 'company', iconsToIgnore);
+                // adminView.changeEditIcon('save', 'address', iconsToIgnore);
+                // adminView.changeEditIcon('save', 'contact', iconsToIgnore);
 
+                adminView.changeSummaryIconState('editing', 'company');
 
                 adminView.makeEditable(companyElements, true, []);
                 adminView.makeAddressEditable(true, 'value', this.state.companies.currentCompany.addresses[0]);
@@ -1327,9 +1328,7 @@ class AdminController {
                             adminView.populateAddressSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.addresses[0]);
                             adminView.populateContactSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.people[0]);
 
-                            adminView.changeEditIcon('save', 'company');
-                            adminView.changeEditIcon('save', 'address');
-                            adminView.changeEditIcon('save', 'contact');
+                            adminView.changeSummaryIconState('edited', 'company');
 
                             this.renderCompaniesTable();
                         }).catch(err => {
@@ -1394,12 +1393,14 @@ class AdminController {
                             adminView.populateContactSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.people[0]);
 
                             // Change the summary icons
-                            const iconsToIgnore = [
-                                'companies-summary__btn--save-new'
-                            ];
-                            adminView.changeNewIcon('new', 'company', iconsToIgnore);
-                            adminView.changeNewIcon('new', 'address', iconsToIgnore);
-                            adminView.changeNewIcon('new', 'contact', iconsToIgnore);
+                            // const iconsToIgnore = [
+                            //     'companies-summary__btn--save-new'
+                            // ];
+                            // adminView.changeNewIcon('new', 'company', iconsToIgnore);
+                            // adminView.changeNewIcon('new', 'address', iconsToIgnore);
+                            // adminView.changeNewIcon('new', 'contact', iconsToIgnore);
+
+                            adminView.changeSummaryIconState('created', 'company');
 
                             this.renderCompaniesTable();
 

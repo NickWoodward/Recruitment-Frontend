@@ -5,9 +5,13 @@ export const clearElement = (element) => {
 }
 
 export const removeElement = (element) => {
-    console.log(element);
     element.parentElement.removeChild(element);
 }
+
+export const swapIcon = (icon1, icon2) => {
+    icon1.insertAdjacentHTML('beforebegin', icon2);
+    removeElement(icon1);
+};
 
 export const changeActiveRow = (row, rows) => {
     console.log(row);
@@ -59,3 +63,4 @@ export const capitalise = (text, all) => {
     }).join(' ');
     return words;
 };
+
