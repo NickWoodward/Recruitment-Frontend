@@ -4,12 +4,25 @@ export const clearElement = (element) => {
     while(element.firstChild) element.removeChild(element.firstChild);
 }
 
+export const clearForm = (elements, defaults) => {
+    elements.forEach((element, index) => {
+        if (element.matches('input[type="checkbox"]')) {
+            element.checked = false;
+        } else {
+            element.innerText = defaults? defaults[index]:'';
+        }
+    });
+    
+}
+
 export const removeElement = (element) => {
     element.parentElement.removeChild(element);
 }
 
-export const swapIcon = (icon1, icon2) => {
-    icon1.insertAdjacentHTML('beforebegin', icon2);
+export const swapElement = (icon1, icon2) => {
+    
+    if(typeof icon2 === 'object') icon1.insertAdjacentElement('beforebegin', icon2);
+    else icon1.insertAdjacentHTML('beforebegin', icon2); 
     removeElement(icon1);
 };
 

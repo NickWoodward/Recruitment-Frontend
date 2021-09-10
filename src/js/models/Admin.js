@@ -39,6 +39,7 @@ export default class Admin {
     }
 
     createJob(formData) {
+        for(let[key, value] of formData.entries()) console.log(key, value);
         return JRS.post(`/admin/create/job`, formData);
     }
 
@@ -67,7 +68,8 @@ export default class Admin {
         return JRS.delete(`/admin/delete/company/${id}`);
     }
 
-    editCompany(companyId, addressId, contactId, formData) {
-        return JRS.post(`/admin/edit/company/${companyId}/${addressId}/${contactId}`, formData);
+    editCompany(companyId, contactId, addressId, formData) {
+        for(let[key, value] of formData.entries()) console.log(key, value);
+        return JRS.post(`/admin/edit/company/${companyId}/${contactId}/${addressId}`, formData);
     }
 }

@@ -65,6 +65,7 @@
 }
 
 .admin__content {
+    position: relative;
     display: flex;
     align-items: flex-start;
     width: 90%;
@@ -88,8 +89,19 @@
     background-color: white;
     border: none;
     box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+
+    &__btn--disabled {
+        pointer-events: none;
+    }
+
+    &__icon--disabled {
+        fill: rgb(197, 197, 197) !important;
+    }
 }
-.companies-table__wrapper {
+.companies-table__wrapper, 
+.users-table__wrapper, 
+.jobs-table__wrapper,
+.applications-table__wrapper {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -110,8 +122,7 @@
     justify-content: flex-start;
     align-items: center;
     margin-right: 12rem;
-    width: 40rem;
-    background-color: rgb(249, 250, 251);
+    width: 50rem;
     
     &__details {
         width: 100%;
@@ -238,12 +249,12 @@
 }
 
 // ********** USER TABLE STYLING **********
-.users-table__wrapper {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-}
+// .users-table__wrapper {
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: space-between;
+//     height: 100%;
+// }
 
 .row {
     position: relative;
@@ -263,52 +274,198 @@
 
 // ********** JOB SUMMARY STYLING ***********
 
+[class*="--editable"] {
+
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+
+    -moz-appearance: textfield;
+    -webkit-appearance: textfield;
+    background-color: white;
+    background-color: -moz-field;
+    border: 1px solid lightgray;
+    box-shadow: 1px 1px 1px 0 lightgray inset;  
+
+    &:hover {
+        cursor: auto;
+    }
+}
+
 .job-summary {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    align-items: center;
     margin-right: 12rem;
-    width: 40rem;
-    background-color: rgb(249, 250, 251);
+    width: 50rem;
+    // max-height: 100rem;
+
+    // transition: max-height 0.2s ease;
     
     &__details {
-        align-self: flex-start;
+        padding: 3.5rem 3.8rem 3rem 3.8rem;
         width: 100%;
-        padding: 2.5rem;
     }
-    &__item {
-        display: block;
-        margin-bottom: .3rem;
+    &__field {
+        padding-left: .7rem;
+        padding-right: 1.3rem;
+        transition: padding 0.2s ease;
+    }
+    &__header {
+        margin-bottom: 2.5rem;
+    }
+    &__title {
+        color: $color-secondary;
+        font-weight: 400;
+        font-size: 1.9rem;
+    }
+    &__company {
+        margin-top: .4rem;
+        font-weight: 400;
         font-size: 1.6rem;
+        // Font family not inheriting when changed to a select element
+        font-family: 'Lato', sans-serif;
+    }
+    &__location {
+        font-size: 1.7rem;
         width: 100%;
-        padding: 1rem 2.5rem .8rem 2rem;
-        border: 1px solid transparent;
-        &:hover {
-            cursor: default;
+
+        &-wrapper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        &-icon {
+            height: 3rem;
+            width: 2.8rem;
+            margin-right: 1.5rem;  
         }
     }
-    &__text-area {
-        margin-top: 2.5rem;
-        padding-top: 2rem;
-        background-color: white;
-        height: 20rem;
-    }
-    &__item--editable {
-        -moz-appearance: textfield;
-        -webkit-appearance: textfield;
-        background-color: white;
-        background-color: -moz-field;
-        border: 1px solid darkgray;
-        box-shadow: 1px 1px 1px 0 lightgray inset;  
-        &:hover {
-            cursor: auto;
+    &__wage {
+        font-size: 1.7rem;
+        width: 100%;
+
+        &-wrapper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+
         }
+        &-icon {
+            height: 1.9rem;
+            width: 1.9rem;
+            margin-right: 1.8rem; 
+            margin-left: .5rem;
+ 
+        }
+    }
+    &__extra {
+
+        &-wrapper {
+            display: flex;
+            align-items: center;
+            font-size: 1.7rem;
+            margin-bottom: 3rem;
+        }
+        &-icon {
+            height: 2.3rem;
+            width: 2.3rem;
+            margin-right: 1.5rem; 
+            margin-left: .2rem;
+        }
+    }
+    &__position, &__PQE {
+        margin-left: 1rem;    
+    }
+    &__PQE {
+        flex-grow: 1;
+    }
+    &__featured {
+        font-size: 1.7rem;
+
+        &-wrapper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 3rem;
+            min-height: 3rem;
+        }
+        &-icon {
+            &--true {
+                height: 2.5rem;
+                width: 2.5rem;
+                margin-right: 1.2rem; 
+                margin-left: .4rem; 
+                fill: green;
+            }
+            &--false {
+                height: 2.2rem;
+                width: 2.2rem;
+                margin-right: 1.5rem; 
+                margin-left: .4rem; 
+                margin-bottom: .5rem;
+                fill: $color-secondary;
+            }
+        }
+        &-checkbox {
+            height: 1.6rem;
+            width: 1.6rem;
+            margin-left: .5rem;
+            margin-right: 2rem;
+            accent-color: $color-secondary-highlight;
+        }
+    }
+    &__description {
+        font-size: 1.6rem;
+        margin-bottom: 2.2rem;
+        margin: 0 0 0 4.1rem;
+        padding-right: 2rem;
+        line-height: 2.1rem;
+        min-height: 10rem;
     }
     &__select {
-        padding: 1rem 2.5rem .8rem 1.7rem;
+        width: 100%;
 
+        // Slightly larger padding for the company name, slightly less lPad
+        &[class*="--editable"] {
+            padding-top: .7rem;
+            padding-bottom: .7rem;
+
+            padding-left: .3rem;
+        }
     }
+
+ 
+
+
+
+    // &__item {
+    //     display: block;
+    //     margin-bottom: .3rem;
+    //     font-size: 1.6rem;
+    //     width: 100%;
+    //     padding: 1rem 2.5rem .8rem 2rem;
+    //     border: 1px solid transparent;
+    //     &:hover {
+    //         cursor: default;
+    //     }
+    // }
+    // &__text-area {
+    //     margin-top: 2.5rem;
+    //     padding-top: 2rem;
+    //     background-color: white;
+    //     height: 20rem;
+    // }
+    // &__item--editable {
+    //     -moz-appearance: textfield;
+    //     -webkit-appearance: textfield;
+    //     background-color: white;
+    //     background-color: -moz-field;
+    //     border: 1px solid darkgray;
+    //     box-shadow: 1px 1px 1px 0 lightgray inset;  
+    //     &:hover {
+    //         cursor: auto;
+    //     }
+    // }
+
 
     &__controls {
         display: flex;
@@ -368,10 +525,6 @@
     
 }
 
-.jobs-table__wrapper {
-    height: 100%;
-}
-
 //////////  COMPANY SUMMARY STYLING  ///////////
 
 
@@ -380,7 +533,7 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    width: 40rem;
+    width: 50rem;
     
     &__details {
         width: 100%;
@@ -472,7 +625,7 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    width: 40rem;
+    width: 50rem;
     min-height: 24rem;
     
     &__details {
@@ -554,8 +707,7 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    width: 40rem;
-    // background-color: rgb(249, 250, 251);
+    width: 50rem;
     
     &__details {
         width: 100%;
@@ -629,15 +781,6 @@
     }
 }
 
-.summary {
-    &__btn--disabled {
-        pointer-events: none;
-    }
-
-    &__icon--disabled {
-        fill: rgb(197, 197, 197) !important;
-    }
-}
 
 
 .pagination {

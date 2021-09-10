@@ -88,7 +88,7 @@ const createUserElement = ({ applicantId, firstName, lastName, userDate }) => {
 }
 const createUserSummary = () => {
     const markup = `
-        <div class="user-summary">
+        <div class="user-summary summary">
             <div class="user-summary__details">
                 <div class="user-summary__item user-summary__first-name" data-placeholder="First Name" contenteditable=false></div>
                 <div class="user-summary__item user-summary__last-name" data-placeholder="Last Name" contenteditable=false></div>
@@ -131,6 +131,87 @@ export const populateUserSummary = (user) => {
     
     addCvElement(user);
 }
+
+
+export const makeJobSummaryEditable = (editable, featured) => {
+    const jobTitle = document.querySelector('.job-summary__title');
+    const location = document.querySelector('.job-summary__location');
+    const wage = document.querySelector('.job-summary__wage');
+    const type = document.querySelector('.job-summary__type');
+    const position = document.querySelector('.job-summary__position');
+    const PQE = document.querySelector('.job-summary__PQE');
+    const description = document.querySelector('.job-summary__description');
+
+    const featuredWrapper = document.querySelector('.job-summary__featured-wrapper');
+    const featuredIcon = document.querySelector('.job-summary__featured-icon');
+
+    const fields = [jobTitle, location, wage, type, position, PQE, description];
+
+    fields.forEach(field => {
+        makeFieldEditable(field, editable);
+    });
+
+    if(editable) {
+        const checkbox = `<input type="checkbox" class="job-summary__featured-checkbox" />`;
+        featuredWrapper.insertAdjacentHTML('afterbegin', checkbox);
+        utils.removeElement(featuredIcon);
+    } else {
+        utils.removeElement(document.querySelector('.job-summary__featured-checkbox'));
+    }
+};
+
+export const addCompanyDropdown = (companies, companyId) => {
+    const companyItem = document.querySelector('.job-summary__company');
+
+    const classNames = ['job-summary__field','job-summary__select', 'job-summary__select--editable', 'job-summary__company'];
+    const dropdown = createSelectElement(companies, 'Company Name', classNames, companyId);
+    utils.swapElement(companyItem, dropdown);
+}
+export const removeCompanyDropdown = (companyName) => {
+    const companyElement = `
+        <div class="job-summary__field job-summary__company" contenteditable=false>
+            ${companyName}
+        </div>`;
+    
+    utils.swapElement(document.querySelector('.job-summary__select'), companyElement);
+};
+
+export const clearJobForm = () => {
+    const fields = [
+        document.querySelector('.job-summary__title'),
+        document.querySelector('.job-summary__location'),
+        document.querySelector('.job-summary__wage'),
+        document.querySelector('.job-summary__type'),
+        document.querySelector('.job-summary__position'),
+        document.querySelector('.job-summary__PQE'),
+        document.querySelector('.job-summary__featured-checkbox'),
+        document.querySelector('.job-summary__description'),
+    ];
+    const defaultText = [
+        'Job Title',
+        'Location',
+        'Wage',
+        'Type',
+        'Position',
+        'PQE',
+        'NA',
+        'Description'
+    ];
+    utils.clearForm(fields, defaultText);
+}
+
+const makeFieldEditable = (field, editable) => {
+    const className = field.classList[0];
+
+    if(!editable) {
+        field.classList.remove(`${className}--editable`);
+        field.setAttribute('contenteditable', false);
+    } else {
+        field.classList.add(`${className}--editable`);
+        field.setAttribute('contenteditable', true);
+    }
+};
+
 // @TODO: move from user section
 export const makeEditable = (elements, makeEditable, exclude) => {
 
@@ -199,7 +280,8 @@ export const changeSummaryIconState = (state, summaryType) => {
     let sectionsToChange;
 
     switch(summaryType) {
-        case 'company': sectionsToChange = [ 'company', 'address', 'contact' ]; break;
+        case 'company'  : sectionsToChange = [ 'company', 'address', 'contact' ]; break;
+        case 'job'      : sectionsToChange = [ 'job' ]; break;
     }
 
     if(state === 'edited') {
@@ -241,11 +323,10 @@ const addCreatedStateIcons = (oldBtn, summaryType) => {
         </div>
     `;
 
-    utils.swapIcon(oldBtn, newBtn);
+    utils.swapElement(oldBtn, newBtn);
 };
 
 const addCreatingStateIcons = (oldBtn, summaryType) => {
-    console.log('HA');
     const saveNewBtn = `
         <div class="${summaryType}-summary__btn ${summaryType}-summary__btn--save-new">
             <svg class="${summaryType}-summary__save-icon">
@@ -254,7 +335,7 @@ const addCreatingStateIcons = (oldBtn, summaryType) => {
         </div>
     `;
 
-    utils.swapIcon(oldBtn, saveNewBtn);
+    utils.swapElement(oldBtn, saveNewBtn);
 };
 
 const addEditedStateIcons = (oldBtn, summaryType) => {
@@ -266,7 +347,7 @@ const addEditedStateIcons = (oldBtn, summaryType) => {
         </div>
     `;
 
-    utils.swapIcon(oldBtn, editBtn);
+    utils.swapElement(oldBtn, editBtn);
 };
 
 const addEditingStateIcons = (oldBtn, summaryType) => {
@@ -278,7 +359,7 @@ const addEditingStateIcons = (oldBtn, summaryType) => {
         </div>
     `;
 
-    utils.swapIcon(oldBtn, saveBtn);
+    utils.swapElement(oldBtn, saveBtn);
 };
 
 export const changeEditIcon = (btnToDisplay, summaryType, skip) => {
@@ -463,17 +544,75 @@ export const togglePlaceholders = (elements, toggle, values) => {
 // };
 
 const createJobSummary = () => {
+    // const markup = `
+    //     <div class="job-summary summary">
+    //         <div class="job-summary__details">
+    //             <div class="job-summary__item job-summary__company" data-placeholder="company" contenteditable=false></div>
+    //             <div class="job-summary__item job-summary__title" data-placeholder="title" contenteditable=false></div>
+    //             <div class="job-summary__item job-summary__location" data-placeholder="location" contenteditable=false></div>
+    //             <div class="job-summary__item job-summary__wage" data-placeholder="wage" contenteditable=false></div>
+    //             <label class="job-summary__item job-summary__featured" for="job-summary__featured-checkbox"></label>
+    //             <div class="job-summary__item job-summary__description job-summary__text-area" data-placeholder="description" contenteditable=false></div>
+    //         </div>
+    //         <div class="job-summary__controls">
+    //             <div class="job-summary__btn job-summary__btn--new">
+    //                 <svg class="job-summary__new-icon job-summary__icon">
+    //                     <use xlink:href="svg/spritesheet.svg#add">
+    //                 </svg>
+    //             </div>
+    //             <div class="job-summary__btn job-summary__btn--hubspot">
+    //                 <svg class="job-summary__hubspot-icon job-summary__icon">
+    //                     <use xlink:href="svg/spritesheet.svg#hubspot">
+    //                 </svg>
+    //             </div>
+    //             <div class="job-summary__btn job-summary__btn--edit">
+    //                 <svg class="job-summary__edit-icon job-summary__icon">
+    //                     <use xlink:href="svg/spritesheet.svg#edit-np1">
+    //                 </svg>
+    //             </div>
+    //             <div class="job-summary__btn job-summary__btn--delete">
+    //                 <svg class="job-summary__delete-icon job-summary__icon">
+    //                     <use xlink:href="svg/spritesheet.svg#delete-np1">
+    //                 </svg>
+    //             </div>
+    //         </div>
+    //     </div>
+    // `;
+    // return markup;
+
     const markup = `
-        <div class="job-summary">
-            <div class="job-summary__details">
-                <div class="job-summary__item job-summary__company" data-placeholder="company" contenteditable=false></div>
-                <div class="job-summary__item job-summary__title" data-placeholder="title" contenteditable=false></div>
-                <div class="job-summary__item job-summary__location" data-placeholder="location" contenteditable=false></div>
-                <div class="job-summary__item job-summary__wage" data-placeholder="wage" contenteditable=false></div>
-                <label class="job-summary__item job-summary__featured" for="job-summary__featured-checkbox"></label>
-                <div class="job-summary__item job-summary__description job-summary__text-area" data-placeholder="description" contenteditable=false></div>
+    <div class="job-summary summary">
+        <div class="job-summary__details">
+            <div class="job-summary__header">
+                <h3 class="job-summary__title job-summary__field">Head of HR</h3> 
+                <div class="job-summary__company job-summary__field">Dell</div>
             </div>
-            <div class="job-summary__controls">
+            <div class="job-summary__content">
+                <div class="job-summary__location-wrapper">
+                    <svg class="job-summary__location-icon"><use xlink:href="svg/spritesheet.svg#location"></svg>
+                    <div class="job-summary__location job-summary__field">Birmingham</div>
+                </div>
+                <div class="job-summary__wage-wrapper">
+                    <svg class="job-summary__wage-icon"><use xlink:href="svg/spritesheet.svg#sterling"></use></svg>
+                    <div class="job-summary__wage job-summary__field">£50000</div>
+
+                </div> 
+                <div class="job-summary__extra-wrapper">
+                    <svg class="job-summary__extra-icon"><use xlink:href="svg/spritesheet.svg#clock"></svg>
+                    <div class="job-summary__type job-summary__field">Permanent</div>
+                    <div class="job-summary__position job-summary__field">In House</div>
+                    <div class="job-summary__PQE job-summary__field">PQE: 3+</div>
+                </div> 
+
+                <div class="job-summary__featured-wrapper">
+                    <div class="job-summary__featured job-summary__field">Featured?</div>
+                </div>
+
+                <div class="job-summary__description job-summary__field">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat</div>
+            </div>    
+            
+        </div>
+        <div class="job-summary__controls">
                 <div class="job-summary__btn job-summary__btn--new">
                     <svg class="job-summary__new-icon job-summary__icon">
                         <use xlink:href="svg/spritesheet.svg#add">
@@ -495,10 +634,12 @@ const createJobSummary = () => {
                     </svg>
                 </div>
             </div>
-        </div>
-    `;
-    return markup;
+     </div>                 
+ `;
+ return markup;
 };
+
+
 
 export const populateJobSummary = (job) => {
     const jobSummary = document.querySelector('.job-summary');
@@ -512,13 +653,29 @@ export const populateJobSummary = (job) => {
     document.querySelector('.job-summary__location').innerText = job.location;
 
     document.querySelector('.job-summary__wage').innerText = job.wage;
-    document.querySelector('.job-summary__featured').innerText = `${job.featured? 'Featured': 'Not Featured'}`;
+    // document.querySelector('.job-summary__featured').innerText = `${job.featured? 'Featured': 'Not Featured'}`;
+
+    const iconExists = document.querySelector('.job-summary__featured-icon');
+    const featuredWrapper = document.querySelector('.job-summary__featured-wrapper');
+
+    if(job.featured) {
+        console.log('featured' + job.featured);
+        const icon = `<svg class="job-summary__featured-icon job-summary__featured-icon--true"><use xlink:href="svg/spritesheet.svg#pin-ok"></use></svg>`;
+        if(iconExists) utils.removeElement(iconExists);
+        featuredWrapper.insertAdjacentHTML('afterbegin', icon);
+    } else {
+        console.log('not featured');
+        const icon = `<svg class="job-summary__featured-icon job-summary__featured-icon--false"><use xlink:href="svg/spritesheet.svg#pin-angle"></use></svg>`;
+        if(iconExists) utils.removeElement(iconExists);
+        featuredWrapper.insertAdjacentHTML('afterbegin', icon);
+
+    }
 
     document.querySelector('.job-summary__description').innerText = job.description;
 
 };
 export const clearJobSummary = () => {
-    const items = document.querySelectorAll('.job-summary__item');
+    const items = document.querySelectorAll('.job-summary__field');
     items.forEach(item => {
         if(item.className.includes('job-summary__title')) item.innerText = 'Job Title';
         if(item.className.includes('job-summary__location')) item.innerText = 'Location';
@@ -528,27 +685,32 @@ export const clearJobSummary = () => {
     });
 };
 
-export const toggleDropdown = (flag, item, dropdown) => {
-    if(flag) {
-        item.insertAdjacentElement('beforebegin', dropdown);
-        utils.removeElement(item);
-    } else {
-        dropdown.insertAdjacentHTML('beforebegin', item);
-        utils.removeElement(dropdown);
-    }
-}
+// export const toggleDropdown = (flag, item, dropdown) => {
+//     if(flag) {
+//         item.insertAdjacentElement('beforebegin', dropdown);
+//         utils.removeElement(item);
+//     } else {
+//         dropdown.insertAdjacentHTML('beforebegin', item);
+//         utils.removeElement(dropdown);
+//     }
+// }
 
 export const createSelectElement = (options, defaultText, classNames, companyId) => {
-    
     const dropdown = document.createElement('select'); 
 
     classNames.forEach(name => dropdown.classList.add(name));
+    
+    if(defaultText) {
+        const placeholder = new Option(defaultText, defaultText)
+        dropdown.add(placeholder);
+        placeholder.setAttribute('disabled', true);
+    }
 
     options.forEach(item => {
         const option = new Option(item.name, item.name);
         option.setAttribute('data-id', item.id);
 
-        if(parseInt(option.dataset.id) === companyId) {
+        if(!defaultText && parseInt(option.dataset.id) === companyId) {
             option.selected = true;
         }
 
@@ -574,40 +736,41 @@ export const addFeaturedCheckbox = (visible, featured) => {
 
 // @TODO: move from job section
 //@TODO: Same as the changeEditIcon?
-export const changeNewIcon = (btnToDisplay, summaryType, skip) => {
-    const newBtn = document.querySelector(`.${summaryType}-summary__btn--new`);
-    const saveBtn = document.querySelector(`.${summaryType}-summary__btn--save-new`);
-    const summaryControls = document.querySelector(`.${summaryType}-summary__controls`);
+// export const changeNewIcon = (btnToDisplay, summaryType, skip) => {
+//     const newBtn = document.querySelector(`.${summaryType}-summary__btn--new`);
+//     const saveBtn = document.querySelector(`.${summaryType}-summary__btn--save-new`);
+//     const summaryControls = document.querySelector(`.${summaryType}-summary__controls`);
 
-    let markup;
-    if(btnToDisplay === 'save') {
-        utils.removeElement(newBtn);
-        markup = `
-            <div class="${summaryType}-summary__btn ${summaryType}-summary__btn--save-new">
-                <svg class="${summaryType}-summary__save-icon">
-                    <use xlink:href="svg/spritesheet.svg#save-np">
-                </svg>
-            </div>
-        `;
-    } else if(btnToDisplay === 'new') {
-        utils.removeElement(saveBtn);
-        markup = `
-            <div class="${summaryType}-summary__btn ${summaryType}-summary__btn--new">
-                <svg class="${summaryType}-summary__edit-icon">
-                    <use xlink:href="svg/spritesheet.svg#add">
-                </svg>
-            </div>
-        `;
-    }
-    summaryControls.insertAdjacentHTML('afterbegin', markup);
+//     let markup;
+//     if(btnToDisplay === 'save') {
+//         utils.removeElement(newBtn);
+//         markup = `
+//             <div class="${summaryType}-summary__btn ${summaryType}-summary__btn--save-new">
+//                 <svg class="${summaryType}-summary__save-icon">
+//                     <use xlink:href="svg/spritesheet.svg#save-np">
+//                 </svg>
+//             </div>
+//         `;
+//     } else if(btnToDisplay === 'new') {
+//         utils.removeElement(saveBtn);
+//         markup = `
+//             <div class="${summaryType}-summary__btn ${summaryType}-summary__btn--new">
+//                 <svg class="${summaryType}-summary__edit-icon">
+//                     <use xlink:href="svg/spritesheet.svg#add">
+//                 </svg>
+//             </div>
+//         `;
+//     }
+//     summaryControls.insertAdjacentHTML('afterbegin', markup);
 
-    // Disable other btns if save is active
-    if(btnToDisplay === 'save') toggleActiveBtns(false, summaryType, skip);
-    else toggleActiveBtns(true, summaryType, skip);
-};
+//     // Disable other btns if save is active
+//     if(btnToDisplay === 'save') toggleActiveBtns(false, summaryType, skip);
+//     else toggleActiveBtns(true, summaryType, skip);
+// };
 
 export const getJobEdits = (currentJob) => {
-    const { companyId, companyName, title, location, wage, featured, description } = getJobFormValues();
+    const { title, location, wage, featured, description } = getJobFormValues();
+
     const formData = new FormData();
     let submit = false;
 
@@ -622,13 +785,19 @@ export const getJobEdits = (currentJob) => {
     parseInt(wage) !== currentJob.wage && (submit = true) ? formData.append('wage', wage):formData.append('wage', currentJob.wage);
     description !== currentJob.description && (submit = true) ? formData.append('description', description):formData.append('description', currentJob.description);
     
+    console.log(featured)
     featured !== currentJob.featured && (submit = true) ? formData.append('featured', featured):formData.append('featured', currentJob.featured); 
 
     return submit ? formData : null;
 }; 
 
 export const getNewJob = () => {
-    const { companyId, companyName, title, location, wage, featured, description } = getJobFormValues();
+    const { title, location, wage, featured, description } = getJobFormValues();
+
+    const selectElement = document.querySelector('.job-summary__company');
+    const companyName = selectElement.value;
+    const companyId = selectElement.options[selectElement.selectedIndex].getAttribute('data-id');
+
 
     // Check the placeholders have been removed
     // @TODO FE validation here
@@ -653,16 +822,13 @@ export const getNewJob = () => {
 }
 
 const getJobFormValues = () => {
-    const selectElement = document.querySelector('.job-summary__company');
-    const companyName = selectElement.value;
-    const companyId = selectElement.options[selectElement.selectedIndex].getAttribute('data-id');
+    // Company name is retrieved by the calling function 
     const title = document.querySelector('.job-summary__title').innerText;
     const location = document.querySelector('.job-summary__location').innerText;
     const wage = document.querySelector('.job-summary__wage').innerText;
-    const featured = document.querySelector('.job-summary__featured-checkbox').checked;
+    const featured = document.querySelector('.job-summary__featured-checkbox').checked? 1:0;
     const description = document.querySelector('.job-summary__description').innerText;
-
-    return { companyId, companyName, title, location, wage, featured, description };
+    return { title, location, wage, featured, description };
 }
 
 export const formatJobs = (jobs) => {
@@ -878,7 +1044,7 @@ const createCompanySummary = (company) => {
     return markup;
 };
 
-export const populateCompanySummary = ({ id, name, addresses = [] }) => {
+export const populateCompanySummary = ({ id, name }) => {
     const companySummary = document.querySelector('.company-summary');
     companySummary.setAttribute('data-id', id);
     
@@ -886,12 +1052,22 @@ export const populateCompanySummary = ({ id, name, addresses = [] }) => {
 
 };
 
+export const getSummaryCompanyId =  () => {
+    return document.querySelector('.company-summary').dataset.id;
+};
+export const getSummaryAddressId = () => {
+    return document.querySelector('.address-summary').dataset.id;
+};
+export const getSummaryContactId = () => {
+    return document.querySelector('.contact-summary').dataset.id;
+};
+
 export const getNewCompany = () => {
     const companyName = document.querySelector('.company-summary__company').innerText;
     
     // @TODO: Add validation
     if(companyName === 'Company') return null;
-
+    console.log(companyName);
     const formData = new FormData();
     formData.append('companyName', companyName);
     return formData;
@@ -987,8 +1163,8 @@ export const createAddressSummary = () => {
     return markup;
 };
 export const populateAddressSummary = (id, address) => {
-    const addressSummary = document.querySelector('.address-summary__details');
-    addressSummary.setAttribute('data-id', address.id);
+    const addressSummary = document.querySelector('.address-summary');
+    addressSummary.setAttribute('data-id', address.addressId);
     addressSummary.setAttribute('data-company-id', id);
     
     populateAddress(address);
@@ -999,11 +1175,11 @@ export const makeAddressEditable = (editable, type, address) => {
     utils.clearElement(addressDetails);
     if(editable) {
         const markup = `
-            <div class="address-summary__item address-summary__item--editable address-summary__first-line" data-placeholder="First Line" contenteditable=false>${type === 'placeholder'? '':address.firstLine}</div>
-            <div class="address-summary__item address-summary__item--editable address-summary__second-line" data-placeholder="Second Line" contenteditable=false>${type === 'placeholder'? '':address.secondLine}</div>
-            <div class="address-summary__item address-summary__item--editable address-summary__city" data-placeholder="City" contenteditable=false>${type === 'placeholder'? '':address.city}</div>
-            <div class="address-summary__item address-summary__item--editable address-summary__county" data-placeholder="County" contenteditable=false>${type === 'placeholder'? '':address.county}</div>
-            <div class="address-summary__item address-summary__item--editable address-summary__postcode" data-placeholder="Postcode" contenteditable=false>${type === 'placeholder'? '':address.postcode}</div>
+            <div class="address-summary__item address-summary__first-line address-summary__item--editable" data-placeholder="First Line" contenteditable=false>${type === 'placeholder'? '':address.firstLine}</div>
+            <div class="address-summary__item address-summary__second-line address-summary__item--editable" data-placeholder="Second Line" contenteditable=false>${type === 'placeholder'? '':address.secondLine}</div>
+            <div class="address-summary__item address-summary__city address-summary__item--editable" data-placeholder="City" contenteditable=false>${type === 'placeholder'? '':address.city}</div>
+            <div class="address-summary__item address-summary__county address-summary__item--editable" data-placeholder="County" contenteditable=false>${type === 'placeholder'? '':address.county}</div>
+            <div class="address-summary__item address-summary__postcode address-summary__item--editable" data-placeholder="Postcode" contenteditable=false>${type === 'placeholder'? '':address.postcode}</div>
         `;
         addressDetails.insertAdjacentHTML('afterbegin', markup);
         makeEditable(document.querySelectorAll('.address-summary__item'), true, []);
@@ -1054,10 +1230,9 @@ export const createContactSummary = () => {
 };
 
 export const populateContactSummary = (id, contact) => {
-    const contactSummary = document.querySelector('.contact-summary__details');
-    contactSummary.setAttribute('data-id', contact.id);
+    const contactSummary = document.querySelector('.contact-summary');
+    contactSummary.setAttribute('data-id', contact.personId);
     contactSummary.setAttribute('data-company-id', id);
-    
     document.querySelector('.contact-summary__firstname').innerText = contact.firstName;
     document.querySelector('.contact-summary__lastname').innerText = contact.lastName;
     document.querySelector('.contact-summary__position').innerText = contact.position;
@@ -1195,8 +1370,7 @@ export const focusOutNewJobHandler = (e) => {
     e.target.innerText = e.target.innerText || e.target.dataset.placeholder;
 };
 export const focusInEditJobHandler = (e) => {
-    if(e.target.nodeName !== 'DIV') return;
-    e.target.innerText = '';
+    window.getSelection().selectAllChildren(e.target);
 };
 export const focusOutEditJobHandler = (job, e) => {
     if(e.target.nodeName !== 'DIV') return;

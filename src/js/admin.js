@@ -4,7 +4,9 @@ import '../sass/admin.scss';
 import '../assets/icons/edit-solid.svg';
 import '../assets/icons/delete-solid.svg';
 import '../assets/icons/hubspot.svg';
-import '../assets/icons/tick.svg';
+import '../assets/icons/pin-ok.svg';
+import '../assets/icons/pin-angle.svg';
+import '../assets/icons/cross.svg';
 import '../assets/icons/upload-np.svg';
 import '../assets/icons/pdf.svg';
 import '../assets/icons/pdf.svg';
@@ -21,6 +23,7 @@ import * as userForm from './views/userForm';
 import * as jobForm from './views/jobForm';
 import * as jobView from './views/jobView';
 import * as utils from './utils/utils';
+import * as dummyData from './utils/dummyData';
 
 import JobList from './models/JobList';
 import UserModel from './models/User';
@@ -32,6 +35,7 @@ import { elements, elementStrings } from './views/base';
 
 class AdminController {
     constructor() {
+
         // JobList and UserModel return axios methods CRUD ops
         this.JobList = new JobList();
         this.UserModel = new UserModel();
@@ -83,6 +87,17 @@ class AdminController {
         
         // initSocket();
 
+        this.handleCtrlQ = async (e) => {  
+            let key;
+            let code;
+            if (e.key === 'q' && e.ctrlKey) {
+                key = e.key;
+        
+                const company = await dummyData.createCompany();
+                const inputs = document.querySelectorAll('div[class$="item--editable"]');
+                dummyData.insertData(inputs, company);
+            }
+        }
         this.addEventListeners();
     }
 
@@ -159,42 +174,39 @@ class AdminController {
                 // Remove element listeners
                 jobSummary.removeEventListener('focusin', adminView.focusInEditJobHandler);
                 jobSummary.removeEventListener('focusout', adminView.focusOutEditJobHandler);
+                document.removeEventListener('keydown', this.handleCtrlPKey);
 
-                adminView.makeEditable(document.querySelectorAll('.job-summary__item'), false);
-                adminView.changeEditIcon('edit', 'job');
+                adminView.populateJobSummary(this.state.jobs.currentJob);
+                adminView.makeJobSummaryEditable(false, this.state.companies.currentCompany.featured);
+                adminView.changeSummaryIconState('edited', 'job');
                 
-                adminView.toggleDropdown(
-                    false, 
-                    `<div class="job-summary__item job-summary__company" contenteditable=false>
-                        ${this.state.jobs.currentJob.companyName}
-                    </div>`,
-                    document.querySelector('.job-summary__select')
-                )
-                adminView.addFeaturedCheckbox(false, this.state.jobs.currentJob.featured);
+                // adminView.toggleDropdown(
+                //     false, 
+                //     `<div class="job-summary__item job-summary__company" contenteditable=false>
+                //         ${this.state.jobs.currentJob.companyName}
+                //     </div>`,
+                //     document.querySelector('.job-summary__select')
+                // )
+                // adminView.addFeaturedCheckbox(false, this.state.jobs.currentJob.featured);
             }
             if(this.createJobLostFocus(e)) {
                 console.log('create jobs lost focus');
 
                 const jobSummary = document.querySelector('.job-summary');
+
                 // Remove element listeners
+                document.body.removeEventListener('keydown', this.handleCtrlQ);
                 jobSummary.removeEventListener('focusin', adminView.focusInNewJobHandler);
                 jobSummary.removeEventListener('focusout', adminView.focusOutNewJobHandler);
                 
                 // Remove the dropdown + replace with company div
-                adminView.toggleDropdown(
-                    false, 
-                    `<div class="job-summary__item job-summary__company" contenteditable=false>
-                        ${this.state.jobs.currentJob.companyName}
-                    </div>`,
-                    document.querySelector('.job-summary__select')
-                );
+                adminView.removeCompanyDropdown(this.state.jobs.currentJob.companyName);
 
                 adminView.populateJobSummary(this.state.jobs.currentJob);
 
-                adminView.makeEditable(document.querySelectorAll('.job-summary__item'), false);
+                adminView.makeJobSummaryEditable(false, this.state.companies.currentCompany.featured);
 
-                adminView.changeNewIcon('new', 'job');
-
+                adminView.changeSummaryIconState('created', 'job');
             }
             if(this.createCompanyLostFocus(e)) {
                 console.log('create company lost focus');
@@ -219,6 +231,7 @@ class AdminController {
             }
             if(this.editCompanyLostFocus(e)) {
                 console.log('edit company lost focus');
+                document.body.removeEventListener('keydown', this.handleCtrlQ);
 
                 const summaryWrapper = document.querySelector('.summary-wrapper');
                 const companyItems = document.querySelectorAll('.company-summary__item');
@@ -330,8 +343,11 @@ class AdminController {
                         this.companies = res.data.companies;
                         this.state.companies.totalCompanies = res.data.total;
                         if(this.companies.length > 0) {
+                            this.state.companies.currentCompany = this.companies[0];
+
                             this.renderCompaniesTable();
                             adminView.populateCompanySummary(this.companies[0]);
+
                             adminView.populateAddressSummary(this.companies[0].id, this.companies[0].addresses[0]);
                             adminView.populateContactSummary(this.companies[0].id, this.companies[0].people[0]);
                             this.addCompanySummaryListeners();
@@ -631,41 +647,23 @@ class AdminController {
             const hubspotBtn = e.target.closest('.job-summary__btn--hubspot');
             const jobElements = jobSummary.querySelectorAll('.job-summary__item');
             const newBtn = e.target.closest('.job-summary__btn--new');
-            const companyItem = jobSummary.querySelector('.job-summary__company');
 
 
             if(editBtn) {
                 const jobId = jobSummary.dataset.id;
                 this.state.jobs.currentJob = this.jobs.find(job => job.id === parseInt(jobId));
-                const companyId = this.state.jobs.currentJob.companyId;
 
+                adminView.changeSummaryIconState('editing', 'job');
 
-                if(jobElements[0].getAttribute('contenteditable') === 'false') {
-
-                    // Icons not to alter when the edit state is changed
-                    const iconsToIgnore = ['job-summary__btn--save'];
-
-                    adminView.changeEditIcon('save', 'job', iconsToIgnore);
-                    adminView.makeEditable(jobElements, true, ['job-summary__featured', 'job-summary__company']);
-                    
-                    // Add focus listeners
-                    this.boundFocusOutEditJobHandler = adminView.focusOutEditJobHandler.bind(this, this.state.jobs.currentJob);
-                    jobSummary.addEventListener('focusin', adminView.focusInEditJobHandler);
-                    jobSummary.addEventListener('focusout', this.boundFocusOutEditJobHandler);
-
-                    // Add a company name dropdown in place of the div
-                    const classNames = ['job-summary__item', 'job-summary__select', 'job-summary__item--editable', 'job-summary__company'];                    
-                    const dropdown = adminView.createSelectElement(this.companies, 'Company Name', classNames, companyId);
-                    
-                    classNames.forEach(name => dropdown.classList.add(name));
-
-                    adminView.toggleDropdown(true, companyItem, dropdown);
-
-                    adminView.addFeaturedCheckbox(true, this.state.jobs.currentJob.featured);
-                }
+                adminView.makeJobSummaryEditable(true, this.state.companies.currentCompany.featured);
+                
+                // Add focus listeners
+                this.boundFocusOutEditJobHandler = adminView.focusOutEditJobHandler.bind(this, this.state.jobs.currentJob);
+                jobSummary.addEventListener('focusin', adminView.focusInEditJobHandler);
+                jobSummary.addEventListener('focusout', this.boundFocusOutEditJobHandler);
             }
             if(saveBtn) {
-
+                console.log('save job')
                 // Remove element listeners
                 jobSummary.removeEventListener('focusin', adminView.focusInEditJobHandler);
                 jobSummary.removeEventListener('focusout', this.boundFocusOutEditJobHandler);
@@ -703,9 +701,11 @@ class AdminController {
 
                 // Technically unnecessary as the edit button never had the disabled class added
                 // but used for consistency
-                const iconsToIgnore = ['job-summary__btn--edit'];
+                // const iconsToIgnore = ['job-summary__btn--edit'];
 
-                adminView.changeEditIcon('edit', 'job', iconsToIgnore);
+                // adminView.changeEditIcon('edit', 'job', iconsToIgnore);
+
+                adminView.changeSummaryIconState('edited', 'job');
                 adminView.makeEditable(jobElements, false, ['job-summary__featured']);
                 adminView.toggleDropdown(
                     false, 
@@ -717,30 +717,27 @@ class AdminController {
                 adminView.addFeaturedCheckbox(false, this.state.jobs.currentJob.featured);
             }
             if(newBtn) {
-                // Save current user
+                // Save current job
                 const jobId = jobSummary.dataset.id;
                 this.state.jobs.currentJob = this.jobs.find(job => job.id === parseInt(jobId));
                 const companyId = this.state.jobs.currentJob.companyId;
 
-                // Make the items editable
-                adminView.makeEditable(jobElements, true, ['job-summary__featured', 'job-summary__company']);
-             
-                // Add event listeners
+                // Add event listeners for inputs
                 jobSummary.addEventListener('focusin', adminView.focusInNewJobHandler);
                 jobSummary.addEventListener('focusout', adminView.focusOutNewJobHandler);
 
-                // Switch the company element to a dropdown
-                const classNames = ['job-summary__item', 'job-summary__select', 'job-summary__item--editable', 'job-summary__company'];
-                const dropdown = adminView.createSelectElement(this.companies, 'Company Name', classNames, companyId);
-                adminView.toggleDropdown(true, companyItem, dropdown);
-
-                const iconsToIgnore = ['job-summary__btn--save-new'];
 
                 // Change the new icon
-                adminView.changeNewIcon('save', 'job', iconsToIgnore);
+                adminView.changeSummaryIconState('creating', 'job');
 
-                // Clear the current summary
-                adminView.clearJobSummary();
+                adminView.makeJobSummaryEditable(true, this.state.companies.currentCompany.featured);
+
+                // Switch the company element to a dropdown
+                adminView.addCompanyDropdown(this.companies, companyId);
+
+                // Swi
+
+                adminView.clearJobForm();
             }
             if(saveNewBtn){
                 console.log('saveBtn');
@@ -1192,13 +1189,7 @@ class AdminController {
                 const companyId = document.querySelector('.company-summary').dataset.id;
                 this.state.companies.currentCompany = this.companies.find(company => company.id === parseInt(companyId));
 
-                // const iconsToIgnore = [
-                //     'company-summary__btn--save-new'
-                // ];
-                // Alter the summary form
-                // adminView.changeNewIcon('save', 'company', iconsToIgnore);
-                // adminView.changeNewIcon('save', 'address', iconsToIgnore);
-                // adminView.changeNewIcon('save', 'contact', iconsToIgnore);
+                document.body.addEventListener('keydown', this.handleCtrlQ);
 
                 adminView.changeSummaryIconState('creating', 'company');
 
@@ -1219,13 +1210,6 @@ class AdminController {
                 const companyId = document.querySelector('.company-summary').dataset.id;
                 this.state.companies.currentCompany = this.companies.find(company => company.id === parseInt(companyId));
 
-                const iconsToIgnore = [
-                    'company-summary__btn--save'
-                ];
-                // Alter the summary form
-                // adminView.changeEditIcon('save', 'company', iconsToIgnore);
-                // adminView.changeEditIcon('save', 'address', iconsToIgnore);
-                // adminView.changeEditIcon('save', 'contact', iconsToIgnore);
 
                 adminView.changeSummaryIconState('editing', 'company');
 
@@ -1233,9 +1217,13 @@ class AdminController {
                 adminView.makeAddressEditable(true, 'value', this.state.companies.currentCompany.addresses[0]);
                 adminView.makeEditable(contactElements, true, []);
 
+
+
                 // adminView.togglePlaceholders(companyElements, true, []);
                 // adminView.togglePlaceholders(document.querySelectorAll('.address-summary__item'), true, []);
                 // adminView.togglePlaceholders(contactElements, true, []);
+
+                document.body.addEventListener('keydown', this.handleCtrlQ);
 
                 this.boundFocusOutEditCompanyHandler = adminView.focusOutEditCompanyHandler.bind(this, this.state.companies.currentCompany);
                 summaryWrapper.addEventListener('focusin', adminView.focusInEditCompanyHandler);
@@ -1276,6 +1264,8 @@ class AdminController {
             if(saveBtn) {
                 console.log('save');
                 // Remove the item listeners
+                document.body.removeEventListener('keydown', this.handleCtrlQ);
+
                 summaryWrapper.removeEventListener('focusin', adminView.focusInNewCompanyHandler);
                 summaryWrapper.removeEventListener('focusout', adminView.focusOutNewCompanyHandler);
 
@@ -1290,15 +1280,22 @@ class AdminController {
                 for(let [key, value] of addressForm.entries()) formData.append(`${key}`, value);
                 for(let [key, value] of contactForm.entries()) formData.append(`${key}`, value);
 
-                for(let [key, value] of addressForm.entries()) console.log(`${key}`, value);
+                // for(let [key, value] of addressForm.entries()) console.log(`${key}`, value);
+                // for(let [key, value] of contactForm.entries()) console.log(`${key}`, value);
+
                 
+                // Get Company, Address and Contact ids
+                const companyId = adminView.getSummaryCompanyId();
+                const addressId = adminView.getSummaryAddressId();
+                const contactId = adminView.getSummaryContactId();
+
                 if(companyForm && addressForm && contactForm) {
                     let formCompany;
 
                     // Make API call here to create company
-                    this.Admin.editCompany(1, 4, 1, formData)
+                    this.Admin.editCompany(companyId, contactId, addressId, formData)
                         .then(response => {
-                            if(response.status !== 201) {
+                            if(response.status !== 200) {
                                 // @TODO: error handling
                                 console.log('error');
                             }
@@ -1339,6 +1336,7 @@ class AdminController {
             if(hubspotBtn) console.log('hub');
             if(saveNewBtn) {
                 console.log('savenewBtn');
+                document.body.removeEventListener('keydown', this.handleCtrlQ);
                 summaryWrapper.removeEventListener('focusin', adminView.focusInNewCompanyHandler);
                 summaryWrapper.removeEventListener('focusout', adminView.focusOutNewCompanyHandler);
 
@@ -1391,14 +1389,6 @@ class AdminController {
                             adminView.populateCompanySummary(this.state.companies.currentCompany);
                             adminView.populateAddressSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.addresses[0]);
                             adminView.populateContactSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.people[0]);
-
-                            // Change the summary icons
-                            // const iconsToIgnore = [
-                            //     'companies-summary__btn--save-new'
-                            // ];
-                            // adminView.changeNewIcon('new', 'company', iconsToIgnore);
-                            // adminView.changeNewIcon('new', 'address', iconsToIgnore);
-                            // adminView.changeNewIcon('new', 'contact', iconsToIgnore);
 
                             adminView.changeSummaryIconState('created', 'company');
 
@@ -1455,14 +1445,13 @@ class AdminController {
     }
     createJobLostFocus(e) {
         const jobSummary = document.querySelector('.job-summary');
-        const editableContent = document.querySelector('.job-summary__item--editable');
+        const editableContent = document.querySelector('[class*="--editable"]');
         const editBtnTarget = e.target.closest('.job-summary__btn--edit');
-        const itemTarget = e.target.closest('.job-summary__item');
+        const itemTarget = e.target.closest('.job-summary__field');
         const saveTarget = e.target.closest('.job-summary__btn--save-new');
         // Returns false if present, ie if the newBtn is on screen 
         // The newBtn is present when both adding a new job && editing a current job
         const editBtn = document.querySelector('.job-summary__btn--edit');
-
         if(jobSummary && editableContent && !editBtnTarget && !itemTarget && !saveTarget && editBtn) {
             return true;
         } 
@@ -1470,9 +1459,9 @@ class AdminController {
     }
     editJobLostFocus(e) {
         const jobSummary = document.querySelector('.job-summary');
-        const editableContent = document.querySelector('.job-summary__item--editable');
+        const editableContent = document.querySelector('[class*="--editable"]');
         const editBtnTarget = e.target.closest('.job-summary__btn--edit');
-        const itemTarget = e.target.closest('.job-summary__item');
+        const itemTarget = e.target.closest('[class*="--editable"]');
         const saveTarget = e.target.closest('.job-summary__btn--save');
 
         // Returns false if present, ie if editBtn on screen
