@@ -1,8 +1,11 @@
 /* COLOURS */
 // Common Colours
-$color-logo: rgb(102, 124, 148);
+// $color-logo: rgb(102, 124, 148);
 
+$color-logo: #36657f;
 $color-primary: rgb(91, 118, 139); 
+// $color-primary-new: #36657f;
+$color-primary-new: #36657f;
 $color-secondary: rgb(117,53,53);
 // $color-secondary-highlight: rgb(218, 210, 166);
 // $color-secondary-highlight: rgb(139, 187, 190);
@@ -23,6 +26,7 @@ $color-menu-item: rgb(246, 247, 249);
 /* HEIGHT */
 $height-logo: 4rem;
 $height-hero: 75%;
+$height-job-card--featured: 33rem;
 
 /* WIDTH */
 

@@ -29,9 +29,7 @@ export const renderApplyForm = (id) => {
 
             <div class="apply__content">
                 <div class="request">
-                    <div class="request__header">
-                        <div class="request__title">Request details</div>       
-                    </div>   
+                    
                     <form class="request__form">
                         <div class="request__field">
                             <label class="request__label--first-name request__label" for="request__input--first-name">First Name</label>
@@ -65,41 +63,6 @@ export const renderApplyForm = (id) => {
 
                     </form>
                 </div>
-
-                <div class="apply__divider">Or</div>
-
-                <div class="login__content--apply">   
-                    <div class="login__header--apply">
-                        <div class="login__title--apply">Sign in to your account</div>  
-                        <div class="login__subtitle--apply">...to apply automatically</div>
-                        
-                    </div>   
-                    <form class="login__form--apply">
-                        <div class="login__field--apply">
-                            <label class="login__label--email login__label--apply" for="login__input--email">Email</label>
-                            <input class="login__input--email login__input--apply" id="login__input--email" />
-                        </div>
-                        <div class="login__field--apply">
-                            <label class="login__label--password login__label--apply" for="login__input--password">Password</label>
-                            <input class="login__input--password login__input--apply" id="login__input--password" />
-                        </div>
-                        <button class="login__submit--apply btn">Sign In</button>
-                        <div class="login__forgot-password--apply">Forgot your password?</div>
-                        <div class="login__register-wrapper--apply">
-                            <div class="login__register-text--apply">Don't have an account? Register&nbsp</div>
-                            <button class="login__register-link--apply">here</button>
-
-                        </div>
-                    </form>
-                </div>
-
-                <div class="apply__btn-wrapper">
-                    <button class="apply__cancel-btn">
-                        <svg class="apply__cancel-svg">
-                            <use xlink:href="svg/spritesheet.svg#close-icon">
-                        </svg>
-                    </button> 
-                </div> 
             </div>
             
         </div>
@@ -108,3 +71,29 @@ export const renderApplyForm = (id) => {
     document.body.insertAdjacentHTML('beforeend', markup);
 };
 
+{/* <div class="apply__divider">Or</div>
+
+<div class="login__content--apply">   
+    <div class="login__header--apply">
+        <div class="login__title--apply">Sign in to your account</div>  
+        <div class="login__subtitle--apply">...to apply automatically</div>
+        
+    </div>   
+    <form class="login__form--apply">
+        <div class="login__field--apply">
+            <label class="login__label--email login__label--apply" for="login__input--email">Email</label>
+            <input class="login__input--email login__input--apply" id="login__input--email" />
+        </div>
+        <div class="login__field--apply">
+            <label class="login__label--password login__label--apply" for="login__input--password">Password</label>
+            <input class="login__input--password login__input--apply" id="login__input--password" />
+        </div>
+        <button class="login__submit--apply btn">Sign In</button>
+        <div class="login__forgot-password--apply">Forgot your password?</div>
+        <div class="login__register-wrapper--apply">
+            <div class="login__register-text--apply">Don't have an account? Register&nbsp</div>
+            <button class="login__register-link--apply">here</button>
+
+        </div>
+    </form>
+</div> */}

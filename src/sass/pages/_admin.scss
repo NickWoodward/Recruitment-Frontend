@@ -107,7 +107,7 @@
     justify-content: space-between;
 
     grid-column: 2/3;
-    width: 70rem;
+    width: 75rem;
     height: 100%;
     
     border: none;
@@ -322,6 +322,7 @@
         margin-top: .4rem;
         font-weight: 400;
         font-size: 1.6rem;
+        width: 100%;
         // Font family not inheriting when changed to a select element
         font-family: 'Lato', sans-serif;
     }
@@ -422,15 +423,12 @@
         min-height: 10rem;
     }
     &__select {
-        width: 100%;
 
         // Slightly larger padding for the company name, slightly less lPad
-        &[class*="--editable"] {
             padding-top: .7rem;
             padding-bottom: .7rem;
 
             padding-left: .3rem;
-        }
     }
 
  

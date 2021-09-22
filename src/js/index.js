@@ -41,6 +41,7 @@ import '../assets/icons/cog.svg';
 
 class IndexController {
     constructor() {
+        this.jobsPerSlide = 2;
         this.JobList = new JobList();
         this.User = new User();
         this.Applications = new Applications();
@@ -147,7 +148,6 @@ class IndexController {
                         case 'sign-in'  : this.closeModal(modal); loginView.renderLogin(); break;  
                     }
                 } else if(e.target.closest('.apply')) {
-                    
                     switch(applyView.getAction(e)) {
                         case 'request':     const jobId = e.target.closest('.apply').dataset.id;
                                             const applicationDetails = applyView.getApplicationDetails();
@@ -226,8 +226,7 @@ class IndexController {
     }
 
     applyForJob(jobId, details) {
-        console.log(jobId, details);
-        
+        for(let[key, value] of details.entries()) console.log(key, value);
         this.Applications.applyForJob(jobId, details)
     }
 
@@ -255,9 +254,11 @@ class IndexController {
             .getFeaturedJobs()
             .then(res => { 
                 // @TODO: add loader
+                // Check the condition here too
                 if(res.data)
-                    jobsListView.renderJobs(res.data.jobs, elements.featuredJobsList, true);
+                    jobsListView.renderFeaturedJobs(res.data.jobs, elements.featuredJobsList, this.jobsPerSlide);
                     homeView.featuredAnimation();
+                    homeView.jobSliderAnimation();
                     // Add listeners to the cards
                     document.querySelectorAll(`${elementStrings.jobCard}`)
                             .forEach(card => {

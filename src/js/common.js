@@ -3,6 +3,8 @@ import * as headerView from './views/headerView';
 
 // Header assets
 import '../assets/logo-crop.jpg';
+// import '../assets/cropped-logo.png';
+import '../assets/logo.svg';
 import '../assets/icons/facebook-icon.svg';
 import '../assets/icons/linkedin-icon.svg';
 import '../assets/icons/twitter-icon.svg';

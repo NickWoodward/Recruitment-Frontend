@@ -89,13 +89,20 @@ class AdminController {
 
         this.handleCtrlQ = async (e) => {  
             let key;
-            let code;
             if (e.key === 'q' && e.ctrlKey) {
                 key = e.key;
         
                 const company = await dummyData.createCompany();
                 const inputs = document.querySelectorAll('div[class$="item--editable"]');
                 dummyData.insertData(inputs, company);
+            }
+        }
+        this.handleCtrl1 = async (e) => {
+            let key;
+            if (e.key === '1' && e.ctrlKey) {
+                key = e.key;
+        
+                await dummyData.createJob('new', this.state.jobs.totalCompanies);
             }
         }
         this.addEventListeners();
@@ -174,20 +181,15 @@ class AdminController {
                 // Remove element listeners
                 jobSummary.removeEventListener('focusin', adminView.focusInEditJobHandler);
                 jobSummary.removeEventListener('focusout', adminView.focusOutEditJobHandler);
-                document.removeEventListener('keydown', this.handleCtrlPKey);
+                document.removeEventListener('keydown', this.handleCtrl1);
+
+                adminView.makeJobSummaryEditable(false, this.state.companies.currentCompany.featured);
+                adminView.removeJobDropdowns(this.state.jobs.currentJob);
+                adminView.changeSummaryIconState('edited', 'job');
 
                 adminView.populateJobSummary(this.state.jobs.currentJob);
-                adminView.makeJobSummaryEditable(false, this.state.companies.currentCompany.featured);
-                adminView.changeSummaryIconState('edited', 'job');
-                
-                // adminView.toggleDropdown(
-                //     false, 
-                //     `<div class="job-summary__item job-summary__company" contenteditable=false>
-                //         ${this.state.jobs.currentJob.companyName}
-                //     </div>`,
-                //     document.querySelector('.job-summary__select')
-                // )
-                // adminView.addFeaturedCheckbox(false, this.state.jobs.currentJob.featured);
+
+            
             }
             if(this.createJobLostFocus(e)) {
                 console.log('create jobs lost focus');
@@ -201,7 +203,7 @@ class AdminController {
                 
                 // Remove the dropdown + replace with company div
                 adminView.removeCompanyDropdown(this.state.jobs.currentJob.companyName);
-
+                adminView.removeJobDropdowns(this.state.jobs.currentJob);
                 adminView.populateJobSummary(this.state.jobs.currentJob);
 
                 adminView.makeJobSummaryEditable(false, this.state.companies.currentCompany.featured);
@@ -271,6 +273,8 @@ class AdminController {
             if(jobs && !document.querySelector('.admin__content--jobs')) {
                 // Clear admin page / rename content class / render placeholders
                 adminView.initialiseAdminPage('jobs');
+                // Calculate # of rows to render / api limit
+                this.state.companies.searchOptions.limit = adminView.calculateRows('jobs');
 
                 // Jobs data initially loaded on DOMLoaded (+company data for editing)
                 this.renderJobsTable();
@@ -311,21 +315,15 @@ class AdminController {
                 this.Applications
                     .getApplications()
                     .then(res => {
-                            this.applications = res.data.applications;
+                        this.applications = res.data.applications;
                         if(this.applications.length > 0) {
                             this.renderApplicationsContent();
                             // Add application button listeners
                             document.querySelectorAll('.cv-btn--table').forEach(btn => {
-                                btn.addEventListener('click', (e) => {
-                                    const cvUrl = e.target.closest('.cv-btn--table').dataset.cvurl;
-                                    if(cvUrl !== 'null')
-                                        this.Admin.getCv(cvUrl).then((res) => {
-                                            const contentDisposition = res.headers['content-disposition'];
-                                            let fileName = contentDisposition.split(';')[1].split('=')[1].toString();
-                                            adminView.forceDownload(res, fileName);
-                                        }).catch(err => console.log(err));
-                                });
+                                btn.addEventListener('click', (e) => this.downloadCv(e));
                             });
+                        } else {
+                            // Show image saying no applications
                         }
 
                     })
@@ -360,6 +358,17 @@ class AdminController {
         // PAGINATION CONTROLS
         document.body.addEventListener('click', this.handlePaginationEvent.bind(this));
             
+    }
+
+    downloadCv(e) {
+        
+        const cvUrl = e.target.closest('.cv-btn--table').dataset.cvurl;
+        if(cvUrl !== 'null')
+            this.Admin.getCv(cvUrl).then((res) => {
+                const contentDisposition = res.headers['content-disposition'];
+                let fileName = contentDisposition.split(';')[1].split('=')[1].toString();
+                adminView.forceDownload(res, fileName);
+            }).catch(err => console.log(err)); 
     }
 
     checkModals(e) {
@@ -612,11 +621,12 @@ class AdminController {
         adminView.renderPagination(index, limit, totalJobs, tableWrapper, 'jobs');
 
         const jobRows = document.querySelectorAll('.row--jobs');
-        // const activeRow = Array.from(jobRows).find(row => {
-        //     console.log(row.querySelector(`[data-id="${this.state.jobs.currentJob.applicantId}"]`));
-        //     return row.querySelector(`[data-id="${this.state.jobs.currentJob.applicantId}"]`)
-        // }) || jobRows[0];
-        utils.changeActiveRow(jobRows[0], jobRows);
+
+        const activeRow = Array.from(jobRows).find(row => {
+            return row.querySelector(`[data-id="${this.state.jobs.currentJob.id}"]`)
+        }) || jobRows[0];
+
+        utils.changeActiveRow(activeRow, jobRows);
 
         // Add table row listeners
         jobRows.forEach(row => {
@@ -645,7 +655,6 @@ class AdminController {
             const saveBtn = e.target.closest('.job-summary__btn--save');
             const saveNewBtn = e.target.closest('.job-summary__btn--save-new');
             const hubspotBtn = e.target.closest('.job-summary__btn--hubspot');
-            const jobElements = jobSummary.querySelectorAll('.job-summary__item');
             const newBtn = e.target.closest('.job-summary__btn--new');
 
 
@@ -654,8 +663,8 @@ class AdminController {
                 this.state.jobs.currentJob = this.jobs.find(job => job.id === parseInt(jobId));
 
                 adminView.changeSummaryIconState('editing', 'job');
-
                 adminView.makeJobSummaryEditable(true, this.state.companies.currentCompany.featured);
+                adminView.addJobDropdowns(this.state.jobs.currentJob);
                 
                 // Add focus listeners
                 this.boundFocusOutEditJobHandler = adminView.focusOutEditJobHandler.bind(this, this.state.jobs.currentJob);
@@ -669,6 +678,8 @@ class AdminController {
                 jobSummary.removeEventListener('focusout', this.boundFocusOutEditJobHandler);
 
                 const formData = adminView.getJobEdits(this.state.jobs.currentJob);
+
+                for(let[key, value] of formData.entries()) console.log(key, value);
 
                 if(formData) {
                     console.log('save data');
@@ -706,15 +717,10 @@ class AdminController {
                 // adminView.changeEditIcon('edit', 'job', iconsToIgnore);
 
                 adminView.changeSummaryIconState('edited', 'job');
-                adminView.makeEditable(jobElements, false, ['job-summary__featured']);
-                adminView.toggleDropdown(
-                    false, 
-                    `<div class="job-summary__item job-summary__company" contenteditable=false>
-                        ${this.state.jobs.currentJob.companyName}
-                    </div>`,
-                    document.querySelector('.job-summary__select')
-                );
-                adminView.addFeaturedCheckbox(false, this.state.jobs.currentJob.featured);
+                adminView.makeJobSummaryEditable(false, this.state.companies.currentCompany.featured);
+                adminView.removeJobDropdowns(this.state.jobs.currentJob);
+
+                // adminView.addFeaturedCheckbox(false, this.state.jobs.currentJob.featured);
             }
             if(newBtn) {
                 // Save current job
@@ -726,6 +732,7 @@ class AdminController {
                 jobSummary.addEventListener('focusin', adminView.focusInNewJobHandler);
                 jobSummary.addEventListener('focusout', adminView.focusOutNewJobHandler);
 
+                document.body.addEventListener('keydown', this.handleCtrl1);
 
                 // Change the new icon
                 adminView.changeSummaryIconState('creating', 'job');
@@ -735,7 +742,8 @@ class AdminController {
                 // Switch the company element to a dropdown
                 adminView.addCompanyDropdown(this.companies, companyId);
 
-                // Swi
+                // Switch the Job Type elements to dropdowns
+                adminView.addJobDropdowns();
 
                 adminView.clearJobForm();
             }
@@ -781,17 +789,21 @@ class AdminController {
                             const job = this.jobs.find(job => {
                                 return job.id === formJob.id;
                             });
+
+
                             // If the job created appears in the paginated results returned from the server, make it the current job
                             if(job) {
                                 this.state.jobs.currentJob = job;
-                                adminView.populateJobSummary(job);
 
                                 companyElement = table.querySelectorAll(`[data-id="${this.state.jobs.currentJob.id}"]`)[0];
 
                             } else {
+
                                 this.state.jobs.currentJob = this.jobs[0];
-                                adminView.populateJobSummary(this.state.jobs.currentJob);   
                             }
+                            adminView.removeCompanyDropdown(this.state.jobs.currentJob.companyName);
+                            adminView.removeJobDropdowns(this.state.jobs.currentJob);
+                            adminView.populateJobSummary(this.state.jobs.currentJob);  
 
                             // If the new job is visible in the table make it the active row, else make it the first row
                             const row = companyElement? companyElement.parentNode.parentNode : document.querySelector('.row--jobs');
@@ -803,21 +815,15 @@ class AdminController {
 
                 } else {
                     console.log('dont save new job');
+                    adminView.removeCompanyDropdown(this.state.jobs.currentJob.companyName);
+                    adminView.removeJobDropdowns(this.state.jobs.currentJob);
+                    adminView.populateJobSummary(this.state.jobs.currentJob);
                 }
 
-                // Technically not needed as the 'new' btn was never disabled, but used for consistency
-                const iconsToIgnore = ['job-summary__btn--new'];
+                adminView.changeSummaryIconState('created', 'job');
+                adminView.makeJobSummaryEditable(false);
 
-                adminView.changeNewIcon('new', 'job', iconsToIgnore);
-                adminView.makeEditable(jobElements, false, ['job-summary__featured']);
-                adminView.toggleDropdown(
-                    false, 
-                    `<div class="job-summary__item job-summary__company" contenteditable=false>
-                        ${this.state.jobs.currentJob.companyName}
-                    </div>`,
-                    document.querySelector('.job-summary__select')
-                );
-                adminView.addFeaturedCheckbox(false, this.state.jobs.currentJob.featured);
+                // adminView.addFeaturedCheckbox(false, this.state.jobs.currentJob.featured);
 
                 // Changing the icons / making elements uneditable handled in a listener on the body
             }
@@ -874,7 +880,6 @@ class AdminController {
         // Add pagination
         adminView.renderPagination(index, limit, totalUsers, tableWrapper, 'users');
 
-        console.log(this.state.users.currentUser.applicantId);
         const userRows = document.querySelectorAll('.row--users');
         const activeRow = Array.from(userRows).find(row => row.querySelector(`[data-id="${this.state.users.currentUser.applicantId}"]`)) || userRows[0];
         utils.changeActiveRow(activeRow, userRows);
@@ -1143,7 +1148,6 @@ class AdminController {
         // Add pagination
         adminView.renderPagination(index, limit, totalCompanies, tableWrapper, 'companies');
 
-        console.log(this.state.companies.currentCompany.id);
 
 
         // Change active 
@@ -1235,7 +1239,6 @@ class AdminController {
                 const companyId = document.querySelector('.company-summary').dataset.id;
 
                 this.Admin.deleteCompany(companyId).then(res => {
-                    console.log(res);
                     // @TODO: handle success/failure
                     
                     // If it's the last company in the table, move back one page
@@ -1246,7 +1249,6 @@ class AdminController {
                     return this.Admin.getCompanies(this.state.companies.searchOptions);
                 }).then(res => {
                     // @TODO: handle success/failure
-                    console.log(res);
                     this.companies = res.data.companies;
                     this.state.companies.totalCompanies = res.data.total;
 
@@ -1449,10 +1451,12 @@ class AdminController {
         const editBtnTarget = e.target.closest('.job-summary__btn--edit');
         const itemTarget = e.target.closest('.job-summary__field');
         const saveTarget = e.target.closest('.job-summary__btn--save-new');
+        const checkboxTarget = e.target.closest('.job-summary__featured-checkbox');
         // Returns false if present, ie if the newBtn is on screen 
         // The newBtn is present when both adding a new job && editing a current job
         const editBtn = document.querySelector('.job-summary__btn--edit');
-        if(jobSummary && editableContent && !editBtnTarget && !itemTarget && !saveTarget && editBtn) {
+
+        if(jobSummary && editableContent && !editBtnTarget && !itemTarget && !saveTarget && !checkboxTarget && editBtn) {
             return true;
         } 
         return false;
@@ -1463,12 +1467,13 @@ class AdminController {
         const editBtnTarget = e.target.closest('.job-summary__btn--edit');
         const itemTarget = e.target.closest('[class*="--editable"]');
         const saveTarget = e.target.closest('.job-summary__btn--save');
+        const checkboxTarget = e.target.closest('.job-summary__featured-checkbox');
 
         // Returns false if present, ie if editBtn on screen
         // Present whenever not editing
         const newBtn = document.querySelector('.job-summary__btn--new');
 
-        if(jobSummary && editableContent && !editBtnTarget && !itemTarget && !saveTarget && newBtn) {
+        if(jobSummary && editableContent && !editBtnTarget && !itemTarget && !checkboxTarget && !saveTarget && newBtn) {
             return true;
         }
         return false;

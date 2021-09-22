@@ -36,14 +36,75 @@ export const initialiseScrollAnimations = () => {
 };
 
 export const loadingAnimation = () => {
-    const tl = gsap.timeline({ 
-      defaults: { opacity: 0, ease: 'back' }, 
-    });
-    tl.add(utils.pageFadeIn());
-    tl.add(headerLoadingAnimation(), '>');
-    tl.add(searchAnimation(), '<');
-    tl.add(heroAnimation(), '<');
+  const tl = gsap.timeline({ 
+    defaults: { opacity: 0, ease: 'back' }, 
+  });
+  tl.add(utils.pageFadeIn());
+  tl.add(headerLoadingAnimation(), '>');
+  tl.add(searchAnimation(), '<');
+  tl.add(heroAnimation(), '<');
 };
+
+// Featured animation can't be called until after the api call
+export const jobSliderAnimation = () => {
+  const slides = document.querySelectorAll('.featured-jobs__slide');
+
+  console.log(slides);
+  const prevBtn = document.querySelector('.featured-jobs__prev-btn');
+  const nextBtn = document.querySelector('.featured-jobs__next-btn');
+  const playBtn = document.querySelector('.featured-jobs__play-btn');
+
+  let autoPlay = true;
+
+  const tl = gsap.timeline({
+    defaults:{duration:0.3, opacity:0}
+  });
+
+  const timer = gsap.from(".featured-jobs__bar", {
+    scaleX:0, 
+    transformOrigin:"0% 50%", 
+    duration:3, 
+    onComplete:()=> tl.play()
+  }).pause();
+
+  tl.add("start")
+  .from(".featured-jobs__slide-0", {})
+  .addPause("+=0", checkAutoPlay)
+  .to(".featured-jobs__slide-0", {opacity: 0})
+  
+  .from(".featured-jobs__slide-1", {});
+
+
+  function checkAutoPlay() {
+    console.log("autoPlay", autoPlay)
+    if(autoPlay) {
+      timer.restart()
+    }
+  }
+
+
+  //if we are on the last slide then go back to beginning
+  nextBtn.addEventListener("click", ()=> {
+    console.log('next');
+
+    if(tl.progress() == 1){
+      tl.play(0);
+      console.log('timeline going back to start')
+    } else {
+      tl.play()
+    }
+  })
+
+  //do not allow reversing if we are on the first slide
+  prevBtn.addEventListener("click", ()=> {
+    console.log('previous');
+    if(tl.previousLabel() != "start"){
+      console.log('reversing tl')
+
+      tl.reverse()
+    }	
+  })
+}
 
 const headerLoadingAnimation = () => {
   const tl = gsap.timeline({ defaults: { opacity: 0, ease: 'ease-in' } });

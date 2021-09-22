@@ -3,7 +3,7 @@
     // Featured job card width set explicitly on landing page
     &--featured {
         width: 65rem;
-        height: 33rem;
+        height: $height-job-card--featured;
 
         @include respond-desktop-medium() {
             width: 38rem;

@@ -39,7 +39,7 @@ export default class Admin {
     }
 
     createJob(formData) {
-        for(let[key, value] of formData.entries()) console.log(key, value);
+        // for(let[key, value] of formData.entries()) console.log(key, value);
         return JRS.post(`/admin/create/job`, formData);
     }
 

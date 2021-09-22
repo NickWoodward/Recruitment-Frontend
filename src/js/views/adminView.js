@@ -133,7 +133,7 @@ export const populateUserSummary = (user) => {
 }
 
 
-export const makeJobSummaryEditable = (editable, featured) => {
+export const makeJobSummaryEditable = (editable) => {
     const jobTitle = document.querySelector('.job-summary__title');
     const location = document.querySelector('.job-summary__location');
     const wage = document.querySelector('.job-summary__wage');
@@ -176,14 +176,66 @@ export const removeCompanyDropdown = (companyName) => {
     utils.swapElement(document.querySelector('.job-summary__select'), companyElement);
 };
 
+export const addJobDropdowns = (job) => {
+    const jobTypes = [ {id:1, name:'Permanent'}, {id: 2, name:'Interim'} ];
+    const positions = [ {id:1, name:'In House'}, {id:1, name:'Private Practice'} ];
+    let PQE = [];
+
+    for(let x = 0; x < 10; x++) {
+        const obj = {};
+        obj.id = x + 1;
+        obj.name = `${x+1}+`;
+        PQE.push(obj);
+    }
+
+    const typesClassNames = ['job-summary__field','job-summary__select', 'job-summary__select--editable', 'job-summary__type'];
+    const positionsClassNames = ['job-summary__field','job-summary__select', 'job-summary__select--editable', 'job-summary__position'];
+    const PQEClassNames = ['job-summary__field','job-summary__select', 'job-summary__select--editable', 'job-summary__PQE'];
+
+    const typesDropdown = createSelectElement(jobTypes, 'Job Type', typesClassNames);
+    const positionsDropdown = createSelectElement(positions, 'Position', positionsClassNames);
+    const PQEDropdown = createSelectElement(PQE, 'PQE', PQEClassNames);
+
+    const typeElement = document.querySelector('.job-summary__type');
+    const positionElement = document.querySelector('.job-summary__position');
+    const PQEElement = document.querySelector('.job-summary__PQE');
+
+    utils.swapElement(typeElement, typesDropdown);
+    utils.swapElement(positionElement, positionsDropdown);
+    utils.swapElement(PQEElement, PQEDropdown);
+
+    // If there's a job it's being edited, not created, so use current values as placeholders
+    if(job) {
+        const [typesIndex] = jobTypes.filter(type => job.jobType === type.name).map(item => item.id);
+        const [positionsIndex] = positions.filter(position => job.position === position.name).map(item => item.id);
+        const [PQEIndex] = PQE.filter(pqe => job.pqe === pqe.name).map(item => item.id);
+
+        typesDropdown.selectedIndex = typesIndex;
+        positionsDropdown.selectedIndex = positionsIndex;
+        PQEDropdown.selectedIndex = PQEIndex;
+    }
+};
+
+export const removeJobDropdowns = ({type, position, PQE}) => {
+    const typeElement = document.querySelector('.job-summary__type');
+    const positionElement = document.querySelector('.job-summary__position');
+    const PQEElement = document.querySelector('.job-summary__PQE');
+
+    const newType= `<div class="job-summary__type job-summary__field">${type}</div>`;
+    const newPosition = `<div class="job-summary__position job-summary__field">${position}</div>`;
+    const newPQE = `<div class="job-summary__PQE job-summary__field">${PQE}</div>`;
+
+    utils.swapElement(typeElement, newType);
+    utils.swapElement(positionElement, newPosition);
+    utils.swapElement(PQEElement, newPQE);
+}
+
 export const clearJobForm = () => {
     const fields = [
         document.querySelector('.job-summary__title'),
         document.querySelector('.job-summary__location'),
         document.querySelector('.job-summary__wage'),
-        document.querySelector('.job-summary__type'),
-        document.querySelector('.job-summary__position'),
-        document.querySelector('.job-summary__PQE'),
+ 
         document.querySelector('.job-summary__featured-checkbox'),
         document.querySelector('.job-summary__description'),
     ];
@@ -191,9 +243,6 @@ export const clearJobForm = () => {
         'Job Title',
         'Location',
         'Wage',
-        'Type',
-        'Position',
-        'PQE',
         'NA',
         'Description'
     ];
@@ -477,7 +526,7 @@ export const calculateRows = (tableName) => {
     const tableHeight = document.querySelector(`.${tableName}-table__wrapper`).offsetHeight;
     const numOfRows = Math.floor((tableHeight - headerHeight - paginationHeight)/rowHeight);
 
-    return numOfRows;
+    return numOfRows-1;
 }
 const getRowHeight = (tableName) => {
     // Create dummy table to get row height
@@ -584,7 +633,7 @@ const createJobSummary = () => {
     <div class="job-summary summary">
         <div class="job-summary__details">
             <div class="job-summary__header">
-                <h3 class="job-summary__title job-summary__field">Head of HR</h3> 
+                <div class="job-summary__title job-summary__field">Head of HR</div> 
                 <div class="job-summary__company job-summary__field">Dell</div>
             </div>
             <div class="job-summary__content">
@@ -651,20 +700,20 @@ export const populateJobSummary = (job) => {
     companyItem.setAttribute('data-id', job.companyId);
     document.querySelector('.job-summary__title').innerText = job.title;
     document.querySelector('.job-summary__location').innerText = job.location;
-
     document.querySelector('.job-summary__wage').innerText = job.wage;
-    // document.querySelector('.job-summary__featured').innerText = `${job.featured? 'Featured': 'Not Featured'}`;
+    document.querySelector('.job-summary__type').innerText = job.jobType;
+    document.querySelector('.job-summary__position').innerText = job.position;
+    document.querySelector('.job-summary__PQE').innerText = job.pqe;
+
 
     const iconExists = document.querySelector('.job-summary__featured-icon');
     const featuredWrapper = document.querySelector('.job-summary__featured-wrapper');
 
     if(job.featured) {
-        console.log('featured' + job.featured);
         const icon = `<svg class="job-summary__featured-icon job-summary__featured-icon--true"><use xlink:href="svg/spritesheet.svg#pin-ok"></use></svg>`;
         if(iconExists) utils.removeElement(iconExists);
         featuredWrapper.insertAdjacentHTML('afterbegin', icon);
     } else {
-        console.log('not featured');
         const icon = `<svg class="job-summary__featured-icon job-summary__featured-icon--false"><use xlink:href="svg/spritesheet.svg#pin-angle"></use></svg>`;
         if(iconExists) utils.removeElement(iconExists);
         featuredWrapper.insertAdjacentHTML('afterbegin', icon);
@@ -717,7 +766,6 @@ export const createSelectElement = (options, defaultText, classNames, companyId)
         dropdown.add(option);
     });
 
-
     return dropdown;
 };
 
@@ -769,7 +817,10 @@ export const addFeaturedCheckbox = (visible, featured) => {
 // };
 
 export const getJobEdits = (currentJob) => {
-    const { title, location, wage, featured, description } = getJobFormValues();
+    const { title, location, wage, type, position, PQE, featured, description } = getJobFormValues();
+    const company = document.querySelector('.job-summary__company');
+    const companyId = company.dataset.id;
+    const companyName = company.value;
 
     const formData = new FormData();
     let submit = false;
@@ -783,21 +834,23 @@ export const getJobEdits = (currentJob) => {
     title !== currentJob.title && (submit = true) ? formData.append('title', title):formData.append('title', currentJob.title);
     location !== currentJob.location && (submit = true) ? formData.append('location', location):formData.append('location', currentJob.location);
     parseInt(wage) !== currentJob.wage && (submit = true) ? formData.append('wage', wage):formData.append('wage', currentJob.wage);
+    type !== currentJob.type && (submit = true) ? formData.append('jobType', type): formData.append('jobType', currentJob.type);
+    position !== currentJob.position && (submit = true) ? formData.append('position', position): formData.append('position', currentJob.position);
+    PQE !== currentJob.PQE && (submit = true) ? formData.append('pqe', PQE): formData.append('pqe', currentJob.PQE);
+
     description !== currentJob.description && (submit = true) ? formData.append('description', description):formData.append('description', currentJob.description);
     
-    console.log(featured)
     featured !== currentJob.featured && (submit = true) ? formData.append('featured', featured):formData.append('featured', currentJob.featured); 
 
     return submit ? formData : null;
 }; 
 
 export const getNewJob = () => {
-    const { title, location, wage, featured, description } = getJobFormValues();
+    const { title, location, wage, type, position, PQE, featured, description } = getJobFormValues();
 
     const selectElement = document.querySelector('.job-summary__company');
     const companyName = selectElement.value;
     const companyId = selectElement.options[selectElement.selectedIndex].getAttribute('data-id');
-
 
     // Check the placeholders have been removed
     // @TODO FE validation here
@@ -806,6 +859,9 @@ export const getNewJob = () => {
         title === 'Job Title' ||
         location === 'Location' ||
         wage === 'Wage' ||
+        type === 'Job Type' ||
+        position === 'position' ||
+        PQE === 'PQE' ||
         description === 'Description'
     ) return null;
 
@@ -814,7 +870,10 @@ export const getNewJob = () => {
     formData.append('companyName', companyName);
     formData.append('title', title);
     formData.append('location', location);
-    formData.append('wage', wage);
+    formData.append('wage', parseInt(wage));
+    formData.append('jobType', type);
+    formData.append('position', position);
+    formData.append('pqe', PQE);
     formData.append('featured', featured);
     formData.append('description', description);
 
@@ -826,9 +885,12 @@ const getJobFormValues = () => {
     const title = document.querySelector('.job-summary__title').innerText;
     const location = document.querySelector('.job-summary__location').innerText;
     const wage = document.querySelector('.job-summary__wage').innerText;
+    const type = document.querySelector('.job-summary__type').value;
+    const position = document.querySelector('.job-summary__position').value;
+    const PQE = document.querySelector('.job-summary__PQE').value;
     const featured = document.querySelector('.job-summary__featured-checkbox').checked? 1:0;
     const description = document.querySelector('.job-summary__description').innerText;
-    return { title, location, wage, featured, description };
+    return { title, location, wage, type, position, PQE, featured, description };
 }
 
 export const formatJobs = (jobs) => {
@@ -841,7 +903,7 @@ export const formatJobs = (jobs) => {
 };
 const createJobElement = (job) => {
     const row = [
-        `<div class="td-data--jobId">${job.id}</div>`,
+        `<div class="td-data--jobId" data-id=${job.id}>${job.id}</div>`,
         `<div class="td-data--company" data-id=${job.id}>${job.companyName}</div>`,
         `<div class="td-data--title">${job.title}</div>`,
         `<div class="td-data--location">${job.location}</div>`,
@@ -1067,7 +1129,6 @@ export const getNewCompany = () => {
     
     // @TODO: Add validation
     if(companyName === 'Company') return null;
-    console.log(companyName);
     const formData = new FormData();
     formData.append('companyName', companyName);
     return formData;
@@ -1301,13 +1362,14 @@ export const initialiseAdminPage = (page) => {
     let createSummary;
 
     switch(page) {
-        case 'users':       createSummary = createUserSummary; break;
-        case 'jobs':        createSummary = createJobSummary; break;
-        case 'companies':   createSummary = createCompanySummary; break;
+        case 'users':           createSummary = createUserSummary; break;
+        case 'jobs':            createSummary = createJobSummary; break;
+        case 'companies':       createSummary = createCompanySummary; break;
+        // case 'applications':    createSummary = createApplicationSummary; break;
     }
 
     // Insert placeholders
-    elements.adminContent.insertAdjacentHTML('afterbegin', createSummary());
+    if(createSummary) elements.adminContent.insertAdjacentHTML('afterbegin', createSummary());
     elements.adminContent.insertAdjacentHTML('beforeend', `<div class="${page}-table__wrapper"></div>`);
 };
 
@@ -1363,7 +1425,8 @@ export const focusOutEditUserHandler = (user, e) => {
 
 export const focusInNewJobHandler = (e) => {
     if(e.target.nodeName !== 'DIV') return;
-    e.target.innerText = '';
+
+    window.getSelection().selectAllChildren(e.target);
 };
 export const focusOutNewJobHandler = (e) => {
     if(e.target.nodeName !== 'DIV') return;
@@ -1401,10 +1464,8 @@ export const focusInEditCompanyHandler = (e) => {
 };
 export const focusOutEditCompanyHandler = (company, e) => {
     let value;
-console.log('out');
-console.log(company);
+
     if(!e.target.innerText) {
-        console.log('test');
         value = company['name'];
     }
 

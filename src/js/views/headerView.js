@@ -7,6 +7,7 @@ export const setParallaxHeaderWidth = () => {
     const header = document.querySelector(elementStrings.header);
     header.style.width = `${width}px`;
 }
+{/* <img class="logo" src="src/assets/cropped-logo.png" alt="JRS Logo" /> */}
 
 export const renderHeader = (page) => {
     const markup = `
@@ -14,7 +15,7 @@ export const renderHeader = (page) => {
 
         <div class="header__content header__content--${page}">
         <a href="./index.html" class="header__logo">
-            <img class="logo" src="src/assets/logo-crop.jpg" alt="JRS Logo" />
+            <svg><use class="logo--svg" xlink:href="svg/spritesheet.svg#logo"></svg>
         </a>
 
         <a href="#main-menu" class="menu-toggle" aria-label="Open main menu">
@@ -28,20 +29,7 @@ export const renderHeader = (page) => {
             </a>
 
             <div class="nav-wrapper">
-                <ul class="nav--social">
-                    <li class="nav__link--social">
-                        <svg class="nav__facebook-icon" aria-hidden="true"><use xlink:href="svg/spritesheet.svg#facebook-icon"></use></svg>
-                    </li>
-                    <li class="nav__link--social">
-                        <svg class="nav__twitter-icon" aria-hidden="true"><use xlink:href="svg/spritesheet.svg#twitter-icon"></use></svg>
-                    </li>                   
-                    <li class="nav__link--social">
-                        <svg class="nav__linkedin-icon" aria-hidden="true"><use xlink:href="svg/spritesheet.svg#linkedin-icon"></use></svg>
-                    </li>
-                    <li class="nav__link--social nav__link--last">
-                        <svg class="nav__instagram-icon" aria-hidden="true"><use xlink:href="svg/spritesheet.svg#instagram-icon"></use></svg>
-                    </li>
-                </ul>
+ 
 
                 <ul class="nav">
                     <li class="nav__link">
@@ -72,3 +60,18 @@ export const addHeaderListeners = ({ renderLogin }) => {
     const loginLink = document.querySelector('.nav__a--login');
     loginLink.addEventListener('click', () => renderLogin());
 }
+
+{/* <ul class="nav--social">
+<li class="nav__link--social">
+    <svg class="nav__facebook-icon" aria-hidden="true"><use xlink:href="svg/spritesheet.svg#facebook-icon"></use></svg>
+</li>
+<li class="nav__link--social">
+    <svg class="nav__twitter-icon" aria-hidden="true"><use xlink:href="svg/spritesheet.svg#twitter-icon"></use></svg>
+</li>                   
+<li class="nav__link--social">
+    <svg class="nav__linkedin-icon" aria-hidden="true"><use xlink:href="svg/spritesheet.svg#linkedin-icon"></use></svg>
+</li>
+<li class="nav__link--social nav__link--last">
+    <svg class="nav__instagram-icon" aria-hidden="true"><use xlink:href="svg/spritesheet.svg#instagram-icon"></use></svg>
+</li>
+</ul> */}

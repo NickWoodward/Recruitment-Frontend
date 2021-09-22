@@ -27,7 +27,6 @@ export const swapElement = (icon1, icon2) => {
 };
 
 export const changeActiveRow = (row, rows) => {
-    console.log(row);
     rows.forEach(row => {
         if(row.classList.contains('row--active')) row.classList.remove('row--active'); 
     });
@@ -77,3 +76,13 @@ export const capitalise = (text, all) => {
     return words;
 };
 
+
+export const chunk = (array, chunkLength) => {
+    let chunks = [];
+    let i = 0;
+
+    while(i < array.length) {
+        chunks.push(array.slice(i, i += chunkLength));
+    };
+    return chunks;
+};
