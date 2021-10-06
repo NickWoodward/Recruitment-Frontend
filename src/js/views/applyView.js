@@ -1,3 +1,5 @@
+import {gsap} from 'gsap';
+
 export const getAction = (e) => {
     const request = e.target.closest('.request__submit');
     const login = e.target.closest('.login__submit--apply');
@@ -24,7 +26,6 @@ export const getApplicationDetails = () => {
 
 export const renderApplyForm = (id) => {
     const markup = `
-
         <div class="modal apply" data-id="${id}">
 
             <div class="apply__content">
@@ -69,7 +70,25 @@ export const renderApplyForm = (id) => {
     `;
 
     document.body.insertAdjacentHTML('beforeend', markup);
+    animateApplyFormIn();
 };
+
+const animateApplyFormIn = () => {
+    const tl = gsap.timeline({
+        defaults: { duration: .5 }
+    })
+    .from('.apply', {  opacity: 0 })
+    .from('.apply__content', {  opacity: 0 }, '<');
+}
+export const animateApplyFormOut = (callback) => {
+    console.log('animate');
+    const tl = gsap.timeline({
+        defaults: { duration: .4 },
+        onComplete: callback
+    })
+    .to('.apply', { opacity: 0, scale: 1.1 })
+    .to('.apply__content', { opacity: 0 }, '<');
+}
 
 {/* <div class="apply__divider">Or</div>
 

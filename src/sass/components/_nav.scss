@@ -3,12 +3,12 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    height: 100%;
-    padding-bottom: .5rem;
+    // height: 100%;
+    // padding-bottom: .5rem;
 }
 
 .nav {
-
+    position: relative;
     display: flex;
     justify-content: flex-end;
     align-items: flex-end;
@@ -40,6 +40,11 @@
             padding: 0 2rem 0 .8rem;
         }
     }
+    &__line {
+        height: 2px;
+        background-color: $color-secondary-highlight;
+        width: 3rem;
+    }
 
     &__facebook-icon,
     &__twitter-icon,
@@ -51,28 +56,28 @@
     }
 
     &__a {
-        position: relative;
         display: flex;
         align-items: center;
         height: 100%;
         padding: .8rem 2rem 1rem 2rem;
         color: rgb(221, 221, 221);
+        // color: $color-primary-new;
         z-index: 1;
 
-        &::before {
-            position: absolute;
-            content: '';
-            bottom: 0;
-            left: 10%;
-            width: 80%;
-            height: 1px;
-            background-color: $color-secondary-highlight;
-            transition: width .3s ease-out;
-        }
+        // &::before {
+        //     position: absolute;
+        //     content: '';
+        //     bottom: 0;
+        //     left: 10%;
+        //     width: 80%;
+        //     height: 1px;
+        //     background-color: $color-secondary-highlight;
+        //     transition: width .3s ease-out;
+        // }
 
-        &:hover::before {
-            width: 80%;
-        }
+        // &:hover::before {
+        //     width: 80%;
+        // }
 
         @include respond-phone {
             color: white;

@@ -9,6 +9,7 @@ import * as forgotPassView from './views/forgotPassView';
 import * as applyView from './views/applyView';
 import * as jobsListView from './views/jobListView';
 import * as jobView from './views/jobView';
+import * as modal from './views/modalView';
 
 import { initSocket } from './socket';
 import User from './models/User';
@@ -38,6 +39,8 @@ import '../assets/icons/paperplane.svg';
 import '../assets/icons/world.svg';
 import '../assets/icons/copy.svg';
 import '../assets/icons/cog.svg';
+import '../assets/icons/tick.svg';
+
 
 class IndexController {
     constructor() {
@@ -45,8 +48,14 @@ class IndexController {
         this.JobList = new JobList();
         this.User = new User();
         this.Applications = new Applications();
-        this.socket = initSocket();
+        // this.socket = initSocket();
 
+        this.state = {
+            featuredJobs: [],
+            featuredJobsAside: [],
+            numFeaturedAside: 3,
+            currentJob: {}
+        }
         this.addEventListeners();
     }
 
@@ -66,6 +75,7 @@ class IndexController {
             homeView.loadingAnimation();
             homeView.initialiseScrollAnimations();
             homeView.initParallax();
+            homeView.whyUsHoverAnimation();
 
             this.JobList.getMenuData()
                 .then(data => {
@@ -144,7 +154,7 @@ class IndexController {
                 } else if(e.target.closest('.job-details')) {
                     switch(jobView.getAction(e)) {
                         case 'apply'    : applyView.renderApplyForm(); break;
-                        case 'cancel'   : this.closeModal(modal); break;
+                        case 'cancel'   : jobView.animateJobDetailsOut(this.closeModal.bind(null, modal)); break;
                         case 'sign-in'  : this.closeModal(modal); loginView.renderLogin(); break;  
                     }
                 } else if(e.target.closest('.apply')) {
@@ -158,7 +168,8 @@ class IndexController {
                         //                     forgotPassView.renderForgotModal(); break;
                         // case 'register':    this.closeModal(modal);
                         //                     registerView.renderRegisterModal(); break;
-                        case 'cancel':      this.closeModal(modal);
+                        case 'cancel':         applyView.animateApplyFormOut(this.closeModal.bind(null, modal));
+                                            
                     }
                 }
                 
@@ -184,13 +195,23 @@ class IndexController {
                 const message = document.querySelector('.chatbox__input').value;
                 console.log(message);
                 chatView.addChatResponse(message, true);
-                this.socket.emit('chatbox', message );
+                // this.socket.emit('chatbox', message );
             }
         });
 
         // KEYCOMBO
         document.addEventListener('keydown', (e) => {
             if(e.ctrlKey && e.shiftKey && e.key === 'L' && !document.querySelector('.login')) loginView.renderLogin();
+        });
+
+        //@TODO: REMOVE TESTING
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'm' && e.ctrlKey) {
+                // modal.displayAlert('Job created', true, document.querySelector('.featured-jobs'));
+                modal.displayAlert('Cannot find job', false, document.querySelector('.featured-jobs'));
+
+
+            };
         });
 
         // BUTTONS
@@ -202,25 +223,26 @@ class IndexController {
             e.preventDefault();
             window.location.href = 'http://localhost:8081/jobs.html';
         });
-        elements.contactBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            elements.footerContent.scrollIntoView({ behavior: 'smooth' });
-        });
+        // elements.contactBtn.addEventListener('click', (e) => {
+        //     e.preventDefault();
+        //     elements.footerContent.scrollIntoView({ behavior: 'smooth' });
+        // });
         // Job card button listeners set after the request is made below
 
         // SOCKETS
-        this.socket.on('job', ({job}) => {
-            jobView.renderJobNotification(job);
-        });
-        this.socket.on('response', (res) => {
-            chatView.addChatResponse(res.message, false);
-        })
+        // this.socket.on('job', ({job}) => {
+        //     jobView.renderJobNotification(job);
+        // });
+        // this.socket.on('response', (res) => {
+        //     chatView.addChatResponse(res.message, false);
+        // })
 
         // jobView.renderJobNotification();
 
     }
 
     closeModal(modal) {
+        console.log('removing');
         modal.parentElement.removeChild(modal);
         document.body.style.overflow = "auto";
     }
@@ -256,41 +278,75 @@ class IndexController {
                 // @TODO: add loader
                 // Check the condition here too
                 if(res.data)
+                    this.state.featuredJobs = res.data.jobs;
+                    
                     jobsListView.renderFeaturedJobs(res.data.jobs, elements.featuredJobsList, this.jobsPerSlide);
                     homeView.featuredAnimation();
                     homeView.jobSliderAnimation();
+
                     // Add listeners to the cards
                     document.querySelectorAll(`${elementStrings.jobCard}`)
-                            .forEach(card => {
-                                card.addEventListener('click', (e) => {
-                                    const viewMoreBtn = e.target.closest(`${elementStrings.viewJobBtn}`);
-                                    const applyBtn = e.target.closest(`${elementStrings.applyBtn}`);
+                        .forEach(card => {
+                            card.addEventListener('click', (e) => {
+                                const viewMoreBtn = e.target.closest(`${elementStrings.viewJobBtn}`);
+                                const applyBtn = e.target.closest(`${elementStrings.applyBtn}`);
 
-                                    if(viewMoreBtn) {
-                                        this.JobList.getJob(card.dataset.id)
-                                            .then(res => {
-                                                if(res.data.job) {
-                                                    jobView.renderJobDetails(res.data.job, document.body, true);
-                                                }
-                                            })
-                                            .catch(err => console.log(err));
-                                    } else if(applyBtn) {
-                                        applyView.renderApplyForm(card.dataset.id);
-                                        // Set a listener on the file picker that appears on the apply modal
-                                        const filePicker = document.querySelector('.request__input--cv');
-                                        filePicker.onchange = function() {
-                                            const path = document.querySelector('.request__input-path');
-                                            path.textContent = '';
-                                            path.insertAdjacentHTML('afterbegin', `<div>${filePicker.value.replace("C:\\fakepath\\", "")}</div>`);
-                                        }
-                                        
+                                if(viewMoreBtn) {
+                                    this.JobList.getJob(card.dataset.id)
+                                        .then(response => {
+                                            if(response.data.job) {
+                                                this.state.currentJob = response.data.job;
+                                                // Filter out the current job from the featured array passed to the details view
+                                                this.state.featuredJobsAside = this.state.featuredJobs.filter(job => job.id !== response.data.job.id).slice(0, this.state.numFeaturedAside);
+                                                jobView.renderJobDetails(response.data.job, document.body, this.state.featuredJobsAside, e);
+
+                                                // Add btn listeners
+                                                this.addJobDetailsBtnListeners();
+                                            }
+                                        })
+                                        .catch(err => console.log(err));
+                                } else if(applyBtn) {
+                                    applyView.renderApplyForm(card.dataset.id);
+                                    // Set a listener on the file picker that appears on the apply modal
+                                    const filePicker = document.querySelector('.request__input--cv');
+                                    filePicker.onchange = function() {
+                                        const path = document.querySelector('.request__input-path');
+                                        path.textContent = '';
+                                        path.insertAdjacentHTML('afterbegin', `<div>${filePicker.value.replace("C:\\fakepath\\", "")}</div>`);
                                     }
-                                });
+                                    
+                                }
                             });
+                        });
             })
             .catch(err => {
                 console.log(err);
             });
+    }
+
+    addJobDetailsBtnListeners() {
+        const viewBtns = document.querySelectorAll('.job-card__view-btn--details');
+        viewBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const jobId = e.target.closest('.job-card').dataset.id;
+                const job = this.state.featuredJobs.find(job => job.id === parseInt(jobId));
+                const jobIndex = this.state.featuredJobsAside.findIndex(job => job.id === parseInt(jobId));
+
+                // Update the main job listing
+                jobView.updateJobDetailsTable(job);
+
+                // Pick a job that exists in the featured array, but isn't currently in the aside array
+                const newJobIndex = this.state.featuredJobs.findIndex(job => !this.state.featuredJobsAside.includes(job) && job.id !== this.state.currentJob.id);
+                // If no job can be found, pick the previously featured job
+                const newJob = newJobIndex !== -1? this.state.featuredJobs[newJobIndex] : this.state.currentJob;
+
+                // Remove the old job and add the job to the featured aside
+                this.state.featuredJobsAside.splice(jobIndex, 1, newJob);
+
+                this.state.currentJob = job;
+                jobView.updateFeaturedJobsAside(jobId, newJob);
+            });
+        });
     }
 }
 

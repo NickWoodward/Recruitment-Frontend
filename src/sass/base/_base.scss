@@ -16,10 +16,11 @@
 
 :root {
     --columns: 16;
-    --header-height: 10rem;
+    --header-height: 8rem;
+    --padding__nav-a: 2rem;
     // --header-height: 11rem;
 
-    --hero-height: 75%;
+    --hero-height: 84%;
     @include respond-desktop-vsmall() {
         --hero-height: 70%;
     }

@@ -1,6 +1,8 @@
 /* HOME PAGE */
 
 // 16 cols, 2 rows
+
+// .why-us is the flex parent
 .why-card__wrapper, .why-us__title {
     --initialbasis: calc(var(--width) / var(--columns) * 100%);
     flex-basis: var(--initialbasis);
@@ -28,7 +30,6 @@
 
 /* JOBS PAGE */
 // (16 cols, 2 rows)
-
 .jobs { // .jobs__main is the flex container
     // &__aside, 
     &__topbar,
@@ -53,4 +54,35 @@
     // &__aside {
     //     --width: 16;
     // }
+}
+
+/* JOBS MODAL */
+// 16 cols, 2 rows
+.job-details {
+    &__content { // Flex parent
+        display: flex;
+        flex-flow: row wrap;
+  
+        justify-content: center;
+        align-content: flex-start;
+
+    }
+
+    // Sections: __back, __table-wrapper, __featured-jobs--detail
+    &__back, &__table-wrapper, &__featured-jobs {
+        --initial-basis: calc(var(--width) /  var(--columns) * 100%);
+        flex-basis: var(--initial-basis);
+    }
+
+    &__back {
+        --width: 16;
+    }
+    &__table-wrapper {
+        --width: 7;
+    }
+    &__featured-jobs {
+        --width: 5;
+
+        margin-left: 7rem;
+    }
 }

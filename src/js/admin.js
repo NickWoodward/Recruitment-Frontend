@@ -79,6 +79,14 @@ class AdminController {
                     orderDirection: "DESC"
                 }
             },
+            applications: {
+                searchOptions: {
+                    index: 0,
+                    limit: 6,
+                    orderField: "createdAt",
+                    orderDirection: "DESC"
+                }
+            },
             jobsTable: {
                 index: 0
             }
@@ -312,22 +320,44 @@ class AdminController {
                 
             }
             if(applications) {
-                this.Applications
-                    .getApplications()
-                    .then(res => {
-                        this.applications = res.data.applications;
-                        if(this.applications.length > 0) {
-                            this.renderApplicationsContent();
-                            // Add application button listeners
-                            document.querySelectorAll('.cv-btn--table').forEach(btn => {
-                                btn.addEventListener('click', (e) => this.downloadCv(e));
-                            });
-                        } else {
-                            // Show image saying no applications
-                        }
+                // this.Applications
+                //     .getApplications()
+                //     .then(res => {
+                //         this.applications = res.data.applications;
+                //         if(this.applications.length > 0) {
+                //             this.renderApplicationsContent();
+                //             // Add application button listeners
+                //             document.querySelectorAll('.cv-btn--table').forEach(btn => {
+                //                 btn.addEventListener('click', (e) => this.downloadCv(e));
+                //             });
+                //         } else {
+                //             // Show image saying no applications
+                //         }
 
+                //     })
+                //     .catch(err => console.log(err));
+
+                // Clear admin page / rename content class / render placeholders
+                adminView.initialiseAdminPage('applications');
+
+                // Calculate # of rows to render / api limit
+                this.state.applications.searchOptions.limit = adminView.calculateRows('applications');
+
+                this.applications.getApplications()
+                    .then(res => {
+                        // Store and render data
+                        this.applications = res.data.applicants;
+                        // this.state.applications.totalApplications = res.data.total;
+
+                        this.renderApplicationTable();
+                        // if(this.users.length > 0) {
+                        //     adminView.populateApplicationSummary(this.applications[0]);
+                        //     this.addUserSummaryListeners();
+                        // } else {
+                        //     // @TODO: Render placeholder
+                        // }
                     })
-                    .catch(err => console.log(err));
+                    .catch();
             }
             if(companies) {
                 adminView.initialiseAdminPage('companies');
@@ -600,6 +630,11 @@ class AdminController {
                 tableView.createTableTest('applications', headers, rows, false),
             ],  elements.adminContent
         );
+    }
+
+    renderApplicationTable() {
+        const {headers, rows} = adminView.formatApplications(this.applications);
+
     }
 
     renderJobsTable() {

@@ -1,3 +1,4 @@
+import gsap from 'gsap/gsap-core';
 import { elements } from './base';
 import { elementStrings } from './base';
 
@@ -14,8 +15,8 @@ export const renderHeader = (page) => {
     <header class="header header--${page}">
 
         <div class="header__content header__content--${page}">
-        <a href="./index.html" class="header__logo">
-            <svg><use class="logo--svg" xlink:href="svg/spritesheet.svg#logo"></svg>
+        <a href="./index.html" class="header__logo-wrapper">
+            <svg class="header__logo"><use class="logo--svg" xlink:href="svg/spritesheet.svg#logo"></svg>
         </a>
 
         <a href="#main-menu" class="menu-toggle" aria-label="Open main menu">
@@ -45,6 +46,8 @@ export const renderHeader = (page) => {
                         <a href="#" class="nav__a nav__a--login">Login</a>
                     </li>
                 </ul>
+                <div class="nav__line"></div>
+
             </div>
         </nav>
 
@@ -54,7 +57,32 @@ export const renderHeader = (page) => {
     </header>`;
     
     elements.body.insertAdjacentHTML('afterbegin', markup);
+
+    addNavAnimation()
 };
+
+const initNav = (item, paddingLeft) => {
+    gsap.to('.nav__line', { overwrite: true, x: item.parentElement.offsetLeft + (paddingLeft/2), width: item.parentElement.clientWidth - paddingLeft});
+};
+
+const addNavAnimation = () => {
+    const items = gsap.utils.toArray('.nav__a');
+    let currentElement = items[0];
+    const paddingLeft = parseFloat(getComputedStyle(items[0]).paddingLeft);
+    
+    items.forEach((item, index) => {
+        console.log(item);
+        item.addEventListener('mouseenter', () =>  {
+            gsap.to('.nav__line', { overwrite: true, x: item.parentElement.offsetLeft + (paddingLeft/2), width: item.parentElement.clientWidth - paddingLeft});
+            currentElement = item;
+        });
+    });
+
+    // @TODO: Debounce
+    window.addEventListener('resize', initNav(currentElement, paddingLeft));
+}
+
+
 
 export const addHeaderListeners = ({ renderLogin }) => {
     const loginLink = document.querySelector('.nav__a--login');

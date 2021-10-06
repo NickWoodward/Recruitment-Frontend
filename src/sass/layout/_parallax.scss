@@ -1,35 +1,56 @@
-.background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+.parallax {
+    position: relative;
+    // height: 100vh;
+    display: flex;
+    // align-items: center;
+    // justify-content: center;
+    overflow: hidden;
 
-    &--hero {
-        background-image: linear-gradient(
-            to bottom right,
-            rgba(black, .6),
-            rgba(31, 31, 31, .6),
-            rgba(31, 31, 31, .5),
-            rgba(31, 31, 31, .2),
-            rgba(31, 31, 31, .1),
-    
-    
-            rgba(31, 31, 31, .1),
-            rgba(31, 31, 31, .02)
-        ), url('/src/assets/hero.webp');
-        background-position: 50% 50%;
-    }
+    & .background-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: auto;
 
-    &--testimonials {
-        background-image: url('/src/assets/parallax2.jpg');
-        background-position: 50% 50%;
+        &--hero {
+            height: 100vh;
+        }
+        &--testimonials {
+            height: 100vh;
+        }
     }
 }
+
+// .background {
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+//     width: 100%;
+//     height: 100%;
+//     z-index: -1;
+//     background-size: cover;
+//     background-position: center;
+//     background-repeat: no-repeat;
+ 
+//     &--hero {
+//         background-image: url('/src/assets/test3.webp');
+//         background-position: 50% 50%;
+//     }
+
+//     &--testimonials {
+//         // background-image:url('/src/assets/parallaxtest3.jpg');
+//         background-image: linear-gradient(
+//             to bottom right,
+//             rgba(54,101,127, .88),
+//             rgba(54,101,127, .88),
+//             rgba(54,101,127, .88),
+//             rgba(54,101,127, .88),
+
+//             rgba(54,101,127, .88),
+//             ), url('/src/assets/parallax2.jpg');
+//         background-position: 50% 50%;
+//     }
+// }
 
 // CSS Parallax
 

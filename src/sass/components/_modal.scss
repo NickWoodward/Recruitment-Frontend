@@ -81,7 +81,7 @@
         display: flex;
         flex-direction: column;
         max-height: 100%;
-        height: 40rem;
+        height: 0;
         width: 100%;
         background-color: $color-background;
     }
@@ -278,7 +278,6 @@
     }
 }
 
-// The apply modal contains a request & login form 
 .apply {
     &__content {
         display: flex;

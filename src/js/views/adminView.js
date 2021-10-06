@@ -934,74 +934,74 @@ export const changeActiveMenuItem = (e) => {
 }
 
 // @TODO: delete?
-export const addTableListeners = (type) => {
-    const deleteButtons = type==='jobs'? 
-                            document.querySelectorAll(elementStrings.deleteJobsBtn):
-                            document.querySelectorAll(elementStrings.deleteUsersBtn);
+// export const addTableListeners = (type) => {
+//     const deleteButtons = type==='jobs'? 
+//                             document.querySelectorAll(elementStrings.deleteJobsBtn):
+//                             document.querySelectorAll(elementStrings.deleteUsersBtn);
 
-    const editButtons = type==='jobs'?
-                            document.querySelectorAll(elementStrings.editJobsBtn):
-                            document.querySelectorAll(elementStrings.editUsersBtn);
+//     const editButtons = type==='jobs'?
+//                             document.querySelectorAll(elementStrings.editJobsBtn):
+//                             document.querySelectorAll(elementStrings.editUsersBtn);
 
-    const hubspotButtons = type === 'users'? 
-                            document.querySelectorAll(elementStrings.hubspotBtn):
-                            [];
+//     const hubspotButtons = type === 'users'? 
+//                             document.querySelectorAll(elementStrings.hubspotBtn):
+//                             [];
 
-    // Row buttons
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            const item = type==='jobs'? getJob(e): getUser(e);
-            if(item) {
-                // Change the display info for the modal based on the table
-                const modalParams = type === 'jobs'? [item.id, item.title]: [item.id, `${item.fName} ${item.lName}`];
-                displayModal('delete', type, modalParams);
-            }
-        });
-    });
-    editButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            const item = type==='jobs'? getJob(e): getUser(e);
-            if(item)
-                if(type === 'jobs') {
-                    jobForm.renderJobForm(e, 'edit', item)
-                } else {
-                    userForm.renderUserForm(e, 'edit', item);
-                }
-        });
-    });
-    if(type === 'users') {
-        hubspotButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const {id, fName, lName} = getUser(e);
-                displayModal('add', type, [id, `${fName} ${lName}`]);
-            });
-        });
-    }
+//     // Row buttons
+//     deleteButtons.forEach(button => {
+//         button.addEventListener('click', (e) => {
+//             const item = type==='jobs'? getJob(e): getUser(e);
+//             if(item) {
+//                 // Change the display info for the modal based on the table
+//                 const modalParams = type === 'jobs'? [item.id, item.title]: [item.id, `${item.fName} ${item.lName}`];
+//                 displayModal('delete', type, modalParams);
+//             }
+//         });
+//     });
+//     editButtons.forEach(button => {
+//         button.addEventListener('click', (e) => {
+//             const item = type==='jobs'? getJob(e): getUser(e);
+//             if(item)
+//                 if(type === 'jobs') {
+//                     jobForm.renderJobForm(e, 'edit', item)
+//                 } else {
+//                     userForm.renderUserForm(e, 'edit', item);
+//                 }
+//         });
+//     });
+//     if(type === 'users') {
+//         hubspotButtons.forEach(button => {
+//             button.addEventListener('click', (e) => {
+//                 const {id, fName, lName} = getUser(e);
+//                 displayModal('add', type, [id, `${fName} ${lName}`]);
+//             });
+//         });
+//     }
 
-    // Row links
-    const table = document.querySelector('.table');
-    if(table) table.addEventListener('click', (e) => {
-        // If a row was clicked but not the edit or delete buttons
-        const row = e.target.closest('.table-row') && (!e.target.closest('.td--edit') && !e.target.closest('.td--delete'));
-        if(row && type === 'jobs') {
-            const job = getJob(e);
-            if(type === 'jobs') renderJobDetails(job, elements.adminContent);
-        }
-    });
+//     // Row links
+//     const table = document.querySelector('.table');
+//     if(table) table.addEventListener('click', (e) => {
+//         // If a row was clicked but not the edit or delete buttons
+//         const row = e.target.closest('.table-row') && (!e.target.closest('.td--edit') && !e.target.closest('.td--delete'));
+//         if(row && type === 'jobs') {
+//             const job = getJob(e);
+//             if(type === 'jobs') renderJobDetails(job, elements.adminContent);
+//         }
+//     });
 
-    // Table controls
-    if(type === 'jobs') {
-        document.querySelector('.create-job-btn')
-        .addEventListener('click', (e) => {
-            jobForm.renderJobForm(e, 'create')
-        })
-    } else if (type === 'users') {
-        document.querySelector('.create-user-btn')
-            .addEventListener('click', (e) => {
-                userForm.renderUserForm(e, 'create')
-            })
-    }
-}
+//     // Table controls
+//     if(type === 'jobs') {
+//         document.querySelector('.create-job-btn')
+//         .addEventListener('click', (e) => {
+//             jobForm.renderJobForm(e, 'create')
+//         })
+//     } else if (type === 'users') {
+//         document.querySelector('.create-user-btn')
+//             .addEventListener('click', (e) => {
+//                 userForm.renderUserForm(e, 'create')
+//             })
+//     }
+// }
 
 // This is for the warning modal
 export const getAction = (e) => {

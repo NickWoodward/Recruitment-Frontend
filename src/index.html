@@ -10,14 +10,15 @@
     <body>
         <main class="parallax-wrapper">
             <section class="hero section--first parallax">
-                <div class="background background--hero"></div>
+                <img src="./assets/test3.webp" alt="London Skyline" class="background-image background-image--hero">
+                <!-- <div class="background background--hero"></div> -->
                 <div class="hero__content">
                     <h1 class="hero__tagline">
                         <div class="hero__tagline--head">Legal Recruitment</div> <div class="hero__tagline--sub">at its Best</div>
                     </h1>
                     <div class="btn-wrapper btn-wrapper--hero">
                         <button class="btn signup-btn signup-btn--hero">
-                            Sign Up
+                            Get in Touch
                         </button>
                         <button class="btn browse-btn browse-btn--hero">
                             Browse
@@ -29,40 +30,7 @@
 
             <section class="candidate-search section static">
                 <div class="candidate-search__content">
-                    <div class="roles">
-                        <div class="roles__title">
-                            Candidates for every role
-                        </div>
-                        <div class="roles__list">
-                            <div class="roles__item">
-                                <div class="roles__icon roles__id-card">
-                                    <svg class="id-card" aria-hidden="true">
-                                        <use xlink:href="svg/spritesheet.svg#permanent">
-                                    </svg>
-                                </div>
-                                <div class="roles__type">Permanent</div>
-                            </div>
-                            <div class="roles__divider"></div>
-                            <div class="roles__item">
-                                <div class="roles__icon roles__interim">
-                                    <svg class="clock" aria-hidden="true">
-                                        <use xlink:href="svg/spritesheet.svg#clock">
-                                    </svg>
-                                </div>
-                                <div class="roles__type">Interim</div>
-                            </div>
-                            <div class="roles__divider"></div>
-                            <div class="roles__item">
-                                <div class="roles__icon roles__location">
-                                    <svg class="location" aria-hidden="true">
-                                        <use xlink:href="svg/spritesheet.svg#location">
-                                    </svg>
-                                </div>
-                                <div class="roles__type">Remote</div>
-                            </div>
-
-                        </div>
-                    </div>
+                    
                     <form class="search" action="jobs.html" method="GET">
                         <div class="search__field">
                             <div class="search__label">Job Title</div>
@@ -99,18 +67,46 @@
                         <h2 class="about__title">Reshaping Legal Recruitment</h2>
                     </div>
                     <div class="about__description">
-                        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sint ipsam vitae quisquam obcaecati tempore doloribus fugiat exercitationem, odit quasi, hic veritatis error! Minus possimus quo perspiciatis illo iure exercitationem numquam cum? Animi quam autem officiis unde laborum sit dolor cum beatae in mollitia asperiores assumenda praesentium repellat, deserunt.
-                        <!-- We are a bespoke legal recruitment and executive search consultancy, driven by the desire to offer effective service and delivery for both candidate and client.
-                        Whether you are searching for a new role, or would like to discuss recruitment for your team, please get in touch. -->
+                        We are a bespoke legal recruitment and executive search consultancy, driven by the desire to offer effective service and delivery for both candidate and client.
+                        Whether you are searching for a new role, or would like to discuss recruitment for your team, please get in touch.
                     </div>
-                    <div class="btn-wrapper btn-wrapper--about">
+                    <div class="roles__list">
+                        <div class="roles__item">
+                            <div class="roles__icon roles__id-card">
+                                <svg class="id-card" aria-hidden="true">
+                                    <use xlink:href="svg/spritesheet.svg#permanent">
+                                </svg>
+                            </div>
+                            <div class="roles__type">Permanent</div>
+                        </div>
+                        <div class="roles__divider"></div>
+                        <div class="roles__item">
+                            <div class="roles__icon roles__interim">
+                                <svg class="clock" aria-hidden="true">
+                                    <use xlink:href="svg/spritesheet.svg#clock">
+                                </svg>
+                            </div>
+                            <div class="roles__type">Interim</div>
+                        </div>
+                        <div class="roles__divider"></div>
+                        <div class="roles__item">
+                            <div class="roles__icon roles__location">
+                                <svg class="location" aria-hidden="true">
+                                    <use xlink:href="svg/spritesheet.svg#location">
+                                </svg>
+                            </div>
+                            <div class="roles__type">Remote</div>
+                        </div>
+
+                    </div>
+                    <!-- <div class="btn-wrapper btn-wrapper--about">
                         <button class="btn contact-btn contact-btn--about">
                             Contact Us
                         </button>
                         <button class="btn signup-btn signup-btn--about">
                             Sign Up
                         </button>
-                    </div>
+                    </div> -->
                 </div>
             </section>
 
@@ -120,24 +116,12 @@
                         <div class="featured-jobs__title">Featured Vacancies</div>
                     </div>
                     <div class="featured-jobs__jobs-list">
-                        <!-- <div class="job-card job-card--featured ">
-                            <div class="job-card__title-wrapper job-card__title-wrapper--featured">
-                                <h3 class="job-card__title job-card__title--featured">Junior Legal Counsel</h3> 
-                                <div class="job-card__pin job-card__pin--featured">
-                                    <svg class="pin-icon">
-                                    <use xlink:href="svg/spritesheet.svg#pin-angle"></use>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div> -->
+
                     </div>
 
                     <div class="featured-jobs__nav">
-                            <label class="featured-jobs__play-label">
-                                Autoplay
-                                <input class="featured-jobs__play-btn" type="checkbox" />
-                                <i></i>
-                            </label>
+                        <div class="featured-jobs__dummy"></div>
+
                         <div class="featured-jobs__nav-controls">
                             <button class="featured-jobs__prev-btn">
                                 <svg class="featured-jobs__prev-svg"><use xlink:href="svg/spritesheet.svg#arrow-left"></svg>
@@ -148,7 +132,13 @@
                                 <svg class="featured-jobs__next-svg"><use xlink:href="svg/spritesheet.svg#arrow-left"></svg>
                             </button>
                         </div>
-                        <div class="featured-jobs__dummy"></div>
+                        <div class="featured-jobs__play-wrapper">
+                            <label class="featured-jobs__play-label">
+                                Autoplay
+                                <input class="featured-jobs__play-btn" type="checkbox" checked />
+                                <i></i>
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <div class="featured-jobs__progress">
@@ -160,33 +150,50 @@
                 <div class="why-us__title">Why work with us?</div>
                 <div class="why-card__wrapper">
                     <div class="why-card">
+                        <div class="why-card__bar"></div>
                         <div class="why-card__image why-card__image-1">
                         </div>
                         <div class="why-card__title why-card__title-1">The right person, the right time</div>
                         <div class="why-card__text why-card__text-1">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel, rem dolorem. Esse, temporibus modi quo sit praesentium exercitationem aut architecto.</div>
+                        <div class="why-card__btn-wrapper">
+                            <div class="why-card__browse-btn why-card__btn">Browse</div>
+                            <div class="why-card__contact-btn why-card__btn">Contact Us</div>
+                        </div>
                     </div>
                 </div>
                 <div class="why-card__wrapper">
                     <div class="why-card">
+                        <div class="why-card__bar"></div>
                         <div class="why-card__image why-card__image-2">
                         </div>
-                        <div class="why-card__title why-card__title-2">The smell of my farts</div>
+                        <div class="why-card__title why-card__title-2">Title 2</div>
                         <div class="why-card__text why-card__text-2">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel, rem dolorem. Esse, temporibus modi quo sit praesentium exercitationem aut architecto.</div>
+                        <div class="why-card__btn-wrapper">
+                            <div class="why-card__browse-btn why-card__btn">Browse</div>
+                            <div class="why-card__contact-btn why-card__btn">Contact Us</div>
+                        </div>
                     </div>
                 </div>
                 <div class="why-card__wrapper">
                     <div class="why-card">
+                        <div class="why-card__bar"></div>
                         <div class="why-card__image why-card__image-3">
                         </div>
-                        <div class="why-card__title why-card__title-3">The right person, the right time</div>
+                        <div class="why-card__title why-card__title-3">Title 3</div>
                         <div class="why-card__text why-card__text-3">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel, rem dolorem. Esse, temporibus modi quo sit praesentium exercitationem aut architecto.</div>
+                        <div class="why-card__btn-wrapper">
+                            <div class="why-card__browse-btn why-card__btn">Browse</div>
+                            <div class="why-card__contact-btn why-card__btn">Contact Us</div>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <section class="testimonials section parallax">
-                <div class="background background--testimonials"></div>
-                <div class="testimonials__content">
+                <img src="./assets/parallaxtest3.jpg" alt="London Skyline" class="background-image background-image--testimonials">
+                <div class="testimonials-gradient"></div>
+                <!-- <div class="background background--testimonials"></div> -->
+                <!-- <div class="testimonials__content">
                         <div class="testimonials__quote">
                             Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sint rem repellat ratione voluptatibus perferendis iste rerum nemo quisquam iure aperiam? 
                             <div class="testimonials__quote-triangle"></div>
@@ -214,7 +221,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </section>
             <section class="footer section static">
                 <div class="footer__content">
