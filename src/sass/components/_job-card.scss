@@ -5,33 +5,31 @@
         width: 65rem;
         height: $height-job-card--featured;
 
-        @include respond-desktop-medium() {
-            width: 38rem;
-            // height: 37rem;
-        }
-        @include respond-desktop-small() {
-            width: 43rem;
-            height: 41rem;
-        }
-        @include respond-desktop-vsmall() {
-            width: 38rem;
+        @include respond-desktop-larger() {
+            width: 63rem;
         }
 
-        @include respond-tablet-small() {
-            width: 45rem;
-            height: 38rem;
-            &:not(:last-of-type) {
-                margin-bottom: 5rem;
-            }
+        @include respond-desktop-small() {
+            width: 65rem;
         }
+
+ 
+
+        // @include respond-desktop-smallest() {
+        //     width: 45rem;
+        //     height: 38rem;
+        //     &:not(:last-of-type) {
+        //         margin-bottom: 5rem;
+        //     }
+        // }
 
         &-last {
-            @include respond-desktop-small() {
+            @include respond-desktop-medium() {
                 display: none;
             }
-            @include respond-tablet-small() {
-                display: flex;
-            }
+            // @include respond-desktop-smallest() {
+            //     display: flex;
+            // }
         }
     }
 
@@ -83,7 +81,7 @@
 
 
         &--featured {
-            font-size: var(--job-card-title--featured);
+            // font-size: var(--job-card-title--featured);
         }
         &--list {
             font-size: 1.9rem;
@@ -106,7 +104,7 @@
             width: 1.8rem;
             height: 1.8rem;
         
-            @include respond-desktop-large() {
+            @include respond-desktop-larger() {
                 width: 1.7rem;
                 height: 1.7rem;
             }
@@ -246,7 +244,6 @@
     &__apply-btn{ margin-left: 2rem; }
 
     &__date {
-        // align-self: flex-end;
         font-size: 1.4rem;
     }
     

@@ -43,7 +43,7 @@
     height: calc(100% - var(--hero-height));
 
 
-    @include respond-desktop-vsmall() {
+    @include respond-desktop-small() {
         justify-content: center;
     }
 
@@ -55,116 +55,14 @@
         margin-right: 7%;
         // margin: 0 var(--page-padding--content) 0 var(--page-padding--content);
         
-        @include respond-desktop-large() {
+        @include respond-desktop-larger() {
             margin: 0 var(--page-padding--l) 0 var(--page-padding--l);
         }
-        @include respond-desktop-vsmall() {
+        @include respond-desktop-small() {
             flex-direction: column;
             align-items: flex-start;
             width: auto;
             margin: 0;
-        }
-    }
-}
-
-.roles {
-    padding: 0 2rem 0 0;
-
-    @include respond-desktop-vsmall() {
-        margin-bottom: 2.5rem;
-    }
-
-    &__list {
-        display: flex;
-        align-items: center;
-        margin-left: 4.5rem;
-
-        @include respond-desktop-medium() {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        @include respond-desktop-vsmall() {
-            flex-direction: row;
-            align-items: center;
-        }
-    }
-    &__item {
-        display: flex;
-        align-items: center;
-        font-size: 1.6rem;
-        color: $color-secondary;
-        cursor: pointer;
-
-        @include respond-phone() {
-            font-size: 1.5rem;
-        }
-    }
-    &__item:not(:first-of-type) {
-        margin-left: 2rem;
-        @include respond-desktop-medium() {
-            margin-left: 0;
-        }
-        @include respond-desktop-vsmall() {
-            margin-left: 2rem;
-        }
-    }
-    &__item:not(:last-of-type) {
-        margin-right: 2rem;
-        @include respond-desktop-medium() {
-            margin-right: 0;
-            margin-bottom: .7rem;
-        }
-        @include respond-desktop-vsmall(){
-            margin-right: 2rem;
-            margin-bottom: 0;
-        }
-    }
-    &__divider {
-        border-left: 1px solid $color-primary;
-        height: 2rem;
-
-        @include respond-desktop-medium() {
-            height: 0;
-            border-left: none;
-        }
-        @include respond-desktop-vsmall() {
-            border-left: 1px solid $color-primary;
-            height: 2rem;
-        }
-    }
-
-    &__icon {
-        display: flex;
-        fill: $color-text-primary;
-    }
-
-    &__id-card {
-        height: 2.5rem;
-        width: 3.4rem;
-        margin-right: 1.2rem;
-        @include respond-desktop-medium() {
-            width: 3rem;
-            margin-right: 1.2rem;
-        }
-    }
-    &__interim {
-        height: 2.5rem;
-        width: 2.5rem;
-        margin-right: .8rem;
-
-        @include respond-desktop-medium() {
-            margin-right: 1.7rem;
-        }
-    
-    }
-    &__location {
-        height: 2.3rem;
-        width: 2.3rem;
-        margin-right: .4rem;
-
-        @include respond-desktop-medium() {
-            margin-right: 1.9rem;
-            margin-top: .2rem;
         }
     }
 }
@@ -231,10 +129,10 @@
         width: 2rem;
     }
 
-    @include respond-desktop-medium() {
+    @include respond-desktop-large() {
         align-self: flex-end;
     }
-    @include respond-desktop-vsmall() {
+    @include respond-desktop-small() {
         align-self: auto;
     }
     @include respond-phone() {
@@ -247,41 +145,110 @@
 
 /* ABOUT SECTION */
 .about {
+    position: relative;
     display: flex;
-    background-color: $color-background;
-    padding-top: $padding-section--m;
-    padding-bottom: $padding-section--m;
-    background-image: linear-gradient(
-        to right,
-        rgba($color-background, 1),
-        rgba($color-background, 1),
+    background-color: $color-about-background;
+    padding-top: 6rem;
+    padding-bottom: 10rem;
 
-        rgba($color-background, .9),
-        rgba($color-background, .8),
-        rgba($color-background, .7),
+    @include respond-desktop-small() {
+        padding-top: 5rem;
+        padding-bottom: 7rem;
+    }
 
-        rgba($color-background, .2),
-        rgba($color-background, 0),
+    @include respond-desktop-smaller() {
+        padding-top: 0;
+        padding-bottom: 0;
+        // padding moved on to the content element
+    }
 
-        rgba($color-background, 0),
+
+    &__background {
+        position: absolute;
+        content: '';
+        top: 0;
+        right: 12%;
+        height: 100%;
+
+        @include respond-desktop-large() {
+            right: 8%;
+        }
+
+        @include respond-desktop-medium() {
+            right: 5%;
+        }
+
+        @include respond-desktop-small() {
+            right: 4%;
+        }
         
-    ), url('/src/assets/about.jpg');
-    background-position: 100% 50%;
-    background-repeat: no-repeat;
-    background-size: contain;
+    }
+    
+    &__gradient {
+        @include respond-desktop-smaller {
+            position: absolute;
+            content: '';
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(to left, rgba($color-primary-new, .95), rgba($color-primary-new, .1));
+
+            // background: linear-gradient(
+            //     to left,
+            //     rgba(255,255,255, .5),
+            //     rgba(255,255,255, .8),
+            // );
+        }
+    }
 
     &__content {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
         justify-content: center;
-        margin-left: 22rem;
+        // margin-left: 25rem;
+        margin-left: 12%;
+        z-index: 1;
+
+       
+
+        @include respond-desktop-large() {
+            margin-left: 8%;
+        }
+
+        @include respond-desktop-medium() {
+            margin-left: 8%;
+        }
+        
+        @include respond-desktop-small() {
+            margin-left: 7%;
+        }
+
+        @include respond-desktop-smaller() {
+            background-image: linear-gradient(to right, rgba(255,255,255, .9), rgba(255,255,255, .5));
+            width: 100%;
+            padding: 5rem 0 7rem 8%;
+            margin-left: 0;
+        }
+        // @include respond-desktop-smaller() {
+        //     margin-left: 5%;
+        // }
+
+
     }
 
     &__title-wrapper {
         display: flex;
         align-items: center;
         margin-bottom: 2rem;
+
+        @include respond-desktop-small() {
+            margin-bottom: 1rem;
+        }
+        @include respond-desktop-smaller() {
+            margin-bottom: 1rem;
+        }
 
     }
 
@@ -290,51 +257,189 @@
         font-weight: 400;
         color: $color-secondary;
 
-        @include respond-desktop-vsmall() {
-            font-size: 2rem;
+        @include respond-desktop-small() {
+            font-size: 1.8rem;
         }
+        // @include respond-desktop-smaller() {
+        //     font-size: 1.6rem;
+        // }
     }
 
     &__image {
         height: 4rem;
         width: 4rem;
         margin-right: 3rem;
+
+        @include respond-desktop-small() {
+            height: 3rem;
+            width: 3rem;
+            margin-right: 2rem;
+        }
     }
 
     &__description {
         width: 65rem;
-        font-size: 1.8rem;
-        line-height: 3rem;
+        font-size: 1.6rem;
+        line-height: 2.8rem;
         margin-left: 5.5rem;
         margin-bottom: 3.5rem;
 
-        @include respond-desktop-small() {
-            width: 90rem;
-        }
-        @include respond-desktop-vsmall() {
-            width: 85rem;
-            font-size: 1.7rem;
-        }
-        @include respond-tablet() {
-            width: 70rem;
-            font-size: 1.65rem;
-            line-height: 2.8rem;
-        }
-        @include respond-tablet-small() {
-            width: 55rem;
-            font-size: 1.6rem;
-            line-height: 2.5rem;
-        }
+        // @media (max-width: 1750px) {
+        //     width: 58rem;
+        // }
+
+        // @include respond-desktop-large() {
+        //     width: 60rem;
+        // }
+
+        // @include respond-desktop-medium() {
+        //     width: 90rem;
+        // }
+                @include respond-desktop-small() {
+                    width: 58rem;
+                    font-size: 1.5rem;
+                    line-height: 2.6rem;
+                    margin-bottom: 2rem;
+                }
+                // @include respond-desktop-smaller() {
+                //     color: white;
+                //     font-weight: 300;
+                //     font-size: 1.7rem;
+                // }
+        // @include respond-desktop-smaller() {
+        //     width: 70rem;
+        //     font-size: 1.65rem;
+        //     line-height: 2.8rem;
+        // }
+        // @include respond-desktop-smallest() {
+        //     width: 55rem;
+        //     font-size: 1.6rem;
+        //     line-height: 2.5rem;
+        // }
     }
     // Button wrapper found in components/buttons.scss
+
+    .roles {
+        padding: 0 2rem 0 0;
+    
+        // @include respond-desktop-small() {
+        //     margin-bottom: 2.5rem;
+        // }
+    
+        &__list {
+            display: flex;
+            align-items: center;
+            margin-left: 4.5rem;
+    
+            // @include respond-desktop-large() {
+            //     flex-direction: column;
+            //     align-items: flex-start;
+            // }
+            @include respond-desktop-smaller() {
+                
+            }
+        }
+        &__item {
+            display: flex;
+            align-items: center;
+            font-size: 1.6rem;
+            color: $color-secondary;
+            cursor: pointer;
+    
+            @include respond-desktop-small() {
+                font-size: 1.4rem;
+            }
+
+            // @include respond-phone() {
+            //     font-size: 1.5rem;
+            // }
+        }
+        &__item:not(:first-of-type) {
+            margin-left: 2rem;
+            // @include respond-desktop-large() {
+            //     margin-left: 0;
+            // }
+            // @include respond-desktop-small() {
+            //     margin-left: 2rem;
+            // }
+ 
+        }
+        &__item:not(:last-of-type) {
+            margin-right: 2rem;
+            // @include respond-desktop-large() {
+            //     margin-right: 0;
+            //     margin-bottom: .7rem;
+            // }
+            // @include respond-desktop-small(){
+            //     margin-right: 2rem;
+            //     margin-bottom: 0;
+            // }
+
+        }
+        &__divider {
+            border-left: 1px solid $color-primary;
+            height: 2rem;
+    
+            // @include respond-desktop-large() {
+            //     height: 0;
+            //     border-left: none;
+            // }
+            // @include respond-desktop-small() {
+            //     border-left: 1px solid $color-primary;
+            //     height: 2rem;
+            // }
+        }
+    
+        &__icon {
+            display: flex;
+            fill: $color-text-primary;
+        }
+    
+        &__id-card {
+            height: 2.5rem;
+            width: 3.4rem;
+            margin-right: 1.2rem;
+            @include respond-desktop-large() {
+                width: 3rem;
+                margin-right: 1.2rem;
+            }
+        }
+        &__interim {
+            height: 2.5rem;
+            width: 2.5rem;
+            margin-right: .8rem;
+
+     
+    
+            // @include respond-desktop-large() {
+            //     margin-right: 1.7rem;
+            // }
+        
+        }
+        &__location {
+            height: 2.3rem;
+            width: 2.3rem;
+            margin-right: .8rem;
+    
+            @include respond-desktop-large() {
+                margin-top: .2rem;
+            }
+        }
+    }
 }
 
 /* FEATURED JOBS SECTION */
 // Card styling in _job-card.scss
 .featured-jobs {
     position: relative;
+
     padding-top: $padding-section--m;
     padding-bottom: $padding-section--l;
+
+    @include respond-desktop-small() {
+        display: flex;
+        justify-content: center;
+    }
 
     &__header {
         display: flex;
@@ -347,6 +452,8 @@
         font-size: 2.2rem;
         font-weight: 400;
         color: $color-secondary;
+
+ 
     }
 
     &__content {
@@ -354,34 +461,31 @@
         flex-direction: column;
         padding: 0 var(--page-padding--l);
 
+        @include respond-desktop-larger() {
+            padding: 0 var(--page-padding--m);
+        }
         @include respond-desktop-large() {
             padding: 0 var(--page-padding--s);
         }
-        @include respond-desktop-small() {
-            padding: 0 var(--page-padding--m);
-        }
-        @include respond-tablet() {
-            padding: 0 5rem;
+        @include respond-desktop-medium() {
 
+            padding: 0 var(--page-padding--xs);
         }
-        @include respond-tablet-small() {
-            align-items: center;
+
+        @include respond-desktop-small() {
+            width: 65rem;
+            padding: 0;
         }
-        
+
     }
 
     &__jobs-list {
         position: relative;
         height: $height-job-card--featured;
 
-        // display: flex;
-        // justify-content: space-between;
-        // @include respond-desktop-small() {
-        //     justify-content: space-around;
-        // }
-        // @include respond-tablet-small() {
-        //     flex-direction: column;
-        // }
+        @include respond-desktop-small() {
+            height: 70rem;
+        }
     }
 
     &__nav {
@@ -447,7 +551,13 @@
         display: flex;
         justify-content: space-between;
         width: 100%;
+        height: 100%;
         opacity: 0;
+
+        @include respond-desktop-small() {
+            flex-direction: column;
+            align-items:center;
+        }
     }
 
     &__progress {
@@ -529,10 +639,10 @@
 }
 
 /* WHY US SECTION */
+
 .why-us {
-    // why-us section layout defined in _page-grid.scss
     display: flex;
-    flex-flow: row wrap;
+    flex-direction: column;
     padding-top: $padding-section--m;
     padding-bottom: $padding-section--l;
     padding-left: var(--page-padding--m);
@@ -540,14 +650,17 @@
 
     background-color: $color-background;
 
-    // @TODO: change to either sass or css vars
-    @include respond-desktop-medium() {
-        padding: $padding-section--m var(--page-padding--s) $padding-section--l var(--page-padding--s) ;
-    }
-    @include respond-desktop-small() {
-        padding: $padding-section--m var(--page-padding--m) $padding-section--l var(--page-padding--m) ;
+    @include respond-desktop-larger() {
+        padding:  $padding-section--m var(--page-padding--s) $padding-section--l var(--page-padding--s);
     }
 
+    // @TODO: change to either sass or css vars
+    @include respond-desktop-large() {
+        padding: $padding-section--m var(--page-padding--s) $padding-section--l var(--page-padding--s) ;
+    }
+    @include respond-desktop-medium() {
+        padding: $padding-section--m var(--page-padding--m) $padding-section--l var(--page-padding--m) ;
+    }
 
     &__title {
         text-align: center;
@@ -556,25 +669,66 @@
         font-weight: 400;
         color: $color-secondary;
     }
+    &__cards {
+        display: flex;
+        justify-content: space-between;
+        // flex-direction: column;
+
+        // homeView.js initWhyUsSection() adds another element
+        // 1x3 => 2x2 layout
+        @include respond-desktop-large() {
+            flex-flow: row wrap;
+        }
+    }
 }
 
-// The wrappers are given grid widths, the cards stay centered at a fixed width
 .why-card__wrapper {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
+
+    &:nth-child(odd) {
+        justify-content: flex-end;
+
+        @include respond-desktop-smaller() {  
+            justify-content: center;
+        }
+    }
+
+    // 1x3 => 2x2 layout
+    @include respond-desktop-large() {
+        width: 48%;    
+        margin: 1%;    
+    }
+    @include respond-desktop-smaller() {
+        width: 100%;
+        margin: 0;
+        justify-content: center;
+    }
 }
 .why-card {
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 45rem;
+    width: var(--why-card-width);
     padding: 5rem;
     background-color: white;
     border: none;
     box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
     overflow: hidden;
 
+    @include respond-desktop-smaller() {  
+        margin-bottom: 3rem;
+    }
+
+    &__background {
+        position: absolute;
+        top: 0;
+        left: -25%;
+        height: 100%;
+    }
+
+    // The bar is the animation overlay
     &__bar {
         position: absolute;
         content: "";
@@ -603,29 +757,30 @@
         width: 100%;
         height: 100%;
     }
-    // &:hover:before {
-    //     background-color: rgba($color-primary-new, 0.9);
-    //     box-shadow: inset 0 0 0 5px $color-primary-new, inset 0 0 0 6px white; 
-    //     transition: all .5s ease;
-    //     z-index: 100;
-    // }
 
-    // &:hover &__btn-wrapper {
-    //     background-color: rgba($color-primary-new, 0);
-    //     pointer-events: all;
-    //     z-index: 100;
-    // }
-    // &:hover &__browse-btn, &:hover &__contact-btn {
-    //     border: 1px solid white;
-    //     color: white;
-    //     pointer-events: all;
-    //     cursor: pointer;
-    //     transition: all 1s ease;
+    &--header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        // background-image:  linear-gradient(
+        //     to bottom right,
+        //     rgba(54,101,127, .85),
+        //     rgba(54,101,127, .85),
+        //     rgba(54,101,127, .85),
+        //     rgba(54,101,127, .85),
+            
+        //     rgba(54,101,127, .8),
+        //     ), url('/src/assets/work-with-us.jpg');
+        // background-repeat: no-repeat;
+        // background-size: cover;
+        // background-position: 50%;
 
-    // }
+        font-size: 2rem;
+        color: whitesmoke;
 
-    &:not(:last-of-type) {
-        margin-bottom: 10rem;
+        @include respond-desktop-smaller() {  
+            background-position: 50% 15%;
+        }
     }
 
     &__btn-wrapper {
@@ -718,44 +873,62 @@
         position: relative;
         display: flex;
         flex-direction: column;
-        align-items: center;
-    }
-    &__cards {
-        display: flex;
         justify-content: center;
-    }
-
-    &__quote {
-        position: absolute;
-        display: flex;
-        align-items: center;
-        top: -8rem;
+        height: 20rem;
         width: 80rem;
-        height: 10rem;
-        padding: 3rem;
-        background-color: $color-logo;
-        font-size: 1.6rem;
-        color: $color-white;
+        border-top: 1px solid white;
+        border-bottom: 1px solid white;
+        z-index: 1;
 
-        @include respond-desktop-small() {
-            width:70rem;
-        }
+        
+        font-family: Georgia, serif;
+        font-size: 2.5rem;
+        font-style: italic;
+        margin: 0.25em 0;
+        padding: 0 7rem;
+        line-height: 1.45;
+        position: relative;
+        color: whitesmoke;
 
-        @include respond-tablet() {
-            left: 8rem;
-            top: -13rem;
-            width: 40rem;
-            height: auto;
+        @include respond-desktop-smaller {
+            width: 55rem;
+            height: 18rem;
+            font-size: 2rem;
+            padding: 0 6rem;
         }
-    
-        &-triangle {
+    }
+    &__quote {
+        position: relative;
+        margin-top: 1rem;
+
+        &:before {
+            display: block;
+            padding-left: 1rem;
+            content: "\201C";
+            font-size: 8rem;
             position: absolute;
-            bottom: -1.5rem;
-            width: 0;
-            height: 0;
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-top: 20px solid $color-logo;
+            left: -6rem;
+            top: -3rem;
+            color: whitesmoke;
+
+            @include respond-desktop-smaller {
+                font-size: 6rem;
+                left: -5rem;
+            }
+        }  
+    }
+ 
+    &__cite {
+        color: $color-secondary-highlight;
+        align-self: flex-end;
+        font-size: 2.3rem;
+        font-weight: 700;
+        display: block;
+        margin-top: 5px;
+
+        @include respond-desktop-smaller {
+            font-size: 1.8rem;
+            margin-top: 2rem;
         }
     }
 }
@@ -768,13 +941,13 @@
     background-color: white;
 
     &-3 {
-        @include respond-desktop-small() {
+        @include respond-desktop-medium() {
             display: none;
         }
     }
 
     &-2 {
-        @include respond-tablet() {
+        @include respond-desktop-smaller() {
             display: none;
         }
     }

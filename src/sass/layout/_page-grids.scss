@@ -3,30 +3,30 @@
 // 16 cols, 2 rows
 
 // .why-us is the flex parent
-.why-card__wrapper, .why-us__title {
-    --initialbasis: calc(var(--width) / var(--columns) * 100%);
-    flex-basis: var(--initialbasis);
-}
-.why-us__title {
-    --width: 16;
+// .why-card__wrapper, .why-us__title {
+//     --initialbasis: calc(var(--width) / var(--columns) * 100%);
+//     flex-basis: var(--initialbasis);
+// }
+// .why-us__title {
+//     --width: 16;
 
-    @include respond-desktop-small() {
-        --width: 8;
-    }
-    @include respond-tablet-small() {
-        --width: 16;
-    }
-}
-.why-card__wrapper {
-    --width: calc(16/3);
+//     @include respond-desktop-medium() {
+//         --width: 8;
+//     }
+//     @include respond-desktop-smallest() {
+//         --width: 16;
+//     }
+// }
+// .why-card__wrapper {
+//     --width: calc(16/3);
 
-    @include respond-desktop-small() {
-        --width: 8;
-    }
-    @include respond-tablet-small() {
-        --width: 16;
-    }
-}
+//     @include respond-desktop-medium() {
+//         --width: 8;
+//     }
+//     @include respond-desktop-smallest() {
+//         --width: 16;
+//     }
+// }
 
 /* JOBS PAGE */
 // (16 cols, 2 rows)

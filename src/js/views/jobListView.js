@@ -112,6 +112,7 @@ export const createJobCard = ({id, title, wage, location, description}, element,
     `;
 
     if(!element) return markup;
+    console.log('oh no');
     element.insertAdjacentHTML('beforeend', markup);
 }
 

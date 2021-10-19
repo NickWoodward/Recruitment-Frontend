@@ -12,12 +12,20 @@ export const clearForm = (elements, defaults) => {
             element.innerText = defaults? defaults[index]:'';
         }
     });
-    
 }
 
 export const removeElement = (element) => {
     element.parentElement.removeChild(element);
 }
+
+export const templateStringToElement = (templateString) => {
+    const placeholder = document.createElement('div');
+
+    placeholder.innerHTML = templateString;
+    return placeholder.firstElementChild;
+
+}
+
 
 export const swapElement = (icon1, icon2) => {
     

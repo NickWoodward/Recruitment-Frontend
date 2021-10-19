@@ -14,6 +14,7 @@ import '../assets/icons/instagram-icon.svg';
 import '../assets/icons/close-icon.svg';
 import '../assets/icons/burger-icon.svg';
 import '../assets/icons/pin-angle.svg';
+import '../assets/icons/location-custom.svg';
 
 import '../assets/icons/loader.svg';
 

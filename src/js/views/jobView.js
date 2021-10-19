@@ -4,185 +4,17 @@ import { createListJobCard } from './jobListView';
 import * as utils from '../utils/utils';
 
 export const getAction = (e) => {
-    const apply = e.target.closest('.job-details__btn--apply');
+    const apply = e.target.closest('.job-details__btn--apply') || e.target.closest('.job-card__apply-btn--details');
     const cancel = e.target.closest('.modal') && (!e.target.closest('.job-details__content') || e.target.closest('.job-details__back-btn') || e.target.closest('.job-details__close-btn'));
-    const signIn = e.target.closest('.job-details__sign-in-btn')
-    console.log(apply, cancel, signIn);
+    const signIn = e.target.closest('.job-details__sign-in-btn');
+    const viewMore = e.target.closest('.job-card__view-btn--details');
+
+    console.log(apply, cancel, signIn, viewMore);
     if(apply) return 'apply';
     if(cancel) return 'cancel';
     if(signIn) return 'sign-in';
+    if(viewMore) return 'view';
 };
-
-export const renderJobDetails = (job, container = document.body, jobs, event) => {
-    const markup = `
-        <div class="modal job-details">
-        
-            <div class="job-details__content">
-                <div class="job-details__back">
-                    <button class="job-details__back-btn">
-                        <svg class="job-details__back-svg">
-                            <use xlink:href="svg/spritesheet.svg#arrow-left">
-                        </svg>
-                        <div class="job-details__back-text">Back</div>
-                    </button>
-                </div>
-                <div class="job-details__table-wrapper">
-                    ${createJobDetailsTable(job)}
-                </div>
-                <div class="job-details__featured-jobs">
-                    ${createListJobCard(jobs[0], null, true, true)}
-                    ${createListJobCard(jobs[1], null, true, true)}
-                    ${createListJobCard(jobs[2], null, true, true)}
-                </div>
-            </div>
- 
-        </div>
-    `;
-
-    container.insertAdjacentHTML('afterbegin', markup);
-    setJobModalPosition();
-
-    // Prevent bg scrolling behind modal
-    // document.body.style.overflow = "hidden";
-
-    animateJobDetailsIn(event);
-};
-
-let detailsAnimating = false;
-export const updateJobDetailsTable = (job) => {
-    if(detailsAnimating) return;
-    detailsAnimating = true;
-
-    const jobDetailsWrapper = document.querySelector('.job-details__table-wrapper');
-    const tl = gsap.timeline({ defaults: { opacity: 1, duration: .8 } });
-
-    // Details animating out, then back in
-    tl.to(jobDetailsWrapper, { 
-        opacity: 0,
-        x: -80,
-        ease: 'ease-in',
-        onComplete: () => { utils.clearElement(jobDetailsWrapper); jobDetailsWrapper.insertAdjacentHTML('afterbegin', createJobDetailsTable(job)); tl.reverse();  },
-        onReverseComplete: () => { detailsAnimating = false }
-    });
-}
-
-export const updateFeaturedJobsAside = (removeId, newJob) => {
-    // Find the element with the selected job
-    const jobs = document.querySelectorAll('.job-card--details');
-    const [ oldJobElement ] = Array.from(jobs).filter(job => job.dataset.id === removeId);
-    
-    const newJobElement = createListJobCard(newJob, null, true, true);
-
-
-    const tl = gsap.timeline({ defaults: { opacity: 0 } });
-    tl.add(transitionAsideJob(oldJobElement, newJobElement));
-    // tl.add(animateInAsideJob(newJobElement));
-} 
-
-const transitionAsideJob = (element, newElement) => {
-    const tl = gsap.timeline();
-    tl.to(element, { opacity: 0, x: 300, duration: 1, onComplete: () => populateAsideCard(element, newElement) });
-
-    return tl;
-}
-
-const populateAsideCard = (element, newElement) => {
-    const placeholder = document.createElement('div');
-    placeholder.insertAdjacentHTML('afterbegin', newElement);
-    const card = placeholder.firstElementChild;
-    card.style.opacity = 0;
-
-    element.insertAdjacentElement('beforebegin', card);
-
-    // element.insertAdjacentHTML('beforebegin', newElement);
-    utils.removeElement(element);
-    
-    animateInAsideJob(card);
-}
-const animateInAsideJob = (element) => {
-    const tl = gsap.timeline({ defaults: { duration: 1  } });
-    tl.fromTo(element, { opacity: 0, x: 300 }, { opacity: 1, x:0 });
-}
-
-const createJobDetailsTable = (job) => { 
-    const markup = `
-        <div class="job-details__table" data-id=${job.id}>
-            <div class="job-details__header">
-                <div class="job-details__title">${job.title}</div>
-                <div class="job-card__pin job-card__pin--details">
-                    <svg class="pin-icon">
-                    <use xlink:href="svg/spritesheet.svg#pin-angle"></use>
-                    </svg>
-                </div>
-            </div>
-            <div class="job-details__row">
-                <div class="job-details__location-label job-details__label">Location</div>
-                <div class="job-details__location-value job-details__value">${job.location}</div>
-            </div>
-            <div class="job-details__row">
-                <div class="job-details__wage-label job-details__label">Wage</div>
-                <div class="job-details__wage-value job-details__value">${job.wage}</div>
-            </div>
-            <div class="job-details__row">
-                <div class="job-details__type-label job-details__label">Type</div>
-                <div class="job-details__type-value job-details__value">Permanent</div>
-            </div>
-            <div class="job-details__row">
-                <div class="job-details__role-label job-details__label">Role</div>
-                <div class="job-details__role-value job-details__value">In House</div>
-            </div>
-            <div class="job-details__row">
-                <div class="job-details__PQE-label job-details__label">PQE</div>
-                <div class="job-details__PQE-value job-details__value">3+ years</div>
-            </div>
-            <div class="job-details__row">
-                <div class="job-details__details-label job-details__label">Details</div>
-                <div class="job-details__details-value job-details__value">${job.description}</div>
-            </div>
-            <div class="job-details__row">
-                <div class="job-details__date-label job-details__label">Posted</div>
-                <div class="job-details__date-value job-details__value">More than 3 days ago</div>
-            </div>
-            <div class="job-details__row job-details__row--btns">
-                <button class="job-details__btn job-details__btn--apply btn">Apply</button>
-            </div>
-        </div>
-    `;
-    return markup;
-}
-
-
-
-let tl;
-
-const animateJobDetailsIn = (event) => {
-    // const {x, y} = event.path[0].getBoundingClientRect();
-    tl = gsap.timeline({
-    defaults: { opacity: 1, duration: .4 },
-    })
-    .from('.job-details', { opacity: 0 });
-
-    tl.add(animateJobDetailsTableIn(), '<+.6');
-    tl.add(animateFeaturedJobsAside(), '>-.4');
-    tl.play(0);
-};
-
-const animateFeaturedJobsAside = () => {
-    const tl = gsap.timeline({ defaults: { opacity: 1, duration: .4 }});
-    tl.from('.job-card--details', { opacity: 0, x: 300, duration: .8, stagger: .2 }, '>-.4');
-    return tl;
-}
-const animateJobDetailsTableIn = () => {
-    const tl = gsap.timeline({ defaults: { opacity: 1, duration: .4 } });
-    tl.from('.job-details__table-wrapper', { opacity: 0, y: 50, duration: .5 });
-    return tl;
-}
-
-export const animateJobDetailsOut = (callback) => {
-    tl.eventCallback('onReverseComplete', callback)
-    tl.reverse();
-};
-
 export const renderJobNotification = (job = {jobId: 20, title: 'Corporate Commercial Partner', wage: 20000, location: 'Devizes'}) => {
     const markup = `
         <div class="job-notification" data-id=${job.jobId}>
@@ -225,3 +57,223 @@ export const setJobModalPosition = () => {
         modal.style.height = `${viewPortHeight - headerHeight}px`;
     }
 };
+
+const createJobDetailsTable = (job) => { 
+    const markup = `
+    <div class="job-details__table-wrapper">
+        <div class="job-details__table" data-id=${job.id}>
+            <div class="job-details__header">
+                <div class="job-details__title">${job.title}</div>
+                <div class="job-card__pin job-card__pin--details">
+                    <svg class="pin-icon">
+                    <use xlink:href="svg/spritesheet.svg#pin-angle"></use>
+                    </svg>
+                </div>
+            </div>
+            <div class="job-details__row">
+                <div class="job-details__location-label job-details__label">Location</div>
+                <div class="job-details__location-value job-details__value">${job.location}</div>
+            </div>
+            <div class="job-details__row">
+                <div class="job-details__wage-label job-details__label">Wage</div>
+                <div class="job-details__wage-value job-details__value">${job.wage}</div>
+            </div>
+            <div class="job-details__row">
+                <div class="job-details__type-label job-details__label">Type</div>
+                <div class="job-details__type-value job-details__value">Permanent</div>
+            </div>
+            <div class="job-details__row">
+                <div class="job-details__role-label job-details__label">Role</div>
+                <div class="job-details__role-value job-details__value">In House</div>
+            </div>
+            <div class="job-details__row">
+                <div class="job-details__PQE-label job-details__label">PQE</div>
+                <div class="job-details__PQE-value job-details__value">3+ years</div>
+            </div>
+            <div class="job-details__row">
+                <div class="job-details__details-label job-details__label">Details</div>
+                <div class="job-details__details-value job-details__value">${job.description}</div>
+            </div>
+            <div class="job-details__row">
+                <div class="job-details__date-label job-details__label">Posted</div>
+                <div class="job-details__date-value job-details__value">More than 3 days ago</div>
+            </div>
+            <div class="job-details__row job-details__row--btns">
+                <button class="job-details__btn job-details__btn--apply btn">Apply</button>
+            </div>
+        </div>
+    </div>`;
+    return markup;
+}
+export const renderJobDetails = (job, container = document.body, jobs, event) => {
+    const markup = `
+        <div class="modal job-details">
+        
+            <div class="job-details__content">
+                <div class="job-details__back">
+                    <button class="job-details__back-btn">
+                        <svg class="job-details__back-svg">
+                            <use xlink:href="svg/spritesheet.svg#arrow-left">
+                        </svg>
+                        <div class="job-details__back-text">Back</div>
+                    </button>
+                </div>
+                <div class="job-details__table-wrapper">
+                    ${createJobDetailsTable(job)}
+                </div>
+                <div class="job-details__featured-jobs">
+                    ${createListJobCard(jobs[0], null, true, true)}
+                    ${createListJobCard(jobs[1], null, true, true)}
+                    ${createListJobCard(jobs[2], null, true, true)}
+                </div>
+            </div>
+ 
+        </div>
+    `;
+
+    container.insertAdjacentHTML('afterbegin', markup);
+    setJobModalPosition();
+
+    // Prevent bg scrolling behind modal
+    // document.body.style.overflow = "hidden";
+
+    initTimeline();
+    tl.play(0);
+};
+
+const removeJobModal = () => {
+    const modal = document.querySelector('.job-details');
+    modal.parentElement.removeChild(modal);
+}
+
+
+//********** ANIMATION **********/
+const tl = gsap.timeline({ defaults: { duration: .4 }, onReverseComplete: removeJobModal });
+let asideArray; 
+let animationRunning = false;
+
+//// MAIN TL ////
+const initTimeline = () => {
+    let progress = tl.progress();
+    let reversed = tl.reversed();
+    tl.reversed(false).progress(0, true).clear();
+
+    tl.add(animateWrapperIn());
+    tl.add(animateMainIn());
+    tl.add(animateAsideIn());
+
+    tl.reversed(reversed);
+    tl.progress(progress);
+}
+const animateWrapperIn = () => {
+    gsap.set('.job-details', { clearProps: "opacity" });
+
+    return gsap.from('.job-details', {
+        opacity: 0,
+    });
+}
+const animateMainIn = () => {
+    gsap.set('.job-details__table-wrapper', { clearProps: "all" });
+
+    return gsap.from('.job-details__table-wrapper', {
+        opacity: 0,
+        y: 50,
+        duration: .5
+    });
+}
+const animateAsideIn = () => {
+    asideArray = gsap.utils.toArray('.job-card--details');
+
+    gsap.set(asideArray, { clearProps: "all" });
+    
+    return gsap.from(asideArray, {
+      opacity: 0,
+      x: 300,
+      stagger: .2
+    });  
+}
+//// MAIN TL END
+
+//// JOB CHANGE TL ////
+const changeJobs = (oldCard, newCard, oldDetails, newDetails) => {
+    const swapTl = gsap.timeline({ 
+        defaults: { duration: .4 },
+        onStart: () => { animationRunning = true },
+        onComplete: () => { animationRunning = false },
+    });
+
+    swapTl.add(animateCardOut(oldCard, newCard));
+    swapTl.add(animateDetailsOut(oldDetails, newDetails), '<');
+
+    swapTl.play(0);
+}
+//// JOB CHANGE TL END
+
+//// TRANSITIONING ASIDE CARD IN ////
+const animateCardOut = (oldCard, newCard) => {
+    return gsap.to(oldCard, { 
+                opacity: 0, 
+                x: 300,
+                onComplete: () => replaceCard(oldCard, newCard)
+            });
+}
+const replaceCard = (oldCard, newCard) => {
+    oldCard.insertAdjacentElement('beforebegin', newCard);
+    utils.removeElement(oldCard);
+
+    animateCardIn(newCard);
+}
+const animateCardIn = (newCard) => {
+    gsap.fromTo(newCard, { opacity: 0, x: 300 }, { 
+        opacity: 1, 
+        x: 0,
+    });
+} 
+//// END ASIDE CARD TRANSITION
+
+//// TRANSITIONING THE JOB DETAILS IN ////
+const animateDetailsOut = (oldDetails, newDetails) => {
+    return gsap.to(oldDetails, { 
+        opacity: 0, 
+        x: -300,
+        onComplete: () => { replaceDetails(oldDetails, newDetails); animateDetailsIn(newDetails) }
+    });
+}
+const replaceDetails = (oldDetails, newDetails) => {
+    oldDetails.insertAdjacentElement('beforebegin', newDetails);
+
+    utils.removeElement(oldDetails);
+    // animateDetailsIn(newDetails);
+}
+const animateDetailsIn = (newDetails) => {
+    gsap.fromTo(newDetails, { opacity: 0, x: -300 }, {
+        opacity: 1,
+        x: 0,
+        // initTimeline reinitialises the timeline and so includes the new card in the animation
+        onComplete: initTimeline
+    });
+} 
+//// END JOB DETAILS TRANSITION
+
+export const updateJobView = (jobId, job, newAsideJob) => {
+    const jobs = document.querySelectorAll('.job-card--details');
+
+    // Find the current job card & create a new element to replace it
+    const [ oldJobCard ] = Array.from(jobs).filter(job => job.dataset.id === jobId);
+    const newJobCard = utils.templateStringToElement(createListJobCard(newAsideJob, null, true, true));
+
+    // Create a new details panel to replace the current one
+    const oldDetails = document.querySelector('.job-details__table-wrapper');
+    const newDetails = utils.templateStringToElement(createJobDetailsTable(job));
+
+    changeJobs(oldJobCard, newJobCard, oldDetails, newDetails);
+}
+
+export const getAnimationState = () => {
+    return animationRunning;
+}
+
+export const animateJobDetailsOut = () => {
+    tl.reverse();
+};
+

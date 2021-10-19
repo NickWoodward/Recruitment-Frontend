@@ -67,6 +67,7 @@ export default class JobsController {
         window.addEventListener("DOMContentLoaded", () => {
             utils.pageFadeIn();
             headerView.renderHeader("jobs");
+            
         });
 
         // #TODO: Debounce / change to GSAP

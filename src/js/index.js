@@ -15,6 +15,7 @@ import { initSocket } from './socket';
 import User from './models/User';
 import JobList from './models/JobList';
 import Applications from './models/Applications';
+import Contact from './models/Contact';
 
 /* ASSETS */
 import '../sass/index.scss';
@@ -48,6 +49,7 @@ class IndexController {
         this.JobList = new JobList();
         this.User = new User();
         this.Applications = new Applications();
+        this.Contact = new Contact();
         // this.socket = initSocket();
 
         this.state = {
@@ -75,6 +77,7 @@ class IndexController {
             homeView.loadingAnimation();
             homeView.initialiseScrollAnimations();
             homeView.initParallax();
+            // homeView.initLocomotiveScroll();
             homeView.whyUsHoverAnimation();
 
             this.JobList.getMenuData()
@@ -91,8 +94,10 @@ class IndexController {
 
         // RESIZE
         window.addEventListener('resize', (e) => {
-            // #TODO: Debounce
+            // @TODO: don't need to set header width any more
+            // @TODO: Debounce
             headerView.setParallaxHeaderWidth();
+            homeView.initWhyUsSection();
         });
 
         // CHECK MODAL CLICKED
@@ -153,7 +158,8 @@ class IndexController {
                     }
                 } else if(e.target.closest('.job-details')) {
                     switch(jobView.getAction(e)) {
-                        case 'apply'    : applyView.renderApplyForm(); break;
+                        case 'apply'    : this.handleApplyEvent(e); break;               
+                        case 'view'     : this.swapJobs(e); break
                         case 'cancel'   : jobView.animateJobDetailsOut(this.closeModal.bind(null, modal)); break;
                         case 'sign-in'  : this.closeModal(modal); loginView.renderLogin(); break;  
                     }
@@ -176,7 +182,7 @@ class IndexController {
             }
         });
 
-        // CHATBOX
+        // CHATBOX / CONTACT FORM
         document.body.addEventListener('click', (e) => {
             const chatboxHeader = e.target.closest('.chatbox__header');
             const chatboxHistory = e.target.closest('.chatbox__history');
@@ -191,11 +197,19 @@ class IndexController {
         document.body.addEventListener('submit', (e) => {
             e.preventDefault();
             const chatboxForm = e.target.closest('.chatbox__form');
+            const contactForm = e.target.closest('.footer__contact');
+
             if(chatboxForm) {
                 const message = document.querySelector('.chatbox__input').value;
                 console.log(message);
                 chatView.addChatResponse(message, true);
                 // this.socket.emit('chatbox', message );
+            } else if(contactForm) {
+                const formData = homeView.getContactForm();
+
+                if(formData) {
+                    this.Contact.sendContactForm(formData);
+                }
             }
         });
 
@@ -301,7 +315,7 @@ class IndexController {
                                                 jobView.renderJobDetails(response.data.job, document.body, this.state.featuredJobsAside, e);
 
                                                 // Add btn listeners
-                                                this.addJobDetailsBtnListeners();
+                                                // this.addJobDetailsBtnListeners();
                                             }
                                         })
                                         .catch(err => console.log(err));
@@ -324,30 +338,64 @@ class IndexController {
             });
     }
 
-    addJobDetailsBtnListeners() {
-        const viewBtns = document.querySelectorAll('.job-card__view-btn--details');
-        viewBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const jobId = e.target.closest('.job-card').dataset.id;
-                const job = this.state.featuredJobs.find(job => job.id === parseInt(jobId));
-                const jobIndex = this.state.featuredJobsAside.findIndex(job => job.id === parseInt(jobId));
+    swapJobs(e) {
+        const viewMoreBtn = e.target.closest('.job-card__view-btn--details');
 
-                // Update the main job listing
-                jobView.updateJobDetailsTable(job);
+        const jobId = viewMoreBtn.parentElement.parentElement.parentElement.dataset.id;
+        const job = this.state.featuredJobs.find(job => job.id === parseInt(jobId));
+        const jobIndex = this.state.featuredJobsAside.findIndex(job => job.id === parseInt(jobId));
 
-                // Pick a job that exists in the featured array, but isn't currently in the aside array
-                const newJobIndex = this.state.featuredJobs.findIndex(job => !this.state.featuredJobsAside.includes(job) && job.id !== this.state.currentJob.id);
-                // If no job can be found, pick the previously featured job
-                const newJob = newJobIndex !== -1? this.state.featuredJobs[newJobIndex] : this.state.currentJob;
+        // Pick a job that exists in the featured array, but isn't currently in the aside array
+        const newJobIndex = this.state.featuredJobs.findIndex(job => !this.state.featuredJobsAside.includes(job) && job.id !== this.state.currentJob.id);
+        // If no job can be found, pick the previously featured job
+        const newJob = newJobIndex !== -1? this.state.featuredJobs[newJobIndex] : this.state.currentJob;
 
-                // Remove the old job and add the job to the featured aside
-                this.state.featuredJobsAside.splice(jobIndex, 1, newJob);
+        // Remove the old job and add the job to the featured aside
+        this.state.featuredJobsAside.splice(jobIndex, 1, newJob);
 
-                this.state.currentJob = job;
-                jobView.updateFeaturedJobsAside(jobId, newJob);
-            });
-        });
+        this.state.currentJob = job;
+
+        if(!jobView.getAnimationState())
+            jobView.updateJobView(jobId, job, newJob);
     }
+
+    handleApplyEvent(e) {
+        // From the Job Details card or an aside
+        const jobDetailsCard = e.target.closest('.job-details__table');
+        const jobAsideCard = e.target.closest('.job-card--details');
+
+        const jobId = jobDetailsCard? jobDetailsCard.dataset.id : jobAsideCard.dataset.id;
+
+        console.log(jobId);
+
+        applyView.renderApplyForm(jobId);
+    }
+
+    // addJobDetailsBtnListeners() {
+    //     const jobModal = document.querySelector('.job-details');
+
+    //     jobModal.addEventListener('click', (e) => {
+
+    //         if(viewMoreBtn) {
+    //             const jobId = viewMoreBtn.parentElement.parentElement.parentElement.dataset.id;
+    //             const job = this.state.featuredJobs.find(job => job.id === parseInt(jobId));
+    //             const jobIndex = this.state.featuredJobsAside.findIndex(job => job.id === parseInt(jobId));
+
+    //             // Pick a job that exists in the featured array, but isn't currently in the aside array
+    //             const newJobIndex = this.state.featuredJobs.findIndex(job => !this.state.featuredJobsAside.includes(job) && job.id !== this.state.currentJob.id);
+    //             // If no job can be found, pick the previously featured job
+    //             const newJob = newJobIndex !== -1? this.state.featuredJobs[newJobIndex] : this.state.currentJob;
+
+    //             // Remove the old job and add the job to the featured aside
+    //             this.state.featuredJobsAside.splice(jobIndex, 1, newJob);
+
+    //             this.state.currentJob = job;
+
+    //             if(!jobView.getAnimationState())
+    //                 jobView.updateJobView(jobId, job, newJob);
+    //         }
+    //     });
+    // }
 }
 
 new IndexController();

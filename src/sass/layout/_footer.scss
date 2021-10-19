@@ -23,7 +23,7 @@
         padding: $padding-section;
         font-size: 1.4rem;
 
-        @include respond-tablet() {
+        @include respond-desktop-smaller() {
             flex-direction: column;
             align-items: center;
         }
@@ -37,7 +37,7 @@
         line-height: 1.8rem;
         border: 1px solid $color-secondary-highlight;
 
-        @include respond-tablet() {
+        @include respond-desktop-smaller() {
             flex-direction: row;
             width: 50rem;
             margin-bottom: 1rem;
@@ -68,7 +68,7 @@
             width: 68%;
             margin-top: .1rem;
 
-            @include respond-tablet() {
+            @include respond-desktop-smaller() {
                 width: 100%;
             }
         }
@@ -85,7 +85,7 @@
         }
 
         &__phone-email-wrapper {
-            @include respond-tablet() {
+            @include respond-desktop-smaller() {
                 margin-left: 6rem;
 
             }
@@ -100,11 +100,11 @@
         flex-direction: column;
         height: 100%;
         width: 60rem;
-        padding: 3rem 2.8rem;
+        padding: 3rem 2.8rem 2.5rem 2.8rem;
         margin-left: 5rem;
         border: 1px solid $color-secondary-highlight;
 
-        @include respond-tablet() {
+        @include respond-desktop-smaller() {
             margin-left: 0;
             width: 50rem;
         }
@@ -112,12 +112,19 @@
         &-row {
             display: flex;
 
-            &:not(&--message){
+            &:not(&--submit):not(&--message) {
                 margin-bottom: 1rem;
             }
             &--message {
                 flex-grow: 1;
+                margin-bottom: 2.5rem;
+                min-height: 10rem;
             }
+            &--submit {
+                width: 100%;
+                // justify-content: flex-end;
+            }
+           
         }
     }
     &__contact-item {
@@ -143,6 +150,7 @@
         
         &--message {
             height: 100%;
+            resize: vertical;
             background-color: #f5f7fa;
             border: 1px solid #56708C;
         }
@@ -150,14 +158,13 @@
 
     &__send-btn {
         padding: 1rem 1rem;
-        width: 15rem;
-        align-self: flex-end;
-        margin-top: 1rem;
-        margin-left: 5rem;
-        background-color: #556B83;
-        border: 1px solid #56708C;
+        // width: 15rem;
+        width: 100%;
+        background-color: $color-primary-new;
+        border: 1px solid #9abfd8;
 
-        color: $color-white;
+        // color: $color-primary-new;
+        color: whitesmoke;
     }
   
 

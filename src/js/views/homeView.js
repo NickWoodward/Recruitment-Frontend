@@ -1,5 +1,6 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
+import LocomotiveScroll from 'locomotive-scroll';
 
 import { elements } from './base';
 import * as utils from '../utils/utils';
@@ -39,8 +40,81 @@ export const populateSearchInputs = (menuData) => {
   });
 }
 
+export const initWhyUsSection = () => {
+  // const pageWidth = document.documentElement.scrollWidth;
+  const pageWidth = window.innerWidth;
+  console.log('pagewidth '+pageWidth);
 
-////////// ANIMATIONS + PARALLAX //////////
+
+  // 1650 @respond-desktop-large media query
+  // > 1650 1x3 grid with a header
+  // < 1650 2x2 grid with no header
+  if(pageWidth <= 1650 && !document.querySelector('.why-card__wrapper--header')) {
+    // Swap the why us title for another element if smaller than 1650px
+    const title = document.querySelector('.why-us__title');
+    const elements = document.querySelectorAll('.why-card__wrapper');
+
+    const whyCardWidth = getComputedStyle(document.documentElement).getPropertyValue('--why-card-width');
+
+    const markup = `
+      <div class="why-card__wrapper why-card__wrapper--header">
+        <div class="why-card why-card--header">
+            <img srcset="src/assets/resized/work-with-us-1920.jpg 1920w, 
+                        src/assets/resized/work-with-us-1200.jpg 1200w, 
+                        src/assets/resized/work-with-us-960.jpg 960w, 
+                        src/assets/resized/work-with-us-500.jpg 500w, 
+                        src/assets/resized/work-with-us-300.jpg 300w" 
+                  sizes="${whyCardWidth}"
+                  src="src/assets/resized/work-with-us-500.jpg"
+                  alt="A memeber of the team smiling"
+                  class="why-card__background"
+            >
+            <div class="why-card__title--header">Why Work with us?</div>
+        </div>
+      </div>
+    `;
+
+    elements[0].insertAdjacentHTML('beforebegin', markup);
+    title.parentElement.removeChild(title);
+
+  } else if(pageWidth > 1650 && document.querySelector('.why-card__wrapper--header')) {
+
+    const extraElement = document.querySelector('.why-card__wrapper--header');
+    extraElement.parentElement.removeChild(extraElement);
+
+    const whyUsSection = document.querySelector('.why-us');
+    whyUsSection.insertAdjacentHTML('afterbegin', `<div class="why-us__title">Why work with us?</div>`);
+  }
+  
+}
+
+export const getContactForm = () => {
+  const email = document.querySelector('.footer__input--email').value;
+  const subject = document.querySelector('.footer__input--subject').value;
+  const message = document.querySelector('.footer__input--message').value;
+
+
+  if(email && subject && message) {
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("subject", subject);
+    formData.append("message", message);
+
+    return formData;
+  } else {
+    return null;
+  }
+};
+
+
+////////// ANIMATIONS + PARALLAX + SMOOTH-SCROLL//////////
+
+export const initLocomotiveScroll = () => {
+  const locoScroll = new LocomotiveScroll({
+    el: document.querySelector('main'),
+    smooth: true
+  });
+}
 
 export const initialiseScrollAnimations = () => {
   // Featured animation can't be called until after the api call
@@ -178,7 +252,7 @@ const headerLoadingAnimation = () => {
   const tl = gsap.timeline({ defaults: { opacity: 0, ease: 'ease-in' } });
   tl.from('.header__logo', { y: 10, duration: 2 })
     .from('.nav__link', { y: 10, duration: 1, stagger: { each: 0.1, from: 'end' } }, '<')
-    .from('.nav__link--social', { y: -5,  duration: 1, stagger: 0.1 }, '<0.5');
+    .fromTo('.nav__line', { y: 10, opacity: 0 }, { y: 0, opacity:1, duration: 1 }, '>');
   return tl;
 };
 const heroAnimation = () => {
@@ -309,8 +383,8 @@ const testimonialAnimation = () => {
       toggleActions: 'restart none none reverse',
       // markers: true
     } 
-  }).from('.testimonial', { stagger: { amount: 0.4, ease: 'ease-in' }, duration: 1.4 })
-    .from('.testimonials__quote', { x: -30, duration: .8 }, '>');
+  }).from('.testimonials__quote', { x: -30, duration: .8 })
+  .from('.testimonials__cite', { x: 50, duration: .8 }, '>-=.6');
 };
 
 const footerAnimation = () => {
@@ -332,41 +406,6 @@ const footerAnimation = () => {
 
 };
 
-// export const initParallax = () => {
-//     gsap.utils.toArray(".parallax").forEach((section, i) => {
-//         section.bg = section.querySelector(".background"); 
-
-//         // Do the parallax effect on each section
-//         if (i) {
-//           section.bg.style.backgroundPosition = `50% ${-innerHeight / 2}px`;
-
-//           gsap.to(section.bg, {
-//             backgroundPosition: `50% ${innerHeight / 2}px`,
-//             ease: "none",
-//             scrollTrigger: {
-//               trigger: section,
-//               scrub: true
-//             }
-//           });
-//         } 
-        
-//         // the first image should be positioned against the top. Use px on the animating part to work with GSAP. 
-//         else {
-//           section.bg.style.backgroundPosition = "50% 0px"; 
-
-//           gsap.to(section.bg, {
-//             backgroundPosition: `50% ${innerHeight / 2}px`,
-//             ease: "none",
-//             scrollTrigger: {
-//               trigger: section,
-//               start: "top top", 
-//               end: "bottom top",
-//               scrub: true
-//             }
-//           });
-//         }
-//       });
-// }
 
 export const initParallax = () => {
   gsap.utils.toArray('.parallax').forEach((section, i) => {

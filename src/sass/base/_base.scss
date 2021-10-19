@@ -20,23 +20,27 @@
     --padding__nav-a: 2rem;
     // --header-height: 11rem;
 
-    --hero-height: 84%;
-    @include respond-desktop-vsmall() {
+    --hero-height: 82%;
+    @include respond-desktop-small() {
         --hero-height: 70%;
     }
     @include respond-phone() {
         --hero-height: 53%;
     }
 
-    --page-padding--s: 5%;
+    --page-padding--xs: 4%;
+    --page-padding--s: 7%;
     --page-padding--m: 10%;
     --page-padding--l: 12%;
     --page-padding--content: 15%;
+
+    --why-card-width: 450px;
 }
 
 html {
     font-size: 62.5%; // 10/16*100 = 62.5%
     height: 100%;
+    border: 1px solid red;
 }
 
 body {

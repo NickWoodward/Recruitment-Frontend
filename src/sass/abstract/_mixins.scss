@@ -4,27 +4,27 @@
     @media (max-width: 750px) { @content };
 }
 
+@mixin respond-desktop-larger {
+    @media (max-width: 1800px) { @content };
+}
+
 @mixin respond-desktop-large {
-    @media (max-width: 1700px) { @content };
+    @media (max-width: 1650px) { @content };
+
 }
 
 @mixin respond-desktop-medium {
     @media (max-width: 1500px) { @content };
-
 }
 
 @mixin respond-desktop-small {
-    @media (max-width: 1350px) { @content };
+    @media (max-width: 1400px) { @content };
 }
 
-@mixin respond-desktop-vsmall {
+@mixin respond-desktop-smaller {
     @media (max-width: 1200px) { @content };
 }
 
-@mixin respond-tablet {
-    @media (max-width: 1050px) { @content };
-}
-
-@mixin respond-tablet-small {
-    @media (max-width: 950px) { @content };
+@mixin respond-desktop-smallest {
+    @media (max-width: 1000px) { @content };
 }

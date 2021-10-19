@@ -15,7 +15,14 @@ module.exports = merge(common, {
             {
                 test: /\.(png|jpg|webp)$/,
                 use: [ 
-                    "url-loader",
+                    { 
+                        loader: "url-loader",
+                        options: {
+                            limit:false,
+                            name: '[name].[ext]'
+                        }
+                    
+                    },
                     {
                         loader: "image-webpack-loader",
                         options: {

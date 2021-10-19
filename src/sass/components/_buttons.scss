@@ -12,7 +12,7 @@
 
     &--about {
         margin-top: 4rem;
-        @include respond-desktop-small() {
+        @include respond-desktop-medium() {
             margin-top: 5rem;
         }
     }

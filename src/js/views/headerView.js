@@ -2,6 +2,11 @@ import gsap from 'gsap/gsap-core';
 import { elements } from './base';
 import { elementStrings } from './base';
 
+let currentNavElement;
+let navPaddingLeft;
+
+
+
 // If the page uses a parallax container the width of the header should account for the wrapper scrollbar
 export const setParallaxHeaderWidth = () => {
     const width = document.querySelector('section').clientWidth;
@@ -58,31 +63,55 @@ export const renderHeader = (page) => {
     
     elements.body.insertAdjacentHTML('afterbegin', markup);
 
-    addNavAnimation()
+    setCurrentNavElement(page);
+    setNavPaddingLeft();
+    initNav(currentNavElement, navPaddingLeft, page);
+
+    addNavAnimation(page);
 };
 
-const initNav = (item, paddingLeft) => {
-    gsap.to('.nav__line', { overwrite: true, x: item.parentElement.offsetLeft + (paddingLeft/2), width: item.parentElement.clientWidth - paddingLeft});
+const initNav = (item, navPaddingLeft, page) => {
+    // Underline fade in on initial page load
+    if(page) { 
+        gsap.set('.nav__line', { opacity: 0, x: item.parentElement.offsetLeft + (navPaddingLeft/2), width: item.parentElement.clientWidth - navPaddingLeft }); 
+        // Opacity set in the header animation for the landing page
+        if(page !== 'index') gsap.set('.nav__line', { opacity: 1 });
+    } else {
+    // Otherwise animate (mouseleave/resize)
+        gsap.to('.nav__line', { overwrite: true, x: item.parentElement.offsetLeft + (navPaddingLeft/2), width: item.parentElement.clientWidth - navPaddingLeft});
+    }
 };
 
-const addNavAnimation = () => {
+const addNavAnimation = (page) => {
     const items = gsap.utils.toArray('.nav__a');
-    let currentElement = items[0];
-    const paddingLeft = parseFloat(getComputedStyle(items[0]).paddingLeft);
+
+    setCurrentNavElement(page);
+    setNavPaddingLeft();
     
     items.forEach((item, index) => {
-        console.log(item);
         item.addEventListener('mouseenter', () =>  {
-            gsap.to('.nav__line', { overwrite: true, x: item.parentElement.offsetLeft + (paddingLeft/2), width: item.parentElement.clientWidth - paddingLeft});
-            currentElement = item;
+            gsap.to('.nav__line', { overwrite: true, x: item.parentElement.offsetLeft + (navPaddingLeft/2), width: item.parentElement.clientWidth - navPaddingLeft});
+            currentNavElement = item;
         });
     });
 
     // @TODO: Debounce
-    window.addEventListener('resize', initNav(currentElement, paddingLeft));
+    window.addEventListener('resize', () => initNav(currentNavElement, navPaddingLeft));
+    const nav = document.querySelector('.nav-wrapper');
+    nav.addEventListener('mouseleave', () => { setCurrentNavElement(page); setTimeout(() => initNav(currentNavElement, navPaddingLeft), 500) });
 }
 
+const setCurrentNavElement = (page) => {
+    switch(page) {
+        case 'index' : currentNavElement = document.querySelector('.nav__a--login'); break;
+        case 'admin' : currentNavElement = document.querySelector('.nav__a--about'); break;
+        case 'jobs' : currentNavElement = document.querySelector('.nav__a--jobs'); break;
+    }
+}
 
+const setNavPaddingLeft = () => {
+    navPaddingLeft = parseFloat(getComputedStyle(currentNavElement).paddingLeft);
+}
 
 export const addHeaderListeners = ({ renderLogin }) => {
     const loginLink = document.querySelector('.nav__a--login');
