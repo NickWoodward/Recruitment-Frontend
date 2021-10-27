@@ -17,15 +17,20 @@
     color: $color-white;
 
     &__content {
+        position: relative;
         display: flex;
         justify-content: center;
         height: 100%;
         padding: $padding-section;
         font-size: 1.4rem;
 
-        @include respond-desktop-smaller() {
+        @include respond-tablet-larger() {
             flex-direction: column;
             align-items: center;
+        }
+        @include respond-tablet-small() {
+            width: 100%;
+            
         }
     }
 
@@ -37,12 +42,40 @@
         line-height: 1.8rem;
         border: 1px solid $color-secondary-highlight;
 
-        @include respond-desktop-smaller() {
+        @include respond-tablet-larger() {
             flex-direction: row;
             width: 50rem;
             margin-bottom: 1rem;
         }
+        @include respond-tablet-small() {
+            // flex-direction: column;
+            width: 100%;
+            // justify-content: center;
+            // padding: 3.5rem 2.8rem 3.5rem 2.8rem;
+            // margin-bottom: 2rem;
+        }
+
     }
+
+        &__address {
+            order: 0;
+            @include respond-tablet-small() {
+                order: 1;
+            }
+        }
+        &__phone-email-wrapper {
+            order: 1;
+            @include respond-tablet-larger() {
+                margin-left: 6rem;
+
+            }
+            @include respond-tablet-small() {
+                order: 0;
+                margin-left: 0;    
+
+            }
+        }
+        
         &__address, &__phone {
             margin-bottom: 1.2rem;
         }
@@ -68,13 +101,24 @@
             width: 68%;
             margin-top: .1rem;
 
-            @include respond-desktop-smaller() {
+            @include respond-tablet-larger() {
                 width: 100%;
             }
         }
         &__phone-row {
             display: flex;
             justify-content: space-between;
+
+            &:first-of-type {
+                @include respond-tablet-small() {
+                    margin-bottom: .8rem;
+                }
+            }
+            @include respond-tablet-small() {
+                flex-direction: column;
+
+            }
+
         }
         &__phone-label {
             margin-right: 1rem;
@@ -84,17 +128,15 @@
             display: flex;
         }
 
-        &__phone-email-wrapper {
-            @include respond-desktop-smaller() {
-                margin-left: 6rem;
 
-            }
-        }
 
     &__contact {
         &-wrapper {
             display: flex;
             flex-direction: column;
+            @include respond-tablet-small() {
+                width: 100%;
+            }
         }
         display: flex;
         flex-direction: column;
@@ -104,13 +146,21 @@
         margin-left: 5rem;
         border: 1px solid $color-secondary-highlight;
 
-        @include respond-desktop-smaller() {
+        @include respond-tablet-larger() {
             margin-left: 0;
             width: 50rem;
         }
+        @include respond-tablet-small() {
+            width: auto;
+        }
+
 
         &-row {
             display: flex;
+
+            @include respond-tablet-small() {
+                flex-direction: column;
+            }
 
             &:not(&--submit):not(&--message) {
                 margin-bottom: 1rem;
@@ -134,6 +184,10 @@
 
         &:not(:first-of-type) {
             margin-left: 3rem;
+            @include respond-tablet-small() {
+                margin-left: 0;
+                margin-top: 1rem;
+            }
         }
     }
 
@@ -153,6 +207,10 @@
             resize: vertical;
             background-color: #f5f7fa;
             border: 1px solid #56708C;
+
+            @include respond-tablet-small() {
+                min-height: 10rem;
+            }
         }
     }
 

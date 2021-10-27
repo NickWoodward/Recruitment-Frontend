@@ -68,7 +68,7 @@ export const renderJobs = (jobs, element, batchNum = 0) => {
 }
 
 export const createJobCard = ({id, title, wage, location, description}, element, featured, details, batchNum) => {
-    description = featured? utils.limitText(description, 168): utils.limitText(description, 168);
+    // description = featured? utils.limitText(description, 168): utils.limitText(description, 168);
 
     const markup = `
        <div class="job-card job-card-${batchNum} ${featured? 'job-card--featured':''} ${details? 'job-card--details':''}" data-id=${id}>

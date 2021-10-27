@@ -23,31 +23,20 @@
     // Job Card
     --job-card-title: 1.8rem;
     --job-card-title--featured: 2.2rem;
-    @include respond-desktop-large() {
-        --job-card-title--featured: 1.5rem;
-    }
+
 
     --job-card-content: 1.5rem;
     --job-card-content--featured: 1.5rem;
-    @include respond-desktop-large() {
-        --job-card-content--featured: 1.4rem;
-    }
+
 
     --job-card-location: 1.7rem;
     --job-card-location--featured: 1.7rem;
-    @include respond-desktop-large() {
-        --job-card-location--featured: 1.45rem;
-    }
+
     --job-card-wage: 1.7rem;
     --job-card-wage--featured: 1.7rem;
-    @include respond-desktop-large() {
-        --job-card-wage--featured: 1.45rem;
-    }
+ 
     --job-card-extra: 1.7rem;
     --job-card-extra--featured: 1.7rem;
-    @include respond-desktop-large() {
-        --job-card-extra--featured: 1.45rem;
-    }
 
     // Jobs Aside
     --blog-title: 1.7rem;

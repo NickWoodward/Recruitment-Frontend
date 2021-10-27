@@ -21,12 +21,10 @@
     // --header-height: 11rem;
 
     --hero-height: 82%;
-    @include respond-desktop-small() {
+    @include respond-tablet-medium() {
         --hero-height: 70%;
     }
-    @include respond-phone() {
-        --hero-height: 53%;
-    }
+ 
 
     --page-padding--xs: 4%;
     --page-padding--s: 7%;
@@ -40,7 +38,7 @@
 html {
     font-size: 62.5%; // 10/16*100 = 62.5%
     height: 100%;
-    border: 1px solid red;
+    // border: 1px solid red;
 }
 
 body {
@@ -49,7 +47,10 @@ body {
     height: 100%;
     // For page fade in/animation
     visibility: hidden;
+    // border: 1px solid green;
 }
+
+h1,h2,h3,h4,h5,h6{font-size: inherit; font-weight:normal;}
 
 main {
     height: 100%;

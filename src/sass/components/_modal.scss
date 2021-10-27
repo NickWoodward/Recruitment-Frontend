@@ -61,6 +61,9 @@
     border-bottom: none;
     background-color: $color-logo;
     font-size: 1.6rem;
+    z-index: 10;
+
+
 
     &__header {
         display: flex;
