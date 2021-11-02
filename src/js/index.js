@@ -62,7 +62,7 @@ class IndexController {
     }
 
     addEventListeners() {
-
+        console.log(window.devicePixelRatio)
         // ONLOAD
         window.addEventListener('DOMContentLoaded', (e) => {
             // this.applyForJob(1, { firstName: 'a', lastName: 'b', phone: '07384838238', email: 'nick@gmail', cv: {} })

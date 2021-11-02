@@ -10,7 +10,102 @@
     <body>
         <main class="parallax-wrapper">
             <section class="hero section--first parallax">
-                <img src="./assets/test3.webp" alt="London Skyline" class="background-image background-image--hero" />
+<!-- 
+                <picture>
+                    <source
+                        media="(min-width: 1500px)"
+                        srcset="./assets/images/hero-1903.webp 1903w"
+                        sizes="(min-width: 150rem): 1903px"
+                    >
+                    <source
+                        media="(min-width: 1200px)"
+                        srcset="
+                            ./assets/images/hero-1500.webp 1500w,
+                            ./assets/images/hero-1903.webp 1903w"
+                        sizes="(min-width: 150rem): 1903px,
+                               (min-width: 120rem): 1500px"
+                    >
+                    <source
+                        media="(min-width: 900px)"
+                        srcset="
+                            ./assets/images/hero-1200.webp 1200w,
+                            ./assets/images/hero-1500.webp 1500w,
+                            ./assets/images/hero-1903.webp 1903w"
+                        sizes="(min-width: 150rem): 1903px,
+                               (min-width: 120rem): 1500px,
+                               (min-width: 90rem): 1200px"
+                    >
+                    <source
+                        media="(min-width: 600px)"
+                        srcset="
+                            ./assets/images/hero-900.webp 900w,
+                            ./assets/images/hero-1200.webp 1200w,
+                            ./assets/images/hero-1500.webp 1500w,
+                            ./assets/images/hero-1903.webp 1903w"
+                        sizes="(min-width: 150rem): 1903px,
+                                (min-width: 120rem): 1500px,
+                                (min-width: 90rem): 1200px,
+                                (min-width: 60rem): 900px"
+                    >
+                    <source
+                        media="(min-width: 320px)"
+                        srcset="
+                            ./assets/images/hero-600.webp 600w,
+                            ./assets/images/hero-900.webp 900w,
+                            ./assets/images/hero-1200.webp 1200w,
+                            ./assets/images/hero-1500.webp 1500w,
+                            ./assets/images/hero-1903.webp 1903w"
+                        sizes="(min-width: 150rem): 1903px,
+                                (min-width: 120rem): 1500px,
+                                (min-width: 90rem): 1200px,
+                                (min-width: 60rem): 900px,
+                                (min-width: 30rem): 600px"
+                    >
+                    <img src="./assets/images/hero-1200.webp" alt="" class="background-image">
+
+                </picture> -->
+                 
+                <picture>
+                    <source
+                        media="(max-width: 390px)"
+                        srcset="./assets/images/hero-400.webp 400w"
+                                            >
+                    <source
+                        media="(max-width: 500px)"
+                        srcset="./assets/images/hero-500.webp 500w"
+                                            >
+                    <source
+                        media="(max-width: 600px)"
+                        srcset="./assets/images/hero-600.webp 600w"
+                                            >
+                    <source
+                        media="(max-width: 900px)"
+                        srcset="./assets/images/hero-900.webp 900w"    
+                                            >
+                    <source
+                        media="(max-width: 1200px)"
+                        srcset="./assets/images/hero-1200.webp 1200w"
+                        
+                    >
+                    <source
+                        media="(max-width: 1500px)"
+                        srcset="./assets/images/hero-1500.webp 1500w"
+                        width="1500"
+                    >
+                    <source
+                        media="(max-width: 1920px)"
+                        srcset="./assets/images/hero-1903.webp 1903w"
+                        width="1920"
+                    >
+                    <source
+                        media="(min-width: 1921px)"
+                        srcset="./assets/images/hero-1903.webp 1903w"
+                        width="100%"
+                    >
+
+                    <img src="./assets/images/hero-1200.webp" alt="" class="background-image background-image--hero">
+                </picture> 
+                
                 <div class="hero-gradient"></div>
                 <!-- <div class="background background--hero"></div> -->
                 <div class="hero__content">
@@ -67,17 +162,30 @@
             </section>
 
             <section class="about section static">
-                <!-- <img srcset="./assets/resized/about-1920.jpg 1920w, 
-                            ./assets/resized/about-1600.jpg 1600w, 
-                            ./assets/resized/about-1200.jpg 1200w, 
-                            ./assets/resized/about-900.jpg 900w, 
-                            ./assets/resized/about-600.jpg 600w,
-                            ./assets/resized/about-300.jpg 300w,
-                            ./assets/resized/about-150.jpg 150w"
-                        src="./assets/resized/about-1200.jpg" 
-                        alt="Woman solving a rubix-cube like recruitment puzzle" 
-                        class="about__background"> -->
-                <img src="./assets/resized/about-test-1.jpg" alt="" class="about__background">
+
+                <picture>
+                    <source 
+                        media="(max-width:450px)"
+                        srcset="./assets/images/about-cropped-800.jpg 800w,
+                                ./assets/images/about-cropped-400.jpg 400w"
+                    >
+                    <source 
+                        media="(max-width:800px)"
+                        srcset="./assets/images/about-cropped-1600.jpg 1600w,
+                                ./assets/images/about-cropped-800.jpg 800w"
+                    >
+                    <source 
+                        srcset="./assets/images/about-1800.jpg 1800w, 
+                                ./assets/images/about-1500.jpg 1500w, 
+                                ./assets/images/about-1200.jpg 1200w,
+                                ./assets/images/about-900.jpg 900w,
+                                ./assets/images/about-600.jpg 600w"
+                        sizes="(max-width: 1400px) 647px, (max-width: 1500px) 735px, 856px"
+                    >
+
+                    <img src="./assets/images/about-600.jpg" alt="Woman solving a rubix-like recruitment puzzle" class="about__background">
+                </picture>
+                <!-- <img src="./assets/resized/about-test-1.jpg" alt="" class="about__background"> -->
                 <div class="about__gradient"></div>
                 <div class="about__content">
                     <div class="about__title-wrapper">
@@ -85,8 +193,8 @@
                         <h2 class="about__title">Reshaping Legal Recruitment</h2>
                     </div>
                     <div class="about__description">
-                        We are a bespoke legal recruitment and executive search consultancy, driven by the desire to offer effective service and delivery for both candidate and client.
-                        <br><br> Whether you are searching for a new role, or would like to discuss recruitment for your team, please get in touch.
+                        <div class="about__description--para-1">We are a bespoke legal recruitment and executive search consultancy, driven by the desire to offer effective service and delivery for both candidate and client.</div>
+                        <div class="about__description--para-2">Whether you are searching for a new role, or would like to discuss recruitment for your team, please get in touch.</div>
                     </div>
                     <div class="roles__list">
                         <div class="roles__item">
@@ -165,102 +273,75 @@
             </section>
 
             <section class="why-us section static">
-                    <div class="why-us__title">Why work with us?</div>
-                    <div class="why-us__cards">
-                        <div class="why-card__wrapper">
-                            <div class="why-card">
-                                <div class="why-card__bar"></div>
-                                <div class="why-card__image why-card__image-1">
-                                </div>
-                                <div class="why-card__title why-card__title-1">The right person, the right time</div>
-                                <div class="why-card__text why-card__text-1">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel, rem dolorem. Esse, temporibus modi quo sit praesentium exercitationem aut architecto.</div>
-                                <div class="why-card__btn-wrapper">
-                                    <div class="why-card__browse-btn why-card__btn">Browse</div>
-                                    <div class="why-card__contact-btn why-card__btn">Contact Us</div>
-                                </div>
+                <div class="why-us__title">Why work with us?</div>
+                <div class="why-us__cards">
+                    <div class="why-card__wrapper">
+                        <div class="why-card">
+                            <div class="why-card__bar"></div>
+                            <div class="why-card__image-wrapper">
+                                <img class="why-card__image why-card__image--test why-card__image-1" src="/src/assets/temp/monkey-left.jpg"/>
                             </div>
-                        </div>
-                        <div class="why-card__wrapper">
-                            <div class="why-card">
-                                <div class="why-card__bar"></div>
-                                <div class="why-card__image why-card__image-2">
-                                </div>
-                                <div class="why-card__title why-card__title-2">Title 2</div>
-                                <div class="why-card__text why-card__text-2">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel, rem dolorem. Esse, temporibus modi quo sit praesentium exercitationem aut architecto.</div>
-                                <div class="why-card__btn-wrapper">
-                                    <div class="why-card__browse-btn why-card__btn">Browse</div>
-                                    <div class="why-card__contact-btn why-card__btn">Contact Us</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="why-card__wrapper">
-                            <div class="why-card">
-                                <div class="why-card__bar"></div>
-                                <div class="why-card__image why-card__image-3">
-                                </div>
-                                <div class="why-card__title why-card__title-3">Title 3</div>
-                                <div class="why-card__text why-card__text-3">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel, rem dolorem. Esse, temporibus modi quo sit praesentium exercitationem aut architecto.</div>
-                                <div class="why-card__btn-wrapper">
-                                    <div class="why-card__browse-btn why-card__btn">Browse</div>
-                                    <div class="why-card__contact-btn why-card__btn">Contact Us</div>
-                                </div>
+                            <div class="why-card__title why-card__title-1">The right person, the right time</div>
+                            <div class="why-card__text why-card__text-1">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel, rem dolorem. Esse, temporibus modi quo sit praesentium exercitationem aut architecto.</div>
+                            <div class="why-card__btn-wrapper">
+                                <div class="why-card__browse-btn why-card__btn">Browse</div>
+                                <div class="why-card__contact-btn why-card__btn">Contact Us</div>
                             </div>
                         </div>
                     </div>
+                    <div class="why-card__wrapper">
+                        <div class="why-card">
+                            <div class="why-card__bar"></div>
+                            <div class="why-card__image why-card__image-2">
+                            </div>
+                            <div class="why-card__title why-card__title-2">Title 2</div>
+                            <div class="why-card__text why-card__text-2">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel, rem dolorem. Esse, temporibus modi quo sit praesentium exercitationem aut architecto.</div>
+                            <div class="why-card__btn-wrapper">
+                                <div class="why-card__browse-btn why-card__btn">Browse</div>
+                                <div class="why-card__contact-btn why-card__btn">Contact Us</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="why-card__wrapper">
+                        <div class="why-card">
+                            <div class="why-card__bar"></div>
+                            <div class="why-card__image why-card__image-3">
+                            </div>
+                            <div class="why-card__title why-card__title-3">Title 3</div>
+                            <div class="why-card__text why-card__text-3">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel, rem dolorem. Esse, temporibus modi quo sit praesentium exercitationem aut architecto.</div>
+                            <div class="why-card__btn-wrapper">
+                                <div class="why-card__browse-btn why-card__btn">Browse</div>
+                                <div class="why-card__contact-btn why-card__btn">Contact Us</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <section class="testimonials section parallax">
-                    <img srcset="./assets/resized/parallax-bottom-1920.jpg 1920w, 
-                                ./assets/resized/parallax-bottom-1800.jpg 1800w, 
-                                ./assets/resized/parallax-bottom-1500.jpg 1500w, 
-                                ./assets/resized/parallax-bottom-1200.jpg 1200w, 
-                                ./assets/resized/parallax-bottom-960.jpg 960w, 
-                                ./assets/resized/parallax-bottom-640.jpg 640w"
-                        src="./assets/resized/parallax-bottom-1800.jpg" 
-                        alt="Office Image" 
-                        class="background-image background-image--testimonials">
+                <img srcset="./assets/resized/parallax-bottom-1920.jpg 1920w, 
+                            ./assets/resized/parallax-bottom-1800.jpg 1800w, 
+                            ./assets/resized/parallax-bottom-1500.jpg 1500w, 
+                            ./assets/resized/parallax-bottom-1200.jpg 1200w, 
+                            ./assets/resized/parallax-bottom-960.jpg 960w, 
+                            ./assets/resized/parallax-bottom-640.jpg 640w"
+                    src="./assets/resized/parallax-bottom-1800.jpg" 
+                    alt="Office Image" 
+                    class="background-image background-image--testimonials">
 
-                <!-- <img src="./assets/parallaxtest3.jpg" alt="JRS Office Image" class="background-image background-image--testimonials"> -->
-                <div class="testimonials-gradient"></div>
+            <!-- <img src="./assets/parallaxtest3.jpg" alt="JRS Office Image" class="background-image background-image--testimonials"> -->
+            <div class="testimonials-gradient"></div>
 
-                <blockquote class="testimonials__content">
-                    <div class="testimonials__quote">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris eget leo  
-                    </div>
-                    <cite class="testimonials__cite">- McKinsey and Company</cite>
-                </blockquote>
-        
-                <!-- <div class="background background--testimonials"></div>
-                <div class="testimonials__content">
-                        <div class="testimonials__quote">
-                            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sint rem repellat ratione voluptatibus perferendis iste rerum nemo quisquam iure aperiam? 
-                            <div class="testimonials__quote-triangle"></div>
-                        </div> -->
-                        <!-- <div class="testimonials__cards">
-                        <div class="testimonial-1 testimonial">
-                            <div class="testimonial__image testimonial__image-1"></div>
-                            <div class="testimonial__details">
-                                <div class="testimonial__name">Julian Prince</div>
-                                <div class="testimonial__company">Prince Properties</div>
-                            </div>
-                        </div>
-                        <div class="testimonial-2 testimonial">
-                            <div class="testimonial__image  testimonial__image-2"></div>
-                            <div class="testimonial__details">
-                                <div class="testimonial__name">Fi-Bear-Pig</div>
-                                <div class="testimonial__company">SSE</div>
-                            </div>
-                        </div>
-                        <div class="testimonial-3 testimonial">
-                            <div class="testimonial__image testimonial__image-3"></div>
-                            <div class="testimonial__details">
-                                <div class="testimonial__name">Dominic</div>
-                                <div class="testimonial__company">Rumbo Oil Ltd</div>
-                            </div>
-                        </div> -->
-                    <!-- </div>
-                </div> -->
+            <blockquote class="testimonials__content">
+                <div class="testimonials__quote">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris eget leo  
+                </div>
+                <cite class="testimonials__cite">- McKinsey and Company</cite>
+            </blockquote>
+    
+
             </section>
+
             <section class="footer section static">
                 <div class="footer__content">
                     <div class="footer__details">
@@ -338,6 +419,7 @@
                 <div class="footer__copyright">
                 </div>
             </section>
+
         </main>
     </body>
 </html>

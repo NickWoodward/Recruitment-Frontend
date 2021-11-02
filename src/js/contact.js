@@ -10,9 +10,7 @@ class ContactController {
     constructor() {
         this.UserModel = new UserModel();
 
-        headerView.renderHeader('contact');
-        homeView.loadingAnimation();
-        homeView.initParallax();
+        console.log('contact');
     }
 
 

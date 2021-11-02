@@ -44,7 +44,11 @@
         }
 
         @include respond-tablet-small() {
-            height: 28rem;
+            height: 31rem;
+        }
+        
+        @include respond-phone-larger() {
+            height: 38rem;
         }
 
         &-last {
@@ -77,8 +81,6 @@
             margin-bottom: .8rem;
             padding: 0 3.5rem;
 
-
-
             &--details {
                 margin-top: 1.5rem;
                 height: 5rem;
@@ -98,6 +100,7 @@
                     height: 5.5rem;
                     margin-top: 2.5rem;
                 }
+            
             }
         }
 
@@ -162,6 +165,7 @@
         padding: 0 4rem;
         flex-grow: 1;
 
+ 
     }
 
     &__wage {
@@ -219,11 +223,19 @@
     }
     &__extra {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         font-size: var(--job-card-extra);
         font-weight: 400;
         color: $color-text-primary;
         margin-bottom: 2rem;
+
+        &-wrapper {
+            display: flex;
+
+            @include respond-phone-larger() {
+                flex-direction: column;
+            }
+        }
 
         &--details {
             margin-bottom: 1rem;
@@ -250,6 +262,10 @@
     }
     &__position, &__PQE {
         margin-left: 2rem;
+
+        @include respond-phone-larger() {
+            margin-left: 0;
+        }
     }
 
     &__description {
@@ -292,6 +308,11 @@
         @include respond-tablet-larger() {
             padding-bottom: 3rem;
         }
+        @include respond-tablet-small() {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
     }
     &__btn-wrapper {
         display: flex;
@@ -300,13 +321,20 @@
         &--list {
             margin-right: 3rem;
         }
+        @include respond-tablet-small() {
+            flex-direction: column;
+            align-items: flex-start; 
+            align-self: flex-start;
+            width: 100%;
+            margin-left: 1rem;
+        }
     }
 
     &__view-btn, &__apply-btn {
         display: block;
         padding: 1.2rem 2rem;
         background-color: white;
-        border: 1px solid $color-logo;
+        border: 1px solid lightgrey;
         font-size: var(--base-size);
         cursor: pointer;
 
@@ -317,7 +345,9 @@
         @include respond-tablet-larger() {
             padding: 1.2rem 2rem;
             font-size: 1.3rem;
-
+        }
+        @include respond-tablet-small() {
+            width: 100%;
         }
 
         &--details {
@@ -327,8 +357,9 @@
     }
     &__apply-btn{ 
         margin-left: 2rem; 
-        @include respond-desktop-small() {
-            margin-left: 1.5rem;
+        @include respond-tablet-small() {
+            margin-left: 0;
+            margin-top: .5rem;
         }
     }
 
@@ -339,6 +370,10 @@
         }
         @include respond-tablet-larger() {
             font-size: 1.4rem;
+        }
+        @include respond-tablet-small() {
+            margin-left: 1rem;
+            margin-top: 1.5rem;
         }
     }
     

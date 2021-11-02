@@ -1,6 +1,4 @@
 
-
-
 /* HERO SECTION */
 .hero {
     position: relative;
@@ -17,17 +15,6 @@
         left: 0;
         width: 100%;
         height: 100%;
-
-        // background-image: linear-gradient(to bottom right, 
-        //     rgba($color-primary-new, .8),
-        //     rgba(59, 107, 135, .6),
-        //     rgba(64, 113, 144, .5),
-        //     rgba(70, 119, 153, .5),
-        //     rgba(76, 126, 161, .4),
-        //     rgba(82, 132, 170, .4),
-        //     rgba(89, 138, 179, .5),
-        //     rgba(95, 144, 188, .7)
-        // );
 
         background-image: linear-gradient(to bottom right, 
             rgba($color-primary-new, .4),
@@ -149,6 +136,9 @@
             justify-content: center;
             margin-right: 0;
         }
+        @include respond-phone-larger() {
+            align-items: flex-start;
+        }
     }
 }
 
@@ -161,8 +151,9 @@
     // background-color: white;
 
     border-radius: 3px ;
-
-
+    @include respond-tablet-large() {
+        padding: 1.2rem 1.1rem;
+    }
 
     @include respond-tablet-medium() {   
         flex-direction: column;
@@ -170,13 +161,14 @@
         width: 90%;
         padding: 3rem .8rem 1.5rem .8rem;
         background-color: white;
-
-
-    
     }
 
     @include respond-tablet-small() {
         width: 90%;
+    }
+
+    @include respond-phone-larger() {
+        margin-top: 2rem;
     }
 
     &__field {
@@ -191,14 +183,15 @@
     &__field:not(:first-of-type) {
         margin-left: 1.2rem;
 
+        @include respond-tablet-large() {
+            margin-left: .8rem;
+        }
+
         @include respond-tablet-medium() {
             margin-left: 0;
         }
-
-
     }
- 
-
+    
     &__label {
         font-size: 1.5rem;
         margin-bottom: .8rem;
@@ -251,7 +244,7 @@
         border: 1px solid #E3E3E3;
         background-color: white;
         color: $color-secondary;
-        padding: 1.2rem 1.5rem;
+        padding: 1.1rem 1.5rem;
         cursor: pointer;
 
         @include respond-tablet-medium() {
@@ -270,7 +263,9 @@
         &-wrapper {
             margin-left: 1.5rem;
             margin-top: .5rem;
-
+            @include respond-tablet-large() {
+                margin-left: .8rem;
+            }
             @include respond-tablet-medium() {
                 width: 90%;
                 margin-left: 0;
@@ -287,8 +282,7 @@
     padding-top: 8rem;
     padding-bottom: 10rem;
     margin-top: 4rem;
-
-
+    overflow-y: hidden;
 
     @include respond-desktop-medium() {
         padding-top: 5rem;
@@ -304,7 +298,9 @@
     @include respond-tablet-medium() {
         margin-top: 0;
     }
-
+    @include respond-phone-larger() {
+        justify-content: center;    
+    }   
 
     &__background {
         position: absolute;
@@ -312,23 +308,24 @@
         top: 0;
         right: 12%;
         height: 100%;
-
-        // @include respond-desktop-larger() {
-        //     right: 6%;
-        // }
+        // border: 3px solid red;
 
         @include respond-desktop-larger() {
             right: 5%;
         }
-
         @include respond-desktop-small() {
             right: 4%;
         }
-
         @include respond-tablet-medium() {
             right: 0;
+            width: 100%;
+            height: auto;
         }
-        
+        @include respond-phone-larger() {
+            // right: 10%;
+            // right: -10%;
+        }
+
     }
     
     &__gradient {
@@ -352,38 +349,30 @@
         margin-left: 13%;
         z-index: 1;
 
-       
-
         @include respond-desktop-larger() {
             margin-left: 10%;
         }
-
         @include respond-desktop-large() {
             margin-left: 7%;
         }
-
         @include respond-desktop-medium() {
             margin-left: 9%;
-        }
-        
+        } 
         @include respond-desktop-small() {
             // margin-left: 7%;
         }
-
         @include respond-tablet-larger() {
             background-image: linear-gradient(to right, rgba(255,255,255, .9), rgba(255,255,255, .7));
             width: 100%;
             padding: 5rem 0 7rem 8%;
             margin-left: 0;
         }
-        
         @include respond-tablet-medium() {
             // Change to centered design
             align-items: center;
             padding: 5rem 0 7rem 0;
             background-image: linear-gradient(to right, rgba(255,255,255, .9), rgba(255,255,255, .75));
         }
-
 
     }
 
@@ -398,12 +387,10 @@
         @include respond-tablet-larger() {
             margin-bottom: 1rem;
         }
-
         @include respond-tablet-medium() {
             flex-direction: column;
             margin-bottom: 1.5rem;
         }
-
     }
 
     &__title {
@@ -414,9 +401,6 @@
         @include respond-desktop-small() {
             font-size: 1.8rem;
         }
-        // @include respond-tablet-larger() {
-        //     font-size: 1.6rem;
-        // }
     }
 
     &__image {
@@ -441,15 +425,12 @@
         margin-left: 5.5rem;
         margin-bottom: 3.5rem;
 
- 
         @include respond-desktop-small() {
             width: 54rem;
             font-size: 1.5rem;
             line-height: 2.6rem;
             margin-bottom: 2rem;
         }
-
-   
         @include respond-tablet-medium() {
             text-align: center;
             margin-left: 0;
@@ -460,6 +441,13 @@
         }
         @include respond-tablet-small() {
             width: 40rem;
+        }
+        @include respond-phone-larger() {
+            width: 30rem;
+        }
+
+        &--para-2 {
+            margin-top: 1rem;
         }
     }
     // Button wrapper found in components/buttons.scss
@@ -583,6 +571,9 @@
         padding-top: $padding-section--m;
         padding-bottom: $padding-section;
     }
+    @include respond-tablet-medium() {
+        padding-top: $padding-section;
+    }
 
 
     &__header {
@@ -622,6 +613,7 @@
         @include respond-tablet-larger() {
             align-items: center;
         }
+
     }
 
     &__jobs-list {
@@ -638,6 +630,10 @@
         }
         @include respond-tablet-small() {
             height: 63rem;
+        }
+
+        @include respond-phone-larger() {
+            height: 80rem;   
         }
 
     }
@@ -658,6 +654,9 @@
         }
         @include respond-tablet-medium() {
             width: 92%;
+        }
+        @include respond-phone-larger() {
+            flex-direction: column;
         }
 
     }
@@ -758,6 +757,10 @@
         width: 18rem;
         border-top: 1px solid #BBB;
         font-size: 1.6rem;
+
+        @include respond-phone-larger() {
+            margin-top: 4rem;
+        }
 
         &:last-child {
             border-bottom: 1px solid #BBB;
@@ -935,18 +938,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        // background-image:  linear-gradient(
-        //     to bottom right,
-        //     rgba(54,101,127, .85),
-        //     rgba(54,101,127, .85),
-        //     rgba(54,101,127, .85),
-        //     rgba(54,101,127, .85),
-            
-        //     rgba(54,101,127, .8),
-        //     ), url('/src/assets/work-with-us.jpg');
-        // background-repeat: no-repeat;
-        // background-size: cover;
-        // background-position: 50%;
 
         font-size: 2rem;
         color: whitesmoke;
@@ -981,19 +972,22 @@
 
     &__image {
         // position:relative;
-        height: 20rem;
-        width: 20rem;
+        // width: 20rem;
         margin-bottom: 3rem;
 
-        border-radius: 100%;
-        border: 1px solid #0000001a;
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: cover;
 
-        &-1, &-3 {
-            background-image: url('/src/assets/select.png');
+
+        &--wrapper {
+            display:flex;
+
         }
+        &--test {
+            
+        }
+
+        // &-1, &-3 {
+        //     background-image: url('/src/assets/select.png');
+        // }
 
         &-2 {
             background-image: url('/src/assets/jj.jpg');

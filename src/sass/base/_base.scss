@@ -24,6 +24,9 @@
     @include respond-tablet-medium() {
         --hero-height: 70%;
     }
+    @include respond-phone-larger() {
+        --hero-height: 60%;
+    }
  
 
     --page-padding--xs: 4%;

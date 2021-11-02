@@ -92,9 +92,11 @@ export const createJobCard = ({id, title, wage, location, description}, element,
                 </div> 
                 <div class="job-card__extra ${featured? 'job-card__extra--featured':''} ${details? 'job-card__extra--details':''}">
                     <svg class="job-card__extra-icon"><use xlink:href="svg/spritesheet.svg#clock"></svg>
-                    <div class="job-card__type ${featured? 'job-card__type--featured':''}">Permanent</div>
-                    <div class="job-card__position ${featured? 'job-card__position--featured':''}">In House</div>
-                    <div class="job-card__PQE ${featured? 'job-card__PQE--featured':''}">PQE: 3+</div>
+                    <div class="job-card__extra-wrapper">    
+                        <div class="job-card__type ${featured? 'job-card__type--featured':''}">Permanent</div>
+                        <div class="job-card__position ${featured? 'job-card__position--featured':''}">In House</div>
+                        <div class="job-card__PQE ${featured? 'job-card__PQE--featured':''}">PQE: 3+</div>
+                    </div>        
                 </div> 
 
                 ${!details? 

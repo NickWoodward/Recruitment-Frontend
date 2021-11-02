@@ -48,11 +48,11 @@
             margin-bottom: 1rem;
         }
         @include respond-tablet-small() {
-            // flex-direction: column;
             width: 100%;
-            // justify-content: center;
-            // padding: 3.5rem 2.8rem 3.5rem 2.8rem;
-            // margin-bottom: 2rem;
+        }
+        @include respond-phone-larger() {
+            flex-direction: column;
+            align-items: center;
         }
 
     }
@@ -61,6 +61,15 @@
             order: 0;
             @include respond-tablet-small() {
                 order: 1;
+            }
+            @include respond-phone-larger() {
+                min-width: 75%;
+                margin-top: 1.5rem;
+                border: 1px solid red;
+
+            }
+            @include respond-phone-large() {
+                min-width: 90%;
             }
         }
         &__phone-email-wrapper {
@@ -72,7 +81,13 @@
             @include respond-tablet-small() {
                 order: 0;
                 margin-left: 0;    
-
+            }
+            @include respond-phone-larger() {
+                min-width: 75%;
+                border: 1px solid red;
+            }
+            @include respond-phone-large() {
+                min-width: 90%;
             }
         }
         

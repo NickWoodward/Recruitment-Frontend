@@ -408,42 +408,53 @@ const footerAnimation = () => {
 
 
 export const initParallax = () => {
-  gsap.utils.toArray('.parallax').forEach((section, i) => {
-    const image = section.querySelector('.background-image');
-    
-    if(i) {
-        gsap.fromTo(image, {
-            y: (i, el) => (500 - el.offsetHeight)
-        }, {
-            y: 0,
-            duration: 4,
-            ease: "none",
-            scrollTrigger: {
+
+  const heroHeight = document.querySelector('.hero').offsetHeight;
+
+  ScrollTrigger.matchMedia({
+      "(min-width: 1299px)": function() { 
+          gsap.utils.toArray('.parallax').forEach((section, i) => {
+            const image = section.querySelector('.background-image');
+        
+            if(i) {
+                gsap.fromTo(image, {
+                    y: (i, el) => (500 - el.offsetHeight)
+                }, {
+                    y: 0,
+                    duration: 4,
+                    ease: "none",
+                    scrollTrigger: {
+                          trigger: section,
+                          start: "top-=50 bottom", 
+                          end: "bottom+=50 top",
+                          scrub: true,
+                          // markers: true,
+                          toggleActions: "restart pause reverse reset"
+                    }
+                });
+            } else {
+        
+              gsap.fromTo(image, {
+                // y: (i, el) => return (500 - (el.offsetHeight - 500)) 
+                y: 0 
+              }, {
+                y: 200,
+                duration: 4,
+                ease: "none",
+                scrollTrigger: {
                   trigger: section,
-                  start: "top-=50 bottom", 
-                  end: "bottom+=50 top",
+                  start: "top top", 
+                  end: "bottom-=100 top",
                   scrub: true,
                   // markers: true,
-                  toggleActions: "restart pause reverse reset"
+                  // toggleActions: "restart pause reverse reset"
+                }
+              });
             }
-        });
-    } else {
-      gsap.fromTo(image, {
-        y: (i, el) => (500 - (el.offsetHeight - 500))
-      }, {
-        y: 200,
-        duration: 4,
-        ease: "none",
-        scrollTrigger: {
-          trigger: section,
-          start: "top top", 
-          end: "bottom-=100 top",
-          scrub: true,
-          // markers: true,
-          // toggleActions: "restart pause reverse reset"
+          });
         }
-      });
-    }
+    
   });
-  
+
+
 };

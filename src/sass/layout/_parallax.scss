@@ -1,9 +1,6 @@
 .parallax {
     position: relative;
-    // height: 100vh;
-    display: flex;
-    // align-items: center;
-    // justify-content: center;
+
     overflow: hidden;
 
     &-wrapper {
@@ -14,26 +11,16 @@
     & .background-image {
         position: absolute;
         top: 0;
-        left: 50%;
-        margin-left: calc(-1920px / 2 + 8px);
-        // margin: 0 auto;
-        // width: auto;
-        // width: 100%;
-        // max-width: 100%;
-
+        left: 0;
+ 
         &--hero {
 
-            @include respond-desktop-small() {
-                left: 60%;
-            }
+            // Anything below this size has parallax turned off
             @include respond-tablet-larger() {
-                left: 80%;
+                object-fit: cover;
+                width: 100%;
+                height: 100%;
             }
-            // height: 50vh;
-            object-fit: cover;
-            
-            // width: auto;
-            // max-width: 100%;
         }
         &--testimonials {
             height: 100vh;
