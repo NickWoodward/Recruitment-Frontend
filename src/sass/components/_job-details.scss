@@ -25,6 +25,12 @@
     &__featured-jobs {
         display: flex;
         flex-direction: column;
+
+        // margin-left: 7rem;
+
+        // @include respond-desktop-medium() {
+        //     margin-left: 2rem;
+        // }
     }
 
     &__header {

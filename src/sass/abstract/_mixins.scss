@@ -39,7 +39,13 @@
 }
 
 @mixin respond-phone-large {
-    @media (max-width: 420px) { @content };
+    @media (max-width: 425px) { @content };
+}
+@mixin respond-phone-medium {
+    @media (max-width: 380px) { @content };
+}
+@mixin respond-phone-small {
+    @media (max-width: 340px) { @content }
 }
 
 

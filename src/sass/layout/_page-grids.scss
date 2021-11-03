@@ -63,26 +63,34 @@
         display: flex;
         flex-flow: row wrap;
   
-        justify-content: center;
+        // justify-content: center;
+        justify-content: space-around;
         align-content: flex-start;
 
     }
 
     // Sections: __back, __table-wrapper, __featured-jobs--detail
     &__back, &__table-wrapper, &__featured-jobs {
-        --initial-basis: calc(var(--width) /  var(--columns) * 100%);
-        flex-basis: var(--initial-basis);
+
+        --initialbasis: calc(var(--width) /  var(--columns) * 100%);
+        flex-basis: var(--initialbasis);
     }
 
     &__back {
         --width: 16;
     }
     &__table-wrapper {
-        --width: 7;
+        --width: 11;
+
+        @include respond-desktop-medium() {
+            --width: 9;
+        }
     }
     &__featured-jobs {
         --width: 5;
 
-        margin-left: 7rem;
+        @include respond-desktop-medium() {
+            --width: 3;
+        }
     }
 }

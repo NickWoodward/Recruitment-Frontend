@@ -17,15 +17,22 @@
         height: 100%;
 
         background-image: linear-gradient(to bottom right, 
-            rgba($color-primary-new, .4),
-            rgba(59, 107, 135, .4),
-            rgba(59, 107, 135, .4),
-            rgba(59, 107, 135, .4),
-            rgba(59, 107, 135, .4),
-            rgba(59, 107, 135, .4),
-            rgba(59, 107, 135, .4),
-            rgba(59, 107, 135, .4)
+            rgba($color-primary-new, .6),
+            rgba(59, 107, 135, .6),
+            rgba(59, 107, 135, .6),
+            rgba(59, 107, 135, .6),
+            rgba(59, 107, 135, .6),
+            rgba(59, 107, 135, .6),
+            rgba(59, 107, 135, .6),
+            rgba(59, 107, 135, .6)
         );
+
+        @include respond-phone-large() {
+            background-image: linear-gradient(to bottom right, 
+                rgba($color-primary-new, .6),
+                rgba(59, 107, 135, .6)
+            );
+        }
     }
 
     &__content {
@@ -35,7 +42,6 @@
         justify-content: center;
         width: 55rem;
         top: 14rem;
-        // margin: 0 0 0 var(--page-padding--content);
         margin: 0 0 0 16%;
 
         @include respond-desktop-large() {
@@ -49,6 +55,15 @@
             margin:0;
             width: 50%;
             top: 22%;
+        }
+        @include respond-phone-large() {
+            top: 16%;
+        }
+        @include respond-phone-medium() {
+            top: 11%;
+        }
+        @include respond-phone-small() {
+            top: 10%;
         }
     }
 
@@ -68,6 +83,14 @@
         @include respond-tablet-medium() {
             font-size: 4rem;
         }
+        @include respond-phone-large() {
+            font-size: 3rem;
+            line-height: 3.8rem;
+        }
+        @include respond-phone-small() {
+            font-size: 2.5rem;
+            line-height: 3rem;
+        }
 
         &--sub {
             font-size: 3.9rem;
@@ -77,6 +100,10 @@
 
             @include respond-tablet-medium() {
                 font-size: 3rem;
+            }
+            @include respond-phone-large() {
+                font-size: 2.3rem;
+                line-height: 3rem;
             }
         }
     }
@@ -148,7 +175,6 @@
     align-items: flex-end;
     padding: 1.2rem 1.3rem;
     border: 1px solid #E3E3E3;
-    // background-color: white;
 
     border-radius: 3px ;
     @include respond-tablet-large() {
@@ -170,11 +196,22 @@
     @include respond-phone-larger() {
         margin-top: 2rem;
     }
+    @include respond-phone-medium() {
+        width: 95%;
+        border: none;
+
+    }
+    @include respond-phone-small() {
+        margin-top: 1rem;
+        padding: 1rem .2rem;
+    }
+ 
 
     &__field {
         @include respond-tablet-medium() {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             width: 90%;
             margin-bottom: 1rem;
         }
@@ -195,11 +232,15 @@
     &__label {
         font-size: 1.5rem;
         margin-bottom: .8rem;
-        // font-weight: bold;
         color: $color-secondary;
         
         @include respond-tablet-medium() {
             flex-basis: 33%;
+        }
+        @include respond-phone-larger() {
+            font-size: 1.3rem;
+            flex-basis: 6rem;
+            flex-grow:0;
         }
     }
 
@@ -211,6 +252,13 @@
 
         @include respond-tablet-medium() {
             flex-basis: 66%;
+        }
+        @include respond-phone-larger() {
+            flex-basis: auto;
+            flex-grow: 1;
+        }
+        @include respond-phone-small() {
+            font-size: 1.2rem;
         }
 
         &:focus {
@@ -295,12 +343,15 @@
         // padding moved on to the content element
     }
 
-    @include respond-tablet-medium() {
-        margin-top: 0;
-    }
     @include respond-phone-larger() {
-        justify-content: center;    
+        justify-content: center;  
     }   
+    @include respond-phone-large() {
+        margin-top: 0;  
+    }
+    @include respond-phone-medium() {
+        margin-top: 2rem;
+    }
 
     &__background {
         position: absolute;
@@ -345,7 +396,6 @@
         flex-direction: column;
         align-items: flex-start;
         justify-content: center;
-        // margin-left: 25rem;
         margin-left: 13%;
         z-index: 1;
 
@@ -358,9 +408,7 @@
         @include respond-desktop-medium() {
             margin-left: 9%;
         } 
-        @include respond-desktop-small() {
-            // margin-left: 7%;
-        }
+
         @include respond-tablet-larger() {
             background-image: linear-gradient(to right, rgba(255,255,255, .9), rgba(255,255,255, .7));
             width: 100%;
@@ -372,6 +420,9 @@
             align-items: center;
             padding: 5rem 0 7rem 0;
             background-image: linear-gradient(to right, rgba(255,255,255, .9), rgba(255,255,255, .75));
+        }
+        @include respond-phone-larger() {
+            // padding: 5rem 0 6rem 0; 
         }
 
     }
@@ -399,6 +450,9 @@
         color: $color-secondary;
 
         @include respond-desktop-small() {
+            font-size: 2rem;
+        }
+        @include respond-phone-large() {
             font-size: 1.8rem;
         }
     }
@@ -415,6 +469,9 @@
         }
         @include respond-tablet-medium() {
             margin-bottom: 1rem;
+        }
+        @include respond-phone-larger() {
+            margin-bottom: 2rem;
         }
     }
 
@@ -444,6 +501,12 @@
         }
         @include respond-phone-larger() {
             width: 30rem;
+            margin-bottom: 2.5rem;
+        }
+        @include respond-phone-small() {
+            font-size: 1.4rem;
+            line-height: 2rem;
+            width: 28rem;
         }
 
         &--para-2 {
@@ -455,18 +518,18 @@
     .roles {
         padding: 0 2rem 0 0;
     
-        // @include respond-desktop-small() {
-        //     margin-bottom: 2.5rem;
-        // }
-    
         &__list {
             display: flex;
             align-items: center;
             margin-left: 4.5rem;
-    
+            
            
             @include respond-tablet-medium() {
                 margin-left: 0;
+            }
+            @include respond-phone-larger() {
+                flex-direction: column;
+                align-items: flex-start;
             }
         }
         &__item {
@@ -480,44 +543,40 @@
                 font-size: 1.4rem;
             }
 
-            // @include respond-phone() {
-            //     font-size: 1.5rem;
-            // }
+            @include respond-phone-larger() {
+                // font-size: 1.3rem;
+            }
         }
         &__item:not(:first-of-type) {
             margin-left: 2rem;
-            // @include respond-desktop-large() {
-            //     margin-left: 0;
-            // }
-            // @include respond-desktop-small() {
-            //     margin-left: 2rem;
-            // }
+            
+            @include respond-phone-larger() {
+                margin-left: 0;
+                margin-top: .5rem;
+            }
  
         }
         &__item:not(:last-of-type) {
             margin-right: 2rem;
-            // @include respond-desktop-large() {
-            //     margin-right: 0;
-            //     margin-bottom: .7rem;
-            // }
-            // @include respond-desktop-small(){
-            //     margin-right: 2rem;
-            //     margin-bottom: 0;
-            // }
+
+            @include respond-phone-larger() {
+                margin-right: 1.5rem;
+                margin-bottom: .5rem;
+            }
 
         }
         &__divider {
             border-left: 1px solid $color-primary;
             height: 2rem;
     
-            // @include respond-desktop-large() {
-            //     height: 0;
-            //     border-left: none;
-            // }
-            // @include respond-desktop-small() {
-            //     border-left: 1px solid $color-primary;
-            //     height: 2rem;
-            // }
+            @include respond-phone-larger() {
+                display: none;
+                border-left: none;
+                border-bottom: 1px solid $color-primary;
+                width: 10%;
+                height: 1px;
+                align-self: center;
+            }
         }
     
         &__icon {
@@ -534,17 +593,16 @@
                 margin-right: 1.2rem;
             }
         }
+        //clock icon
         &__interim {
             height: 2.5rem;
             width: 2.5rem;
             margin-right: .8rem;
-
-     
-    
-            // @include respond-desktop-large() {
-            //     margin-right: 1.7rem;
-            // }
-        
+            
+            @include respond-phone-larger() {
+                margin-left: .3rem;
+                margin-right: 1.6rem;
+            }
         }
         &__location {
             height: 2.3rem;
@@ -553,6 +611,10 @@
     
             @include respond-desktop-large() {
                 margin-top: .2rem;
+            }
+            @include respond-phone-larger() {
+                margin-left: .4rem;
+                margin-right: 1.6rem;
             }
         }
     }
@@ -592,7 +654,12 @@
         font-weight: 400;
         color: $color-secondary;
 
-
+        @include respond-desktop-small() {
+            font-size: 2rem;
+        }
+        @include respond-phone-large() {
+            font-size: 1.8rem;
+        }
     }
 
     &__content {
@@ -887,7 +954,7 @@
     flex-direction: column;
     align-items: center;
     width: var(--why-card-width);
-    padding: 5rem;
+    padding: 0 0 5rem 0;
     background-color: white;
     border: none;
     box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
@@ -896,12 +963,14 @@
     @include respond-tablet-larger() {  
         margin-bottom: 3rem;
     }
+    
 
     &__background {
         position: absolute;
         top: 0;
         left: -25%;
-        height: 100%;
+        // height: 100%;
+
     }
 
     // The bar is the animation overlay
@@ -971,18 +1040,17 @@
     }
 
     &__image {
-        // position:relative;
-        // width: 20rem;
-        margin-bottom: 3rem;
+        height: 100%;
+        // width: 100%;
+        object-fit: cover;
 
-
-
-        &--wrapper {
+        &-wrapper {
             display:flex;
+            height: 44rem;
+            width: 100%;
+            margin-bottom: 3rem;
+            overflow: hidden;
 
-        }
-        &--test {
-            
         }
 
         // &-1, &-3 {
@@ -990,7 +1058,17 @@
         // }
 
         &-2 {
-            background-image: url('/src/assets/jj.jpg');
+            // background-image: url('/src/assets/jj.jpg');
+        }
+        &-3 {
+            // display: none;
+            @include respond-tablet-small() {
+                transform: translateX(-10rem);
+            }
+            @include respond-phone-large() {
+                transform: translateX(-22rem);
+
+            }
         }
     }
     
@@ -999,6 +1077,8 @@
         font-size: 1.8rem;
         font-weight: 400;
         color: $color-secondary;
+        text-align: center;
+
     }
 
     &__text {
@@ -1006,6 +1086,7 @@
         font-weight: 400;
         line-height: 1.8rem;
         text-align: center;
+        padding: 0 5rem;
     }
 }
 

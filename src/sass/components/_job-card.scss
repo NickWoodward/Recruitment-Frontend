@@ -67,6 +67,8 @@
         &:not(:first-of-type) {
             margin-top: 1.5rem;
         }
+
+
     }
     
     &__title {
@@ -118,6 +120,10 @@
             @include respond-tablet-larger() {
                 font-size: 2rem;
             }
+ 
+            @include respond-phone-larger() {
+                font-size: 1.8rem;
+            }
         }
         &--list {
             font-size: 1.9rem;
@@ -165,16 +171,29 @@
         padding: 0 4rem;
         flex-grow: 1;
 
- 
+        font-size: var(--job-card-extra);
+        font-weight: 400;
+        color: $color-text-primary;
+
+        &--featured {
+            font-size: var(--job-card-location--featured);
+            @include respond-desktop-small() {
+                font-size: 1.6rem;
+            }
+            @include respond-tablet-larger() {
+                font-size: var(--job-card-wage--featured);
+            }
+            @include respond-phone-larger() {
+                font-size: 1.5rem;
+            }
+        }
+        
     }
 
     &__wage {
         display: flex;
         align-items: center;
 
-        color: $color-text-primary;
-        font-size: var(--job-card-wage);
-        font-weight: 400;
         margin-bottom: .5rem;
 
         &-icon {
@@ -185,23 +204,11 @@
             margin-right: 1.7rem;
             fill: rgb(44, 44, 44);
         }
-        &--featured {
-            font-size: var(--job-card-wage--featured);
-            @include respond-desktop-small() {
-                font-size: 1.6rem;
-            }
-            @include respond-tablet-larger() {
-                font-size: var(--job-card-wage--featured);
-            }
-        }
+
     }
     &__location {
         display: flex;
         align-items: center;
-
-        font-size: var(--job-card-location);
-        font-weight: 400;
-        color: $color-text-primary;
         margin-bottom: .5rem;
 
         &-icon {
@@ -210,23 +217,10 @@
             margin-right: 1.5rem;
 
         }
-
-        &--featured {
-            font-size: var(--job-card-location--featured);
-            @include respond-desktop-small() {
-                font-size: 1.6rem;
-            }
-            @include respond-tablet-larger() {
-                font-size: var(--job-card-wage--featured);
-            }
-        }
     }
     &__extra {
         display: flex;
         align-items: flex-start;
-        font-size: var(--job-card-extra);
-        font-weight: 400;
-        color: $color-text-primary;
         margin-bottom: 2rem;
 
         &-wrapper {
@@ -248,15 +242,13 @@
         }
 
         &--featured {
-            font-size: var(--job-card-extra--featured);
-
             @include respond-desktop-small() {
                 margin-bottom: 1.3rem;
-                font-size: 1.6rem;
+                // font-size: 1.6rem;
             }
             @include respond-tablet-larger() {
                 margin-bottom: 2rem;
-                font-size: var(--job-card-wage--featured);
+                // font-size: var(--job-card-wage--featured);
             }
         }
     }

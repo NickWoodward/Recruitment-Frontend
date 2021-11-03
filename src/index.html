@@ -72,7 +72,8 @@
                                             >
                     <source
                         media="(max-width: 500px)"
-                        srcset="./assets/images/hero-500.webp 500w"
+                        srcset="./assets/images/hero-500.webp 500w,
+                                ./assets/images/hero-600.webp 600w"
                                             >
                     <source
                         media="(max-width: 600px)"
@@ -85,7 +86,6 @@
                     <source
                         media="(max-width: 1200px)"
                         srcset="./assets/images/hero-1200.webp 1200w"
-                        
                     >
                     <source
                         media="(max-width: 1500px)"
@@ -131,7 +131,7 @@
                     
                     <form class="search" action="jobs.html" method="GET">
                         <div class="search__field">
-                            <div class="search__label">Job Title</div>
+                            <div class="search__label">Title</div>
                             <select name="title" id="title" class="search__input">
                                 <option value="">----</option>
                                 <!-- options added in js -->
@@ -185,7 +185,6 @@
 
                     <img src="./assets/images/about-600.jpg" alt="Woman solving a rubix-like recruitment puzzle" class="about__background">
                 </picture>
-                <!-- <img src="./assets/resized/about-test-1.jpg" alt="" class="about__background"> -->
                 <div class="about__gradient"></div>
                 <div class="about__content">
                     <div class="about__title-wrapper">
@@ -292,7 +291,8 @@
                     <div class="why-card__wrapper">
                         <div class="why-card">
                             <div class="why-card__bar"></div>
-                            <div class="why-card__image why-card__image-2">
+                            <div class="why-card__image-wrapper">
+                                <img class="why-card__image why-card__image--test why-card__image-2" src="/src/assets/temp/monkey-center.webp" width="640px" height="961px"/>
                             </div>
                             <div class="why-card__title why-card__title-2">Title 2</div>
                             <div class="why-card__text why-card__text-2">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel, rem dolorem. Esse, temporibus modi quo sit praesentium exercitationem aut architecto.</div>
@@ -305,7 +305,8 @@
                     <div class="why-card__wrapper">
                         <div class="why-card">
                             <div class="why-card__bar"></div>
-                            <div class="why-card__image why-card__image-3">
+                            <div class="why-card__image-wrapper">
+                                <img class="why-card__image why-card__image--test why-card__image-3" src="/src/assets/temp/monkey-right.jpg"/>
                             </div>
                             <div class="why-card__title why-card__title-3">Title 3</div>
                             <div class="why-card__text why-card__text-3">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel, rem dolorem. Esse, temporibus modi quo sit praesentium exercitationem aut architecto.</div>
@@ -319,7 +320,7 @@
             </section>
 
             <section class="testimonials section parallax">
-                <img srcset="./assets/resized/parallax-bottom-1920.jpg 1920w, 
+                <!-- <img srcset="./assets/resized/parallax-bottom-1920.jpg 1920w, 
                             ./assets/resized/parallax-bottom-1800.jpg 1800w, 
                             ./assets/resized/parallax-bottom-1500.jpg 1500w, 
                             ./assets/resized/parallax-bottom-1200.jpg 1200w, 
@@ -327,9 +328,17 @@
                             ./assets/resized/parallax-bottom-640.jpg 640w"
                     src="./assets/resized/parallax-bottom-1800.jpg" 
                     alt="Office Image" 
-                    class="background-image background-image--testimonials">
+                    class="background-image background-image--testimonials"> -->
 
-            <!-- <img src="./assets/parallaxtest3.jpg" alt="JRS Office Image" class="background-image background-image--testimonials"> -->
+                <picture>
+                    <source
+                        srcset="./assets/temp/skyscraperscityoflondon.jpg",
+                        width="1920"
+                    >
+                    <img src="./assets/temp/skyscraperscityoflondon.jpg" alt="" class="background-image background-image--testimonials">
+                </picture>
+
+
             <div class="testimonials-gradient"></div>
 
             <blockquote class="testimonials__content">

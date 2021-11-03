@@ -418,7 +418,9 @@ export const initParallax = () => {
         
             if(i) {
                 gsap.fromTo(image, {
-                    y: (i, el) => (500 - el.offsetHeight)
+                    // y: (i, el) => (500 - el.offsetHeight)
+                    y: (i, el) => (316 - el.offsetHeight)
+
                 }, {
                     y: 0,
                     duration: 4,

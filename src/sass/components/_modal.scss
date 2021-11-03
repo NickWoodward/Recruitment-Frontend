@@ -63,7 +63,16 @@
     font-size: 1.6rem;
     z-index: 10;
 
-
+    @include respond-tablet-medium() {
+        width: 20rem;
+    }
+    @include respond-phone-larger() {
+        width: 40%;
+        font-size: 1.4rem;
+    }
+    @include respond-phone-large() {
+        // width: 50%;
+    }
 
     &__header {
         display: flex;
@@ -73,6 +82,13 @@
         padding: 1.3rem 2.5rem;
         cursor: pointer;
 
+
+        @include respond-phone-larger() {
+            padding: 1rem 1.9rem;
+        }
+        @include respond-phone-large() {
+            // width: 50%;
+        }
     }
     &__close-icon {
         width: 2rem;

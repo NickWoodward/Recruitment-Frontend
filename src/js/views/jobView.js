@@ -60,7 +60,6 @@ export const setJobModalPosition = () => {
 
 const createJobDetailsTable = (job) => { 
     const markup = `
-    <div class="job-details__table-wrapper">
         <div class="job-details__table" data-id=${job.id}>
             <div class="job-details__header">
                 <div class="job-details__title">${job.title}</div>
@@ -101,8 +100,7 @@ const createJobDetailsTable = (job) => {
             <div class="job-details__row job-details__row--btns">
                 <button class="job-details__btn job-details__btn--apply btn">Apply</button>
             </div>
-        </div>
-    </div>`;
+        </div>`;
     return markup;
 }
 export const renderJobDetails = (job, container = document.body, jobs, event) => {
