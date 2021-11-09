@@ -17,7 +17,18 @@
 :root {
     --columns: 16;
     --header-height: 8rem;
+    --jobs-menu-height: 10rem;
     --padding__nav-a: 2rem;
+    // Need to be px for js calculations
+    --job-card-height--details: 180px;
+    --job-card-margin--details: 15px;
+
+    @include respond-desktop-medium()  {
+        --job-card-height--details: 240px;
+    }
+    @include respond-tablet-larger() {
+        --job-card-height--details: 280px;
+    }
     // --header-height: 11rem;
 
     --hero-height: 82%;

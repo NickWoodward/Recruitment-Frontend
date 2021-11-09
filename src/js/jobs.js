@@ -4,7 +4,7 @@ import * as loginView from "./views/loginView";
 import * as applyView from "./views/applyView";
 import * as registerView from "./views/registerView";
 import * as forgotPassView from "./views/forgotPassView";
-import * as JobListView from "./views/jobListView";
+import * as jobListView from "./views/jobListView";
 import * as jobsMenuView from "./views/jobsMenuView";
 import * as loader from "./views/loader";
 import * as utils from "./utils/utils";
@@ -67,14 +67,14 @@ export default class JobsController {
         window.addEventListener("DOMContentLoaded", () => {
             utils.pageFadeIn();
             headerView.renderHeader("jobs");
-            
+            jobListView.initialiseScrollAnimation();
         });
 
         // #TODO: Debounce / change to GSAP
         window.addEventListener("scroll", (e) => {
             // At bottom of screen && there are more jobs to retrieve
             if (
-                JobListView.isAtBottom() &&
+                jobListView.isAtBottom() &&
                 this.totalJobs > document.querySelectorAll(".job-card").length
             ) {
                 this.getJobs();
@@ -97,7 +97,7 @@ export default class JobsController {
                 if(this.searchOptions.titles.length !== [...new Set(suggestions)].length) {
                     this.searchOptions.titles = [...new Set(suggestions)];
                     // Remove current Jobs
-                    JobListView.clearJobs(elements.jobsGrid);
+                    jobListView.clearJobs(elements.jobsGrid);
 
                     // Every time a filter is added restart the index
                     this.searchOptions.index = 0;
@@ -246,14 +246,14 @@ export default class JobsController {
                 this.totalJobs = totalJobs;
                 this.searchOptions.index += this.limit;
                 // Passing the index to the render and animate functions allow gsap to animate only the most recent elements added to the page
-                JobListView.renderJobs(jobs, elements.jobsGrid, false, this.searchOptions.index);
-                // JobListView.animateJobs(this.searchOptions.index);
+                jobListView.renderJobs(jobs, elements.jobsGrid, false, this.searchOptions.index);
+                // jobListView.animateJobs(this.searchOptions.index);
             })
             .catch((err) => console.log(err));
     }
 
     clearJobs() {
-        JobListView.clearJobs(elements.jobsGrid);
+        jobListView.clearJobs(elements.jobsGrid);
     }
 
     initialiseJobsMenu() {
@@ -303,7 +303,7 @@ export default class JobsController {
                 this.changeSearchOptions(submenu, checkboxTitle);
                 
                 // Remove current Jobs
-                JobListView.clearJobs(elements.jobsGrid);
+                jobListView.clearJobs(elements.jobsGrid);
 
                 // Every time a filter is added restart the index
                 this.searchOptions.index = 0;

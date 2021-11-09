@@ -2,7 +2,7 @@
 .jobs__main {
     // --job-card-width: 42rem;
 
-    // Grid set in 'layout/grids'
+    position: relative;
     display: flex;
     flex-flow: row wrap;
     align-content: flex-start;
@@ -10,15 +10,27 @@
     min-height: 100%;
     background-color: rgb(245, 247, 250);
 
+    @include respond-desktop-large() {
+        flex-direction: column;
+        align-content: center;
+    }
+
 }
 
 /*** Column 1 (Menu) ***/
 .jobs__menu-wrapper {
+    position: fixed;
     display: flex;
     justify-content: center;
     background-color: $color-logo;
     min-height: calc(100vh - var(--header-height));
-    // z-index: 100;
+    z-index: 100;
+
+    @include respond-desktop-large() {
+        min-height: auto;  
+        width: 100%; 
+        background-color: rgb(245, 247, 250);
+    }
 }
 
 .jobs-menu {
@@ -30,13 +42,39 @@
     // For the icons
     fill: $color-secondary-highlight;
 
+    @include respond-desktop-large() {
+        position: relative;
+        flex-direction: row;
+        justify-content: flex-start;
+        height: var(--jobs-menu-height);
+        padding-left: 3.5rem;
+        padding-top: 0;
+        z-index: 100;
+    }
+    @include respond-desktop-small() {
+        justify-content: center;
+        padding-left: 0;
+    }
     
     &__item {
         // position for stacking context (prevent collapsed list items covering submenus below)
         position: relative;
+ 
         width: 100%;
         // border-bottom: 1px solid $color-secondary-highlight;
 
+        @include respond-desktop-large() {
+            display: flex;
+            justify-content: center;
+            width: 16rem;
+            height: 5rem;
+            border: 1px solid #d4d4d5;
+            background-color: white;
+
+            &:not(:first-of-type) {
+                margin-left: 2.5rem;
+            }
+        }
 
     }
 
@@ -47,22 +85,44 @@
         
         padding: 2.5rem 0 2.5rem 3rem;
 
+        @include respond-desktop-large() {
+            padding: 0;
+            transform: translateX(-1rem);
+        }
+
         font-size: 1.6rem;
         color: $color-white;
         cursor: pointer;
+
+        @include respond-desktop-large() {
+            color: $color-secondary;
+            fill: $color-primary-new;
+        }
 
         &--active {
             background-color: $color-secondary-highlight;
             color: #042950;
             fill: #042950;
+
+            @include respond-desktop-large() {
+                color: $color-secondary;
+                fill: $color-primary-new;
+                background-color: white;
+            }
         }
     }   
     &__title-text{
         margin-left: 2rem;
+        transform: translateY(-1px);
+        
+        @include respond-desktop-large() {
+            margin-left: 1rem;
+        }
     }
     &__title-icon {
         height: 2rem;
         width: 2rem;
+
 
         &--active {
             transform:rotate(90deg);
@@ -83,22 +143,35 @@
     }
     
     &__content {
-        // display: none;
+        position: absolute;
         flex-direction: column;
         align-items: center;
         // padding-bottom: 3rem;
         // padding-top: 2.2rem;
-        height: 0px;
+        // height: 0px;
         // max-height: 0;
         // opacity: 0;
         visibility: hidden;
         font-size: var(--menu-content);
+        z-index: 100;
         
-        &--open {
-            display: flex;
-            max-height: 100%;
-            // opacity: 1;
+
+        @include respond-desktop-large() {
+            top: calc(100% + 1rem );
+            left: 0;
+            width: 35rem;
+            padding: 1.2rem 0 1.8rem 0;
+            background-color: white;
+            box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
         }
+
+
+        // &--open {
+        //     display: flex;
+        //     max-height: 100%;
+        //     background-color: white;
+        //     // opacity: 1;
+        // }
 
 
     }
@@ -110,6 +183,10 @@
         width: 100%;
         padding: 1rem 3.5rem 1rem 3rem;
         color: $color-white;
+
+        @include respond-desktop-large() {
+            color: $color-secondary;
+        }
     }
 
     &__description {
@@ -171,6 +248,8 @@
     position: relative;
     display: inline-flex;
     flex-direction: column;
+    // width: 100%;
+    // border: 1px solid green;
 }
 
 
@@ -195,6 +274,15 @@
     padding-top: 5rem;
     padding-bottom: 10rem;
 
+    @include respond-desktop-large() {
+        display: flex; 
+        justify-content: center;
+        padding-top: 1rem;
+        margin-top: var(--jobs-menu-height);
+    }
+    @include respond-desktop-small() {
+        width: 60%; 
+    }
 }
 
 .jobs__grid {
@@ -205,6 +293,11 @@
     column-gap: 2.8rem; 
     justify-items: center;
     margin-top: 2.5rem; 
+
+    @include respond-desktop-small() {
+        display: flex;
+        flex-direction: column;    
+    }
 }
 
 // .jobs__aside {

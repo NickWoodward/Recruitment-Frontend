@@ -60,6 +60,7 @@ export const setJobModalPosition = () => {
 
 const createJobDetailsTable = (job) => { 
     const markup = `
+    <div class="job-details__table-wrapper">
         <div class="job-details__table" data-id=${job.id}>
             <div class="job-details__header">
                 <div class="job-details__title">${job.title}</div>
@@ -97,40 +98,41 @@ const createJobDetailsTable = (job) => {
                 <div class="job-details__date-label job-details__label">Posted</div>
                 <div class="job-details__date-value job-details__value">More than 3 days ago</div>
             </div>
-            <div class="job-details__row job-details__row--btns">
+            <div class="job-details__row--btns">
                 <button class="job-details__btn job-details__btn--apply btn">Apply</button>
             </div>
+        </div>
         </div>`;
     return markup;
 }
 export const renderJobDetails = (job, container = document.body, jobs, event) => {
     const markup = `
-        <div class="modal job-details">
-        
+        <div class="modal job-details">        
+            <div class="job-details__back">
+                <button class="job-details__back-btn">
+                    <svg class="job-details__back-svg">
+                        <use xlink:href="svg/spritesheet.svg#arrow-left">
+                    </svg>
+                    <div class="job-details__back-text">Back</div>
+                </button>
+            </div>
             <div class="job-details__content">
-                <div class="job-details__back">
-                    <button class="job-details__back-btn">
-                        <svg class="job-details__back-svg">
-                            <use xlink:href="svg/spritesheet.svg#arrow-left">
-                        </svg>
-                        <div class="job-details__back-text">Back</div>
-                    </button>
-                </div>
-                <div class="job-details__table-wrapper">
                     ${createJobDetailsTable(job)}
-                </div>
                 <div class="job-details__featured-jobs">
-                    ${createListJobCard(jobs[0], null, true, true)}
-                    ${createListJobCard(jobs[1], null, true, true)}
-                    ${createListJobCard(jobs[2], null, true, true)}
                 </div>
             </div>
- 
         </div>
     `;
 
     container.insertAdjacentHTML('afterbegin', markup);
     setJobModalPosition();
+    const numFeaturedJobs = calculateNumFeaturedJobs(document.querySelector('.job-details__table-wrapper'));
+
+    const featuredJobsList = document.querySelector('.job-details__featured-jobs');
+    
+    for(let x = 0; x < numFeaturedJobs; x++) {
+        featuredJobsList.insertAdjacentHTML('beforeend', createListJobCard(jobs[x], null, null, true));
+    }
 
     // Prevent bg scrolling behind modal
     // document.body.style.overflow = "hidden";
@@ -139,14 +141,33 @@ export const renderJobDetails = (job, container = document.body, jobs, event) =>
     tl.play(0);
 };
 
+const calculateNumFeaturedJobs = (container) => {
+    // const jobCard = document.querySelector('.job-card--details');
+    const jobCardMargin = getComputedStyle(document.documentElement).getPropertyValue('--job-card-margin--details');
+    const jobCardHeight = getComputedStyle(document.documentElement).getPropertyValue('--job-card-height--details');
+    const containerHeight = container.clientHeight;
+    const totalHeight = parseFloat(jobCardHeight) + parseFloat(jobCardMargin);
+
+    // Top element doesn't have a margin so add to container height
+    const numOfJobs = Math.floor((containerHeight + parseFloat(jobCardMargin)) / totalHeight);
+
+    return numOfJobs;
+}
+
 const removeJobModal = () => {
     const modal = document.querySelector('.job-details');
     modal.parentElement.removeChild(modal);
+    console.log('finished');
 }
 
 
 //********** ANIMATION **********/
-const tl = gsap.timeline({ defaults: { duration: .4 }, onReverseComplete: removeJobModal });
+const tl = gsap.timeline({ 
+    defaults: { 
+        duration: .4 
+    }, 
+    onReverseComplete: () => { removeJobModal(); animationRunning = false; } 
+});
 let asideArray; 
 let animationRunning = false;
 
@@ -238,6 +259,7 @@ const animateDetailsOut = (oldDetails, newDetails) => {
     });
 }
 const replaceDetails = (oldDetails, newDetails) => {
+    console.log(oldDetails, newDetails);
     oldDetails.insertAdjacentElement('beforebegin', newDetails);
 
     utils.removeElement(oldDetails);
@@ -258,7 +280,7 @@ export const updateJobView = (jobId, job, newAsideJob) => {
 
     // Find the current job card & create a new element to replace it
     const [ oldJobCard ] = Array.from(jobs).filter(job => job.dataset.id === jobId);
-    const newJobCard = utils.templateStringToElement(createListJobCard(newAsideJob, null, true, true));
+    const newJobCard = utils.templateStringToElement(createListJobCard(newAsideJob, null, null, true));
 
     // Create a new details panel to replace the current one
     const oldDetails = document.querySelector('.job-details__table-wrapper');
@@ -272,6 +294,9 @@ export const getAnimationState = () => {
 }
 
 export const animateJobDetailsOut = () => {
-    tl.reverse();
+    if(!animationRunning) {
+        tl.reverse();
+        animationRunning = true;
+    }
 };
 

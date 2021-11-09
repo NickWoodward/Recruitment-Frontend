@@ -1,5 +1,12 @@
+import gsap from 'gsap/all';
+import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
+
 import * as utils from '../utils/utils';
 import { setSlideIndex, hideSlide, changeDot } from './homeView';
+
+gsap.registerPlugin(ScrollTrigger);
+
+// @TODO: This file has the jobs list and the featured jobs list mixed together - separate
 
 var tl;
 var featuredSlides = [];
@@ -16,6 +23,30 @@ export const animateJobs = (batchNum) => {
     tl.from(`.job-card-${batchNum}`, { opacity: 0, transformOrigin: "50% 50%", stagger: { amount: 2.6 }, ease: 'ease-out'})
         .from('.box', {opacity: 0, transformOrigin: "50% 50%", ease: "ease-out"}, "<");
 
+}
+
+export const initialiseScrollAnimation = () => {
+    console.log('initialising');
+
+    jobsMenuScrollAnimation();
+}
+
+const jobsMenuScrollAnimation = () => {
+    const tl = gsap.timeline({ 
+        defaults: { duration: .6 },
+        scrollTrigger: {
+            trigger: '.jobs-menu',
+            start: 'top 70px',
+            end: 'bottom bottom',
+            toggleActions: 'restart none none reverse',
+            // markers: true
+        },
+        
+    }).to('.jobs__menu-wrapper', { scaleY: .8, transformOrigin: '0 0', backgroundColor: 'rgba(255,255,255, 1)', borderBottom:'1px solid lightgrey' }
+    ).to('.jobs-menu', { scaleX: .8, transformOrigin: '0 0' }, '<'
+    ).to('.jobs-menu__content', { scale: 1.3, transformOrigin: '0 0', borderTopWidth: '0px' }, '<');
+
+    return tl;
 }
 
 // Check if user has scrolled to the bottom of the visible jobs list
@@ -119,18 +150,19 @@ export const createJobCard = ({id, title, wage, location, description}, element,
 }
 
 export const createListJobCard = ({id, title, wage, location, description}, element, featured, details) => {
+    console.log(id, title, wage, location);
     const markup = `
         <div class="job-card ${featured? 'job-card--featured':''} ${details? 'job-card--details':''}" data-id=${id}>
             <div class="job-card__title-wrapper ${featured? 'job-card__title-wrapper--featured':''} ${details? 'job-card__title-wrapper--details':''}">
-                <h3 class="job-card__title job-card__title--list ${featured? 'job-card__title--featured':''}">${title}</h3> 
+                <h3 class="job-card__title job-card__title--details ${featured? 'job-card__title--featured':''}">${title}</h3> 
                 <div class="job-card__pin ${featured? 'job-card__pin--featured':''}">
                     <svg class="pin-icon">
                     <use xlink:href="svg/spritesheet.svg#pin-angle"></use>
                     </svg>
                 </div>
             </div>
-            <div class="job-card__content-wrapper">
-                <div class="job-card__content ${featured? 'job-card__content--featured':''}">
+            <div class="job-card__content-wrapper job-card__content-wrapper--details">
+                <div class="job-card__content ${featured? 'job-card__content--featured':''} job-card__content--details">
                     <div class="job-card__location ${featured? 'job-card__location--featured':''}">
                         <svg class="job-card__location-icon"><use xlink:href="svg/spritesheet.svg#location"></svg>
                         <div class="job-card__location-text">${location}</div>
@@ -140,15 +172,16 @@ export const createListJobCard = ({id, title, wage, location, description}, elem
                         <div class="job-card__wage-text">£${wage}</div>
 
                     </div> 
-                    <div class="job-card__extra ${featured? 'job-card__extra--featured':''} ${details? 'job-card__extra--details':''}">
-                        <svg class="job-card__extra-icon"><use xlink:href="svg/spritesheet.svg#clock"></svg>
-                        <div class="job-card__type ${featured? 'job-card__type--featured':''}">Permanent</div>
-                        <div class="job-card__position ${featured? 'job-card__position--featured':''}">In House</div>
-                        <div class="job-card__PQE ${featured? 'job-card__PQE--featured':''}">PQE: 3+</div>
-                    </div> 
-
+                        <div class="job-card__extra ${featured? 'job-card__extra--featured':''} ${details? 'job-card__extra--details':''}">
+                            <svg class="job-card__extra-icon"><use xlink:href="svg/spritesheet.svg#clock"></svg>
+                            <div class="job-card__extra-wrapper--details">
+                                <div class="job-card__type ${featured? 'job-card__type--featured':''}">Permanent</div>
+                                <div class="job-card__position ${featured? 'job-card__position--featured':''} job-card__position--details">In House</div>
+                                <div class="job-card__PQE ${featured? 'job-card__PQE--featured':''} job-card__PQE--details">PQE: 3+</div>
+                            </div>
+                        </div> 
                 </div>    
-                <div class="job-card__btn-wrapper job-card__btn-wrapper--list">
+                <div class="job-card__btn-wrapper job-card__btn-wrapper--details">
                     <button class="job-card__view-btn ${details? 'job-card__view-btn--details':''}">View More</button>
                     <button class="job-card__apply-btn ${details? 'job-card__apply-btn--details':''}">Apply</button>
                 </div>

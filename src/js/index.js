@@ -97,7 +97,13 @@ class IndexController {
             // @TODO: don't need to set header width any more
             // @TODO: Debounce
             headerView.setParallaxHeaderWidth();
+            // sets the layout
             homeView.initWhyUsSection();
+
+            if(document.querySelector('.modal')) {
+                // jobView.animateJobDetailsOut(this.closeModal.bind(null, modal));
+            }
+
         });
 
         // CHECK MODAL CLICKED

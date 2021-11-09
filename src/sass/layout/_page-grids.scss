@@ -30,67 +30,80 @@
 
 /* JOBS PAGE */
 // (16 cols, 2 rows)
-.jobs { // .jobs__main is the flex container
-    // &__aside, 
-    &__topbar,
-    &__menu-wrapper,
-    &__wrapper{
-        --gap-constant: 0.4%;
-        --gap: calc((var(--columns, 16) - var(--width, 0)) * var(--gap-constant, 0.3%));
+// .jobs { // .jobs__main is the flex container
+//     // &__aside, 
+//     &__topbar,
+//     &__menu-wrapper,
+//     &__wrapper{
+//         --gap-constant: 0.4%;
+//         --gap: calc((var(--columns, 16) - var(--width, 0)) * var(--gap-constant, 0.3%));
 
-        --initialbasis: calc(var(--width) / var(--columns) * 100%);
-        flex-basis: calc(var(--initialbasis) - var(--gap));
-    }
+//         --initialbasis: calc(var(--width) / var(--columns) * 100%);
+//         flex-basis: calc(var(--initialbasis) - var(--gap));
 
-    &__topbar {
-        --width: 16;    
-    }
-    &__menu-wrapper {
-        --width: 3;
-    }
-    &__wrapper {
-        --width: 13;
-    }
+//     }
+
+//     &__topbar {
+//         --width: 16;    
+//     }
+//     &__menu-wrapper {
+//         --width: 3;
+
+//         // Vertical layout
+//         @include respond-desktop-large() {
+//             --width: 13
+//         }
+//     }
+//     &__wrapper {
+//         --width: 13;
+//     }
     // &__aside {
     //     --width: 16;
     // }
-}
+
+
+// }
 
 /* JOBS MODAL */
 // 16 cols, 2 rows
-.job-details {
-    &__content { // Flex parent
-        display: flex;
-        flex-flow: row wrap;
+// .job-details {
+//     &__content { // Flex parent
+//         display: flex;
+//         flex-flow: row wrap;
   
-        // justify-content: center;
-        justify-content: space-around;
-        align-content: flex-start;
+//         // justify-content: center;
 
-    }
+//         justify-content: space-around;
+//         justify-content: space-evenly;
+//         align-content: flex-start;
 
-    // Sections: __back, __table-wrapper, __featured-jobs--detail
-    &__back, &__table-wrapper, &__featured-jobs {
+//     }
 
-        --initialbasis: calc(var(--width) /  var(--columns) * 100%);
-        flex-basis: var(--initialbasis);
-    }
+//     // Sections: __back, __table-wrapper, __featured-jobs--detail
+//     &__back, &__table-wrapper, &__featured-jobs {
 
-    &__back {
-        --width: 16;
-    }
-    &__table-wrapper {
-        --width: 11;
+//         --gap-constant: 0.4%;
+//         --gap: calc((var(--columns, 16) - var(--width, 0)) * var(--gap-constant, 0.3%));
 
-        @include respond-desktop-medium() {
-            --width: 9;
-        }
-    }
-    &__featured-jobs {
-        --width: 5;
+//         --initialbasis: calc(var(--width) / var(--columns) * 100%);
+//         flex-basis: calc(var(--initialbasis) - var(--gap));
+//     }
 
-        @include respond-desktop-medium() {
-            --width: 3;
-        }
-    }
-}
+//     &__back {
+//         --width: 16;
+//     }
+//     &__table-wrapper {
+//         --width: 10;
+
+//         @include respond-desktop-medium() {
+//             --width: 9;
+//         }
+//     }
+//     &__featured-jobs {
+//         --width: 6;
+
+//         @include respond-desktop-medium() {
+//             --width: 3;
+//         }
+//     }
+// }

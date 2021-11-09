@@ -8,7 +8,9 @@ var tl;
 export const animateMenu = () => {
     tl = gsap.timeline({defaults: {opacity: 0, ease: 'back'}});
 
-    tl.from(`.jobs-menu__title`, { opacity: 0, y: -80, transformOrigin: "50% 50%", stagger: { amount: .8 }, ease: 'ease-out', duration: .8});
+    // tl.from(`.jobs-menu__title`, { opacity: 0, y: -80, stagger: { amount: .8 }, ease: 'ease-out', duration: .8});
+    tl.from(`.jobs-menu__item`, { opacity: 0, y: 20, stagger: { amount: .6 }, ease: 'ease-out', duration: 1});
+
 }
 
 /**
@@ -86,33 +88,34 @@ export const renderItem = (menuItem, htmlElement, menuType, checked) => {
     
 };
 
-export const toggleMenu = (e) => {
-    const item = e.target.closest('.jobs-menu__title');
-    // If the element clicked isn't a menu title, return
-    if(!item) return;
-    // Else get the adjacent sibling (the associated content div) & its styles
-    const itemContent = item.nextElementSibling;
-    const itemStyles = window.getComputedStyle(itemContent);
-    const itemIcon = item.querySelector('.jobs-menu__title-icon');
+// @TODO: delete?
+// export const toggleMenu = (e) => {
+//     const item = e.target.closest('.jobs-menu__title');
+//     // If the element clicked isn't a menu title, return
+//     if(!item) return;
+//     // Else get the adjacent sibling (the associated content div) & its styles
+//     const itemContent = item.nextElementSibling;
+//     const itemStyles = window.getComputedStyle(itemContent);
+//     const itemIcon = item.querySelector('.jobs-menu__title-icon');
 
-    // If the max-height is 0, set it to be 100%, and vice versa
-    // Set the itemContent class to 'jobs-menu__content--open'
-    if(itemStyles.maxHeight === '0px') {
-        itemContent.style.maxHeight = '100%';
-        itemContent.style.opacity = 1;
-        itemContent.classList.add('jobs-menu__content--open');
-        // Set item class active
-        item.classList.add('jobs-menu__title--active');
-        itemIcon.classList.add('jobs-menu__title-icon--active');
-    } else {
-        itemContent.style.maxHeight = '0px';
-        itemContent.style.opacity = 0;
-        itemContent.classList.remove('jobs-menu__content--open');
-        item.classList.remove('jobs-menu__title--active');
-        itemIcon.classList.remove('jobs-menu__title-icon--active');
+//     // If the max-height is 0, set it to be 100%, and vice versa
+//     // Set the itemContent class to 'jobs-menu__content--open'
+//     if(itemStyles.maxHeight === '0px') {
+//         itemContent.style.maxHeight = '100%';
+//         itemContent.style.opacity = 1;
+//         itemContent.classList.add('jobs-menu__content--open');
+//         // Set item class active
+//         item.classList.add('jobs-menu__title--active');
+//         itemIcon.classList.add('jobs-menu__title-icon--active');
+//     } else {
+//         itemContent.style.maxHeight = '0px';
+//         itemContent.style.opacity = 0;
+//         itemContent.classList.remove('jobs-menu__content--open');
+//         item.classList.remove('jobs-menu__title--active');
+//         itemIcon.classList.remove('jobs-menu__title-icon--active');
 
-    }
-};
+//     }
+// };
 
 export const toggleMenuAnimated = (e) => {
     tl = gsap.timeline({defaults: { ease: 'ease-out'}});
@@ -127,11 +130,11 @@ export const toggleMenuAnimated = (e) => {
 
     if(itemStyles.visibility === 'hidden') {
         console.log(itemStyles.height);
-        tl.to(itemContent, {visibility: "visible", opacity: '1', height: '480px', paddingTop: '2.2rem', paddingBottom: '3rem', duration: .4, ease: 'ease-in'})
+        tl.to(itemContent, {visibility: "visible", opacity: '1',   duration: .4, ease: 'ease-in'})
         item.classList.add('jobs-menu__title--active');
         itemIcon.classList.add('jobs-menu__title-icon--active');
     } else {
-        tl.to(itemContent, {visibility: "hidden", opacity: '0', height: '0px', paddingTop: '0rem', paddingBottom: '0rem', duration: .4, ease: 'ease-out'});
+        tl.to(itemContent, {visibility: "hidden", opacity: '0',  duration: .4, ease: 'ease-out'});
         console.log(itemStyles.height);
         item.classList.remove('jobs-menu__title--active');
         itemIcon.classList.remove('jobs-menu__title-icon--active');

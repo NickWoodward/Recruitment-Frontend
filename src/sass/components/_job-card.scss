@@ -55,20 +55,25 @@
             @include respond-desktop-medium() {
                 display: none;
             }
-            // @include respond-tablet-large() {
-            //     display: flex;
-            // }
         }
     }
 
     &--details {
-        height: 18rem;
+        height: var(--job-card-height--details);
 
         &:not(:first-of-type) {
-            margin-top: 1.5rem;
+            margin-top: var(--job-card-margin--details);
         }
 
-
+        @include respond-desktop-medium() {
+            width: 48rem;
+        }
+        @include respond-desktop-small() {
+            width: 38rem;
+        }
+        @include respond-tablet-larger() {
+            width: 35rem;
+        }
     }
     
     &__title {
@@ -125,8 +130,12 @@
                 font-size: 1.8rem;
             }
         }
-        &--list {
+        &--details {
             font-size: 1.9rem;
+
+            @include respond-desktop-small() {
+                font-size: 1.8rem;
+            }
         }
     }
 
@@ -163,6 +172,12 @@
     &__content-wrapper {
         display:flex;
         flex-direction: row;
+
+        &--details {
+            @include respond-desktop-medium() {
+                flex-direction: column;
+            }
+        } 
     }
 
     &__content {
@@ -187,7 +202,14 @@
                 font-size: 1.5rem;
             }
         }
-        
+        &--details {
+            @include respond-desktop-small() {
+                font-size: 1.6rem;
+            }
+            @include respond-tablet-larger() {
+                font-size: 1.5rem;
+            }
+        }
     }
 
     &__wage {
@@ -229,6 +251,13 @@
             @include respond-phone-larger() {
                 flex-direction: column;
             }
+
+            &--details {
+                display: flex;
+                @include respond-tablet-larger() {
+                    flex-direction: column;
+                }
+            }
         }
 
         &--details {
@@ -257,6 +286,12 @@
 
         @include respond-phone-larger() {
             margin-left: 0;
+        }
+
+        &--details {
+            @include respond-tablet-larger() {
+                margin-left: 0;
+            }
         }
     }
 
@@ -310,9 +345,19 @@
         display: flex;
         align-self: flex-end;
         align-items: center;
-        &--list {
+
+        &--details {
             margin-right: 3rem;
+
+            @include respond-desktop-medium() {
+                align-self: flex-start;
+                margin-left: 4rem;
+                margin-top: 2rem;
+            }
         }
+
+
+
         @include respond-tablet-small() {
             flex-direction: column;
             align-items: flex-start; 

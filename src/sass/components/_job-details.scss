@@ -1,16 +1,20 @@
 .job-details {
-    position: fixed;
+    position: absolute;
     display: flex;
-    align-items: flex-start;
+    // align-items: flex-start;
     top: 0;
     left: 0;
     z-index: 100;
+    background-color: rgb(245, 247, 250);
 
     &__content {
-        // Flex layout set in page-grids.scss
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
         height: 100%;
         width: 100%;
-        background-color: rgb(245, 247, 250);
+        padding-top: 8rem;
     }
 
     &__table {
@@ -20,17 +24,31 @@
         background-color: white;
         border: none;
         box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+
+        &-wrapper {
+            margin-right: 3%;
+            width: 80rem;
+
+            @include respond-desktop-medium() {
+                width: 70rem;
+                margin-right: 2%;
+            }
+            @include respond-desktop-small() {
+                width: 60rem;
+            }
+            // @include respond-tablet-larger() {
+            //     margin-right: 1%;
+            // }
+        }
     }
 
     &__featured-jobs {
         display: flex;
         flex-direction: column;
 
-        // margin-left: 7rem;
-
-        // @include respond-desktop-medium() {
-        //     margin-left: 2rem;
-        // }
+        @media (max-width: 1100px) {
+            display: none;
+        } 
     }
 
     &__header {
@@ -42,7 +60,12 @@
         background-color: white;
     }
 
-    &__back { margin-bottom: 5rem; }
+    &__back { 
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 100;
+    }
     &__back-btn, &__close-btn {
         display: flex;
         justify-content: center;
@@ -50,7 +73,7 @@
         margin-bottom: 2.5rem;
         margin-right: .5rem;
         margin-left: 3rem;
-        margin-top: 3rem;
+        margin-top: 2rem;
         background-color: rgb(245, 247, 250);
         cursor: pointer;
     }
@@ -63,7 +86,7 @@
     
     &__back-text {
         margin-left: .5rem;
-        font-size: 1.7rem;
+        font-size: 1.5rem;
         // transform: translateY(1px);
     }
 
@@ -72,6 +95,11 @@
         font-size: 2.2rem;
         color: $color-secondary;
         background-color: white;
+
+        @include respond-desktop-small() {
+            padding: 3rem 4rem;
+            font-size: 2rem;
+        }
     }
   
     &__row {
@@ -81,7 +109,6 @@
         background-color: rgb(249, 250, 251);
         font-size: 1.7rem;
 
-
         &:nth-child(odd) {
             background-color: white;
         }
@@ -89,7 +116,14 @@
         &--btns {
             justify-content: flex-start;
             align-items: baseline;
-            padding: 2.5rem 6rem;
+            padding: 2.2rem 6rem;
+        }
+
+        @include respond-desktop-small() {
+            padding: 1.6rem 6rem;
+        }
+        @include respond-tablet-larger() {
+            font-size: 1.6rem;
         }
         
     }
