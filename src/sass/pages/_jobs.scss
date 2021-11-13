@@ -23,13 +23,17 @@
     display: flex;
     justify-content: center;
     background-color: $color-logo;
-    min-height: calc(100vh - var(--header-height));
+    // min-height: calc(100vh - var(--header-height));
     z-index: 100;
 
     @include respond-desktop-large() {
         min-height: auto;  
         width: 100%; 
         background-color: rgb(245, 247, 250);
+    }
+    @include respond-tablet-small() {
+        position: relative;
+        display: flex;
     }
 }
 
@@ -41,6 +45,7 @@
     padding-top: 2rem;
     // For the icons
     fill: $color-secondary-highlight;
+    // background-color: blue;
 
     @include respond-desktop-large() {
         position: relative;
@@ -55,26 +60,67 @@
         justify-content: center;
         padding-left: 0;
     }
+    @include respond-tablet-small() {
+        flex-direction: column;
+        height: auto;
+        
+    }
     
-    &__item {
-        // position for stacking context (prevent collapsed list items covering submenus below)
+    &__item-wrapper {
         position: relative;
- 
+        border: 1px solid #d4d4d5;
+        background-color: white;
+
+        &:not(:first-of-type) {
+            margin-left: 2.5rem;
+
+            @include respond-tablet-medium() {
+                margin-left: .6rem;
+            }
+            @include respond-tablet-small() {
+                margin-left: 0;
+            }
+        }
+        @include respond-tablet-small() {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            border: none;
+            border-top: 1px solid #d4d4d5;
+            
+            &:last-of-type {
+                border-bottom: 1px solid #d4d4d5;
+            }
+        }
+
+        &--active {
+            background-color: $color-primary-new;
+        }
+    }
+
+    &__item {
+        position: relative;
         width: 100%;
-        // border-bottom: 1px solid $color-secondary-highlight;
+        z-index: 2;
+        cursor: pointer;
+
 
         @include respond-desktop-large() {
             display: flex;
             justify-content: center;
             width: 16rem;
             height: 5rem;
-            border: 1px solid #d4d4d5;
-            background-color: white;
-
-            &:not(:first-of-type) {
-                margin-left: 2.5rem;
-            }
         }
+
+        @include respond-tablet-medium() {
+            width: 15rem;
+        }
+        @include respond-tablet-small() {
+            width: 12rem;
+        }
+
+
 
     }
 
@@ -92,22 +138,25 @@
 
         font-size: 1.6rem;
         color: $color-white;
-        cursor: pointer;
 
         @include respond-desktop-large() {
             color: $color-secondary;
             fill: $color-primary-new;
         }
+        @include respond-tablet-small() {
+            display: flex;
+            width: 100%;
+            justify-content: flex-start;
+            transform: none;
+
+            // border: 1px solid red;
+        }
 
         &--active {
-            background-color: $color-secondary-highlight;
-            color: #042950;
-            fill: #042950;
+            color: white;
+            fill: $color-secondary-highlight;
 
             @include respond-desktop-large() {
-                color: $color-secondary;
-                fill: $color-primary-new;
-                background-color: white;
             }
         }
     }   
@@ -118,11 +167,13 @@
         @include respond-desktop-large() {
             margin-left: 1rem;
         }
+        @include respond-tablet-small() {
+            margin-left: 2rem;
+        }
     }
     &__title-icon {
         height: 2rem;
         width: 2rem;
-
 
         &--active {
             transform:rotate(90deg);
@@ -142,46 +193,97 @@
         display: none;
     }
     
-    &__content {
+    &__content-wrapper {
         position: absolute;
-        flex-direction: column;
-        align-items: center;
-        // padding-bottom: 3rem;
-        // padding-top: 2.2rem;
-        // height: 0px;
-        // max-height: 0;
-        // opacity: 0;
-        visibility: hidden;
-        font-size: var(--menu-content);
-        z-index: 100;
-        
+        top: calc(100% + 1rem);
 
-        @include respond-desktop-large() {
-            top: calc(100% + 1rem );
-            left: 0;
-            width: 35rem;
-            padding: 1.2rem 0 1.8rem 0;
-            background-color: white;
-            box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+        overflow: hidden;
+
+        @include respond-tablet-small() {
+            position: relative;
+
+            top: auto;
+            width: 100%;
+            height: 0;
         }
 
+        &--titles {
+            left: -1px;
+        }
+        &--locations {
+            @include respond-desktop-small() {
+                right: calc(-2.5rem - 16.3rem);
+            }
+            @include respond-tablet-medium() {
+                right: calc(-.6rem - 15.3rem);
+            }
+            @include respond-tablet-small() {
+                right: auto;
 
-        // &--open {
-        //     display: flex;
-        //     max-height: 100%;
-        //     background-color: white;
-        //     // opacity: 1;
-        // }
+            }
+        }
+        &--type {
+            @include respond-desktop-small() {
+                right: 0;
+            }        
+            @include respond-tablet-small() {
+                right: auto;
+            }
+            @include respond-tablet-small() {
+                right: auto;
 
+            }
+        }
+    }
 
+    &__content {
+
+        // BUG in flexbox: Won't expand container for flex-flow: column wrap
+        // Use single column with scroll bars if grid not supported
+
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        overflow: auto;
+
+        display: grid;
+        grid-auto-flow: row;
+        grid-template-columns: repeat(3, auto);
+        column-gap: 4rem;
+        row-gap: 1rem;
+        font-size: var(--menu-content);
+        z-index: 1;
+
+        @include respond-desktop-large() {
+            --menu-content: 1.6rem;
+            grid-template-columns: repeat(3, auto);
+
+            padding: 2.5rem 2.8rem 3rem 2rem;
+            background-color: white;
+            box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+            margin: 2px;
+        }
+        @include respond-tablet-small() {
+            margin: 0;
+            grid-template-columns: repeat(1, auto);
+            justify-content: center;
+        }
+
+        &--titles {
+            @include respond-desktop-small() {
+                grid-template-columns: repeat(1, auto);
+
+            }
+        }
+    }
+    &__loading {
+        display: none;
     }
 
     &__input-wrapper {
         display: flex;
         align-items: center;
-        justify-content: flex-start;
-        width: 100%;
-        padding: 1rem 3.5rem 1rem 3rem;
         color: $color-white;
 
         @include respond-desktop-large() {
@@ -190,6 +292,8 @@
     }
 
     &__description {
+        display: flex;
+        width: max-content;
         margin-left: 2rem;
     }
 }
@@ -282,6 +386,10 @@
     }
     @include respond-desktop-small() {
         width: 60%; 
+    }
+    @include respond-tablet-small() {
+        width: 100%;
+        margin-top: 0;
     }
 }
 

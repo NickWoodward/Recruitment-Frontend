@@ -31,6 +31,8 @@ export default class JobsController {
         this.locationParam = this.searchParams.get('location');
 
         this.JobList = new JobList();
+        this.activeNavItem;
+        this.navItems;
         this.menuItems = {
             titles: []
         }
@@ -81,11 +83,17 @@ export default class JobsController {
             }
         });
 
-        // Menu Accordion
-        elements.jobsMenu.addEventListener("click", (e) => {
-            // jobsMenuView.toggleMenu(e);
-            jobsMenuView.toggleMenuAnimated(e);
-        });
+        // Handle closing menu items
+        window.addEventListener('click', (e) => {
+            if(!e.target.closest('.jobs-menu__item') && this.activeNavItem) {
+                this.activeNavItem.animation.reverse();
+                this.activeNavArrow.animation.reverse();
+                jobsMenuView.setMenuActive(this.activeNavItem, false);
+                this.activeNavItem = null;
+                this.activeNavArrow = null;
+            }
+        })
+        
 
         // Job Controls
         elements.jobsTitleSearch.addEventListener("input", (e) => {
@@ -225,6 +233,63 @@ export default class JobsController {
 
         // NB: Menu item listeners added once menu initialised (this.initialiseJobsMenu)
     }
+
+    initialiseMenuItems() {
+        this.navItems = Array.from(document.querySelectorAll('.jobs-menu__item-wrapper'));
+
+        this.navItems.forEach((item) => {
+            const itemContent = item.querySelector('.jobs-menu__content');
+
+            // Calculate max visible height
+            const yPos = itemContent.getBoundingClientRect().y;
+            const contentHeight = window.innerHeight - yPos;
+            itemContent.style.maxHeight = contentHeight + 'px';
+
+            // Add the animation to each item's content element + the arrow element
+            jobsMenuView.addMenuAnimation(itemContent);
+
+            // Add listeners to each element that trigger the animations
+            item.addEventListener('click', () => {
+
+                if(this.activeNavItem) {
+                    // Close any item that's open
+                    this.activeNavItem.animation.reverse();
+                    // Rotate the arrow back
+                    this.activeNavArrow.animation.reverse();
+                    // Alter the DOM classes
+                    jobsMenuView.setMenuActive(this.activeNavItem, false);
+
+                    if(this.activeNavItem !== itemContent) {
+                        // If the clicked item is different to the active one
+                        // Set the new active item
+                        this.activeNavItem = itemContent;
+                        // Set the new active item arrow
+                        this.activeNavArrow = itemContent.parentElement.parentElement.querySelector('.jobs-menu__title-icon');
+                        // Alter the DOM classes
+                        jobsMenuView.setMenuActive(this.activeNavItem, true);
+                        // Animate the menu
+                        this.activeNavItem.animation.play();
+                        this.activeNavArrow.animation.play();
+                    } else {
+                        // Else the same item has been clicked, 
+                        // set the active items to null
+                        this.activeNavItem = null;
+                        this.activeNavArrow = null;
+                    }
+
+                } else if(!this.activeNavItem) {
+                    // If there's no active item, set and open it
+                    this.activeNavItem = itemContent;
+                    this.activeNavArrow = itemContent.parentElement.parentElement.querySelector('.jobs-menu__title-icon');
+
+                    jobsMenuView.setMenuActive(this.activeNavItem, true);
+                    this.activeNavItem.animation.play();
+                    this.activeNavArrow.animation.play();
+                }
+            });
+        })
+    }
+
     getSuggestions(input) {
         this.searchSuggestions.titles = this.searchSuggestions.titles.filter(suggestion => {
             const words = suggestion.split(" ");
@@ -281,6 +346,9 @@ export default class JobsController {
 
                 // Add listeners to the JobsMenu
                 this.addMenuListeners();
+
+                this.initialiseMenuItems();
+
             })
             .catch((err) => console.log(err));
     }

@@ -2,6 +2,9 @@ import { elements } from './base';
 import { elementStrings } from "./base";
 
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
+// Register ScrollTrigger
+gsap.registerPlugin(ScrollTrigger);
 
 var tl;
 
@@ -117,29 +120,106 @@ export const renderItem = (menuItem, htmlElement, menuType, checked) => {
 //     }
 // };
 
-export const toggleMenuAnimated = (e) => {
-    tl = gsap.timeline({defaults: { ease: 'ease-out'}});
+export const addMenuAnimation = (itemContent) => {
+    // *** MENU CONTENT ANIMATION ***
+    const contentHeight = itemContent.getBoundingClientRect().height;
 
-    const item = e.target.closest('.jobs-menu__title');
-    // If the element clicked isn't a menu title, return
-    if(!item) return;
-    // Else get the adjacent sibling (the associated content div) & its styles
-    const itemContent = item.nextElementSibling;
-    const itemStyles = window.getComputedStyle(itemContent);
-    const itemIcon = item.querySelector('.jobs-menu__title-icon');
+    // In mobile / smaller views, the item wrapper's height is animated, rather than the content div being moved down
+    const contentWrapper = itemContent.parentElement;
 
-    if(itemStyles.visibility === 'hidden') {
-        console.log(itemStyles.height);
-        tl.to(itemContent, {visibility: "visible", opacity: '1',   duration: .4, ease: 'ease-in'})
-        item.classList.add('jobs-menu__title--active');
-        itemIcon.classList.add('jobs-menu__title-icon--active');
+
+    // Animation for each item
+    let animation; 
+
+    // ScrollTrigger can be used for animation media queries outside of any scrolling
+    ScrollTrigger.matchMedia({
+        "(max-width: 650px)": () => {
+            ScrollTrigger.saveStyles(contentWrapper);
+
+            animation = gsap.timeline({ 
+                paused: true, 
+                onComplete: () => window.scroll({
+                    top: 0,
+                    left: 0,
+                    behavior: 'smooth'
+                }) 
+            });
+            animation.fromTo(contentWrapper, {pointerEvents: 'none', height: 0, duration: .4, ease: 'ease-in'}, {pointerEvents: 'none', height: contentHeight});
+        }, 
+        "(min-width: 651px)": () => {
+            ScrollTrigger.saveStyles(itemContent);
+
+            animation = gsap.timeline({ paused: true });
+            animation.from(itemContent, {pointerEvents: 'none', opacity: 0, y: -contentHeight, duration: .4, ease: 'ease-in'});
+        }, 
+      });
+      
+    // Assign the animation to the element
+    itemContent.animation = animation;
+
+
+    // *** ARROW ANIMATION ***
+    const itemArrow = itemContent.parentElement.parentElement.querySelector('.jobs-menu__title-icon');
+    const arrowAnimation = gsap.timeline({paused: true, onReverseComplete: ()=>console.log('reversed'), onComplete: ()=>console.log('playing')});
+    arrowAnimation.to(itemArrow, { rotation: '90', duration: .2 });
+
+    itemArrow.animation = arrowAnimation;
+}
+
+export const setMenuActive = (itemContent, setTrue) => {
+    const itemWrapper = itemContent.parentElement.parentElement;
+    // const item = itemWrapper.querySelector('.jobs-menu__item');
+    const itemTitle = itemWrapper.querySelector('.jobs-menu__title');
+    
+    if(setTrue) {
+        itemWrapper.classList.add('jobs-menu__item-wrapper--active');
+        itemTitle.classList.add('jobs-menu__title--active');
     } else {
-        tl.to(itemContent, {visibility: "hidden", opacity: '0',  duration: .4, ease: 'ease-out'});
-        console.log(itemStyles.height);
-        item.classList.remove('jobs-menu__title--active');
-        itemIcon.classList.remove('jobs-menu__title-icon--active');
+        itemWrapper.classList.remove('jobs-menu__item-wrapper--active');
+        itemTitle.classList.remove('jobs-menu__title--active');
     }
 }
+
+// export const initMenuItemAnimations = (e) => {
+//     const items = gsap.utils.toArray('.jobs-menu__item');
+
+//     items.forEach(item => {
+//         const itemContent = item.querySelector('.jobs-menu__content');
+
+//         // Animation for each item
+//         let animation = gsap.timeline({
+//             paused:true, 
+//             onComplete: () => console.log('complete')
+//         });
+//         animation.to(itemContent, {opacity: '1', duration: .2, ease: 'ease-in' });
+//         // Assign the animation to the element
+//         itemContent.animation = animation;
+//     });
+// } 
+
+// export const toggleMenuAnimated = (e) => {
+//     tl = gsap.timeline({defaults: { ease: 'ease-out'}});
+
+//     const item = e.target.closest('.jobs-menu__title');
+//     // If the element clicked isn't a menu title, return
+//     if(!item) return;
+//     // Else get the adjacent sibling (the associated content div) & its styles
+//     const itemContent = item.nextElementSibling;
+//     const itemStyles = window.getComputedStyle(itemContent);
+//     const itemIcon = item.querySelector('.jobs-menu__title-icon');
+
+//     if(itemStyles.visibility === 'hidden') {
+//         console.log(itemStyles.height);
+//         tl.to(itemContent, {visibility: "visible", opacity: '1',   duration: .4, ease: 'ease-in'})
+//         item.classList.add('jobs-menu__title--active');
+//         itemIcon.classList.add('jobs-menu__title-icon--active');
+//     } else {
+//         tl.to(itemContent, {visibility: "hidden", opacity: '0',  duration: .4, ease: 'ease-out'});
+//         console.log(itemStyles.height);
+//         item.classList.remove('jobs-menu__title--active');
+//         itemIcon.classList.remove('jobs-menu__title-icon--active');
+//     }
+// }
 
 /**
  *  Update the checkbox values in the submenu
