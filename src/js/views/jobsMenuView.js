@@ -127,7 +127,6 @@ export const addMenuAnimation = (itemContent) => {
     // In mobile / smaller views, the item wrapper's height is animated, rather than the content div being moved down
     const contentWrapper = itemContent.parentElement;
 
-
     // Animation for each item
     let animation; 
 
@@ -145,17 +144,26 @@ export const addMenuAnimation = (itemContent) => {
                 }) 
             });
             animation.fromTo(contentWrapper, {pointerEvents: 'none', height: 0, duration: .4, ease: 'ease-in'}, {pointerEvents: 'none', height: contentHeight});
+        
+            // Assign the animation to the element
+            itemContent.animation = animation;
         }, 
         "(min-width: 651px)": () => {
             ScrollTrigger.saveStyles(itemContent);
 
             animation = gsap.timeline({ paused: true });
-            animation.from(itemContent, {pointerEvents: 'none', opacity: 0, y: -contentHeight, duration: .4, ease: 'ease-in'});
+            animation.fromTo(
+                itemContent, 
+                {pointerEvents: 'none', opacity: 0, y: -contentHeight, duration: .4, ease: 'ease-in'},
+                {pointerEvents: 'auto', opacity: 1, y: 0}
+            );
+
+            // Assign the animation to the element
+            itemContent.animation = animation;
         }, 
       });
       
-    // Assign the animation to the element
-    itemContent.animation = animation;
+
 
 
     // *** ARROW ANIMATION ***

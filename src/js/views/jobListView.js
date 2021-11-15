@@ -34,23 +34,23 @@ const jobsMenuScrollAnimation = () => {
     
     ScrollTrigger.matchMedia({
 
-        "(min-width: 650px)": function() {
-            const tl = gsap.timeline({ 
-                defaults: { duration: .6 },
-                scrollTrigger: {
-                    trigger: '.jobs-menu',
-                    start: 'top 70px',
-                    end: 'bottom bottom',
-                    toggleActions: 'restart none none reverse',
-                    // markers: true
-                },
+        // "(min-width: 650px)": function() {
+        //     const tl = gsap.timeline({ 
+        //         defaults: { duration: .6 },
+        //         scrollTrigger: {
+        //             trigger: '.jobs-menu',
+        //             start: 'top 70px',
+        //             end: 'bottom bottom',
+        //             toggleActions: 'restart none none reverse',
+        //             // markers: true
+        //         },
                 
-            }).to('.jobs__menu-wrapper', { scaleY: .8, transformOrigin: '50% 0', backgroundColor: 'rgba(255,255,255, 1)', borderBottom:'1px solid lightgrey' }
-            ).to('.jobs-menu', { scaleX: .8, transformOrigin: '50% 0' }, '<'
-            ).to('.jobs-menu__content', { scale: 1.3, transformOrigin: '50% 0', borderTopWidth: '0px' }, '<');
+        //     }).to('.jobs__menu-wrapper', { scaleY: .8, transformOrigin: '50% 0', borderBottom:'1px solid lightgrey' }
+        //     ).to('.jobs-menu', { scaleX: .8, transformOrigin: '50% 0' }, '<'
+        //     ).to('.jobs-menu__content', { scale: 1.3, transformOrigin: '50% 0', borderTopWidth: '0px' }, '<');
         
-            return tl;
-        },
+        //     return tl;
+        // },
         "(min-width: 1401px)": function() {
             const tl = gsap.timeline({ 
                 defaults: { duration: .6 },
@@ -62,10 +62,11 @@ const jobsMenuScrollAnimation = () => {
                     // markers: true
                 },
                 
-            }).to('.jobs__menu-wrapper', { scaleY: .8, transformOrigin: '0 0', backgroundColor: 'rgba(255,255,255, 1)', borderBottom:'1px solid lightgrey' }
+            }).to('.jobs__menu-wrapper', { scaleY: .8, transformOrigin: '0 0', borderBottom:'1px solid lightgrey' }
             ).to('.jobs-menu', { scaleX: .8, transformOrigin: '0 0' }, '<'
-            ).to('.jobs-menu__content', { scale: 1.3, transformOrigin: '0 0', borderTopWidth: '0px' }, '<');
-        
+            ).to('.jobs-menu__content-wrapper', { scale: 1.2, transformOrigin: '0 0' }, '<')
+            // ).to('.jobs-menu__content', { scale: 1.3, transformOrigin: '0 0', borderTopWidth: '0px' }, '<');
+            
             return tl;
         }
     });

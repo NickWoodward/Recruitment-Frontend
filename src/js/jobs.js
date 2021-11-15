@@ -8,6 +8,7 @@ import * as jobListView from "./views/jobListView";
 import * as jobsMenuView from "./views/jobsMenuView";
 import * as loader from "./views/loader";
 import * as utils from "./utils/utils";
+import * as inputUtils from "./utils/inputUtils";
 
 import JobList from "./models/JobList";
 import User from './models/User';
@@ -33,8 +34,11 @@ export default class JobsController {
         this.JobList = new JobList();
         this.activeNavItem;
         this.navItems;
+        this.searchInputs = Array.from(document.querySelectorAll('.search-input'));
+        this.activeSearchInput;
         this.menuItems = {
-            titles: []
+            titles: [],
+            locations: []
         }
         this.searchOptions = {
             index: 0,
@@ -83,8 +87,8 @@ export default class JobsController {
             }
         });
 
-        // Handle closing menu items
         window.addEventListener('click', (e) => {
+            // Handle closing menu items
             if(!e.target.closest('.jobs-menu__item') && this.activeNavItem) {
                 this.activeNavItem.animation.reverse();
                 this.activeNavArrow.animation.reverse();
@@ -92,31 +96,53 @@ export default class JobsController {
                 this.activeNavItem = null;
                 this.activeNavArrow = null;
             }
-        })
-        
 
-        // Job Controls
-        elements.jobsTitleSearch.addEventListener("input", (e) => {
+            // Handle search inputs if clicked
+            const input = e.target.closest('.search-input');
+            let value;
 
-            const suggestions = this.getSuggestions(e.target.value);
+            // Reset the input default value if focus is lost, but not if it's the autocomplete list
 
-            // #TODO: DEBOUNCE THIS
-            if(suggestions.length > 0) {
-                if(this.searchOptions.titles.length !== [...new Set(suggestions)].length) {
-                    this.searchOptions.titles = [...new Set(suggestions)];
-                    // Remove current Jobs
-                    jobListView.clearJobs(elements.jobsGrid);
-
-                    // Every time a filter is added restart the index
-                    this.searchOptions.index = 0;
-                    console.log(this.searchOptions.titles);
-                    this.getJobs();
+            if(this.activeSearchInput  && !e.target.closest('.autocomplete-items')) {
+                switch(this.activeSearchInput.classList[0]) {
+                    case "search-input--title":     value = "Job Title"; break;
+                    case "search-input--location":  value = "Location"; break;
                 }
+                // console.log(e.target.closest('.search-input'), this.activeSearchInput);
+                inputUtils.setInput(this.activeSearchInput, value);
+            }
+            // Set the active input if clicked and clear the value
+            if(input) {
+                this.activeSearchInput = input;
+                inputUtils.clearInput(this.activeSearchInput);
             }
             
-            // Return the suggestions to unfiltered menu items
-            this.searchSuggestions.titles = this.menuItems.titles;
         });
+
+
+
+        // Job Controls
+        // elements.jobsTitleSearch.addEventListener("input", (e) => {
+
+        //     const suggestions = this.getSuggestions(e.target.value);
+
+        //     // #TODO: DEBOUNCE THIS
+        //     if(suggestions.length > 0) {
+        //         if(this.searchOptions.titles.length !== [...new Set(suggestions)].length) {
+        //             this.searchOptions.titles = [...new Set(suggestions)];
+        //             // Remove current Jobs
+        //             jobListView.clearJobs(elements.jobsGrid);
+
+        //             // Every time a filter is added restart the index
+        //             this.searchOptions.index = 0;
+        //             console.log(this.searchOptions.titles);
+        //             this.getJobs();
+        //         }
+        //     }
+            
+        //     // Return the suggestions to unfiltered menu items
+        //     this.searchSuggestions.titles = this.menuItems.titles;
+        // });
 
         // Job Card btns
         document.body.addEventListener('click', (e) => {
@@ -340,7 +366,7 @@ export default class JobsController {
 
                 // Store menu items in the controller & add to the suggested search arrays
                 this.menuItems.titles = items.uniqueTitles;
-                // this.menuItems.titles = items.uniqueLocations;
+                this.menuItems.locations = items.uniqueLocations;
                 this.searchSuggestions.titles = items.uniqueTitles;
                 this.searchSuggestions.locations = items.uniqueLocations;
 
@@ -349,8 +375,16 @@ export default class JobsController {
 
                 this.initialiseMenuItems();
 
+                this.initialiseSearchAutoComplete();
+
             })
             .catch((err) => console.log(err));
+    }
+
+    initialiseSearchAutoComplete() {
+        inputUtils.autoComplete(document.querySelector('.search-input--title'), this.menuItems.titles);
+        inputUtils.autoComplete(document.querySelector('.search-input--location'), this.menuItems.locations);
+
     }
 
     addMenuListeners() {

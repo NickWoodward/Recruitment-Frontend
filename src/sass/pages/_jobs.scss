@@ -196,7 +196,7 @@
     &__content-wrapper {
         position: absolute;
         top: calc(100% + 1rem);
-
+        pointer-events: none;
         overflow: hidden;
 
         @include respond-tablet-small() {
@@ -245,6 +245,7 @@
         flex-direction: column;
         align-items: flex-start;
         justify-content: flex-start;
+        opacity: 0;
         overflow: auto;
 
         display: grid;
@@ -268,6 +269,7 @@
             margin: 0;
             grid-template-columns: repeat(1, auto);
             justify-content: center;
+            opacity: 1;
         }
 
         &--titles {
@@ -307,20 +309,54 @@
     height: var(--item-height);
 }
 
-
+.search-wrapper {
+    display: flex;
+}
 .search-input {
-    height: 3rem;
+    padding: .8rem 0;
+    font-size: inherit;
+    font-family: inherit;
+    color: $color-secondary;
+    width: 25rem;
 }
 
 .search-input--location, .search-input--title {
     text-align: end;
     padding-right: 1.5rem;
-    color: rgb(87, 87, 87);
     border: 1px solid #d4d4d5;
 }
 
-.search-input--title {
+.input-wrapper { 
+    position: relative; 
+    font-size: 1.5rem;
+}
+.input-wrapper--title {
     margin-left: 1.5rem;
+}
+.autocomplete-items {
+    position: absolute;
+    top: 100%;
+    width: 100%;
+    border: 1px solid #d4d4d5;
+    background-color: white;
+}
+.autocomplete-item {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 1.5rem 0;
+    padding-right: 1.5rem;
+}
+.autocomplete-items div:hover {
+    /*when hovering an item:*/
+    background-color: $color-primary-new;
+    color: #ffffff;
+
+  }
+.autocomplete-active {
+    /*when navigating through the items using the arrow keys:*/
+    background-color: $color-primary-new;
+    color: #ffffff;
 }
 
 .sort {
