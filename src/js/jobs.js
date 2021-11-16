@@ -57,6 +57,11 @@ export default class JobsController {
             locations: []
         }
 
+        this.searchInputValues = {
+            title: "",
+            location: ""
+        }
+
         // Used to determine if infinite scroll effect should continue by comparing to # job-card elements
         this.totalJobs = 0;
 
@@ -104,9 +109,10 @@ export default class JobsController {
             // Reset the input default value if focus is lost, but not if it's the autocomplete list
 
             if(this.activeSearchInput  && !e.target.closest('.autocomplete-items')) {
+                console.log(this.searchInputValues)
                 switch(this.activeSearchInput.classList[0]) {
-                    case "search-input--title":     value = "Job Title"; break;
-                    case "search-input--location":  value = "Location"; break;
+                    case "search-input--title":     value = this.searchInputValues.title? this.searchInputValues.title : "Job Title"; break;
+                    case "search-input--location":  value = this.searchInputValues.location? this.searchInputValues.location : "Location"; break;
                 }
                 // console.log(e.target.closest('.search-input'), this.activeSearchInput);
                 inputUtils.setInput(this.activeSearchInput, value);
@@ -115,10 +121,8 @@ export default class JobsController {
             if(input) {
                 this.activeSearchInput = input;
                 inputUtils.clearInput(this.activeSearchInput);
-            }
-            
+            }            
         });
-
 
 
         // Job Controls
@@ -375,7 +379,19 @@ export default class JobsController {
 
                 this.initialiseMenuItems();
 
-                this.initialiseSearchAutoComplete();
+                // this.initialiseSearchAutoComplete();
+                
+                // Initialise search autoComplete
+                document.querySelectorAll('.search-input').forEach(input => {
+                    let data;
+                    let inputName;
+                    switch(input.classList[0]) {
+                        case 'search-input--title': data = this.menuItems.titles; inputName = 'title'; break;
+                        case 'search-input--location': data = this.menuItems.locations; inputName = 'location'; break;
+                    }
+                    // Logic for typing in the input
+                    this.handleAutoComplete(input, inputName, data);
+                });
 
             })
             .catch((err) => console.log(err));
@@ -398,20 +414,12 @@ export default class JobsController {
                 const submenu = jobsMenuView.findSelectedSubmenu(e);
                 const checkboxTitle = e.target.value;
 
+                console.log(submenu, checkboxTitle);
                 // Update checkboxes based on selection
-                jobsMenuView.updateCheckboxes(submenu, checkboxTitle);
-
-                // Change the search object's options
-                this.changeSearchOptions(submenu, checkboxTitle);
-                
-                // Remove current Jobs
-                jobListView.clearJobs(elements.jobsGrid);
-
-                // Every time a filter is added restart the index
-                this.searchOptions.index = 0;
+                this.updateFilters(submenu, checkboxTitle);
 
                 // Query the database using the new search object
-                this.getJobs();
+                this.getJobs();     
             });
         });
     }
@@ -428,6 +436,152 @@ export default class JobsController {
             const index = this.searchOptions[submenu].indexOf(checkboxTitle);
             this.searchOptions[submenu].splice(index, 1);
         }
+    }
+
+    updateFilters(submenu, checkboxTitle) {
+        jobsMenuView.updateCheckboxes(submenu, checkboxTitle);
+
+        // Change the search object's options
+        this.changeSearchOptions(submenu, checkboxTitle);
+        
+        // Remove current Jobs
+        jobListView.clearJobs(elements.jobsGrid);
+
+        // Every time a filter is added restart the index
+        this.searchOptions.index = 0;
+    }
+    addSearchFilters(submenu, filter) {
+        // If the filter doesn't already exist, add it to the search options 
+        if(!this.searchOptions[submenu].includes(filter)) {
+            this.searchOptions[submenu].push(filter);
+            // Manually check the relevant checkbox
+            Array.from(document.querySelectorAll(elementStrings[`${submenu}Checkbox`])).forEach(checkbox => {
+                if(checkbox.value === filter) {
+                    checkbox.checked = true;
+                    jobsMenuView.updateCheckboxes(submenu, filter);
+                }
+            });
+            jobListView.clearJobs(elements.jobsGrid);
+            // Every time a filter is added restart the index
+            this.searchOptions.index = 0;
+        }
+        // jobsMenuView.updateCheckboxes(submenu, checkboxTitle);
+
+        // // Change the search object's options
+        // this.changeSearchOptions(submenu, checkboxTitle);
+        
+        // // Remove current Jobs
+        // jobListView.clearJobs(elements.jobsGrid);
+
+        // // Every time a filter is added restart the index
+        // this.searchOptions.index = 0;
+    }
+
+    handleAutoComplete(input, inputName, data) {
+        // inputUtils.initialiseAutoComplete.bind(this, input, data);
+        let currentFocus;
+
+        input.addEventListener('input', e => {
+            let autoCompleteList, autoCompleteItem;
+            // Close all open autocomplete lists
+            // inputUtils.closeAllLists(null, input);
+            if(!input.value) return;
+            currentFocus = -1;
+            // Create a div container for the suggestions
+            autoCompleteList = inputUtils.createAutoCompleteList(inputName);
+
+            // For each data item
+            data.forEach(item => {
+                // If the value typed matches a data item
+                if(inputUtils.isAutoCompleteMatch(item, input.value)) {
+                    // Create a suggestion
+                    autoCompleteItem = inputUtils.createAutoCompleteItem(item, input.value);
+
+                    // Append it to the list
+                    autoCompleteList.appendChild(autoCompleteItem);
+
+                    // Handle clicks on the suggestion
+                    autoCompleteItem.addEventListener('click', e => {
+                        input.value = e.target.getElementsByTagName('input')[0].value;
+                        inputUtils.closeAllLists(null, input);
+
+                        // Set the input value for when focus is lost & push filter to the relevant array
+                        switch(e.target.parentElement.classList[1]) {
+                            case 'autocomplete-list--title' :   this.searchInputValues.title = input.value;  
+                                                                // Add to search options if it doesn't already exist
+                                                                this.addSearchFilters('titles', input.value);
+                                                                this.getJobs();
+                                                                break;
+                            case 'autocomplete-list--location': this.searchInputValues.location = input.value;
+                                                                // Add to search options if it doesn't already exist
+                                                                this.addSearchFilters('locations', input.value);
+                                                                this.getJobs();
+                                                                break;
+                        }
+                        this.updateTags();
+                    });
+                }
+            });
+
+            // Append to container
+            input.parentNode.appendChild(autoCompleteList);
+        });
+
+        input.addEventListener('keydown', e => {
+            const list = document.querySelector(`.autocomplete-list--${inputName}`);
+            let suggestions;
+            if(document.querySelector(`.autocomplete-list--${inputName}`)) {
+                suggestions = list.getElementsByTagName('div');
+
+                if(e.keyCode == 40) {
+                    // DOWN key
+                    currentFocus++;
+                    updateSuggestionFocus(suggestions);
+                } else if(e.keyCode == 38) {
+                    // UP key
+                    currentFocus--;
+                    updateSuggestionFocus(suggestions);
+                } else if(e.keyCode == 13) {
+                    e.preventDefault(); // ENTER
+                    if(currentFocus > -1) {
+                        // Simulate click
+                        if(suggestions) suggestions[currentFocus].click();
+                    }
+                }
+            }
+        });
+
+        function updateSuggestionFocus(suggestions) {
+            // Remove all active classes
+            inputUtils.removeActive(suggestions);
+            // CurrentFocus edge cases
+            if(currentFocus >= suggestions.length) currentFocus = 0;
+            if(currentFocus < 0) currentFocus = suggestions.length - 1;
+            // Add active class
+            suggestions[currentFocus].classList.add('autocomplete-active');
+        }
+
+
+        document.addEventListener("click", function (e) {
+            inputUtils.closeAllLists(e.target, input);
+        });
+    }
+
+    updateTags() {
+        const container = document.querySelector('.jobs__tags');
+        utils.clearElement(container);
+        this.searchOptions.titles.forEach(title => {
+            const closeIcon = `<svg class="jobs__tag-close"><use xlink:href="svg/spritesheet.svg#close-icon"></svg>`;
+            const tagWrapper = document.createElement('DIV');
+            tagWrapper.setAttribute('class', `jobs__tag-wrapper`);
+
+            const tag = document.createElement('DIV');
+            tag.setAttribute('class', `jobs__tag-text jobs__tag-text--${title}`);
+            tag.innerText = title;
+            tagWrapper.appendChild(tag);
+            tagWrapper.insertAdjacentHTML('afterbegin', closeIcon);
+            container.append(tagWrapper);
+        })
     }
 }
 

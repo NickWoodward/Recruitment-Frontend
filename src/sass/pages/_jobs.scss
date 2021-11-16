@@ -21,7 +21,8 @@
 .jobs__menu-wrapper {
     position: fixed;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
+    align-items: center;
     background-color: $color-logo;
     // min-height: calc(100vh - var(--header-height));
     z-index: 100;
@@ -41,7 +42,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
+    // width: 100%;
     padding-top: 2rem;
     // For the icons
     fill: $color-secondary-highlight;
@@ -297,6 +298,51 @@
         display: flex;
         width: max-content;
         margin-left: 2rem;
+    }
+}
+
+.jobs__tags {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    // border: 1px solid red;
+    height: 5rem;
+    margin-left: 4rem;
+
+}
+.jobs__tag-wrapper {
+    display: flex;
+    padding: .2rem;
+}
+.jobs__tag {
+    display: flex;
+
+    width: 15rem;
+    padding: 1.2rem;
+    // background-color: $color-primary-new;
+    // border: 1px solid $color-primary-new;
+    border-radius: 2rem;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &-text {
+        color: $color-secondary;
+        font-size: 1.3rem;
+    }
+
+    &-close {
+        height: 1.5rem;
+        width: 1.5rem;
+        // padding: .1rem;
+        margin-left: 2rem;
+        margin-right: .8rem;
+        fill: $color-primary-new;
+        // fill: white;
+        // background-color: white;
+        border-radius: 50%;
     }
 }
 
