@@ -12,16 +12,11 @@ var tl;
 var featuredSlides = [];
 
 export const animateJobs = (batchNum) => {
+    console.log('called');
     // Use autoAlpha to stop FOUC
-    // tl.from(elements.jobsMain, { ease: 'linear', autoAlpha: 0})
-    // .from('.logo--header', {duration: 3.5})
+    tl.from('.jobs__grid', { ease: 'linear', autoAlpha: 0})
 
-    // .from('.tagline__title', {y:80, duration: .6, ease: 'ease-out'}, "<")
-    // .from('.tagline__sub', {duration:1}, "<.05")
-    // .from('.tagline__date', {y:80, duration: 1.3}, "<.24")
-
-    tl.from(`.job-card-${batchNum}`, { opacity: 0, transformOrigin: "50% 50%", stagger: { amount: 2.6 }, ease: 'ease-out'})
-        .from('.box', {opacity: 0, transformOrigin: "50% 50%", ease: "ease-out"}, "<");
+    tl.from(`.job-card-${batchNum}`, { opacity: 0, transformOrigin: "50% 50%", stagger: { amount: 2.6 }, ease: 'ease-out'});
 
 }
 
@@ -116,7 +111,7 @@ export const renderFeaturedJobs = (jobs, element, jobsPerSlide) => {
 };
 
 export const renderJobs = (jobs, element, batchNum = 0) => {
-    // tl = gsap.timeline({defaults: {opacity: 0, ease: 'back'}});
+    tl = gsap.timeline({defaults: {opacity: 0, ease: 'back'}});
     // Add individually so that a stagger animation can be applied
     jobs.forEach((job) => {
         createJobCard(job, element);
@@ -125,7 +120,6 @@ export const renderJobs = (jobs, element, batchNum = 0) => {
 
 export const createJobCard = ({id, title, wage, location, description}, element, featured, details, batchNum) => {
     // description = featured? utils.limitText(description, 168): utils.limitText(description, 168);
-
     const markup = `
        <div class="job-card job-card-${batchNum} ${featured? 'job-card--featured':''} ${details? 'job-card--details':''}" data-id=${id}>
             <div class="job-card__title-wrapper ${featured? 'job-card__title-wrapper--featured':''} ${details? 'job-card__title-wrapper--details':''}">
@@ -170,7 +164,6 @@ export const createJobCard = ({id, title, wage, location, description}, element,
     `;
 
     if(!element) return markup;
-    console.log('oh no');
     element.insertAdjacentHTML('beforeend', markup);
 }
 

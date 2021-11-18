@@ -168,7 +168,7 @@ export const addMenuAnimation = (itemContent) => {
 
     // *** ARROW ANIMATION ***
     const itemArrow = itemContent.parentElement.parentElement.querySelector('.jobs-menu__title-icon');
-    const arrowAnimation = gsap.timeline({paused: true, onReverseComplete: ()=>console.log('reversed'), onComplete: ()=>console.log('playing')});
+    const arrowAnimation = gsap.timeline({paused: true});
     arrowAnimation.to(itemArrow, { rotation: '90', duration: .2 });
 
     itemArrow.animation = arrowAnimation;
@@ -186,6 +186,20 @@ export const setMenuActive = (itemContent, setTrue) => {
         itemWrapper.classList.remove('jobs-menu__item-wrapper--active');
         itemTitle.classList.remove('jobs-menu__title--active');
     }
+}
+
+let tagListAnimation;
+export const initialiseTagsListAnimation = () => {
+    const tl = gsap.timeline({ paused: true, defaults: { duration: .8 } });
+    tl.to('.tags-wrapper', { minHeight: '30px', height: 'auto' });
+    tagListAnimation = tl;
+}
+export const openTagsList = () => {
+    tagListAnimation.play();
+}
+export const closeTagsList = (cb) => {
+    tagListAnimation.eventCallback("onReverseComplete", cb);
+    tagListAnimation.reverse();
 }
 
 // export const initMenuItemAnimations = (e) => {
@@ -238,7 +252,8 @@ export const setMenuActive = (itemContent, setTrue) => {
  *  @param {string} submenu The submenu that contains the checkbox
  *  @param {string} checkboxTitle The checkbox title ('all' etc)
  */ 
-export const updateCheckboxes = (submenu, checkboxTitle) => {
+export const handleCheckboxLogic = (submenu, checkboxTitle) => {
+    console.log(submenu, checkboxTitle);
     // Select the submenu's checkboxes (except 'all') 
     const checkboxArray = Array.from(document.querySelectorAll(elementStrings[`${submenu}Checkbox`]))
                                 .filter((element) => !element.classList.contains(elementStrings[`${submenu}CheckboxAll`]))
@@ -250,10 +265,12 @@ export const updateCheckboxes = (submenu, checkboxTitle) => {
     }  
     // If it's the last remaining checkbox, select 'all', else just uncheck 
     else if(isLastCheckbox(checkboxArray)) {
+        console.log('last');
         checkboxAll.checked = true;
     } else {
     // Uncheck the 'all' option if any other checkbox is selected
         checkboxAll.checked = false;
+        console.log('else');
     }
 }
 

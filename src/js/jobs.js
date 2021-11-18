@@ -11,7 +11,6 @@ import * as utils from "./utils/utils";
 import * as inputUtils from "./utils/inputUtils";
 
 import JobList from "./models/JobList";
-import User from './models/User';
 
 import { elements } from "./views/base";
 import { elementStrings } from "./views/base";
@@ -48,9 +47,12 @@ export default class JobsController {
             orderField: "title",
             orderDirection: "ASC"
         };
+        this.tags = [];
+        window.tagtest = this.tags;
         // If the page has search params from the search form on index.html add them to the seachParams (update menus once populated)
         if(this.titleParam) this.searchOptions.titles.push(this.titleParam);
         if(this.locationParam) this.searchOptions.locations.push(this.locationParam);
+
 
         this.searchSuggestions = {
             titles: [],
@@ -61,6 +63,7 @@ export default class JobsController {
             title: "",
             location: ""
         }
+        // this.tagsListAnimation = jobsMenuView.getTagsListAnimation();
 
         // Used to determine if infinite scroll effect should continue by comparing to # job-card elements
         this.totalJobs = 0;
@@ -70,7 +73,6 @@ export default class JobsController {
         this.getJobs();
         // Get unique column entries and initialise
         this.initialiseJobsMenu();
-
         this.addEventListeners();
     }
 
@@ -79,6 +81,7 @@ export default class JobsController {
             utils.pageFadeIn();
             headerView.renderHeader("jobs");
             jobListView.initialiseScrollAnimation();
+            jobsMenuView.initialiseTagsListAnimation();
         });
 
         // #TODO: Debounce / change to GSAP
@@ -109,7 +112,6 @@ export default class JobsController {
             // Reset the input default value if focus is lost, but not if it's the autocomplete list
 
             if(this.activeSearchInput  && !e.target.closest('.autocomplete-items')) {
-                console.log(this.searchInputValues)
                 switch(this.activeSearchInput.classList[0]) {
                     case "search-input--title":     value = this.searchInputValues.title? this.searchInputValues.title : "Job Title"; break;
                     case "search-input--location":  value = this.searchInputValues.location? this.searchInputValues.location : "Location"; break;
@@ -340,9 +342,10 @@ export default class JobsController {
             .then(({ data, data: { jobs, totalJobs, message } } = {}) => {
                 this.totalJobs = totalJobs;
                 this.searchOptions.index += this.limit;
+
                 // Passing the index to the render and animate functions allow gsap to animate only the most recent elements added to the page
                 jobListView.renderJobs(jobs, elements.jobsGrid, false, this.searchOptions.index);
-                // jobListView.animateJobs(this.searchOptions.index);
+                jobListView.animateJobs(this.searchOptions.index);
             })
             .catch((err) => console.log(err));
     }
@@ -402,7 +405,7 @@ export default class JobsController {
         inputUtils.autoComplete(document.querySelector('.search-input--location'), this.menuItems.locations);
 
     }
-
+// ******************************
     addMenuListeners() {
         const checkboxes = document.querySelectorAll(
             elementStrings.jobsMenuCheckbox
@@ -412,60 +415,173 @@ export default class JobsController {
             input.addEventListener("change", (e) => {
                 // Find out which submenu has been selected
                 const submenu = jobsMenuView.findSelectedSubmenu(e);
+                const checkbox = e.target;
                 const checkboxTitle = e.target.value;
 
-                console.log(submenu, checkboxTitle);
-                // Update checkboxes based on selection
-                this.updateFilters(submenu, checkboxTitle);
+///////////////
+                // Deal with visual logic of checking/unchecking 'all', or unchecking the last checkbox
+                jobsMenuView.handleCheckboxLogic(submenu, checkboxTitle);   
+
+                // If a checkbox is checked that isn't 'All'
+                if(checkbox.checked && checkboxTitle !== 'all') { 
+                    // Add a new tag
+                    this.addTag(submenu, checkboxTitle);
+
+                    // Add as a search option if it doesn't already exist
+                    if(!this.searchOptions[submenu].includes(checkboxTitle)) this.addSearchOption(submenu, checkboxTitle);
+
+                // If the 'All' checkbox is checked
+                } else if(checkbox.checked && checkboxTitle === 'all') {
+
+                    // Remove all tags
+                    this.removeAllTags(submenu);
+                    // Remove tag from array
+                    this.removeFromTagsArray(tag);
+
+                    // Reset the search object
+                    this.searchOptions[submenu] = [];
+                
+                // If a checkbox that isn't 'All' is unchecked
+                } else if(!checkbox.checked && checkboxTitle !== 'all') {
+                    // Remove the tag
+                    const tag = this.findAndDeleteTagByText(checkboxTitle);
+                    
+                    // Remove the search option
+                    this.removeSearchOption(submenu, checkboxTitle);
+                
+                // If the 'All' checkbox is unchecked, recheck it, because why?
+                } else if(!checkbox.checked && checkboxTitle === 'all') {
+                    // Remove all tags
+                    this.removeAllTags(submenu);
+                    checkbox.checked = true;
+                }
+
+                // Remove current Jobs
+                jobListView.clearJobs(elements.jobsGrid);
+
+                // Every time a filter is added restart the index
+                this.searchOptions.index = 0;
 
                 // Query the database using the new search object
-                this.getJobs();     
+                this.getJobs();  
+
+
+///////////////
+
+
+                // // Deal with visual logic of clicking 'all', or the last checkbox
+                // jobsMenuView.handleCheckboxLogic(submenu, checkboxTitle);
+
+                // // Update tags
+                // this.updateTags(submenu, e.target, checkboxTitle);
+
+                // // Change the search object's options
+                // // this.changeSearchOptions(submenu, checkboxTitle);
+
+                // // Reset the submenu search options if 'all' is selected
+                // if(checkboxTitle === 'all') {
+                //     this.searchOptions[submenu] = [];
+                // // Else if the option doesn't exist, add it
+                // } else if(!this.searchOptions[submenu].includes(checkboxTitle)) {
+                //     this.addSearchOption(submenu, checkboxTitle)
+                // // Else remove it
+                // } else {
+                //     this.removeSearchOption(submenu, checkboxTitle);
+                // }
+
+                // // Remove current Jobs
+                // jobListView.clearJobs(elements.jobsGrid);
+
+                // // Every time a filter is added restart the index
+                // this.searchOptions.index = 0;
+
+                // // Query the database using the new search object
+                // this.getJobs();     
             });
         });
     }
 
-    changeSearchOptions(submenu, checkboxTitle) {
-        // Reset the submenu search options if 'all' is selected
-        if(checkboxTitle === 'all') {
-            this.searchOptions[submenu] = [];
-        // Else if the option doesn't exist, add it
-        } else if(!this.searchOptions[submenu].includes(checkboxTitle)) {
-            this.searchOptions[submenu].push(checkboxTitle);
-        // Else remove it
-        } else {
-            const index = this.searchOptions[submenu].indexOf(checkboxTitle);
-            this.searchOptions[submenu].splice(index, 1);
-        }
+    // changeSearchOptions(submenu, checkboxTitle) {
+    //     // Reset the submenu search options if 'all' is selected
+    //     if(checkboxTitle === 'all') {
+    //         this.searchOptions[submenu] = [];
+    //     // Else if the option doesn't exist, add it
+    //     } else if(!this.searchOptions[submenu].includes(checkboxTitle)) {
+    //         this.searchOptions[submenu].push(checkboxTitle);
+    //     // Else remove it
+    //     } else {
+    //         const index = this.searchOptions[submenu].indexOf(checkboxTitle);
+    //         this.searchOptions[submenu].splice(index, 1);
+    //     }
+    // }
+
+    // updateTags(submenu, checkbox, checkboxTitle) {
+    //     if(checkbox.checked && checkboxTitle !== 'all') {
+    //         // Add the tag if checkbox checked
+    //         this.addTag(submenu, checkboxTitle);
+    //     } else if(!checkbox.checked && checkboxTitle !== 'all') {
+    //         // Remove the tag if checkbox unchecked
+    //         const tag = Array.from(document.querySelectorAll('.tag__text')).filter(tagText => {
+    //             return tagText.textContent === filter;
+    //         })[0].parentElement;
+
+    //         utils.removeElement(tag);
+    //     } else if(checkboxTitle === 'all') {
+    //         // If 'all' selected close tag list and remove all submenu tags
+
+    //         document.querySelectorAll('.tag').forEach(() => );
+    //     }
+    // }
+
+
+    removeAllTags(submenu) {
+        const tags = Array.from(document.querySelectorAll(`.tag--${submenu}`));
+        this.tags = [];
+        tags.forEach(tag => {
+            jobsMenuView.closeTagsList(() => utils.removeElement(tag));
+            this.removeFromTagsArray(tag);
+        });
+        console.log('deleted all' + this.tags)
     }
 
-    updateFilters(submenu, checkboxTitle) {
-        jobsMenuView.updateCheckboxes(submenu, checkboxTitle);
+    findandDeleteTagByText(text) {
+        const tag = Array.from(document.querySelectorAll('.tag__text')).filter(tagText => {
+            return tagText.textContent === text;
+        })[0].parentElement;
 
-        // Change the search object's options
-        this.changeSearchOptions(submenu, checkboxTitle);
-        
-        // Remove current Jobs
-        jobListView.clearJobs(elements.jobsGrid);
+        utils.removeElement(tag);
+        this.removeFromTagsArray(tag);
 
-        // Every time a filter is added restart the index
-        this.searchOptions.index = 0;
+        console.log(`deleted one ${this.tags}`);
     }
-    addSearchFilters(submenu, filter) {
+
+    removeFromTagsArray(tag) {
+        this.tags.splice(this.tags.indexOf(tag), 1);
+    }
+
+    findAndSelectCheckboxByText(submenu, checkboxTitle) {
+        const submenuElement = document.querySelector(`.jobs-menu__content--${submenu}`);
+        Array.from(submenuElement.querySelectorAll('.jobs-menu__checkbox')).filter(checkbox => {
+            return checkbox.value === checkboxTitle;
+        })[0].checked = true;
+    }
+
+    addSearchOption(submenu, filter) {
         // If the filter doesn't already exist, add it to the search options 
         if(!this.searchOptions[submenu].includes(filter)) {
             this.searchOptions[submenu].push(filter);
             // Manually check the relevant checkbox
-            Array.from(document.querySelectorAll(elementStrings[`${submenu}Checkbox`])).forEach(checkbox => {
-                if(checkbox.value === filter) {
-                    checkbox.checked = true;
-                    jobsMenuView.updateCheckboxes(submenu, filter);
-                }
-            });
-            jobListView.clearJobs(elements.jobsGrid);
-            // Every time a filter is added restart the index
-            this.searchOptions.index = 0;
+            // Array.from(document.querySelectorAll(elementStrings[`${submenu}Checkbox`])).forEach(checkbox => {
+            //     if(checkbox.value === filter) {
+            //         checkbox.checked = true;
+            //         jobsMenuView.handleCheckboxLogic(submenu, filter);
+            //     }
+            // });
+            // jobListView.clearJobs(elements.jobsGrid);
+            // // Every time a filter is added restart the index
+            // this.searchOptions.index = 0;
         }
-        // jobsMenuView.updateCheckboxes(submenu, checkboxTitle);
+        // jobsMenuView.handleCheckboxLogic(submenu, checkboxTitle);
 
         // // Change the search object's options
         // this.changeSearchOptions(submenu, checkboxTitle);
@@ -475,6 +591,29 @@ export default class JobsController {
 
         // // Every time a filter is added restart the index
         // this.searchOptions.index = 0;
+    }
+    removeSearchOption(submenu, filter) {
+        // If the filter already exists, remove it from the search options 
+        if(this.searchOptions[submenu].includes(filter)) {
+            this.searchOptions[submenu].splice(this.searchOptions[submenu].indexOf(filter), 1);
+           
+           
+            // jobListView.clearJobs(elements.jobsGrid);
+            // // Every time a filter is added restart the index
+            // this.searchOptions.index = 0;
+            // this.getJobs();
+            // // Remove the checkbox from the relevent menu
+            // Array.from(document.querySelectorAll(elementStrings[`${submenu}Checkbox`])).forEach(checkbox => {
+            //     if(checkbox.value === filter) checkbox.checked = false;
+            //     jobsMenuView.handleCheckboxLogic(submenu, filter);
+            // });
+
+            // const tag = Array.from(document.querySelectorAll('.tag__text')).filter(tagText => {
+            //     return tagText.textContent === filter;
+            // })[0].parentElement;
+
+            // utils.removeElement(tag);
+        }
     }
 
     handleAutoComplete(input, inputName, data) {
@@ -505,20 +644,48 @@ export default class JobsController {
                         input.value = e.target.getElementsByTagName('input')[0].value;
                         inputUtils.closeAllLists(null, input);
 
-                        // Set the input value for when focus is lost & push filter to the relevant array
                         switch(e.target.parentElement.classList[1]) {
-                            case 'autocomplete-list--title' :   this.searchInputValues.title = input.value;  
-                                                                // Add to search options if it doesn't already exist
-                                                                this.addSearchFilters('titles', input.value);
-                                                                this.getJobs();
-                                                                break;
-                            case 'autocomplete-list--location': this.searchInputValues.location = input.value;
-                                                                // Add to search options if it doesn't already exist
-                                                                this.addSearchFilters('locations', input.value);
-                                                                this.getJobs();
-                                                                break;
+                            case 'autocomplete-list--title':
+                                // Add the item to the search object
+                                this.addSearchOption('titles', input.value);
+                                // Add a tag
+                                this.addTag('titles', input.value);
+                                // Manually select the checkbox
+                                this.findAndSelectCheckboxByText('titles', input.value);
+                                // Handle checkbox logic
+                                jobsMenuView.handleCheckboxLogic('titles', input.value);
+                                break;
+                            case 'autocomplete-list--location':
+                                // Add the item to the search object
+                                this.addSearchOption('locations', input.value);
+                                // Add a tag
+                                this.addTag('locations');
+                                // Manually select the checkbox
+                                this.findAndSelectCheckboxByText('locations', input.value);
+                                // Handle checkbox logic
+                                jobsMenuView.handleCheckboxLogic('locations', input.value);
+                                break;
                         }
-                        this.updateTags();
+
+                        this.getJobs();
+
+                        // // Set the input value for when focus is lost & push filter to the relevant array
+                        // switch(e.target.parentElement.classList[1]) {
+                        //     case 'autocomplete-list--title' :   this.searchInputValues.title = input.value;  
+                        //                                         // Add to search options if it doesn't already exist
+                        //                                         this.addSearchOption('titles', input.value);
+                        //                                         this.addTag('titles', input.value);
+
+                        //                                         this.getJobs();
+                        //                                         break;
+                        //     case 'autocomplete-list--location': this.searchInputValues.location = input.value;
+                        //                                         // Add to search options if it doesn't already exist
+                        //                                         this.addSearchOption('locations', input.value);
+                        //                                         this.addTag('locations', input.value);
+
+                        //                                         this.getJobs();
+                        //                                         break;
+                        // }
                     });
                 }
             });
@@ -567,21 +734,59 @@ export default class JobsController {
         });
     }
 
-    updateTags() {
-        const container = document.querySelector('.jobs__tags');
-        utils.clearElement(container);
-        this.searchOptions.titles.forEach(title => {
-            const closeIcon = `<svg class="jobs__tag-close"><use xlink:href="svg/spritesheet.svg#close-icon"></svg>`;
-            const tagWrapper = document.createElement('DIV');
-            tagWrapper.setAttribute('class', `jobs__tag-wrapper`);
+    // addTags() {
+    //     const tagsList = document.querySelector('.tags-list');
+    //     utils.clearElement(tagsList);
 
-            const tag = document.createElement('DIV');
-            tag.setAttribute('class', `jobs__tag-text jobs__tag-text--${title}`);
-            tag.innerText = title;
-            tagWrapper.appendChild(tag);
-            tagWrapper.insertAdjacentHTML('afterbegin', closeIcon);
-            container.append(tagWrapper);
-        })
+    //     this.searchOptions.titles.forEach(title => {
+    //         this.addTag(title, 'titles');
+    //     });
+    //     this.searchOptions.locations.forEach(location => {
+    //         this.addTag(location, 'locations');
+    //     });
+
+    //     // If this is the first tag, open the tag wrapper
+    //     if(document.querySelectorAll('.tag').length === 1) jobsMenuView.openTagsWrapper();
+    // }
+
+    addTag(submenu, title) {
+
+        console.log('adding tag' + this.tags);
+        const container = document.querySelector('.tags-wrapper');
+        const tagsList = document.querySelector('.tags-list');
+        const closeIcon = `<svg class="tag__close-icon"><use xlink:href="svg/spritesheet.svg#close-icon"></svg>`;
+        const tag = document.createElement('DIV');
+        tag.setAttribute('class', `tag tag--${submenu}`);
+
+        const tagText = document.createElement('DIV');
+        tagText.setAttribute('class', `tag__text`);
+        tagText.innerText = title;
+        tag.appendChild(tagText);
+        tag.insertAdjacentHTML('afterbegin', closeIcon);
+        tagsList.append(tag);
+        container.append(tagsList);
+
+        // Add the tag to the tags array
+        this.tags.push(title);
+        // If this is the first tag, open the tag wrapper
+        if(this.tags.length === 1) jobsMenuView.openTagsList();
+
+        tag.addEventListener('click', (e) => {
+            // Simulate checkbox-all click
+            document.querySelector(`.jobs-menu__${submenu}-checkbox--all`).clicked = true;
+            // Handle checkbox logic (unselect every other tag)
+            jobsMenuView.handleCheckboxLogic(submenu, title);
+            // Remove the tag from the array
+            this.removeFromTagsArray(tag);
+
+            // Remove the tag
+            if(this.tags.length === 0) {
+                // Close tags wrapper if it's the last tag
+                jobsMenuView.closeTagsList(() => utils.removeElement(tag));
+            } else {
+                utils.removeElement(tag);
+            }
+        });
     }
 }
 

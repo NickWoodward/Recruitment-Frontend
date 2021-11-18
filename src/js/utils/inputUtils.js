@@ -2,7 +2,6 @@ export const clearInput = (input) => {
   input.value = '';
 }
 export const setInput = (input, value) => {
-  console.log(value);
   input.value = value;
 }
 
