@@ -10,10 +10,9 @@
     min-height: 100%;
     background-color: rgb(245, 247, 250);
 
-    @include respond-desktop-large() {
-        flex-direction: column;
-        align-content: center;
-    }
+    flex-direction: column;
+    align-content: center;
+    
 
 }
 
@@ -27,11 +26,11 @@
     // min-height: calc(100vh - var(--header-height));
     z-index: 100;
 
-    @include respond-desktop-large() {
+    // @include respond-desktop-large() {
         min-height: auto;  
         width: 100%; 
         background-color: rgb(245, 247, 250);
-    }
+    // }
     @include respond-tablet-small() {
         position: relative;
         display: flex;
@@ -40,23 +39,19 @@
 
 .jobs-menu {
     display: flex;
-    flex-direction: column;
+ 
+    position: relative;
+    flex-direction: row;
+    justify-content: flex-start;
     align-items: center;
-    // width: 100%;
-    padding-top: 2rem;
-    // For the icons
-    fill: $color-secondary-highlight;
-    // background-color: blue;
+    height: var(--jobs-menu-height);
+    padding-left: 3.5rem;
+    padding-top: 0;
 
-    @include respond-desktop-large() {
-        position: relative;
-        flex-direction: row;
-        justify-content: flex-start;
-        height: var(--jobs-menu-height);
-        padding-left: 3.5rem;
-        padding-top: 0;
-        z-index: 100;
-    }
+    fill: $color-secondary-highlight;
+
+    z-index: 100;
+
     @include respond-desktop-small() {
         justify-content: center;
         padding-left: 0;
@@ -102,17 +97,12 @@
 
     &__item {
         position: relative;
-        width: 100%;
-        z-index: 2;
+        
+        display: flex;
+        justify-content: center;
+        width: 16rem;
+        height: 5rem;
         cursor: pointer;
-
-
-        @include respond-desktop-large() {
-            display: flex;
-            justify-content: center;
-            width: 16rem;
-            height: 5rem;
-        }
 
         @include respond-tablet-medium() {
             width: 15rem;
@@ -120,9 +110,6 @@
         @include respond-tablet-small() {
             width: 12rem;
         }
-
-
-
     }
 
     &__title {
@@ -130,44 +117,29 @@
         align-items: center;
         justify-content: flex-start;
         
-        padding: 2.5rem 0 2.5rem 3rem;
-
-        @include respond-desktop-large() {
-            padding: 0;
-            transform: translateX(-1rem);
-        }
+        padding: 0;
+        transform: translateX(-1rem);
 
         font-size: 1.6rem;
-        color: $color-white;
-
-        @include respond-desktop-large() {
-            color: $color-secondary;
-            fill: $color-primary-new;
-        }
+        color: $color-secondary;
+        fill: $color-primary-new;
+      
         @include respond-tablet-small() {
             display: flex;
             width: 100%;
             justify-content: flex-start;
             transform: none;
-
-            // border: 1px solid red;
         }
 
         &--active {
             color: white;
             fill: $color-secondary-highlight;
-
-            @include respond-desktop-large() {
-            }
         }
     }   
     &__title-text{
-        margin-left: 2rem;
+        margin-left: 1rem;
         transform: translateY(-1px);
-        
-        @include respond-desktop-large() {
-            margin-left: 1rem;
-        }
+      
         @include respond-tablet-small() {
             margin-left: 2rem;
         }
@@ -254,18 +226,16 @@
         grid-template-columns: repeat(3, auto);
         column-gap: 4rem;
         row-gap: 1rem;
-        font-size: var(--menu-content);
+
+        font-size: 1.6rem;
+
+        padding: 2.5rem 2.8rem 3rem 2rem;
+        background-color: white;
+        box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+        margin: 2px;
+
         z-index: 1;
 
-        @include respond-desktop-large() {
-            --menu-content: 1.6rem;
-            grid-template-columns: repeat(3, auto);
-
-            padding: 2.5rem 2.8rem 3rem 2rem;
-            background-color: white;
-            box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
-            margin: 2px;
-        }
         @include respond-tablet-small() {
             margin: 0;
             grid-template-columns: repeat(1, auto);
@@ -287,11 +257,9 @@
     &__input-wrapper {
         display: flex;
         align-items: center;
-        color: $color-white;
 
-        @include respond-desktop-large() {
-            color: $color-secondary;
-        }
+        color: $color-secondary;
+        
     }
 
     &__description {
@@ -350,10 +318,6 @@
         color: $color-secondary;
         font-size: 1.3rem;
         padding-right: .3rem;
-
-        // white-space: nowrap;
-        // overflow: hidden;
-        // text-overflow: ellipsis;
     }
 
     &__close-icon {
@@ -429,9 +393,17 @@
 
 .sort {
     width: 15rem;
-    height: 3rem;
+    // height: 3rem;
     margin-left: 1rem;
     border: 1px solid #d4d4d5;
+    padding: .8rem 1rem;
+    // font-size: inherit;
+    font-family: inherit;
+    color: $color-secondary;
+
+    &:focus {
+
+    }
 
 }
 
@@ -479,18 +451,17 @@
 }
 
 .jobs__wrapper {
-    display: flex;
-    // justify-content: center;
-    padding-top: 5rem;
-    padding-bottom: 10rem;
+    // display: flex;
+    // padding-top: 5rem;
+    // padding-bottom: 10rem;
     max-width: 132rem;
 
-    @include respond-desktop-large() {
+    // @include respond-desktop-large() {
         display: flex; 
         justify-content: center;
         padding-top: 0;
         margin-top: var(--jobs-menu-height);
-    }
+    // }
     @include respond-desktop-small() {
         width: 60%; 
     }

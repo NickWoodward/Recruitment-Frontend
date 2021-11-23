@@ -12,7 +12,6 @@ var tl;
 var featuredSlides = [];
 
 export const animateJobs = (batchNum) => {
-    console.log('called');
     // Use autoAlpha to stop FOUC
     tl.from('.jobs__grid', { ease: 'linear', autoAlpha: 0})
 
@@ -168,7 +167,6 @@ export const createJobCard = ({id, title, wage, location, description}, element,
 }
 
 export const createListJobCard = ({id, title, wage, location, description}, element, featured, details) => {
-    console.log(id, title, wage, location);
     const markup = `
         <div class="job-card ${featured? 'job-card--featured':''} ${details? 'job-card--details':''}" data-id=${id}>
             <div class="job-card__title-wrapper ${featured? 'job-card__title-wrapper--featured':''} ${details? 'job-card__title-wrapper--details':''}">

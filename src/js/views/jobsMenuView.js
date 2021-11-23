@@ -32,15 +32,15 @@ export const populateMenu = (content, params) => {
     const locationParam = params['locationParam'];
 
     // Render Job Titles
-    jobTitles.forEach(title => {
+    jobTitles.forEach(({id, title}) => {
         const checked = title === titleParam;
-        renderItem(title, elements.jobsMenuJobTitles, "titles", checked);
+        renderItem(id, title, elements.jobsMenuJobTitles, "titles", checked);
     });
 
     // Render Job Locations
-    jobLocations.forEach(location => {
+    jobLocations.forEach(({id, location}) => {
         const checked = location === locationParam;
-        renderItem(location, elements.jobsMenuLocations, "locations", checked);
+        renderItem(id, location, elements.jobsMenuLocations, "locations", checked);
     });
 }
 
@@ -72,18 +72,15 @@ export const findSelectedSubmenu = e => {
  * @param {string} menuType The type of item to be added (title/salary/location etc).
  * @param {boolean} checked Should the element be pre-checked
  */
-export const renderItem = (menuItem, htmlElement, menuType, checked) => {
+export const renderItem = (id, menuItem, htmlElement, menuType, checked) => {
     // If there's a param then the 'all' checkbox isn't applicable
     if(checked && menuType === 'titles') document.querySelector(`.${elementStrings.titlesCheckboxAll}`).checked = false;
     if(checked && menuType === 'locations') document.querySelector(`.${elementStrings.locationsCheckboxAll}`).checked = false;
 
-    const random = Math.floor(Math.random() * 10) +1;
     const markup = `
          <div class="jobs-menu__input-wrapper">
-             <input class="jobs-menu__${menuType}-checkbox jobs-menu__checkbox" type="checkbox" name="${menuType}" value="${menuItem}" ${checked? 'checked': ''}>
+             <input class="jobs-menu__${menuType}-checkbox jobs-menu__checkbox" type="checkbox" name="${menuType}" value="${menuItem}" ${checked? 'checked': ''} data-id=${id}>
              <p class="jobs-menu__description">${menuItem}</p>
-             <div class="jobs-menu__count">(${random})</div>
-
          </div>
     `;
 
@@ -270,7 +267,7 @@ export const handleCheckboxLogic = (submenu, checkboxTitle) => {
     } else {
     // Uncheck the 'all' option if any other checkbox is selected
         checkboxAll.checked = false;
-        console.log('else');
+        console.log('Uncheck All option');
     }
 }
 

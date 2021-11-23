@@ -13,16 +13,17 @@ export const createAutoCompleteList = (inputName) => {
   return autoCompleteList;
 }
 
-export const createAutoCompleteItem = (item, value) => {
+export const createAutoCompleteItem = (id, item, value) => {
   const index = item.toUpperCase().indexOf(value.toUpperCase());
 
   const element = document.createElement('DIV');
   element.setAttribute('class', 'autocomplete-item');
+  element.setAttribute('data-id', id);
 
   element.innerHTML = `${item.substr(0, index)}<strong>${item.substr(index, value.length)}</strong>${item.substr(index+value.length)}`;
   
   /*insert a input field that will hold the current array item's value:*/
-  element.innerHTML += `<input type='hidden' value='${item}'>`;
+  element.innerHTML += `<input type='hidden' value='${item}' data-id=${id}>`;
 
   return element;
 }

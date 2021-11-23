@@ -49,6 +49,7 @@ export default class JobsController {
         };
         this.tags = [];
         window.tagtest = this.tags;
+        window.search = this.searchOptions;
         // If the page has search params from the search form on index.html add them to the seachParams (update menus once populated)
         if(this.titleParam) this.searchOptions.titles.push(this.titleParam);
         if(this.locationParam) this.searchOptions.locations.push(this.locationParam);
@@ -126,6 +127,30 @@ export default class JobsController {
             }            
         });
 
+        // Sort Input
+        document.querySelector('.sort').addEventListener('change', (e) => {
+            switch(e.target.value) {
+                case 'Newest':
+                    this.searchOptions.orderField = 'createdAt';
+                    this.searchOptions.orderDirection = 'DESC'; 
+                    break;
+                case 'Oldest':
+                    this.searchOptions.orderField = 'createdAt'; 
+                    this.searchOptions.orderDirection = 'ASC'; 
+                    break;
+                case 'A-Z Desc':
+                    this.searchOptions.orderField = 'title';
+                    this.searchOptions.orderDirection = "DESC"; 
+                    break;
+                case 'A-Z Asc': 
+                    this.searchOptions.orderField = 'title';
+                    this.searchOptions.orderDirection = "ASC"; 
+                    break;
+            }
+            this.clearJobs();
+            this.searchOptions.index = 0;
+            this.getJobs();
+        });
 
         // Job Controls
         // elements.jobsTitleSearch.addEventListener("input", (e) => {
@@ -342,7 +367,7 @@ export default class JobsController {
             .then(({ data, data: { jobs, totalJobs, message } } = {}) => {
                 this.totalJobs = totalJobs;
                 this.searchOptions.index += this.limit;
-
+console.log(jobs);
                 // Passing the index to the render and animate functions allow gsap to animate only the most recent elements added to the page
                 jobListView.renderJobs(jobs, elements.jobsGrid, false, this.searchOptions.index);
                 jobListView.animateJobs(this.searchOptions.index);
@@ -367,6 +392,7 @@ export default class JobsController {
                     loader.clearLoader(item);
                 });
 
+                console.log(items);
                 // Render content
                 jobsMenuView.populateMenu(items, { titleParam: this.titleParam, locationParam: this.locationParam });
                 jobsMenuView.animateMenu();
@@ -396,6 +422,8 @@ export default class JobsController {
                     this.handleAutoComplete(input, inputName, data);
                 });
 
+
+
             })
             .catch((err) => console.log(err));
     }
@@ -417,7 +445,8 @@ export default class JobsController {
                 const submenu = jobsMenuView.findSelectedSubmenu(e);
                 const checkbox = e.target;
                 const checkboxTitle = e.target.value;
-
+                const checkboxId = checkbox.dataset.id;
+                
 ///////////////
                 // Deal with visual logic of checking/unchecking 'all', or unchecking the last checkbox
                 jobsMenuView.handleCheckboxLogic(submenu, checkboxTitle);   
@@ -425,7 +454,7 @@ export default class JobsController {
                 // If a checkbox is checked that isn't 'All'
                 if(checkbox.checked && checkboxTitle !== 'all') { 
                     // Add a new tag
-                    this.addTag(submenu, checkboxTitle);
+                    this.addTag(submenu, checkboxId, checkboxTitle);
 
                     // Add as a search option if it doesn't already exist
                     if(!this.searchOptions[submenu].includes(checkboxTitle)) this.addSearchOption(submenu, checkboxTitle);
@@ -435,20 +464,21 @@ export default class JobsController {
 
                     // Remove all tags
                     this.removeAllTags(submenu);
-                    // Remove tag from array
-                    this.removeFromTagsArray(tag);
-
+                    
                     // Reset the search object
                     this.searchOptions[submenu] = [];
-                
                 // If a checkbox that isn't 'All' is unchecked
                 } else if(!checkbox.checked && checkboxTitle !== 'all') {
-                    // Remove the tag
-                    const tag = this.findAndDeleteTagByText(checkboxTitle);
-                    
+
+                    // Remove the tag from screen and tagsArray
+                    const tag = document.querySelectorAll(`.tag--${submenu}[data-id="${checkboxId}"]`)[0];
+                    this.removeFromTagsArray(tag);
+                    this.removeTag(tag);
+
                     // Remove the search option
                     this.removeSearchOption(submenu, checkboxTitle);
                 
+                    console.log(this.searchOptions[submenu]);
                 // If the 'All' checkbox is unchecked, recheck it, because why?
                 } else if(!checkbox.checked && checkboxTitle === 'all') {
                     // Remove all tags
@@ -541,19 +571,27 @@ export default class JobsController {
             jobsMenuView.closeTagsList(() => utils.removeElement(tag));
             this.removeFromTagsArray(tag);
         });
-        console.log('deleted all' + this.tags)
     }
 
-    findandDeleteTagByText(text) {
-        const tag = Array.from(document.querySelectorAll('.tag__text')).filter(tagText => {
-            return tagText.textContent === text;
-        })[0].parentElement;
-
-        utils.removeElement(tag);
-        this.removeFromTagsArray(tag);
-
-        console.log(`deleted one ${this.tags}`);
+    removeTag(tag) {
+        if(this.tags.length === 0) {
+            // Close tags wrapper if it's the last tag
+            jobsMenuView.closeTagsList(() => utils.removeElement(tag));
+        } else {
+            utils.removeElement(tag);
+        }
     }
+
+    // findandDeleteTagByText(text) {
+    //     const tag = Array.from(document.querySelectorAll('.tag__text')).filter(tagText => {
+    //         return tagText.textContent === text;
+    //     })[0].parentElement;
+
+    //     utils.removeElement(tag);
+    //     this.removeFromTagsArray(tag);
+
+    //     console.log(`deleted one ${this.tags}`);
+    // }
 
     removeFromTagsArray(tag) {
         this.tags.splice(this.tags.indexOf(tag), 1);
@@ -630,15 +668,17 @@ export default class JobsController {
             autoCompleteList = inputUtils.createAutoCompleteList(inputName);
 
             // For each data item
-            data.forEach(item => {
+            data.forEach(entry => {
+                const id = entry.id;
+                const item = entry[inputName];
+
                 // If the value typed matches a data item
                 if(inputUtils.isAutoCompleteMatch(item, input.value)) {
                     // Create a suggestion
-                    autoCompleteItem = inputUtils.createAutoCompleteItem(item, input.value);
+                    autoCompleteItem = inputUtils.createAutoCompleteItem(id, item, input.value);
 
                     // Append it to the list
                     autoCompleteList.appendChild(autoCompleteItem);
-
                     // Handle clicks on the suggestion
                     autoCompleteItem.addEventListener('click', e => {
                         input.value = e.target.getElementsByTagName('input')[0].value;
@@ -649,24 +689,30 @@ export default class JobsController {
                                 // Add the item to the search object
                                 this.addSearchOption('titles', input.value);
                                 // Add a tag
-                                this.addTag('titles', input.value);
+                                this.addTag('titles', id, input.value);
                                 // Manually select the checkbox
                                 this.findAndSelectCheckboxByText('titles', input.value);
                                 // Handle checkbox logic
                                 jobsMenuView.handleCheckboxLogic('titles', input.value);
+
                                 break;
                             case 'autocomplete-list--location':
                                 // Add the item to the search object
                                 this.addSearchOption('locations', input.value);
                                 // Add a tag
-                                this.addTag('locations');
+                                this.addTag('locations', id, input.value);
                                 // Manually select the checkbox
                                 this.findAndSelectCheckboxByText('locations', input.value);
                                 // Handle checkbox logic
                                 jobsMenuView.handleCheckboxLogic('locations', input.value);
+
                                 break;
                         }
+                        // Remove current Jobs
+                        jobListView.clearJobs(elements.jobsGrid);
 
+                        // Every time a filter is added restart the index
+                        this.searchOptions.index = 0;
                         this.getJobs();
 
                         // // Set the input value for when focus is lost & push filter to the relevant array
@@ -734,22 +780,10 @@ export default class JobsController {
         });
     }
 
-    // addTags() {
-    //     const tagsList = document.querySelector('.tags-list');
-    //     utils.clearElement(tagsList);
 
-    //     this.searchOptions.titles.forEach(title => {
-    //         this.addTag(title, 'titles');
-    //     });
-    //     this.searchOptions.locations.forEach(location => {
-    //         this.addTag(location, 'locations');
-    //     });
-
-    //     // If this is the first tag, open the tag wrapper
-    //     if(document.querySelectorAll('.tag').length === 1) jobsMenuView.openTagsWrapper();
-    // }
-
-    addTag(submenu, title) {
+    addTag(submenu, id, title) {
+        // If the tag already exists, return
+        if(this.tags.includes(title)) return;
 
         console.log('adding tag' + this.tags);
         const container = document.querySelector('.tags-wrapper');
@@ -757,6 +791,7 @@ export default class JobsController {
         const closeIcon = `<svg class="tag__close-icon"><use xlink:href="svg/spritesheet.svg#close-icon"></svg>`;
         const tag = document.createElement('DIV');
         tag.setAttribute('class', `tag tag--${submenu}`);
+        tag.setAttribute('data-id', id);
 
         const tagText = document.createElement('DIV');
         tagText.setAttribute('class', `tag__text`);
@@ -771,21 +806,35 @@ export default class JobsController {
         // If this is the first tag, open the tag wrapper
         if(this.tags.length === 1) jobsMenuView.openTagsList();
 
+        console.log(this.tags);
+
         tag.addEventListener('click', (e) => {
-            // Simulate checkbox-all click
-            document.querySelector(`.jobs-menu__${submenu}-checkbox--all`).clicked = true;
-            // Handle checkbox logic (unselect every other tag)
+            // // Simulate click of corresponding checkbox
+            const checkboxes = Array.from(document.querySelectorAll(`.jobs-menu__${submenu}-checkbox`));
+            const checkbox = checkboxes.filter(checkbox => checkbox.dataset.id == id)[0];
+            checkbox.checked = false;
+            
+            // Handle checkbox logic/edgecases
             jobsMenuView.handleCheckboxLogic(submenu, title);
             // Remove the tag from the array
             this.removeFromTagsArray(tag);
 
             // Remove the tag
-            if(this.tags.length === 0) {
-                // Close tags wrapper if it's the last tag
-                jobsMenuView.closeTagsList(() => utils.removeElement(tag));
-            } else {
-                utils.removeElement(tag);
-            }
+            this.removeTag(tag);
+
+            this.removeFromTagsArray(tag);
+
+            this.removeSearchOption(submenu, title);
+
+            // Remove current Jobs
+            jobListView.clearJobs(elements.jobsGrid);
+
+            // Every time a filter is added restart the index
+            this.searchOptions.index = 0;
+
+            this.getJobs();
+            console.log(this.tags);
+
         });
     }
 }
