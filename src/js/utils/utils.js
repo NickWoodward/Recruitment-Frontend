@@ -84,6 +84,25 @@ export const capitalise = (text, all) => {
     return words;
 };
 
+export const formatSalary = (number) => {
+    let text ='';
+    const reversed = number.toString().split("").reverse();
+    reversed.forEach((number, index) => {
+        if(index % 3 === 0 && index !== 0 ) { text += ',' }
+        text += number;
+    })
+
+    return `£${text.split("").reverse().join("")}`;
+};
+export const removeSalaryFormatting = (str) => {
+    let [min, max] = str.split(" - ");
+
+    min = min.replace ( /[^0-9.]/g, '' );
+    max = max.replace ( /[^0-9.]/g, '' );
+
+    return [parseInt(min), parseInt(max)];
+}
+
 
 export const chunk = (array, chunkLength) => {
     let chunks = [];
@@ -94,3 +113,32 @@ export const chunk = (array, chunkLength) => {
     };
     return chunks;
 };
+
+const epochs = [
+    ['year', 31536000],
+    ['month', 2592000],
+    ['day', 86400],
+    ['hour', 3600],
+    ['minute', 60],
+    ['second', 1]
+];
+
+const getDuration = (timeAgoInSeconds) => {
+    for (let [name, seconds] of epochs) {
+        const interval = Math.floor(timeAgoInSeconds / seconds);
+        if (interval >= 1) {
+            return {
+                interval: interval,
+                epoch: name
+            };
+        }
+    }
+};
+
+export const timeAgo = (date) => {
+    const timeAgoInSeconds = Math.floor((new Date() - new Date(date)) / 1000);
+    const {interval, epoch} = getDuration(timeAgoInSeconds);
+    const suffix = interval === 1 ? '' : 's';
+    return `${interval} ${epoch}${suffix} ago`;
+};
+

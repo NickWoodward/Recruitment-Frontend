@@ -55,7 +55,6 @@ class IndexController {
         this.state = {
             featuredJobs: [],
             featuredJobsAside: [],
-            numFeaturedAside: 3,
             currentJob: {}
         }
         this.addEventListeners();
@@ -262,7 +261,6 @@ class IndexController {
     }
 
     closeModal(modal) {
-        console.log('removing');
         modal.parentElement.removeChild(modal);
         document.body.style.overflow = "auto";
     }
@@ -312,12 +310,13 @@ class IndexController {
                                 const applyBtn = e.target.closest(`${elementStrings.applyBtn}`);
 
                                 if(viewMoreBtn) {
+                                    console.log('yes');
                                     this.JobList.getJob(card.dataset.id)
                                         .then(response => {
                                             if(response.data.job) {
                                                 this.state.currentJob = response.data.job;
                                                 // Filter out the current job from the featured array passed to the details view
-                                                this.state.featuredJobsAside = this.state.featuredJobs.filter(job => job.id !== response.data.job.id).slice(0, this.state.numFeaturedAside);
+                                                this.state.featuredJobsAside = this.state.featuredJobs.filter(job => job.id !== response.data.job.id);
                                                 jobView.renderJobDetails(response.data.job, document.body, this.state.featuredJobsAside, e);
 
                                                 // Add btn listeners
@@ -360,6 +359,7 @@ class IndexController {
         this.state.featuredJobsAside.splice(jobIndex, 1, newJob);
 
         this.state.currentJob = job;
+        console.log(jobId, job, newJob)
 
         if(!jobView.getAnimationState())
             jobView.updateJobView(jobId, job, newJob);

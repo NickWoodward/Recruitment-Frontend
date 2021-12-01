@@ -12,11 +12,17 @@ var tl;
 var featuredSlides = [];
 
 export const animateJobs = (batchNum) => {
-    // Use autoAlpha to stop FOUC
-    tl.from('.jobs__grid', { ease: 'linear', autoAlpha: 0})
-
-    tl.from(`.job-card-${batchNum}`, { opacity: 0, transformOrigin: "50% 50%", stagger: { amount: 2.6 }, ease: 'ease-out'});
-
+    gsap.set(`.job-card-${batchNum}`, { autoAlpha: 0, y:-30 });
+    ScrollTrigger.batch(`.job-card-${batchNum}`, {
+        onEnter: elements => {
+          gsap.to(elements, {
+            autoAlpha: 1,
+            y: 0,
+            stagger: .2
+          });
+        },
+        once: true          
+    });
 }
 
 export const initialiseScrollAnimation = () => {
@@ -69,12 +75,15 @@ const jobsMenuScrollAnimation = () => {
 }
 
 // Check if user has scrolled to the bottom of the visible jobs list
+// export const isAtBottom = () => {
+//     const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+//     return (Math.ceil(scrollTop) + Math.ceil(clientHeight) ) + 1 >= scrollHeight;
+// };
 export const isAtBottom = () => {
     const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-
-    return (Math.ceil(scrollTop) + Math.ceil(clientHeight) ) + 1 >= scrollHeight;
-};
-
+  return scrollTop >= scrollHeight - clientHeight;
+}
 
 export const renderFeaturedJobs = (jobs, element, jobsPerSlide) => {
 
@@ -110,14 +119,15 @@ export const renderFeaturedJobs = (jobs, element, jobsPerSlide) => {
 };
 
 export const renderJobs = (jobs, element, batchNum = 0) => {
-    tl = gsap.timeline({defaults: {opacity: 0, ease: 'back'}});
+    console.log(batchNum);
+    // tl = gsap.timeline({defaults: {ease: 'back'}});
     // Add individually so that a stagger animation can be applied
     jobs.forEach((job) => {
-        createJobCard(job, element);
+        createJobCard(job, element, false, false, batchNum);
      });
 }
 
-export const createJobCard = ({id, title, wage, location, description}, element, featured, details, batchNum) => {
+export const createJobCard = ({id, title, wage, location, description, position, pqe, jobType, createdAt}, element, featured, details, batchNum) => {
     // description = featured? utils.limitText(description, 168): utils.limitText(description, 168);
     const markup = `
        <div class="job-card job-card-${batchNum} ${featured? 'job-card--featured':''} ${details? 'job-card--details':''}" data-id=${id}>
@@ -142,9 +152,9 @@ export const createJobCard = ({id, title, wage, location, description}, element,
                 <div class="job-card__extra ${featured? 'job-card__extra--featured':''} ${details? 'job-card__extra--details':''}">
                     <svg class="job-card__extra-icon"><use xlink:href="svg/spritesheet.svg#clock"></svg>
                     <div class="job-card__extra-wrapper">    
-                        <div class="job-card__type ${featured? 'job-card__type--featured':''}">Permanent</div>
-                        <div class="job-card__position ${featured? 'job-card__position--featured':''}">In House</div>
-                        <div class="job-card__PQE ${featured? 'job-card__PQE--featured':''}">PQE: 3+</div>
+                        <div class="job-card__type ${featured? 'job-card__type--featured':''}">${jobType}</div>
+                        <div class="job-card__position ${featured? 'job-card__position--featured':''}">${position}</div>
+                        <div class="job-card__PQE ${featured? 'job-card__PQE--featured':''}">PQE: ${pqe}</div>
                     </div>        
                 </div> 
 
@@ -157,7 +167,7 @@ export const createJobCard = ({id, title, wage, location, description}, element,
                     <button class="job-card__view-btn ${details? 'job-card__view-btn--details':''}">View More</button>
                     <button class="job-card__apply-btn ${details? 'job-card__apply-btn--details':''}">Apply</button>
                 </div>
-                <div class="job-card__date">Posted: 3+ days ago</div>
+                <div class="job-card__date">Posted: ${utils.timeAgo(createdAt)}</div>
             </div>
         </div>                 
     `;

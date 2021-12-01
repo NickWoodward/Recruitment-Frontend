@@ -28,8 +28,12 @@ export const populateMenu = (content, params) => {
     // Add menu items to the relevant menus
     const jobTitles = content.uniqueTitles;
     const jobLocations = content.uniqueLocations;
+    const jobSalaries = content.salaries;
+    const jobTypes = content.types;
+
     const titleParam = params['titleParam'];
     const locationParam = params['locationParam'];
+    const salaryParam = params['salaryParam'];
 
     // Render Job Titles
     jobTitles.forEach(({id, title}) => {
@@ -41,6 +45,11 @@ export const populateMenu = (content, params) => {
     jobLocations.forEach(({id, location}) => {
         const checked = location === locationParam;
         renderItem(id, location, elements.jobsMenuLocations, "locations", checked);
+    });
+
+    jobSalaries.forEach(range => {
+        const checked = range === salaryParam;
+        renderItem(null, range, elements.jobsMenuSalaries, "salaries", checked);
     });
 }
 
@@ -250,7 +259,6 @@ export const closeTagsList = (cb) => {
  *  @param {string} checkboxTitle The checkbox title ('all' etc)
  */ 
 export const handleCheckboxLogic = (submenu, checkboxTitle) => {
-    console.log(submenu, checkboxTitle);
     // Select the submenu's checkboxes (except 'all') 
     const checkboxArray = Array.from(document.querySelectorAll(elementStrings[`${submenu}Checkbox`]))
                                 .filter((element) => !element.classList.contains(elementStrings[`${submenu}CheckboxAll`]))
@@ -262,12 +270,10 @@ export const handleCheckboxLogic = (submenu, checkboxTitle) => {
     }  
     // If it's the last remaining checkbox, select 'all', else just uncheck 
     else if(isLastCheckbox(checkboxArray)) {
-        console.log('last');
         checkboxAll.checked = true;
     } else {
     // Uncheck the 'all' option if any other checkbox is selected
         checkboxAll.checked = false;
-        console.log('Uncheck All option');
     }
 }
 

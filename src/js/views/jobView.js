@@ -40,17 +40,17 @@ export const renderJobNotification = (job = {jobId: 20, title: 'Corporate Commer
 
 export const setJobModalPosition = () => {
     const modal = document.querySelector('.modal');
-    const menu = document.querySelector('.jobs__menu-wrapper') || document.querySelector('.sidebar');
+    // const menu = document.querySelector('.jobs__menu-wrapper') || document.querySelector('.sidebar');
     const header = document.querySelector('.header');
     const { height: headerHeight } = header? header.getBoundingClientRect() : {};
-    const { width: menuWidth } = menu? menu.getBoundingClientRect() : {};
+    // const { width: menuWidth } = menu? menu.getBoundingClientRect() : {};
     const {width: viewPortWidth, height: viewPortHeight} = document.body.getBoundingClientRect() || {};
     
     // If there's a menu shift the modal to the right and adjust width
-    if(menuWidth) {
-        modal.style.left = `${menuWidth}px`;
-        modal.style.width = `${viewPortWidth - menuWidth}px`;
-    }
+    // if(menuWidth) {
+    //     modal.style.left = `${menuWidth}px`;
+    //     modal.style.width = `${viewPortWidth - menuWidth}px`;
+    // }
     // If there's a header, move down and shrink height
     if(headerHeight) {
         modal.style.top = `${headerHeight}px`;
@@ -157,7 +157,6 @@ const calculateNumFeaturedJobs = (container) => {
 const removeJobModal = () => {
     const modal = document.querySelector('.job-details');
     modal.parentElement.removeChild(modal);
-    console.log('finished');
 }
 
 
@@ -259,7 +258,6 @@ const animateDetailsOut = (oldDetails, newDetails) => {
     });
 }
 const replaceDetails = (oldDetails, newDetails) => {
-    console.log(oldDetails, newDetails);
     oldDetails.insertAdjacentElement('beforebegin', newDetails);
 
     utils.removeElement(oldDetails);

@@ -37,19 +37,26 @@ export default class JobsController {
         this.activeSearchInput;
         this.menuItems = {
             titles: [],
-            locations: []
+            locations: [],
+            salaries: [],
+            types: [ "Interim", "Permanent" ]
         }
         this.searchOptions = {
             index: 0,
             limit: 12,
             titles: [],
             locations: [],
+            salaries: [],
             orderField: "title",
             orderDirection: "ASC"
         };
-        this.tags = [];
-        window.tagtest = this.tags;
-        window.search = this.searchOptions;
+        this.tags = {
+            titles: [],
+            salaries:[],
+            locations:[],
+            types:[]
+        };
+
         // If the page has search params from the search form on index.html add them to the seachParams (update menus once populated)
         if(this.titleParam) this.searchOptions.titles.push(this.titleParam);
         if(this.locationParam) this.searchOptions.locations.push(this.locationParam);
@@ -72,6 +79,9 @@ export default class JobsController {
         // Max # items loaded: 3 rows of 4 (No need to vary with columns as not bandwidth heavy)
         this.limit = 12;
         this.getJobs();
+        this.currentJob;
+        this.featuredJobs;
+        this.featuredJobsAside;
         // Get unique column entries and initialise
         this.initialiseJobsMenu();
         this.addEventListeners();
@@ -83,14 +93,14 @@ export default class JobsController {
             headerView.renderHeader("jobs");
             jobListView.initialiseScrollAnimation();
             jobsMenuView.initialiseTagsListAnimation();
+            this.getFeaturedJobs();
         });
 
         // #TODO: Debounce / change to GSAP
         window.addEventListener("scroll", (e) => {
             // At bottom of screen && there are more jobs to retrieve
             if (
-                jobListView.isAtBottom() &&
-                this.totalJobs > document.querySelectorAll(".job-card").length
+                jobListView.isAtBottom() 
             ) {
                 this.getJobs();
             }
@@ -98,7 +108,7 @@ export default class JobsController {
 
         window.addEventListener('click', (e) => {
             // Handle closing menu items
-            if(!e.target.closest('.jobs-menu__item') && this.activeNavItem) {
+            if(!e.target.closest('.jobs-menu__item') && this.activeNavItem && !e.target.closest('.jobs-menu__content')) {
                 this.activeNavItem.animation.reverse();
                 this.activeNavArrow.animation.reverse();
                 jobsMenuView.setMenuActive(this.activeNavItem, false);
@@ -176,29 +186,51 @@ export default class JobsController {
         // });
 
         // Job Card btns
-        document.body.addEventListener('click', (e) => {
-            const viewJobBtn = e.target.closest(elementStrings.viewJobBtn);
-            const applyBtn = e.target.closest(elementStrings.applyBtn);
-            if(viewJobBtn) {
-                const jobCard = viewJobBtn.closest(elementStrings.jobCard);
-                this.JobList.getJob(jobCard.dataset.id)
-                .then(job => {
-                    if(job) {
-                        jobView.renderJobDetails(job.data.job, elements.jobsMain);
-                    }
-                })
-                .catch(err => console.log(err));
-            } else if(applyBtn) {
-                const jobCard = applyBtn.closest(elementStrings.jobCard);
-                applyView.renderApplyForm(jobCard.dataset.id);
-            }
-        });
+        // document.body.addEventListener('click', async (e) => {
+        //     const viewJobBtn = e.target.closest(elementStrings.viewJobBtn);
+        //     const applyBtn = e.target.closest(elementStrings.applyBtn);
+        //     if(viewJobBtn) {
+        //         const jobCard = viewJobBtn.closest(elementStrings.jobCard);
+        //         console.log('yes');
+        //         try {
+        //             // Get the selected job
+        //             const { data: { job } } = await this.JobList.getJob(jobCard.dataset.id);
+        //             this.currentJob = job;
+
+        //             // Filter out this job from the Featured Array, and shorten it to the number of featured jobs to display
+        //             this.featuredJobsAside = this.featuredJobs.filter(job => job.id !== this.currentJob.id);
+                    
+        //             // Render the Current Job and the aside
+        //             jobView.renderJobDetails(this.currentJob, document.body, this.featuredJobsAside, e);
+        //         } catch(e) {
+        //             console.log(e);
+        //         }
+
+
+        //         // this.JobList.getJob(jobCard.dataset.id)
+        //         // .then(response => {
+        //         //     console.log(response);
+        //         //     // if(response.data.job) {
+        //         //     //     this.currentJob = response.data.job;
+        //         //     //      // Filter out the current job from the featured array passed to the details view
+        //         //     //      this.featuredJobsAside = this.featuredJobs.filter(job => job.id !== response.data.job.id).slice(0, this.state.numFeaturedAside);
+                                                
+        //         //     //     jobView.renderJobDetails(response.data.job, document.body, this.featuredJobsAside);
+        //         //     // }
+        //         // })
+        //         // .catch(err => console.log(err));
+        //     } else if(applyBtn) {
+        //         const jobCard = applyBtn.closest(elementStrings.jobCard);
+        //         applyView.renderApplyForm(jobCard.dataset.id);
+        //     }
+        // });
 
         // Handle Modal Events
         document.body.addEventListener('click', async (e) => {
             const modal = e.target.closest('.modal');
             const header = e.target.closest('.header');
             const menu = e.target.closest('.jobs__menu-wrapper');
+
             // If there's a modal, but the user has clicked on the menu or header, close it
             if((header || menu) && document.querySelector('.modal')) {
                 document.querySelector('.modal').parentElement.removeChild(document.querySelector('.modal'));
@@ -241,9 +273,11 @@ export default class JobsController {
                                             forgotPassView.renderForgotModal(); break;
                     }
                 } else if(e.target.closest('.job-details')) {
+                    
                     switch(jobView.getAction(e)) {
                         case 'apply'    : applyView.renderApplyForm(); break;
-                        case 'cancel'   : modal.parentElement.removeChild(modal); break;
+                        case 'view'     : this.swapJobs(e); break
+                        case 'cancel'   : jobView.animateJobDetailsOut(this.closeModal.bind(null, modal)); break;
                         case 'sign-in'  : modal.parentElement.removeChild(modal); loginView.renderLogin(); break;  
                     }
                 } else if(e.target.closest('.apply')) {
@@ -272,25 +306,38 @@ export default class JobsController {
             // Re-enable scrolling
             document.body.style.overflow = "auto";
         });
-
-//         elements.jobsSort.addEventListener('change', e => {
-
-// ******START HERE
-
-//             if(e.target.value === 'A-Z &#8595') {
-//                 this.searchOptions.orderField = 'title';
-//                 this.searchOptions.orderDirection = 'ASC';
-//             } else if (e.target.value === 'A-Z &#8593') {
-//                 this.searchOptions.orderField = 'title';
-//                 this.searchOptions.orderDirection = 'DESC';
-//             }
-//             this.getJobs();
-//             console.log(this.searchOptions);
-//         });
-
-        // NB: Menu item listeners added once menu initialised (this.initialiseJobsMenu)
     }
+    closeModal(modal) {
+        modal.parentElement.removeChild(modal);
+        document.body.style.overflow = "auto";
+    }
+    
+    swapJobs(e) {
+        const viewMoreBtn = e.target.closest('.job-card__view-btn--details');
 
+        // Get the id of the jobs that has been chosen to swap in
+        const jobId = viewMoreBtn.parentElement.parentElement.parentElement.dataset.id;
+
+        // Find the job in the featured aside array (NB: Non-featured jobs can be swapped *in* to the featured aside array)
+        const job = this.featuredJobsAside.find(job => { return job.id === parseInt(jobId)});
+        const jobIndex = this.featuredJobsAside.findIndex(job => { return job.id === parseInt(jobId)});
+
+        // Pick a job that exists in the featured array, but isn't currently in the aside array
+        let newJobIndex = this.featuredJobs.findIndex(job => !this.featuredJobsAside.includes(job) && job.id !== this.currentJob.id);
+        // If no job can be found, pick the previously featured job
+        const newJob = newJobIndex !== -1? this.featuredJobs[newJobIndex] : this.currentJob;
+
+
+        // Remove the old job and add the job to the featured aside
+        this.featuredJobsAside.splice(jobIndex, 1, newJob);
+
+        this.currentJob = job;
+
+        // console.log(jobId, job, newJob)
+
+        if(!jobView.getAnimationState())
+            jobView.updateJobView(jobId, job, newJob);
+    }
     initialiseMenuItems() {
         this.navItems = Array.from(document.querySelectorAll('.jobs-menu__item-wrapper'));
 
@@ -306,7 +353,8 @@ export default class JobsController {
             jobsMenuView.addMenuAnimation(itemContent);
 
             // Add listeners to each element that trigger the animations
-            item.addEventListener('click', () => {
+            item.addEventListener('click', (e) => {
+                if(e.target.closest('.jobs-menu__content')) { console.log('return'); return; }
 
                 if(this.activeNavItem) {
                     // Close any item that's open
@@ -365,15 +413,46 @@ export default class JobsController {
     getJobs() {
         this.JobList.getJobs(this.searchOptions)
             .then(({ data, data: { jobs, totalJobs, message } } = {}) => {
+                if(jobs.length === 0) return;
                 this.totalJobs = totalJobs;
-                this.searchOptions.index += this.limit;
-console.log(jobs);
+                this.searchOptions.index += jobs.length;
                 // Passing the index to the render and animate functions allow gsap to animate only the most recent elements added to the page
-                jobListView.renderJobs(jobs, elements.jobsGrid, false, this.searchOptions.index);
+                jobListView.renderJobs(jobs, elements.jobsGrid, this.searchOptions.index);
                 jobListView.animateJobs(this.searchOptions.index);
+
+                document.querySelectorAll(`${elementStrings.jobCard}`).forEach(card => {
+                    card.addEventListener('click', async (e) => {
+                        const viewJobBtn = e.target.closest(elementStrings.viewJobBtn);
+                        const applyBtn = e.target.closest(elementStrings.applyBtn);
+                        if(viewJobBtn) {
+                            const jobCard = viewJobBtn.closest(elementStrings.jobCard);
+                            try {
+                                // Get the selected job
+                                const { data: { job } } = await this.JobList.getJob(jobCard.dataset.id);
+                                this.currentJob = job;
+            
+                                // Filter out this job from the Featured Array, and shorten it to the number of featured jobs to display
+                                this.featuredJobsAside = this.featuredJobs.filter(job => job.id !== this.currentJob.id);
+                                
+                                // Render the Current Job and the aside
+                                jobView.renderJobDetails(this.currentJob, document.body, this.featuredJobsAside, e);
+                            } catch(e) {
+                                console.log(e);
+                            }
+            
+            
+                        } else if(applyBtn) {
+                            const jobCard = applyBtn.closest(elementStrings.jobCard);
+                            applyView.renderApplyForm(jobCard.dataset.id);
+                        }
+                    });
+                })
+
+
             })
             .catch((err) => console.log(err));
     }
+
 
     clearJobs() {
         jobListView.clearJobs(elements.jobsGrid);
@@ -392,9 +471,22 @@ console.log(jobs);
                     loader.clearLoader(item);
                 });
 
-                console.log(items);
+                const min = 0;
+                let range = 20000;
+                const max = 200000;
+                // Populate salary array 
+                for(let x = min; x <= max; x+=range) {
+                    if(x === 20000) range = 10000;
+                    if(x === 100000) range = 20000;
+                    if(x === max) this.menuItems.salaries.push(`${utils.formatSalary(x)} +`);
+                    else this.menuItems.salaries.push(`${utils.formatSalary(x)} - ${utils.formatSalary(x + range)}`);
+                }
+
+                items.salaries = this.menuItems.salaries;
+                items.types = this.menuItems.types;
+
                 // Render content
-                jobsMenuView.populateMenu(items, { titleParam: this.titleParam, locationParam: this.locationParam });
+                jobsMenuView.populateMenu(items, { titleParam: this.titleParam, locationParam: this.locationParam});
                 jobsMenuView.animateMenu();
 
                 // Store menu items in the controller & add to the suggested search arrays
@@ -422,8 +514,6 @@ console.log(jobs);
                     this.handleAutoComplete(input, inputName, data);
                 });
 
-
-
             })
             .catch((err) => console.log(err));
     }
@@ -433,7 +523,7 @@ console.log(jobs);
         inputUtils.autoComplete(document.querySelector('.search-input--location'), this.menuItems.locations);
 
     }
-// ******************************
+
     addMenuListeners() {
         const checkboxes = document.querySelectorAll(
             elementStrings.jobsMenuCheckbox
@@ -447,7 +537,6 @@ console.log(jobs);
                 const checkboxTitle = e.target.value;
                 const checkboxId = checkbox.dataset.id;
                 
-///////////////
                 // Deal with visual logic of checking/unchecking 'all', or unchecking the last checkbox
                 jobsMenuView.handleCheckboxLogic(submenu, checkboxTitle);   
 
@@ -461,7 +550,6 @@ console.log(jobs);
 
                 // If the 'All' checkbox is checked
                 } else if(checkbox.checked && checkboxTitle === 'all') {
-
                     // Remove all tags
                     this.removeAllTags(submenu);
                     
@@ -472,13 +560,12 @@ console.log(jobs);
 
                     // Remove the tag from screen and tagsArray
                     const tag = document.querySelectorAll(`.tag--${submenu}[data-id="${checkboxId}"]`)[0];
-                    this.removeFromTagsArray(tag);
+                    this.removeFromTagsArray(tag, submenu);
                     this.removeTag(tag);
 
                     // Remove the search option
                     this.removeSearchOption(submenu, checkboxTitle);
                 
-                    console.log(this.searchOptions[submenu]);
                 // If the 'All' checkbox is unchecked, recheck it, because why?
                 } else if(!checkbox.checked && checkboxTitle === 'all') {
                     // Remove all tags
@@ -493,88 +580,27 @@ console.log(jobs);
                 this.searchOptions.index = 0;
 
                 // Query the database using the new search object
-                this.getJobs();  
-
-
-///////////////
-
-
-                // // Deal with visual logic of clicking 'all', or the last checkbox
-                // jobsMenuView.handleCheckboxLogic(submenu, checkboxTitle);
-
-                // // Update tags
-                // this.updateTags(submenu, e.target, checkboxTitle);
-
-                // // Change the search object's options
-                // // this.changeSearchOptions(submenu, checkboxTitle);
-
-                // // Reset the submenu search options if 'all' is selected
-                // if(checkboxTitle === 'all') {
-                //     this.searchOptions[submenu] = [];
-                // // Else if the option doesn't exist, add it
-                // } else if(!this.searchOptions[submenu].includes(checkboxTitle)) {
-                //     this.addSearchOption(submenu, checkboxTitle)
-                // // Else remove it
-                // } else {
-                //     this.removeSearchOption(submenu, checkboxTitle);
-                // }
-
-                // // Remove current Jobs
-                // jobListView.clearJobs(elements.jobsGrid);
-
-                // // Every time a filter is added restart the index
-                // this.searchOptions.index = 0;
-
-                // // Query the database using the new search object
-                // this.getJobs();     
+                this.getJobs();    
             });
         });
     }
 
-    // changeSearchOptions(submenu, checkboxTitle) {
-    //     // Reset the submenu search options if 'all' is selected
-    //     if(checkboxTitle === 'all') {
-    //         this.searchOptions[submenu] = [];
-    //     // Else if the option doesn't exist, add it
-    //     } else if(!this.searchOptions[submenu].includes(checkboxTitle)) {
-    //         this.searchOptions[submenu].push(checkboxTitle);
-    //     // Else remove it
-    //     } else {
-    //         const index = this.searchOptions[submenu].indexOf(checkboxTitle);
-    //         this.searchOptions[submenu].splice(index, 1);
-    //     }
-    // }
-
-    // updateTags(submenu, checkbox, checkboxTitle) {
-    //     if(checkbox.checked && checkboxTitle !== 'all') {
-    //         // Add the tag if checkbox checked
-    //         this.addTag(submenu, checkboxTitle);
-    //     } else if(!checkbox.checked && checkboxTitle !== 'all') {
-    //         // Remove the tag if checkbox unchecked
-    //         const tag = Array.from(document.querySelectorAll('.tag__text')).filter(tagText => {
-    //             return tagText.textContent === filter;
-    //         })[0].parentElement;
-
-    //         utils.removeElement(tag);
-    //     } else if(checkboxTitle === 'all') {
-    //         // If 'all' selected close tag list and remove all submenu tags
-
-    //         document.querySelectorAll('.tag').forEach(() => );
-    //     }
-    // }
-
-
     removeAllTags(submenu) {
         const tags = Array.from(document.querySelectorAll(`.tag--${submenu}`));
-        this.tags = [];
-        tags.forEach(tag => {
-            jobsMenuView.closeTagsList(() => utils.removeElement(tag));
-            this.removeFromTagsArray(tag);
+        this.tags[submenu] = [];
+        tags.forEach((tag, index) => {
+            // if it's the last tag in any submenu, close the tags wrapper
+            if(document.querySelectorAll('.tag').length === 1)
+                jobsMenuView.closeTagsList(() => utils.removeElement(tag));
+            else 
+                utils.removeElement(tag)
+
+            this.removeFromTagsArray(tag, submenu);
         });
     }
 
     removeTag(tag) {
-        if(this.tags.length === 0) {
+        if(document.querySelectorAll('.tag').length === 0) {
             // Close tags wrapper if it's the last tag
             jobsMenuView.closeTagsList(() => utils.removeElement(tag));
         } else {
@@ -582,19 +608,8 @@ console.log(jobs);
         }
     }
 
-    // findandDeleteTagByText(text) {
-    //     const tag = Array.from(document.querySelectorAll('.tag__text')).filter(tagText => {
-    //         return tagText.textContent === text;
-    //     })[0].parentElement;
-
-    //     utils.removeElement(tag);
-    //     this.removeFromTagsArray(tag);
-
-    //     console.log(`deleted one ${this.tags}`);
-    // }
-
-    removeFromTagsArray(tag) {
-        this.tags.splice(this.tags.indexOf(tag), 1);
+    removeFromTagsArray(tag, submenu) {
+        this.tags[submenu].splice(this.tags[submenu].indexOf(tag), 1);
     }
 
     findAndSelectCheckboxByText(submenu, checkboxTitle) {
@@ -605,52 +620,34 @@ console.log(jobs);
     }
 
     addSearchOption(submenu, filter) {
+        // If the filter is a salary range, split on the " - ", and strip it of non numeric digits
+        if(submenu === 'salaries') {
+            filter = utils.removeSalaryFormatting(filter);
+        }
+
         // If the filter doesn't already exist, add it to the search options 
         if(!this.searchOptions[submenu].includes(filter)) {
             this.searchOptions[submenu].push(filter);
-            // Manually check the relevant checkbox
-            // Array.from(document.querySelectorAll(elementStrings[`${submenu}Checkbox`])).forEach(checkbox => {
-            //     if(checkbox.value === filter) {
-            //         checkbox.checked = true;
-            //         jobsMenuView.handleCheckboxLogic(submenu, filter);
-            //     }
-            // });
-            // jobListView.clearJobs(elements.jobsGrid);
-            // // Every time a filter is added restart the index
-            // this.searchOptions.index = 0;
         }
-        // jobsMenuView.handleCheckboxLogic(submenu, checkboxTitle);
-
-        // // Change the search object's options
-        // this.changeSearchOptions(submenu, checkboxTitle);
-        
-        // // Remove current Jobs
-        // jobListView.clearJobs(elements.jobsGrid);
-
-        // // Every time a filter is added restart the index
-        // this.searchOptions.index = 0;
+ 
     }
     removeSearchOption(submenu, filter) {
-        // If the filter already exists, remove it from the search options 
-        if(this.searchOptions[submenu].includes(filter)) {
-            this.searchOptions[submenu].splice(this.searchOptions[submenu].indexOf(filter), 1);
-           
-           
-            // jobListView.clearJobs(elements.jobsGrid);
-            // // Every time a filter is added restart the index
-            // this.searchOptions.index = 0;
-            // this.getJobs();
-            // // Remove the checkbox from the relevent menu
-            // Array.from(document.querySelectorAll(elementStrings[`${submenu}Checkbox`])).forEach(checkbox => {
-            //     if(checkbox.value === filter) checkbox.checked = false;
-            //     jobsMenuView.handleCheckboxLogic(submenu, filter);
-            // });
+        console.log(submenu);
+        if(submenu === 'salaries') {
+            // Strip it of non numeric digits and return as a min/max array
+            filter = utils.removeSalaryFormatting(filter);
 
-            // const tag = Array.from(document.querySelectorAll('.tag__text')).filter(tagText => {
-            //     return tagText.textContent === filter;
-            // })[0].parentElement;
-
-            // utils.removeElement(tag);
+            // this.searchOptions[salary] = [][]; 
+            // filter = [min/max]
+            // So use `findIndex()/every()`
+            const index = this.searchOptions[submenu].findIndex(arr => arr.every((item, i) => filter[i] === item));
+            
+            this.searchOptions[submenu].splice(index, 1);
+        } else {
+            // If the filter already exists, remove it from the search options 
+            if(this.searchOptions[submenu].includes(filter)) {
+                this.searchOptions[submenu].splice(this.searchOptions[submenu].indexOf(filter), 1);
+            }
         }
     }
 
@@ -780,12 +777,11 @@ console.log(jobs);
         });
     }
 
-
     addTag(submenu, id, title) {
+        // console.log(submenu, this.tags[submenu]);
         // If the tag already exists, return
-        if(this.tags.includes(title)) return;
+        if(this.tags[submenu].includes(title)) return;
 
-        console.log('adding tag' + this.tags);
         const container = document.querySelector('.tags-wrapper');
         const tagsList = document.querySelector('.tags-list');
         const closeIcon = `<svg class="tag__close-icon"><use xlink:href="svg/spritesheet.svg#close-icon"></svg>`;
@@ -802,11 +798,11 @@ console.log(jobs);
         container.append(tagsList);
 
         // Add the tag to the tags array
-        this.tags.push(title);
+        this.tags[submenu].push(title);
         // If this is the first tag, open the tag wrapper
-        if(this.tags.length === 1) jobsMenuView.openTagsList();
+        if(document.querySelectorAll('.tag').length === 1) jobsMenuView.openTagsList();
 
-        console.log(this.tags);
+        // console.log('tags after addition: ', this.tags[submenu]);
 
         tag.addEventListener('click', (e) => {
             // // Simulate click of corresponding checkbox
@@ -817,12 +813,10 @@ console.log(jobs);
             // Handle checkbox logic/edgecases
             jobsMenuView.handleCheckboxLogic(submenu, title);
             // Remove the tag from the array
-            this.removeFromTagsArray(tag);
+            this.removeFromTagsArray(tag, submenu);
 
             // Remove the tag
             this.removeTag(tag);
-
-            this.removeFromTagsArray(tag);
 
             this.removeSearchOption(submenu, title);
 
@@ -833,9 +827,13 @@ console.log(jobs);
             this.searchOptions.index = 0;
 
             this.getJobs();
-            console.log(this.tags);
 
         });
+    }
+
+    async getFeaturedJobs() {
+        const { data: { jobs } } = await this.JobList.getFeaturedJobs();
+        this.featuredJobs = jobs;
     }
 }
 

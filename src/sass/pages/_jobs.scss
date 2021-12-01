@@ -24,7 +24,7 @@
     align-items: center;
     background-color: $color-logo;
     // min-height: calc(100vh - var(--header-height));
-    z-index: 100;
+    z-index: 99;
 
     // @include respond-desktop-large() {
         min-height: auto;  
@@ -235,6 +235,13 @@
         margin: 2px;
 
         z-index: 1;
+
+        &--salaries {
+            grid-auto-flow: column;
+            grid-template-rows: repeat(6, auto);
+            column-gap: 4rem;
+            padding: 2.5rem 2rem 3rem 2rem;
+        }
 
         @include respond-tablet-small() {
             margin: 0;
