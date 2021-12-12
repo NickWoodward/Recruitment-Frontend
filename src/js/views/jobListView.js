@@ -119,7 +119,6 @@ export const renderFeaturedJobs = (jobs, element, jobsPerSlide) => {
 };
 
 export const renderJobs = (jobs, element, batchNum = 0) => {
-    console.log(batchNum);
     // tl = gsap.timeline({defaults: {ease: 'back'}});
     // Add individually so that a stagger animation can be applied
     jobs.forEach((job) => {
@@ -162,7 +161,7 @@ export const createJobCard = ({id, title, wage, location, description, position,
                     `<div class="job-card__description ${featured? 'job-card__description--featured':''}">${description}</div>`:''
                 }
             </div>    
-            <div class="job-card__footer">
+            <div class="job-card__footer ${featured? 'job-card__footer--featured':''}">
                 <div class="job-card__btn-wrapper">
                     <button class="job-card__view-btn ${details? 'job-card__view-btn--details':''}">View More</button>
                     <button class="job-card__apply-btn ${details? 'job-card__apply-btn--details':''}">Apply</button>

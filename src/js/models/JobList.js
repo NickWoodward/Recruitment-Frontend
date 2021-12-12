@@ -13,10 +13,10 @@ export default class JobList {
         locations,
         salaries,
         types,
+        pqes,
         orderField,
         orderDirection
     } = {}) {
-        console.log(salaries);
         // Handle async from the jobs controller 
         return JRS.get('/jobs/all', {
             params: {
@@ -26,6 +26,7 @@ export default class JobList {
                 locations,
                 salaries,
                 types,
+                pqes,
                 orderField,
                 orderDirection
             }

@@ -22,15 +22,18 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    background-color: $color-logo;
-    // min-height: calc(100vh - var(--header-height));
     z-index: 99;
 
-    // @include respond-desktop-large() {
-        min-height: auto;  
-        width: 100%; 
-        background-color: rgb(245, 247, 250);
-    // }
+    min-height: auto;  
+    width: 100%; 
+    background-color: rgb(245, 247, 250);
+  
+    @include respond-tablet-large() {
+        position: relative;
+        display: flex;
+        // background-color: white;
+    }
+
     @include respond-tablet-small() {
         position: relative;
         display: flex;
@@ -45,7 +48,7 @@
     justify-content: flex-start;
     align-items: center;
     height: var(--jobs-menu-height);
-    padding-left: 3.5rem;
+    margin-left: 3.5rem;
     padding-top: 0;
 
     fill: $color-secondary-highlight;
@@ -54,14 +57,23 @@
 
     @include respond-desktop-small() {
         justify-content: center;
-        padding-left: 0;
+        margin: 0 auto;
     }
-    @include respond-tablet-small() {
+    @include respond-tablet-large() {
         flex-direction: column;
         height: auto;
-        
+        width: 80%;
+        margin-top: 2rem;
+        margin-bottom: 1.5rem;
+        border-left: 1px solid #d4d4d5;
+        border-right: 1px solid #d4d4d5;
     }
-    
+    @include respond-tablet-small() {
+        width: 100%;
+        margin-top: 0;
+        border: none;
+    }
+
     &__item-wrapper {
         position: relative;
         border: 1px solid #d4d4d5;
@@ -70,14 +82,15 @@
         &:not(:first-of-type) {
             margin-left: 2.5rem;
 
-            @include respond-tablet-medium() {
-                margin-left: .6rem;
-            }
-            @include respond-tablet-small() {
+            // @include respond-tablet-large() {
+            //     margin-left: .6rem;
+            // }
+            @include respond-tablet-large() {
                 margin-left: 0;
+                width: 100%;
             }
         }
-        @include respond-tablet-small() {
+        @include respond-tablet-large() {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -104,10 +117,8 @@
         height: 5rem;
         cursor: pointer;
 
-        @include respond-tablet-medium() {
-            width: 15rem;
-        }
-        @include respond-tablet-small() {
+      
+        @include respond-tablet-large() {
             width: 12rem;
         }
     }
@@ -124,7 +135,7 @@
         color: $color-secondary;
         fill: $color-primary-new;
       
-        @include respond-tablet-small() {
+        @include respond-tablet-large() {
             display: flex;
             width: 100%;
             justify-content: flex-start;
@@ -172,7 +183,7 @@
         pointer-events: none;
         overflow: hidden;
 
-        @include respond-tablet-small() {
+        @include respond-tablet-large() {
             position: relative;
 
             top: auto;
@@ -180,17 +191,14 @@
             height: 0;
         }
 
-        &--titles {
-            left: -1px;
-        }
         &--locations {
             @include respond-desktop-small() {
                 right: calc(-2.5rem - 16.3rem);
             }
-            @include respond-tablet-medium() {
-                right: calc(-.6rem - 15.3rem);
-            }
-            @include respond-tablet-small() {
+            // @include respond-tablet-medium() {
+            //     right: calc(-.6rem - 15.3rem);
+            // }
+            @include respond-tablet-large() {
                 right: auto;
 
             }
@@ -202,10 +210,7 @@
             @include respond-tablet-small() {
                 right: auto;
             }
-            @include respond-tablet-small() {
-                right: auto;
-
-            }
+           
         }
     }
 
@@ -236,14 +241,21 @@
 
         z-index: 1;
 
-        &--salaries {
+        &--salaries, &--pqes {
             grid-auto-flow: column;
             grid-template-rows: repeat(6, auto);
             column-gap: 4rem;
             padding: 2.5rem 2rem 3rem 2rem;
+
+            @include respond-tablet-small() {
+                grid-auto-flow: row;
+            }
+        }
+        &--pqes {
+            padding: 2.5rem 0 3rem 3.5rem;
         }
 
-        @include respond-tablet-small() {
+        @include respond-tablet-large() {
             margin: 0;
             grid-template-columns: repeat(1, auto);
             justify-content: center;
@@ -304,7 +316,6 @@
     // transition: height .5s;
 }
 
-
 .tag {
     display: flex;
     justify-content: center;
@@ -339,14 +350,106 @@
     }
 }
 
+
+.jobs__controls {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: space-between;
+    height: 8rem;
+
+    padding-left: 2rem;
+    padding-right: 3rem;
+
+    border: none;
+    border: 1px solid #d4d4d5;
+
+    @include respond-tablet-large() {
+        height: auto;
+        padding: 0 1rem;
+    }
+    @include respond-tablet-small() {
+        align-items: stretch;
+        width: 90%;
+        border: 1px solid #d4d4d5;
+        padding: .5rem;
+    }
+    
+    @include respond-phone-large() {
+        justify-content: center;
+    }
+
+
+}
+
 .sort-wrapper {
     display: flex;
     align-items: center;
     height: var(--item-height);
+
+    @include respond-tablet-small() {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    @include respond-phone-large() {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+.sort {
+    width: 15rem;
+    margin-left: 1rem;
+    border: 1px solid #d4d4d5;
+    padding: .8rem 1rem;
+    font-family: inherit;
+    color: $color-secondary;
+
+    &:focus {
+
+    }
+
+    @include respond-tablet-small() {
+        margin-left: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    @include respond-phone-large() {
+        margin: 0;
+        margin-right: 1rem;
+    }
+
+}
+
+// .list-btn { margin-left: 1rem; }
+.list-btn, .grid-btn{
+    padding: 1rem;
+    background-color: $color-background;
+}
+
+.list-icon {
+    width: 3rem;
+    height: 3rem;
+    fill: grey;        
+}
+.grid-icon {
+    height: 3rem;
+    width: 3rem;
+    fill: $color-primary;
 }
 
 .search-wrapper {
     display: flex;
+
+    @include respond-tablet-large() {
+        flex-direction: column;
+        padding: 1rem .5rem;
+    }
+
+    @include respond-phone-large() {
+        width: 100%;
+    }
 }
 .search-input {
     padding: .8rem 0;
@@ -354,12 +457,30 @@
     font-family: inherit;
     color: $color-secondary;
     width: 25rem;
+
+    @include respond-desktop-small() {
+        width: 19rem;
+    }
+    @include respond-tablet-medium() {
+        width: 19rem;
+    }
+    @include respond-tablet-small() {
+        // width: 17rem;
+    }
+
+    @include respond-phone-large() {
+        width: 100%;
+    }
 }
 
 .search-input--location, .search-input--title {
     text-align: end;
     padding-right: 1.5rem;
     border: 1px solid #d4d4d5;
+
+    @include respond-phone-large() {
+        text-align: center;
+    }
 }
 
 .input-wrapper { 
@@ -368,6 +489,12 @@
 }
 .input-wrapper--title {
     margin-left: 1.5rem;
+
+    @include respond-tablet-large() {
+        margin-left: 0;
+        margin-top: .5rem;
+    }
+    
 }
 .autocomplete-items {
     position: absolute;
@@ -398,83 +525,42 @@
     color: #ffffff;
 }
 
-.sort {
-    width: 15rem;
-    // height: 3rem;
-    margin-left: 1rem;
-    border: 1px solid #d4d4d5;
-    padding: .8rem 1rem;
-    // font-size: inherit;
-    font-family: inherit;
-    color: $color-secondary;
-
-    &:focus {
-
-    }
-
-}
-
-// .list-btn { margin-left: 1rem; }
-.list-btn, .grid-btn{
-    padding: 1rem;
-    background-color: $color-background;
-}
-
-.list-icon {
-    width: 3rem;
-    height: 3rem;
-    fill: grey;        
-}
-.grid-icon {
-    height: 3rem;
-    width: 3rem;
-    fill: $color-primary;
-}
-
 .jobs__content {
     position: relative;
-    display: inline-flex;
-    flex-direction: column;
-    // margin-top: .1rem;
-    // width: 100%;
-    // border: 1px solid green;
-}
-
-
-.jobs__controls {
     display: flex;
-    flex-flow: row wrap;
-    align-items: center;
-    justify-content: space-between;
-    height: 8rem;
-
-    padding-left: 2rem;
-    padding-right: 3rem;
-
-    // background: #d4d4d5;
-    border: none;
-    border: 1px solid #d4d4d5;
-    // box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+    flex-direction: column;
+    
+    @include respond-tablet-large() {
+        width: 80%;
+    }
+    @include respond-tablet-small() {
+        align-items: center;
+        width: 100%;
+    }
 }
+
 
 .jobs__wrapper {
-    // display: flex;
-    // padding-top: 5rem;
-    // padding-bottom: 10rem;
-    max-width: 132rem;
 
-    // @include respond-desktop-large() {
-        display: flex; 
-        justify-content: center;
-        padding-top: 0;
-        margin-top: var(--jobs-menu-height);
-    // }
+    // max-width: 132rem;
+
+    display: flex; 
+    justify-content: center;
+    padding-top: 0;
+    margin-top: var(--jobs-menu-height);
+    
     @include respond-desktop-small() {
-        width: 60%; 
+        width: 65%; 
+    }
+    @include respond-tablet-larger() {
+        width: 75%;
+    }
+    @include respond-tablet-large() {
+        width: 100%;
+        margin-top: 0
     }
     @include respond-tablet-small() {
         width: 100%;
-        margin-top: 0;
     }
 }
 
@@ -489,41 +575,10 @@
     @include respond-desktop-small() {
         display: flex;
         flex-direction: column;    
+        width: 100%;
+    }
+    @include respond-tablet-small() {
+        width: 90%;
     }
 }
-
-// .jobs__aside {
-//     display: flex;
-//     flex-flow: row wrap;
-//     align-content: flex-start;
-//     justify-content: center;
-
-//     width: 100%;
-// }
-
-// .jobs__blog-title {
-//     display: flex;
-//     justify-content: center;
-//     align-items: center;
-//     width: 100%;
-//     height: 5rem;
-//     color: $color-secondary;
-//     background-color: lightgray;
-//     font-size: var(--blog-title);
-//     font-weight: 700;
-//     margin-bottom: 1.5rem;
-// }
-// .article {
-//     display: flex;
-
-//     // height: 30rem;
-//     width: 50%;
-//     margin-bottom: 2rem;
-//     background-color: rgb(255, 255, 255);
-
-//     &__image {
-//         width: 20rem;
-//     }
-// }
-
 

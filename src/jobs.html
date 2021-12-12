@@ -80,7 +80,7 @@
                         </div>
 
                         <div class="jobs-menu__item-wrapper ">
-                            <div class="jobs-menu__item jobs-menu__item--vacancies">
+                            <div class="jobs-menu__item jobs-menu__item--types">
                                 <div class="jobs-menu__title">
                                     <svg class="jobs-menu__title-icon">
                                         <use xlink:href="svg/spritesheet.svg#arrow-right">
@@ -89,10 +89,31 @@
                                 </div>
 
                             </div>
-                            <div class="jobs-menu__content-wrapper jobs-menu__content-wrapper--type">
-                                <fieldset class="jobs-menu__content jobs-menu__content--type">
+                            <div class="jobs-menu__content-wrapper jobs-menu__content-wrapper--types">
+                                <fieldset class="jobs-menu__content jobs-menu__content--types">
                                     <div class="jobs-menu__input-wrapper jobs-menu__input-wrapper--all">
-                                        <input class="jobs-menu__vacancies-checkbox jobs-menu__vacancies-checkbox--all jobs-menu__checkbox" type="checkbox" name="jobVacancies" value="all" checked>
+                                        <input class="jobs-menu__types-checkbox jobs-menu__types-checkbox--all jobs-menu__checkbox" type="checkbox" name="jobVacancies" value="all" checked>
+                                        <p class="jobs-menu__description">All</p>
+                                    </div>  
+                                    <!-- Items added dynamically -->
+                                </fieldset>
+                            </div>
+                        </div>
+
+                        <div class="jobs-menu__item-wrapper ">
+                            <div class="jobs-menu__item jobs-menu__item--pqes">
+                                <div class="jobs-menu__title">
+                                    <svg class="jobs-menu__title-icon">
+                                        <use xlink:href="svg/spritesheet.svg#arrow-right">
+                                    </svg>
+                                    <p class="jobs-menu__title-text">PQE</p>
+                                </div>
+
+                            </div>
+                            <div class="jobs-menu__content-wrapper jobs-menu__content-wrapper--pqes">
+                                <fieldset class="jobs-menu__content jobs-menu__content--pqes">
+                                    <div class="jobs-menu__input-wrapper jobs-menu__input-wrapper--all">
+                                        <input class="jobs-menu__pqes-checkbox jobs-menu__pqes-checkbox--all jobs-menu__checkbox" type="checkbox" name="jobVacancies" value="all" checked>
                                         <p class="jobs-menu__description">All</p>
                                     </div>  
                                     <!-- Items added dynamically -->
@@ -129,19 +150,20 @@
                         <div class="jobs__controls">
                             
                             <div class="sort-wrapper">
-
-                                <button class="list-btn" aria-label="Display list view.">
-                                    <span class="sr-only">List view</span>
-                                    <svg class="list-icon" aria-hidden="true">
-                                        <use xlink:href="svg/spritesheet.svg#list-icon-test"></use>
-                                    </svg>
-                                </button>
-                                <button class="grid-btn" aria-label="Display grid view.">
-                                    <span class="sr-only">Grid view</span>
-                                    <svg class="grid-icon" aria-hidden="true">
-                                        <use xlink:href="svg/spritesheet.svg#grid-icon-test"></use>
-                                    </svg>
-                                </button>
+                                <div class="sort-buttons-wrapper">
+                                    <button class="list-btn" aria-label="Display list view.">
+                                        <span class="sr-only">List view</span>
+                                        <svg class="list-icon" aria-hidden="true">
+                                            <use xlink:href="svg/spritesheet.svg#list-icon-test"></use>
+                                        </svg>
+                                    </button>
+                                    <button class="grid-btn" aria-label="Display grid view.">
+                                        <span class="sr-only">Grid view</span>
+                                        <svg class="grid-icon" aria-hidden="true">
+                                            <use xlink:href="svg/spritesheet.svg#grid-icon-test"></use>
+                                        </svg>
+                                    </button>
+                                </div>
                                 <select class="sort">
                                     <option value="" disabled selected>Sort By</option>
                                     <option class="option">Newest</option>

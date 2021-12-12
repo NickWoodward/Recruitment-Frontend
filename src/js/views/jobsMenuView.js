@@ -30,6 +30,7 @@ export const populateMenu = (content, params) => {
     const jobLocations = content.uniqueLocations;
     const jobSalaries = content.salaries;
     const jobTypes = content.types;
+    const jobPqes = content.pqes;
 
     const titleParam = params['titleParam'];
     const locationParam = params['locationParam'];
@@ -47,9 +48,19 @@ export const populateMenu = (content, params) => {
         renderItem(id, location, elements.jobsMenuLocations, "locations", checked);
     });
 
-    jobSalaries.forEach(range => {
+    jobSalaries.forEach((range, index) => {
         const checked = range === salaryParam;
-        renderItem(null, range, elements.jobsMenuSalaries, "salaries", checked);
+        renderItem(index, range, elements.jobsMenuSalaries, "salaries", checked);
+    });
+
+    jobTypes.forEach((range, index) => {
+        const checked = range === salaryParam;
+        renderItem(index, range, elements.jobsMenuTypes, "types", checked);
+    });
+
+    jobPqes.forEach((range, index) => {
+        const checked = range === salaryParam;
+        renderItem(index, range, elements.jobsMenuPqes, "pqes", checked);
     });
 }
 
@@ -65,11 +76,16 @@ export const findSelectedSubmenu = e => {
     const salariesSubmenu = e.target.closest(elementStrings.salariesContent);
     const locationsSubmenu = e.target.closest(elementStrings.locationsContent);
     const vacanciesSubmenu = e.target.closest(elementStrings.vacanciesContent);
+    const typesSubmenu = e.target.closest(elementStrings.typesContent);
+    const pqesSubmenu = e.target.closest(elementStrings.pqesContent);
+
 
     if(titlesSubmenu) return 'titles';
     if(salariesSubmenu) return 'salaries';
     if(locationsSubmenu) return 'locations';
     if(vacanciesSubmenu) return 'vacancies';
+    if(typesSubmenu) return 'types';
+    if(pqesSubmenu) return 'pqes';
 
     throw new Error('Submenu not found');
 }
@@ -138,7 +154,7 @@ export const addMenuAnimation = (itemContent) => {
 
     // ScrollTrigger can be used for animation media queries outside of any scrolling
     ScrollTrigger.matchMedia({
-        "(max-width: 650px)": () => {
+        "(max-width: 1000px)": () => {
             ScrollTrigger.saveStyles(contentWrapper);
 
             animation = gsap.timeline({ 
@@ -154,7 +170,7 @@ export const addMenuAnimation = (itemContent) => {
             // Assign the animation to the element
             itemContent.animation = animation;
         }, 
-        "(min-width: 651px)": () => {
+        "(min-width: 1001px)": () => {
             ScrollTrigger.saveStyles(itemContent);
 
             animation = gsap.timeline({ paused: true });

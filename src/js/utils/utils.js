@@ -103,7 +103,6 @@ export const removeSalaryFormatting = (str) => {
     return [parseInt(min), parseInt(max)];
 }
 
-
 export const chunk = (array, chunkLength) => {
     let chunks = [];
     let i = 0;

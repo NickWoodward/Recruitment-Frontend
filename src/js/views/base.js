@@ -28,6 +28,8 @@ export const elements = {
     jobsMenuSalaries: document.querySelector('.jobs-menu__content--salaries'),
     jobsMenuLocations: document.querySelector('.jobs-menu__content--locations'),
     jobsMenuTypes: document.querySelector('.jobs-menu__content--types'),
+    jobsMenuPqes: document.querySelector('.jobs-menu__content--pqes'),
+
 
     /* Admin.html */
     adminMain: document.querySelector('.admin__main'),
@@ -99,8 +101,21 @@ export const elementStrings = {
     locationsCheckbox: '.jobs-menu__locations-checkbox',
     locationsCheckboxAll: 'jobs-menu__locations-checkbox--all',
 
+    typesCheckbox: '.jobs-menu__types-checkbox',
+    typesCheckboxAll: 'jobs-menu__types-checkbox--all',
+    typesContent: '.jobs-menu__content--types',
+
+    pqesCheckbox: '.jobs-menu__pqes-checkbox',
+    pqesCheckboxAll: 'jobs-menu__pqes-checkbox--all',
+    pqesContent: '.jobs-menu__content--pqes',
+
+
     vacanciesMenu: '.jobs-menu__item--vacancies',
     vacanciesContent: '.jobs-menu__content--vacancies',
+
+
+
+
 
 
     /* ADMIN */

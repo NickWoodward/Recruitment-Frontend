@@ -39,7 +39,8 @@ export default class JobsController {
             titles: [],
             locations: [],
             salaries: [],
-            types: [ "Interim", "Permanent" ]
+            types: [ "Interim", "Permanent" ],
+            pqes: []
         }
         this.searchOptions = {
             index: 0,
@@ -47,6 +48,8 @@ export default class JobsController {
             titles: [],
             locations: [],
             salaries: [],
+            types:[],
+            pqes: [],
             orderField: "title",
             orderDirection: "ASC"
         };
@@ -54,7 +57,8 @@ export default class JobsController {
             titles: [],
             salaries:[],
             locations:[],
-            types:[]
+            types:[],
+            pqes:[],
         };
 
         // If the page has search params from the search form on index.html add them to the seachParams (update menus once populated)
@@ -345,9 +349,9 @@ export default class JobsController {
             const itemContent = item.querySelector('.jobs-menu__content');
 
             // Calculate max visible height
-            const yPos = itemContent.getBoundingClientRect().y;
-            const contentHeight = window.innerHeight - yPos;
-            itemContent.style.maxHeight = contentHeight + 'px';
+            // const yPos = itemContent.getBoundingClientRect().y;
+            // const contentHeight = window.innerHeight - yPos;
+            // itemContent.style.maxHeight = contentHeight + 'px';
 
             // Add the animation to each item's content element + the arrow element
             jobsMenuView.addMenuAnimation(itemContent);
@@ -481,15 +485,23 @@ export default class JobsController {
                     if(x === max) this.menuItems.salaries.push(`${utils.formatSalary(x)} +`);
                     else this.menuItems.salaries.push(`${utils.formatSalary(x)} - ${utils.formatSalary(x + range)}`);
                 }
+                // Populate type array
+                this.menuItems.type = ['Interim', 'Permanent'];
+                // Populate PQE array
+                for(let x = 1; x < 11; x++) {
+                    this.menuItems.pqes.push(`${x}+`);
+                }
 
                 items.salaries = this.menuItems.salaries;
                 items.types = this.menuItems.types;
+                items.pqes = this.menuItems.pqes;
 
+                // console.log(items);
                 // Render content
                 jobsMenuView.populateMenu(items, { titleParam: this.titleParam, locationParam: this.locationParam});
                 jobsMenuView.animateMenu();
 
-                // Store menu items in the controller & add to the suggested search arrays
+                // Store dynamically added menu items in the controller & add to the suggested search arrays
                 this.menuItems.titles = items.uniqueTitles;
                 this.menuItems.locations = items.uniqueLocations;
                 this.searchSuggestions.titles = items.uniqueTitles;
@@ -557,9 +569,9 @@ export default class JobsController {
                     this.searchOptions[submenu] = [];
                 // If a checkbox that isn't 'All' is unchecked
                 } else if(!checkbox.checked && checkboxTitle !== 'all') {
-
                     // Remove the tag from screen and tagsArray
                     const tag = document.querySelectorAll(`.tag--${submenu}[data-id="${checkboxId}"]`)[0];
+                    console.log(tag)
                     this.removeFromTagsArray(tag, submenu);
                     this.removeTag(tag);
 
@@ -600,6 +612,7 @@ export default class JobsController {
     }
 
     removeTag(tag) {
+        console.log('removing ');
         if(document.querySelectorAll('.tag').length === 0) {
             // Close tags wrapper if it's the last tag
             jobsMenuView.closeTagsList(() => utils.removeElement(tag));
@@ -610,6 +623,8 @@ export default class JobsController {
 
     removeFromTagsArray(tag, submenu) {
         this.tags[submenu].splice(this.tags[submenu].indexOf(tag), 1);
+        console.log('tags after removal ' + this.tags[submenu]);
+
     }
 
     findAndSelectCheckboxByText(submenu, checkboxTitle) {
@@ -625,6 +640,12 @@ export default class JobsController {
             filter = utils.removeSalaryFormatting(filter);
         }
 
+        // If filter is a PQE, convert from 'x +' to 'x'
+        if(submenu === 'pqes') {
+            const index = filter.indexOf('+');
+            filter = filter.substring(0,index);
+        } 
+
         // If the filter doesn't already exist, add it to the search options 
         if(!this.searchOptions[submenu].includes(filter)) {
             this.searchOptions[submenu].push(filter);
@@ -632,7 +653,7 @@ export default class JobsController {
  
     }
     removeSearchOption(submenu, filter) {
-        console.log(submenu);
+        console.log(submenu, filter);
         if(submenu === 'salaries') {
             // Strip it of non numeric digits and return as a min/max array
             filter = utils.removeSalaryFormatting(filter);
@@ -644,6 +665,8 @@ export default class JobsController {
             
             this.searchOptions[submenu].splice(index, 1);
         } else {
+            if(submenu === 'pqes') filter = filter.substring(0, filter.indexOf('+'));
+
             // If the filter already exists, remove it from the search options 
             if(this.searchOptions[submenu].includes(filter)) {
                 this.searchOptions[submenu].splice(this.searchOptions[submenu].indexOf(filter), 1);
@@ -802,7 +825,7 @@ export default class JobsController {
         // If this is the first tag, open the tag wrapper
         if(document.querySelectorAll('.tag').length === 1) jobsMenuView.openTagsList();
 
-        // console.log('tags after addition: ', this.tags[submenu]);
+        console.log('tags after addition: ', this.tags[submenu]);
 
         tag.addEventListener('click', (e) => {
             // // Simulate click of corresponding checkbox

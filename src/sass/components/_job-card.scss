@@ -5,14 +5,24 @@
     width: 100%;
     height: 33rem;
     
+    background-color: white;
+    border: none;
+    box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
     
+    @include respond-tablet-small() {
+        height: 40rem;
+    }
+    @include respond-phone-larger() {
+        height: 43rem;
+    }
+    @include respond-phone-medium() {
+        height: 37rem;
+    }
+
     @supports not (display: grid) {
         margin-top: 2rem;
     }
 
-    background-color: white;
-    border: none;
-    box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
 
     &--featured {
         width: 65rem;
@@ -48,7 +58,7 @@
         }
         
         @include respond-phone-larger() {
-            height: 38rem;
+            height: 35rem;
         }
 
         &-last {
@@ -88,6 +98,15 @@
             margin-bottom: .8rem;
             padding: 0 3.5rem;
 
+            @include respond-phone-larger() {
+                margin-top: 2.2rem;
+                margin-bottom: 0.5rem;
+            }
+            @include respond-phone-medium() {
+                margin-top: 2rem;
+                padding: 0 2.5rem;
+            }
+
             &--details {
                 margin-top: 1.5rem;
                 height: 5rem;
@@ -107,6 +126,9 @@
                     height: 5.5rem;
                     margin-top: 2.5rem;
                 }
+                @include respond-phone-larger() {
+                    margin-top: 2rem;
+                }
             
             }
         }
@@ -115,6 +137,9 @@
         font-weight: 400;
         font-size: var(--job-card-title);  
 
+        // @include respond-phone-larger() {
+        //     font-size: 1.8rem;
+        // }
 
         &--featured {
             font-size: 2rem;
@@ -127,6 +152,7 @@
             }
  
             @include respond-phone-larger() {
+
                 font-size: 1.8rem;
             }
         }
@@ -190,6 +216,10 @@
         font-weight: 400;
         color: $color-text-primary;
 
+        @include respond-phone-medium() {
+            padding: 0 2.5rem;
+        }
+
         &--featured {
             font-size: var(--job-card-location--featured);
             @include respond-desktop-small() {
@@ -200,6 +230,9 @@
             }
             @include respond-phone-larger() {
                 font-size: 1.5rem;
+            }
+            @include respond-phone-medium() {
+                padding: 0 2.5rem;
             }
         }
         &--details {
@@ -244,6 +277,10 @@
         display: flex;
         align-items: flex-start;
         margin-bottom: 2rem;
+
+        @include respond-phone-larger() {
+            margin-bottom: 1.5rem;
+        }
 
         &-wrapper {
             display: flex;
@@ -307,6 +344,10 @@
         -webkit-box-orient: vertical;  
         overflow: hidden;
 
+        @include respond-phone-medium() {
+            display: none;
+        }
+
         &--featured {
             @include respond-desktop-small() {
                 font-size: 1.4rem;
@@ -339,6 +380,18 @@
             flex-direction: column;
             align-items: flex-start;
         }
+        @include respond-phone-medium() {
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+
+        &--featured {
+            @include respond-phone-medium() {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
 
     }
     &__btn-wrapper {
@@ -364,6 +417,9 @@
             align-self: flex-start;
             width: 100%;
             margin-left: 1rem;
+        }
+        @include respond-phone-medium() {
+            margin-left: 0;
         }
     }
 
