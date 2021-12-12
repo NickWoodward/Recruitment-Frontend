@@ -7,6 +7,10 @@
     align-items: flex-start;
     height: var(--hero-height);
 
+    // At narrower screens, keep the form a set height and alter the hero height
+    @include respond-tablet-medium() {
+        height: calc(100vh - var(--search-height));
+    }
 
     &-gradient {
         position: absolute;
@@ -41,7 +45,8 @@
         flex-direction: column;
         justify-content: center;
         width: 55rem;
-        top: 14rem;
+        // top: 14rem;
+        top: 25%;
         margin: 0 0 0 16%;
 
         @include respond-desktop-large() {
@@ -49,22 +54,20 @@
         }
 
         @include respond-tablet-larger() {
-            align-items: center;
-            align-self: center;
-            text-align: center;
-            margin:0;
-            width: 50%;
             top: 22%;
         }
+        @include respond-tablet-small() {
+            margin-left: 18%;
+        }
         @include respond-phone-large() {
-            top: 16%;
+            top: 20%;
+            // reduce width to make the tagline wrap
+            width: 20rem;
         }
         @include respond-phone-medium() {
-            top: 11%;
+            top: 12%;
         }
-        @include respond-phone-small() {
-            top: 10%;
-        }
+     
     }
 
     // &__tagline {
@@ -81,7 +84,10 @@
         color: $color-white;
 
         @include respond-tablet-medium() {
-            font-size: 4rem;
+            font-size: 3.8rem;
+        }
+        @include respond-tablet-small() {
+            font-size: 3.2rem;
         }
         @include respond-phone-large() {
             font-size: 3rem;
@@ -99,7 +105,10 @@
             margin-left: .5rem;
 
             @include respond-tablet-medium() {
-                font-size: 3rem;
+                font-size: 2.8rem;
+            }
+            @include respond-tablet-small() {
+                font-size: 2.5rem;
             }
             @include respond-phone-large() {
                 font-size: 2.3rem;
@@ -120,7 +129,9 @@
             width: 50rem;
         }
         @include respond-tablet-medium() {
+            width: 45rem;
             margin-top: 1rem;
+            line-height: 2.8rem;
         }
         @include respond-tablet-small() {
             width: 35rem;
@@ -144,6 +155,9 @@
     align-items: center;
     height: calc(100% - var(--hero-height));
 
+    @include respond-tablet-medium() {
+        height: var(--search-height);
+    }
   
     &__content {
         display: flex;
@@ -163,6 +177,7 @@
             justify-content: center;
             margin-right: 0;
         }
+
         @include respond-phone-larger() {
             align-items: flex-start;
         }
@@ -184,9 +199,10 @@
     @include respond-tablet-medium() {   
         flex-direction: column;
         align-items: center;
-        width: 90%;
-        padding: 3rem .8rem 1.5rem .8rem;
+        width: 75%;
+        padding: 2.5rem .8rem 1.5rem .8rem;
         background-color: white;
+        border: none;
     }
 
     @include respond-tablet-small() {
@@ -204,6 +220,7 @@
     @include respond-phone-small() {
         margin-top: 1rem;
         padding: 1rem .2rem;
+
     }
  
 
@@ -326,10 +343,11 @@
 .about {
     position: relative;
     display: flex;
+    // justify-content: center;
     background-color: $color-about-background;
     padding-top: 8rem;
     padding-bottom: 10rem;
-    margin-top: 4rem;
+    margin-top: 2rem;
     overflow-y: hidden;
 
     @include respond-desktop-medium() {
@@ -389,6 +407,17 @@
             height: 100%;
             background-image: linear-gradient(to left, rgba($color-primary-new, .55), rgba($color-primary-new, .1));
         }
+
+        &-2 {
+            position: absolute;
+            content: '';
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(to right, rgba(255,255,255, .9), rgba(255,255,255, .7));
+
+        }
     }
 
     &__content {
@@ -396,30 +425,31 @@
         flex-direction: column;
         align-items: flex-start;
         justify-content: center;
-        margin-left: 13%;
+        margin-left: 16%;
         z-index: 1;
 
-        @include respond-desktop-larger() {
-            margin-left: 10%;
-        }
-        @include respond-desktop-large() {
-            margin-left: 7%;
-        }
-        @include respond-desktop-medium() {
-            margin-left: 9%;
-        } 
+        // @include respond-desktop-larger() {
+        //     margin-left: 10%;
+        // }
+        // @include respond-desktop-large() {
+        //     margin-left: 7%;
+        // }
+        // @include respond-desktop-medium() {
+        //     margin-left: 9%;
+        // } 
 
         @include respond-tablet-larger() {
-            background-image: linear-gradient(to right, rgba(255,255,255, .9), rgba(255,255,255, .7));
+            // background-image: linear-gradient(to right, rgba(255,255,255, .9), rgba(255,255,255, .7));
             width: 100%;
             padding: 5rem 0 7rem 8%;
             margin-left: 0;
         }
         @include respond-tablet-medium() {
-            // Change to centered design
-            align-items: center;
+            // border: 1px solid red;
+            width: 65%;
+
             padding: 5rem 0 7rem 0;
-            background-image: linear-gradient(to right, rgba(255,255,255, .9), rgba(255,255,255, .75));
+            // background-image: linear-gradient(to right, rgba(255,255,255, .9), rgba(255,255,255, .75));
         }
         @include respond-phone-larger() {
             // padding: 5rem 0 6rem 0; 
@@ -429,6 +459,7 @@
 
     &__title-wrapper {
         display: flex;
+        flex-direction: row-reverse;
         align-items: center;
         margin-bottom: 2rem;
 
@@ -439,7 +470,8 @@
             margin-bottom: 1rem;
         }
         @include respond-tablet-medium() {
-            flex-direction: column;
+            // flex-direction: column;
+            flex-direction: row-reverse;
             margin-bottom: 1.5rem;
         }
     }
@@ -458,9 +490,10 @@
     }
 
     &__image {
-        height: 4rem;
-        width: 4rem;
-        margin-right: 3rem;
+        height: 3.2rem;
+        width: 3.2rem;
+        margin-left: 3rem;
+        // transform: translateY(-5px);
 
         @include respond-desktop-small() {
             height: 3rem;
@@ -479,7 +512,7 @@
         width: 60rem;
         font-size: 1.6rem;
         line-height: 2.8rem;
-        margin-left: 5.5rem;
+        // margin-left: 5.5rem;
         margin-bottom: 3.5rem;
 
         @include respond-desktop-small() {
@@ -489,12 +522,12 @@
             margin-bottom: 2rem;
         }
         @include respond-tablet-medium() {
-            text-align: center;
+            // text-align: center;
             margin-left: 0;
             margin-right: 0;
             width: 50rem;
             margin-bottom: 3rem;
-            line-height: 2.8rem;
+            line-height: 2.6rem;
         }
         @include respond-tablet-small() {
             width: 40rem;
@@ -521,7 +554,7 @@
         &__list {
             display: flex;
             align-items: center;
-            margin-left: 4.5rem;
+            // margin-left: 4.5rem;
             
            
             @include respond-tablet-medium() {

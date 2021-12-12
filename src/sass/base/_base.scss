@@ -24,6 +24,9 @@
     --job-card-height--details: 180px;
     --job-card-margin--details: 15px;
 
+    --search-height: 25rem;
+
+
     @include respond-desktop-medium()  {
         --job-card-height--details: 240px;
     }
@@ -38,6 +41,9 @@
     }
     @include respond-phone-larger() {
         --hero-height: 60%;
+    }
+    @include respond-phone-small() {
+        --search-height: 22rem;
     }
  
 
