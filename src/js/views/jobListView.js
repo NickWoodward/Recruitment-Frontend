@@ -176,6 +176,8 @@ export const createJobCard = ({id, title, wage, location, description, position,
 }
 
 export const createListJobCard = ({id, title, wage, location, description}, element, featured, details) => {
+    console.log('called');
+    // console.log(`id: ${id}, title: ${title}, location: ${location}, element: ${element}, featured: ${featured}, details: ${details}`);
     const markup = `
         <div class="job-card ${featured? 'job-card--featured':''} ${details? 'job-card--details':''}" data-id=${id}>
             <div class="job-card__title-wrapper ${featured? 'job-card__title-wrapper--featured':''} ${details? 'job-card__title-wrapper--details':''}">

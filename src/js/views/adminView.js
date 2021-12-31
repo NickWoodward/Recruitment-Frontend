@@ -137,15 +137,15 @@ export const makeJobSummaryEditable = (editable) => {
     const jobTitle = document.querySelector('.job-summary__title');
     const location = document.querySelector('.job-summary__location');
     const wage = document.querySelector('.job-summary__wage');
-    const type = document.querySelector('.job-summary__type');
-    const position = document.querySelector('.job-summary__position');
-    const PQE = document.querySelector('.job-summary__PQE');
+    // const type = document.querySelector('.job-summary__type');
+    // const position = document.querySelector('.job-summary__position');
+    // const PQE = document.querySelector('.job-summary__PQE');
     const description = document.querySelector('.job-summary__description');
 
     const featuredWrapper = document.querySelector('.job-summary__featured-wrapper');
     const featuredIcon = document.querySelector('.job-summary__featured-icon');
 
-    const fields = [jobTitle, location, wage, type, position, PQE, description];
+    const fields = [jobTitle, location, wage, description];
 
     fields.forEach(field => {
         makeFieldEditable(field, editable);
@@ -208,7 +208,8 @@ export const addJobDropdowns = (job) => {
     if(job) {
         const [typesIndex] = jobTypes.filter(type => job.jobType === type.name).map(item => item.id);
         const [positionsIndex] = positions.filter(position => job.position === position.name).map(item => item.id);
-        const [PQEIndex] = PQE.filter(pqe => job.pqe === pqe.name).map(item => item.id);
+        const [PQEIndex] = PQE.filter(pqe => job.pqe === pqe.id).map(item => item.id);
+        console.log(PQEIndex);
 
         typesDropdown.selectedIndex = typesIndex;
         positionsDropdown.selectedIndex = positionsIndex;
@@ -216,14 +217,15 @@ export const addJobDropdowns = (job) => {
     }
 };
 
-export const removeJobDropdowns = ({type, position, PQE}) => {
+export const removeJobDropdowns = ({type, position, pqe}) => {
+    console.log(pqe);
     const typeElement = document.querySelector('.job-summary__type');
     const positionElement = document.querySelector('.job-summary__position');
     const PQEElement = document.querySelector('.job-summary__PQE');
 
     const newType= `<div class="job-summary__type job-summary__field">${type}</div>`;
     const newPosition = `<div class="job-summary__position job-summary__field">${position}</div>`;
-    const newPQE = `<div class="job-summary__PQE job-summary__field">${PQE}</div>`;
+    const newPQE = `<div class="job-summary__PQE job-summary__field">${pqe}</div>`;
 
     utils.swapElement(typeElement, newType);
     utils.swapElement(positionElement, newPosition);
@@ -817,10 +819,10 @@ export const addFeaturedCheckbox = (visible, featured) => {
 // };
 
 export const getJobEdits = (currentJob) => {
-    const { title, location, wage, type, position, PQE, featured, description } = getJobFormValues();
+    let { title, location, wage, type, position, PQE, featured, description } = getJobFormValues();
     const company = document.querySelector('.job-summary__company');
     const companyId = company.dataset.id;
-    const companyName = company.value;
+    const companyName = company.innerText;
 
     const formData = new FormData();
     let submit = false;
@@ -834,9 +836,12 @@ export const getJobEdits = (currentJob) => {
     title !== currentJob.title && (submit = true) ? formData.append('title', title):formData.append('title', currentJob.title);
     location !== currentJob.location && (submit = true) ? formData.append('location', location):formData.append('location', currentJob.location);
     parseInt(wage) !== currentJob.wage && (submit = true) ? formData.append('wage', wage):formData.append('wage', currentJob.wage);
-    type !== currentJob.type && (submit = true) ? formData.append('jobType', type): formData.append('jobType', currentJob.type);
+    type !== currentJob.jobType && (submit = true) ? formData.append('jobType', type): formData.append('jobType', currentJob.jobType);
     position !== currentJob.position && (submit = true) ? formData.append('position', position): formData.append('position', currentJob.position);
-    PQE !== currentJob.PQE && (submit = true) ? formData.append('pqe', PQE): formData.append('pqe', currentJob.PQE);
+
+    // Make sure the PQE is always a string in the format 'num+'
+    console.log(PQE, currentJob.pqe)
+    PQE !== `${currentJob.pqe}+` && (submit = true) ? formData.append('pqe', PQE): formData.append('pqe', currentJob.pqe);
 
     description !== currentJob.description && (submit = true) ? formData.append('description', description):formData.append('description', currentJob.description);
     
@@ -887,7 +892,8 @@ const getJobFormValues = () => {
     const wage = document.querySelector('.job-summary__wage').innerText;
     const type = document.querySelector('.job-summary__type').value;
     const position = document.querySelector('.job-summary__position').value;
-    const PQE = document.querySelector('.job-summary__PQE').value;
+    let PQE = document.querySelector('.job-summary__PQE').value;
+    PQE = PQE.substring(0, PQE.length - 1);
     const featured = document.querySelector('.job-summary__featured-checkbox').checked? 1:0;
     const description = document.querySelector('.job-summary__description').innerText;
     return { title, location, wage, type, position, PQE, featured, description };

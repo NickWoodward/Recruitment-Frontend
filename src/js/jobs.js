@@ -438,9 +438,12 @@ export default class JobsController {
                                 // Filter out this job from the Featured Array, and shorten it to the number of featured jobs to display
                                 this.featuredJobsAside = this.featuredJobs.filter(job => job.id !== this.currentJob.id);
                                 
+
                                 // Render the Current Job and the aside
                                 jobView.renderJobDetails(this.currentJob, document.body, this.featuredJobsAside, e);
+
                             } catch(e) {
+                                console.log('uh oh');
                                 console.log(e);
                             }
             

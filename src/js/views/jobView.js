@@ -125,14 +125,20 @@ export const renderJobDetails = (job, container = document.body, jobs, event) =>
     `;
 
     container.insertAdjacentHTML('afterbegin', markup);
+
     setJobModalPosition();
+
     const numFeaturedJobs = calculateNumFeaturedJobs(document.querySelector('.job-details__table-wrapper'));
 
     const featuredJobsList = document.querySelector('.job-details__featured-jobs');
     
-    for(let x = 0; x < numFeaturedJobs; x++) {
+
+    for(let x = 0; x < numFeaturedJobs && x < jobs.length; x++) {
+        console.log(numFeaturedJobs, jobs);
+        // console.log(job, container, jobs);
         featuredJobsList.insertAdjacentHTML('beforeend', createListJobCard(jobs[x], null, null, true));
     }
+    console.log('here');
 
     // Prevent bg scrolling behind modal
     // document.body.style.overflow = "hidden";

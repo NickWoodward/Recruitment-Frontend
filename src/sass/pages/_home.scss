@@ -21,15 +21,26 @@
         height: 100%;
 
         background-image: linear-gradient(to bottom right, 
-            rgba($color-primary-new, .6),
-            rgba(59, 107, 135, .6),
-            rgba(59, 107, 135, .6),
-            rgba(59, 107, 135, .6),
-            rgba(59, 107, 135, .6),
-            rgba(59, 107, 135, .6),
-            rgba(59, 107, 135, .6),
-            rgba(59, 107, 135, .6)
+            rgba($color-primary-new, .5),
+            rgba(59, 107, 135, .5),
+            rgba(59, 107, 135, .5),
+            rgba(59, 107, 135, .5),
+            rgba(59, 107, 135, .5),
+            rgba(59, 107, 135, .5),
+            rgba(59, 107, 135, .5),
+            rgba(59, 107, 135, .5)
         );
+
+        // background-image: linear-gradient(to right, 
+        //     rgba($color-primary-new, 1),
+        //     rgba(59, 107, 135, 1),
+        //     rgba(59, 107, 135, .98),
+        //     rgba(59, 107, 135, .98),
+        //     rgba(59, 107, 135, .92),
+        //     rgba(59, 107, 135, .9),
+        //     rgba(59, 107, 135, .88),
+        //     rgba(59, 107, 135, .82)
+        // );
 
         @include respond-phone-large() {
             background-image: linear-gradient(to bottom right, 
@@ -210,7 +221,7 @@
     }
 
     @include respond-phone-larger() {
-        margin-top: 2rem;
+        // margin-top: 2rem;
     }
     @include respond-phone-medium() {
         width: 95%;
@@ -380,10 +391,10 @@
         // border: 3px solid red;
 
         @include respond-desktop-larger() {
-            right: 5%;
+            // right: 5%;
         }
         @include respond-desktop-small() {
-            right: 4%;
+            // right: 4%;
         }
         @include respond-tablet-medium() {
             right: 0;
@@ -398,13 +409,16 @@
     }
     
     &__gradient {
+        position: absolute;
+        content: '';
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: linear-gradient(to top left, rgba($color-primary-new, .5), rgba($color-primary-new, .4), rgba($color-primary-new, .15), rgba(white, .1),  rgba(white, .4), rgba(white, .6));
+
         @include respond-tablet-larger {
-            position: absolute;
-            content: '';
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+
             background-image: linear-gradient(to left, rgba($color-primary-new, .55), rgba($color-primary-new, .1));
         }
 
@@ -415,8 +429,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: linear-gradient(to right, rgba(255,255,255, .9), rgba(255,255,255, .7));
+            background-image: linear-gradient(to right, rgba(255,255,255, .8), rgba(255,255,255, .4), rgba(255,255,255, .1), rgba(255,255,255, 0));
 
+            @include respond-tablet-larger {
+                background-image: linear-gradient(to right, rgba(255,255,255, .9), rgba(255,255,255, .7));
+
+            }
         }
     }
 
@@ -509,7 +527,7 @@
     }
 
     &__description {
-        width: 60rem;
+        width: 54rem;
         font-size: 1.6rem;
         line-height: 2.8rem;
         // margin-left: 5.5rem;

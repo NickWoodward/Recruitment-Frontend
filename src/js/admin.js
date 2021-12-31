@@ -696,8 +696,8 @@ class AdminController {
             if(editBtn) {
                 const jobId = jobSummary.dataset.id;
                 this.state.jobs.currentJob = this.jobs.find(job => job.id === parseInt(jobId));
-
                 adminView.changeSummaryIconState('editing', 'job');
+                //@TODO what's the featured state for?
                 adminView.makeJobSummaryEditable(true, this.state.companies.currentCompany.featured);
                 adminView.addJobDropdowns(this.state.jobs.currentJob);
                 
@@ -713,8 +713,8 @@ class AdminController {
                 jobSummary.removeEventListener('focusout', this.boundFocusOutEditJobHandler);
 
                 const formData = adminView.getJobEdits(this.state.jobs.currentJob);
-
-                for(let[key, value] of formData.entries()) console.log(key, value);
+                console.log(formData.get('pqe'));
+                // for(let[key, value] of formData.entries()) console.log(key, value);
 
                 if(formData) {
                     console.log('save data');
@@ -735,10 +735,16 @@ class AdminController {
                             this.state.jobs.totalJobs = response.data.total;
 
                             const jobId = jobSummary.dataset.id;
-                            this.state.jobs.currentJob = this.jobs.find(job => job.id === parseInt(jobId));
+                            this.state.jobs.currentJob = this.jobs.find(job => { return job.id === parseInt(jobId)});
                             this.renderJobsTable();
+
+                            adminView.changeSummaryIconState('edited', 'job');
+                            adminView.makeJobSummaryEditable(false, this.state.companies.currentCompany.featured);
+                            adminView.removeJobDropdowns(this.state.jobs.currentJob);
+
                             adminView.populateJobSummary(this.state.jobs.currentJob);
-                            
+                            console.log('ha')
+                           
                         })
                         .catch(err => console.log(err));
                 } else {
@@ -751,9 +757,9 @@ class AdminController {
 
                 // adminView.changeEditIcon('edit', 'job', iconsToIgnore);
 
-                adminView.changeSummaryIconState('edited', 'job');
-                adminView.makeJobSummaryEditable(false, this.state.companies.currentCompany.featured);
-                adminView.removeJobDropdowns(this.state.jobs.currentJob);
+                // adminView.changeSummaryIconState('edited', 'job');
+                // adminView.makeJobSummaryEditable(false, this.state.companies.currentCompany.featured);
+                // adminView.removeJobDropdowns(this.state.jobs.currentJob);
 
                 // adminView.addFeaturedCheckbox(false, this.state.jobs.currentJob.featured);
             }
