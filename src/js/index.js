@@ -163,16 +163,26 @@ class IndexController {
                     }
                 } else if(e.target.closest('.job-details')) {
                     switch(jobView.getAction(e)) {
-                        case 'apply'    : this.handleApplyEvent(e); break;               
-                        case 'view'     : this.swapJobs(e); break
-                        case 'cancel'   : jobView.animateJobDetailsOut(this.closeModal.bind(null, modal)); break;
-                        case 'sign-in'  : this.closeModal(modal); loginView.renderLogin(); break;  
+                        case 'apply': 
+                            // Get the jobId from the details or aside card
+                            const jobDetailsCard = e.target.closest('.job-details__table');
+                            const jobAsideCard = e.target.closest('.job-card--details');
+                            const jobId = jobDetailsCard? jobDetailsCard.dataset.id : jobAsideCard.dataset.id;
+                            this.renderApplyForm(jobId); 
+                            break;               
+                        case 'view': 
+                            this.swapJobs(e); break
+                        case 'cancel': 
+                            jobView.animateJobDetailsOut(this.closeModal.bind(null, modal)); break;
+                        case 'sign-in': 
+                            this.closeModal(modal); loginView.renderLogin(); break;  
                     }
                 } else if(e.target.closest('.apply')) {
                     switch(applyView.getAction(e)) {
                         case 'request':     const jobId = e.target.closest('.apply').dataset.id;
                                             const applicationDetails = applyView.getApplicationDetails();
                                             this.applyForJob(jobId, applicationDetails);
+                                            console.log('sending application');
                                             break;
                         // case 'login':       console.log('login'); break;
                         // case 'forgot':      this.closeModal(modal);
@@ -310,7 +320,6 @@ class IndexController {
                                 const applyBtn = e.target.closest(`${elementStrings.applyBtn}`);
 
                                 if(viewMoreBtn) {
-                                    console.log('yes');
                                     this.JobList.getJob(card.dataset.id)
                                         .then(response => {
                                             if(response.data.job) {
@@ -325,15 +334,7 @@ class IndexController {
                                         })
                                         .catch(err => console.log(err));
                                 } else if(applyBtn) {
-                                    applyView.renderApplyForm(card.dataset.id);
-                                    // Set a listener on the file picker that appears on the apply modal
-                                    const filePicker = document.querySelector('.request__input--cv');
-                                    filePicker.onchange = function() {
-                                        const path = document.querySelector('.request__input-path');
-                                        path.textContent = '';
-                                        path.insertAdjacentHTML('afterbegin', `<div>${filePicker.value.replace("C:\\fakepath\\", "")}</div>`);
-                                    }
-                                    
+                                    this.renderApplyForm(card.dataset.id); 
                                 }
                             });
                         });
@@ -365,17 +366,28 @@ class IndexController {
             jobView.updateJobView(jobId, job, newJob);
     }
 
-    handleApplyEvent(e) {
-        // From the Job Details card or an aside
-        const jobDetailsCard = e.target.closest('.job-details__table');
-        const jobAsideCard = e.target.closest('.job-card--details');
+    // renderApplyForm(e) {
+    //     // From the Job Details card or an aside
+    //     const jobDetailsCard = e.target.closest('.job-details__table');
+    //     const jobAsideCard = e.target.closest('.job-card--details');
 
-        const jobId = jobDetailsCard? jobDetailsCard.dataset.id : jobAsideCard.dataset.id;
+    //     const jobId = jobDetailsCard? jobDetailsCard.dataset.id : jobAsideCard.dataset.id;
 
-        console.log(jobId);
+    //     console.log(jobId);
 
-        applyView.renderApplyForm(jobId);
+    //     applyView.renderApplyForm(jobId);
+    // }
+    renderApplyForm(id) {
+        applyView.renderApplyForm(id);
+        // Set a listener on the file picker that appears on the apply modal
+        const filePicker = document.querySelector('.request__input--cv');
+        filePicker.onchange = function() {
+            const path = document.querySelector('.request__input-path');
+            path.textContent = '';
+            path.insertAdjacentHTML('afterbegin', `<div>${filePicker.value.replace("C:\\fakepath\\", "")}</div>`);
+        }
     }
+
 
     // addJobDetailsBtnListeners() {
     //     const jobModal = document.querySelector('.job-details');

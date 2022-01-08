@@ -138,7 +138,6 @@ export const renderJobDetails = (job, container = document.body, jobs, event) =>
         // console.log(job, container, jobs);
         featuredJobsList.insertAdjacentHTML('beforeend', createListJobCard(jobs[x], null, null, true));
     }
-    console.log('here');
 
     // Prevent bg scrolling behind modal
     // document.body.style.overflow = "hidden";

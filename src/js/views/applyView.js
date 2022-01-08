@@ -74,6 +74,7 @@ export const renderApplyForm = (id) => {
 };
 
 const animateApplyFormIn = () => {
+    console.log('apply form in');
     const tl = gsap.timeline({
         defaults: { duration: .5 }
     })
@@ -89,6 +90,9 @@ export const animateApplyFormOut = (callback) => {
     .to('.apply', { opacity: 0, scale: 1.1 })
     .to('.apply__content', { opacity: 0 }, '<');
 }
+
+
+
 
 {/* <div class="apply__divider">Or</div>
 

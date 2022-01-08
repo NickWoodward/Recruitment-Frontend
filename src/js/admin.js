@@ -80,6 +80,8 @@ class AdminController {
                 }
             },
             applications: {
+                totalApplications: 0,
+                currentApplication: {},
                 searchOptions: {
                     index: 0,
                     limit: 6,
@@ -343,21 +345,32 @@ class AdminController {
                 // Calculate # of rows to render / api limit
                 this.state.applications.searchOptions.limit = adminView.calculateRows('applications');
 
-                this.applications.getApplications()
+                this.Admin
+                    .getApplications()
                     .then(res => {
-                        // Store and render data
-                        this.applications = res.data.applicants;
-                        // this.state.applications.totalApplications = res.data.total;
-
+                        this.applications = res.data.applications;
+                        this.state.applications.totalApplications = res.data.applications.length;
                         this.renderApplicationTable();
-                        // if(this.users.length > 0) {
-                        //     adminView.populateApplicationSummary(this.applications[0]);
-                        //     this.addUserSummaryListeners();
-                        // } else {
-                        //     // @TODO: Render placeholder
-                        // }
                     })
-                    .catch();
+                    .catch(err => {
+                        console.log(err);
+                    });
+
+                // this.Applications.getApplications()
+                //     .then(res => {
+                //         // Store and render data
+                //         this.applications = res.data.applicants;
+                //         // this.state.applications.totalApplications = res.data.total;
+
+                //         this.renderApplicationTable();
+                //         // if(this.users.length > 0) {
+                //         //     adminView.populateApplicationSummary(this.applications[0]);
+                //         //     this.addUserSummaryListeners();
+                //         // } else {
+                //         //     // @TODO: Render placeholder
+                //         // }
+                //     })
+                //     .catch();
             }
             if(companies) {
                 adminView.initialiseAdminPage('companies');
@@ -633,8 +646,42 @@ class AdminController {
     }
 
     renderApplicationTable() {
+        // Format applications/headers into html elements
         const {headers, rows} = adminView.formatApplications(this.applications);
 
+        const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
+        const tableWrapper = document.querySelector('.applications-table__wrapper');
+
+        // removeApplicationsTable & pagination if it exists
+        const table = document.querySelector('.table--applications');
+        const pagination = document.querySelector('.pagination--applications');
+        if(table) utils.removeElement(table);
+        if(pagination) utils.removeElement(pagination);   
+
+        tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('applications', headers, rows, false));
+        // Add pagination
+        adminView.renderPagination(index, limit, totalApplications, tableWrapper, 'applications');
+
+        const applicationRows = document.querySelectorAll('.row--applications');
+        const activeRow = Array.from(applicationRows).find(row => row.querySelector(`[data-id="${this.state.applications.currentApplication.applicantId}"]`)) || applicationRows[0];
+        utils.changeActiveRow(activeRow, applicationRows);
+
+        applicationRows.forEach(row => {
+            row.addEventListener('click', (e) => {
+                const targetRow = e.target.closest('.row');
+                console.log(targetRow);
+                const rowId = targetRow.querySelector('.td-data--applicationId').dataset.application;
+                console.log(rowId);
+                const application = this.applications.filter(application => {
+                    return parseInt(rowId) === application.applicationId;
+                });
+
+                utils.changeActiveRow(targetRow, applicationRows);
+                this.state.applications.currentApplication = application[0];
+                console.log(this.state.applications.currentApplication);
+                // adminView.populateUserSummary(user[0]);
+            });
+        });
     }
 
     renderJobsTable() {
@@ -680,7 +727,7 @@ class AdminController {
 
     addJobSummaryListeners() {
         const jobSummary = document.querySelector('.job-summary');
-
+        console.log(jobSummary);
         jobSummary.addEventListener('click', e => {
             // Ignore synthetic clicks from the offscreen input element
             // if(e.target === document.querySelector('.user-summary__input')) return;
@@ -698,7 +745,7 @@ class AdminController {
                 this.state.jobs.currentJob = this.jobs.find(job => job.id === parseInt(jobId));
                 adminView.changeSummaryIconState('editing', 'job');
                 //@TODO what's the featured state for?
-                adminView.makeJobSummaryEditable(true, this.state.companies.currentCompany.featured);
+                adminView.makeJobSummaryEditable(true, this.state.jobs.currentJob);
                 adminView.addJobDropdowns(this.state.jobs.currentJob);
                 
                 // Add focus listeners
@@ -778,7 +825,7 @@ class AdminController {
                 // Change the new icon
                 adminView.changeSummaryIconState('creating', 'job');
 
-                adminView.makeJobSummaryEditable(true, this.state.companies.currentCompany.featured);
+                adminView.makeJobSummaryEditable(true, this.state.jobs.currentJob);
 
                 // Switch the company element to a dropdown
                 adminView.addCompanyDropdown(this.companies, companyId);

@@ -33,6 +33,14 @@
         white-space: nowrap;
         text-overflow: ellipsis;
     }
+
+    // Applications
+    &--position {
+        max-width: 12rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
 }
 
 // caption {

@@ -31,6 +31,7 @@ export const forceDownload = (res, filename, ext) => {
 export const formatApplications = (applications) => {
     // Headers should match the returned divs in createApplicationElement
     const headers = ['', 'NAME','SURNAME','POSITION','COMPANY','CV']
+    console.log(applications);
     const rows = applications.map(application => {
         
         return createApplicationElement(formatProperties(application, ['cvUrl']));
@@ -43,8 +44,8 @@ const createApplicationElement = ({applicationId, company, companyId, firstName,
 
     const row = [
         `<div class="td-data--applicationId" data-application=${applicationId}>${applicationId}</div>`,
-        `<div class="td-data--firstName" data-id=${personId}>${firstName}</div>`,
-        `<div class="td-data--lastName" data-id=${personId}>${lastName}</div>`,
+        `<div class="td-data--first-name" data-id=${personId}>${firstName}</div>`,
+        `<div class="td-data--last-name" data-id=${personId}>${lastName}</div>`,
         `<div class="td-data--position" data-id=${jobId}>${position}</div>`,
         `<div class="td-data--company data-id=${companyId}">${company}</div>`,
         `<div class="cv-btn--table" data-cvUrl=${applicantId}><svg class="cv-icon">
@@ -133,7 +134,7 @@ export const populateUserSummary = (user) => {
 }
 
 
-export const makeJobSummaryEditable = (editable) => {
+export const makeJobSummaryEditable = (editable, job) => {
     const jobTitle = document.querySelector('.job-summary__title');
     const location = document.querySelector('.job-summary__location');
     const wage = document.querySelector('.job-summary__wage');
@@ -154,6 +155,7 @@ export const makeJobSummaryEditable = (editable) => {
     if(editable) {
         const checkbox = `<input type="checkbox" class="job-summary__featured-checkbox" />`;
         featuredWrapper.insertAdjacentHTML('afterbegin', checkbox);
+        if(job.featured) document.querySelector('.job-summary__featured-checkbox').checked = true;
         utils.removeElement(featuredIcon);
     } else {
         utils.removeElement(document.querySelector('.job-summary__featured-checkbox'));
@@ -1371,6 +1373,7 @@ export const initialiseAdminPage = (page) => {
         case 'users':           createSummary = createUserSummary; break;
         case 'jobs':            createSummary = createJobSummary; break;
         case 'companies':       createSummary = createCompanySummary; break;
+        // No summary for applications
         // case 'applications':    createSummary = createApplicationSummary; break;
     }
 

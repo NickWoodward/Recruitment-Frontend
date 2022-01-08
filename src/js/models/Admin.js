@@ -19,6 +19,11 @@ export default class Admin {
         return JRS.post('/admin/create/applicant', formData);
     }
 
+    /////////// Application Methods ////////////
+    getApplications() {
+        return JRS.get('/admin/applications');
+    }
+
     ///////////  Job Methods  ///////////
     getJobs({limit, index, titles, locations, orderField, orderDirection} = {}) {
         return JRS.get('/admin/jobs', {

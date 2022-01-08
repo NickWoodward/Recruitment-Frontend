@@ -98,17 +98,9 @@ export default class JobsController {
             jobListView.initialiseScrollAnimation();
             jobsMenuView.initialiseTagsListAnimation();
             this.getFeaturedJobs();
+            
         });
 
-        // #TODO: Debounce / change to GSAP
-        window.addEventListener("scroll", (e) => {
-            // At bottom of screen && there are more jobs to retrieve
-            if (
-                jobListView.isAtBottom() 
-            ) {
-                this.getJobs();
-            }
-        });
 
         window.addEventListener('click', (e) => {
             // Handle closing menu items
@@ -285,14 +277,24 @@ export default class JobsController {
                         case 'sign-in'  : modal.parentElement.removeChild(modal); loginView.renderLogin(); break;  
                     }
                 } else if(e.target.closest('.apply')) {
+                    e.preventDefault();
                     switch(applyView.getAction(e)) {
-                        case 'request':     console.log('request'); break;
-                        case 'login':       console.log('login'); break;
-                        case 'forgot':      modal.parentElement.removeChild(modal);
-                                            forgotPassView.renderForgotModal(); break;
-                        case 'register':    modal.parentElement.removeChild(modal);
-                                            registerView.renderRegisterModal(); break;
-                        case 'cancel':      modal.parentElement.removeChild(modal);
+                        case 'request':     
+                            console.log('request'); 
+                            const jobId = e.target.closest('.apply').dataset.id;
+                            const applicationDetails = applyView.getApplicationDetails();
+                            console.log(jobId, applicationDetails);
+                            this.applyForJob(jobId, applicationDetails);
+                            console.log('sending application for job ' + jobId);
+                            break;
+                        // case 'login':       console.log('login'); break;
+                        // case 'forgot':      modal.parentElement.removeChild(modal);
+                        //                     forgotPassView.renderForgotModal(); break;
+                        // case 'register':    modal.parentElement.removeChild(modal);
+                        //                     registerView.renderRegisterModal(); break;
+                        case 'cancel':      
+                            applyView.animateApplyFormOut(this.closeModal.bind(null, modal));
+                            // modal.parentElement.removeChild(modal);
                     }
                 } else if(e.target.closest('.register')) {
                     switch(registerView.getAction(e)) {
@@ -424,7 +426,10 @@ export default class JobsController {
                 jobListView.renderJobs(jobs, elements.jobsGrid, this.searchOptions.index);
                 jobListView.animateJobs(this.searchOptions.index);
 
-                document.querySelectorAll(`${elementStrings.jobCard}`).forEach(card => {
+                console.log(this.searchOptions);
+                // Cards are grouped by the ajax call/searchOption index
+                // Selecting them this way avoids duplicating listeners on existing cards
+                document.querySelectorAll(`${elementStrings.jobCard}-${this.searchOptions.index}`).forEach(card => {
                     card.addEventListener('click', async (e) => {
                         const viewJobBtn = e.target.closest(elementStrings.viewJobBtn);
                         const applyBtn = e.target.closest(elementStrings.applyBtn);
@@ -443,7 +448,6 @@ export default class JobsController {
                                 jobView.renderJobDetails(this.currentJob, document.body, this.featuredJobsAside, e);
 
                             } catch(e) {
-                                console.log('uh oh');
                                 console.log(e);
                             }
             
@@ -455,14 +459,54 @@ export default class JobsController {
                     });
                 })
 
+                // To prevent the scroll event triggering before the jobs render (because we're technically at the bottom of the screen 
+                // when nothing is rendered), which would then duplicate the ajax call to getJobs(), the listener is added 
+                // once the jobs are rendered.
+
+                // But it should only run once (see function below), not every time new jobs are fetched
+                this.addEndOfPageListener();
 
             })
             .catch((err) => console.log(err));
     }
 
+    addEndOfPageListener() {
+
+        // Function to make sure the listener is added only once
+        const once = (fn) => {
+            let count = 0;
+
+            return () => {
+                return count++ === 0 ? fn() : null;
+            }
+        }
+
+        const addEndListener = () => {
+            // #TODO: Debounce / change to GSAP
+            window.addEventListener("scroll", (e) => {
+                // At bottom of screen && there are more jobs to retrieve
+                if (
+                    jobListView.isAtBottom() 
+                ) {
+                    this.getJobs();
+                    console.log('bottom!');
+                }
+            });
+        }
+
+        const runOnce = once(addEndListener);
+
+        runOnce();
+
+    }
 
     clearJobs() {
         jobListView.clearJobs(elements.jobsGrid);
+    }
+
+    applyForJob(jobId, details) {
+        for(let[key, value] of details.entries()) console.log(key, value);
+        this.Applications.applyForJob(jobId, details)
     }
 
     initialiseJobsMenu() {
