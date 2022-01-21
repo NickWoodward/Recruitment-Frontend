@@ -82,6 +82,7 @@ class AdminController {
             applications: {
                 totalApplications: 0,
                 currentApplication: {},
+                currentPage: 0,
                 searchOptions: {
                     index: 0,
                     limit: 6,
@@ -306,7 +307,6 @@ class AdminController {
                 // Get User data
                 this.Admin.getUsers(this.state.users.searchOptions)
                     .then((res) => {
-
                         // Store and render data
                         this.users = res.data.applicants;
                         this.state.users.totalUsers = res.data.total;
@@ -346,10 +346,10 @@ class AdminController {
                 this.state.applications.searchOptions.limit = adminView.calculateRows('applications');
 
                 this.Admin
-                    .getApplications()
+                    .getApplications(this.state.applications.searchOptions)
                     .then(res => {
                         this.applications = res.data.applications;
-                        this.state.applications.totalApplications = res.data.applications.length;
+                        this.state.applications.totalApplications = res.data.total;
                         this.renderApplicationTable();
                     })
                     .catch(err => {
@@ -626,29 +626,28 @@ class AdminController {
         return this.UserModel.getUsers(this.state.users.searchOptions);
     }
 
-    renderApplicationsContent() {
-        // Already on the applications page, return
-        if(document.querySelector('.admin__content--applications')) return;
+    // renderApplicationsContent() {
+    //     // Already on the applications page, return
+    //     if(document.querySelector('.admin__content--applications')) return;
 
-        // Remove existing content
-        utils.clearElement(elements.adminContent);
+    //     // Remove existing content
+    //     utils.clearElement(elements.adminContent);
 
-        // Replace existing classname
-        elements.adminContent.className = "admin__content admin__content--applications";
+    //     // Replace existing classname
+    //     elements.adminContent.className = "admin__content admin__content--applications";
 
-        // Create table contents
-        const {headers, rows} = adminView.formatApplications(this.applications);
+    //     // Create table contents
+    //     const {headers, rows} = adminView.formatApplications(this.applications);
 
-        adminView.renderContent([ 
-                tableView.createTableTest('applications', headers, rows, false),
-            ],  elements.adminContent
-        );
-    }
+    //     adminView.renderContent([ 
+    //             tableView.createTableTest('applications', headers, rows, false),
+    //         ],  elements.adminContent
+    //     );
+    // }
 
     renderApplicationTable() {
         // Format applications/headers into html elements
         const {headers, rows} = adminView.formatApplications(this.applications);
-
         const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
         const tableWrapper = document.querySelector('.applications-table__wrapper');
 
@@ -659,26 +658,26 @@ class AdminController {
         if(pagination) utils.removeElement(pagination);   
 
         tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('applications', headers, rows, false));
+       
         // Add pagination
         adminView.renderPagination(index, limit, totalApplications, tableWrapper, 'applications');
 
         const applicationRows = document.querySelectorAll('.row--applications');
         const activeRow = Array.from(applicationRows).find(row => row.querySelector(`[data-id="${this.state.applications.currentApplication.applicantId}"]`)) || applicationRows[0];
+        
+        console.log(activeRow, applicationRows);
         utils.changeActiveRow(activeRow, applicationRows);
 
         applicationRows.forEach(row => {
             row.addEventListener('click', (e) => {
                 const targetRow = e.target.closest('.row');
-                console.log(targetRow);
                 const rowId = targetRow.querySelector('.td-data--applicationId').dataset.application;
-                console.log(rowId);
                 const application = this.applications.filter(application => {
                     return parseInt(rowId) === application.applicationId;
                 });
 
                 utils.changeActiveRow(targetRow, applicationRows);
                 this.state.applications.currentApplication = application[0];
-                console.log(this.state.applications.currentApplication);
                 // adminView.populateUserSummary(user[0]);
             });
         });
@@ -727,7 +726,6 @@ class AdminController {
 
     addJobSummaryListeners() {
         const jobSummary = document.querySelector('.job-summary');
-        console.log(jobSummary);
         jobSummary.addEventListener('click', e => {
             // Ignore synthetic clicks from the offscreen input element
             // if(e.target === document.querySelector('.user-summary__input')) return;
@@ -760,7 +758,6 @@ class AdminController {
                 jobSummary.removeEventListener('focusout', this.boundFocusOutEditJobHandler);
 
                 const formData = adminView.getJobEdits(this.state.jobs.currentJob);
-                console.log(formData.get('pqe'));
                 // for(let[key, value] of formData.entries()) console.log(key, value);
 
                 if(formData) {
@@ -790,7 +787,6 @@ class AdminController {
                             adminView.removeJobDropdowns(this.state.jobs.currentJob);
 
                             adminView.populateJobSummary(this.state.jobs.currentJob);
-                            console.log('ha')
                            
                         })
                         .catch(err => console.log(err));
@@ -1039,38 +1035,51 @@ class AdminController {
                 // Flow: 
                     // Create user > post to server > get and store updated user list > render jobs table 
                     // If the newly created user is in the paginated list of jobs returned, make it the currentJob/active row
-                this.Admin.createApplicant(formData).then(res => {
-                    if(res.status !== 201) { 
-                        throw new Error('Applicant not created') 
-                    }// @TODO: show error message
-                    // @TODO: show success message
-                    formUser = res.data.user;
+                if(formData) {
+                    this.Admin.createApplicant(formData).then(res => {
+                        if(res.status !== 201) { 
+                            throw new Error('Applicant not created') 
+                        }// @TODO: show error message
+                        // @TODO: show success message
+                        formUser = res.data.user;
 
-                    return this.Admin.getUsers(this.state.users.searchOptions);
-                    
-                }).then(res => {
-                    // @TODO: show error msg
-                    if(res.status !== 200) {
-                        throw new Error('Problem displaying applicants');
-                    } 
-                    this.users = res.data.applicants;
-                    this.state.users.totalUsers = res.data.total;
+                        return this.Admin.getUsers(this.state.users.searchOptions);
+                        
+                    }).then(res => {
+                        // @TODO: show error msg
+                        if(res.status !== 200) {
+                            throw new Error('Problem displaying applicants');
+                        } 
+                        this.users = res.data.applicants;
+                        this.state.users.totalUsers = res.data.total;
 
-                    // Look for the recently created user in the visible users array
-                    const user = this.users.find(user => user.applicantId === formUser.applicantId);
+                        // Look for the recently created user in the visible users array
+                        const user = this.users.find(user => user.applicantId === formUser.applicantId);
 
 
-                    if(user) {
-                        // Means the newly created user is visible
-                        this.state.users.currentUser = user;
+                        if(user) {
+                            // Means the newly created user is visible
+                            this.state.users.currentUser = user;
 
-                    } else {
-                        // If the newly created user isn't visible, set the current user to the first in the array + populate summary
-                        this.state.users.currentUser = this.users[0];
-                        adminView.populateUserSummary(this.state.users.currentUser);
-                    }
-                    
-                    this.renderUsersTable();
+                        } else {
+                            // If the newly created user isn't visible, set the current user to the first in the array + populate summary
+                            this.state.users.currentUser = this.users[0];
+                            adminView.populateUserSummary(this.state.users.currentUser);
+                        }
+                        
+                        this.renderUsersTable();
+
+                        const iconsToIgnore = [
+                            'user-summary__btn--upload',
+                            'user-summary__btn--save-new'
+                        ];
+                        adminView.changeNewIcon('new', 'user', iconsToIgnore);
+                        adminView.makeEditable(userElements, false);
+
+                    })
+                    .catch(err => console.log(err));
+                } else {
+                    adminView.populateUserSummary(this.state.users.currentUser);
 
                     const iconsToIgnore = [
                         'user-summary__btn--upload',
@@ -1078,10 +1087,7 @@ class AdminController {
                     ];
                     adminView.changeNewIcon('new', 'user', iconsToIgnore);
                     adminView.makeEditable(userElements, false);
-
-                })
-                .catch(err => console.log(err));
-                
+                }
 
                 // Remove focus listeners
                 userSummary.removeEventListener('focusin', adminView.focusInNewUserHandler);
@@ -1598,6 +1604,7 @@ class AdminController {
         const userBtn = e.target.closest('.pagination__item--users');
         const jobBtn = e.target.closest('.pagination__item--jobs');
         const companyBtn = e.target.closest('.pagination__item--companies');
+        const applicationBtn = e.target.closest('.pagination__item--applications');
 
         const userPrevious = e.target.closest('.pagination__previous--users');
         const userNext = e.target.closest('.pagination__next--users');
@@ -1608,12 +1615,17 @@ class AdminController {
         const companyPrevious = e.target.closest('.pagination__previous--companies');
         const companyNext = e.target.closest('.pagination__next--companies');
 
+        const applicationPrevious = e.target.closest('.pagination__previous--applications');
+        const applicationNext = e.target.closest('.pagination__next--applications');
+
         if(userBtn || userPrevious || userNext) {
             this.handleUserPagination(userBtn, userPrevious, userNext);
         } else if(jobBtn || jobPrevious || jobNext){
             this.handleJobPagination(jobBtn, jobPrevious, jobNext);
         } else if(companyBtn || companyPrevious || companyNext) {
             this.handleCompanyPagination(companyBtn, companyPrevious, companyNext);
+        } else if(applicationBtn || applicationPrevious || applicationNext) {
+            this.handleApplicationPagination(applicationBtn, applicationPrevious, applicationNext);
         }
     };
     handleUserPagination(userBtn, userPrevious, userNext) {
@@ -1676,14 +1688,12 @@ class AdminController {
             }).catch(err => console.log(err));
     };
 
-
     handleCompanyPagination(companyBtn, companyPrevious, companyNext) {
         const companyState = this.state.companies;
         // New page, new current company
         companyState.currentCompany = this.companies[0];
-
         const pages = Math.ceil(companyState.totalCompanies / companyState.searchOptions.limit);
-
+ 
         if(companyPrevious && !(companyState.currentPage < 1)) {
             this.movePageBackwards(companyState);
         }
@@ -1709,6 +1719,33 @@ class AdminController {
             })
             .catch(err => console.log(err));
     };
+
+    handleApplicationPagination(applicationBtn, applicationPrevious, applicationNext) {
+        const applicationState = this.state.applications;
+        // New page, new application
+        applicationState.currentApplication = this.applications[0];
+
+        const pages = Math.ceil(applicationState.totalApplications / applicationState.searchOptions.limit);
+
+        if(applicationPrevious && !(applicationState.currentPage < 1)) {
+            this.movePageBackwards(applicationState);
+        } else if(applicationNext && !(applicationState.currentPage >= pages - 1)) {
+            this.movePageForwards(applicationState);
+        } else if(applicationBtn) {
+            this.movePage(applicationState, applicationBtn);
+        }
+
+        this.Admin.getApplications(this.state.applications.searchOptions)
+            .then(res => {
+                if(res.data.applications ) {
+                    // Store data
+                    this.applications = res.data.applications;
+                    this.state.applications.totalApplications = res.data.total;
+                    this.renderApplicationTable();
+                }
+            })
+            .catch(err => console.log(err));
+    }
 
     movePageBackwards(state) {
         state.currentPage--;

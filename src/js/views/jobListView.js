@@ -81,8 +81,12 @@ const jobsMenuScrollAnimation = () => {
 //     return (Math.ceil(scrollTop) + Math.ceil(clientHeight) ) + 1 >= scrollHeight;
 // };
 export const isAtBottom = () => {
+    // console.log(document.documentElement);
     const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-  return scrollTop >= scrollHeight - clientHeight;
+    // console.log(scrollTop + window.innerHeight >= scrollHeight);
+    // console.log(scrollTop+ window.innerHeight, scrollHeight, window.innerHeight, clientHeight);
+    
+  return scrollTop + window.innerHeight * 1.5  >= scrollHeight;
 }
 
 export const renderFeaturedJobs = (jobs, element, jobsPerSlide) => {

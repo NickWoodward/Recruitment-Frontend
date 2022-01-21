@@ -529,6 +529,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    padding-bottom: 11rem;
     
     @include respond-tablet-large() {
         width: 80%;

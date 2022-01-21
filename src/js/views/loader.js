@@ -1,6 +1,6 @@
 import { elementStrings } from './base';
 
-export const renderLoader = (parent, type) => {
+export const renderLoader = (parent, type, position = 'afterbegin', inFlow = true) => {
     const loader = `
         <div class="${elementStrings.loader} ${elementStrings.loader}--${type}">
             <svg>
@@ -8,7 +8,14 @@ export const renderLoader = (parent, type) => {
             </svg>
         </div>
     `;
-    parent.insertAdjacentHTML('afterbegin', loader);
+
+    parent.insertAdjacentHTML(position, loader);
+
+    // If a loader should be outside of the document flow, set position class to absolute
+    const loaderElement = document.querySelector(`.${elementStrings.loader}`);
+    if(!inFlow) loaderElement.classList.add("loader--absolute");
+
+ 
 };
 
 export const clearLoader = () => {

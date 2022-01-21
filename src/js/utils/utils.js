@@ -1,5 +1,22 @@
 import { gsap } from 'gsap';
 
+
+export const displayLoaderMessage = (container, type, msg) => {
+
+    const markup = `
+        <div class="loader__message-wrapper loader__message-wrapper--${type}">
+            <div class="loader__message-close loader__message-close--${type}">
+                <svg class="loader__close-svg loader__close-svg--${type}">
+                    <use xlink:href="svg/spritesheet.svg#close-icon" />
+                </svg>
+            </div>
+            <div class="loader__message loader__message--${type}">${msg}</div>
+        </div>
+    `;
+     
+    container.insertAdjacentHTML('beforeend', markup);
+}
+
 export const clearElement = (element) => {
     while(element.firstChild) element.removeChild(element.firstChild);
 }
@@ -14,7 +31,7 @@ export const clearForm = (elements, defaults) => {
     });
 }
 
-export const removeElement = (element) => {
+export const removeElement = (element, test) => {
     element.parentElement.removeChild(element);
 }
 

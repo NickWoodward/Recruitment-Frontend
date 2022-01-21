@@ -38,6 +38,18 @@ export const renderJobNotification = (job = {jobId: 20, title: 'Corporate Commer
     // }, 5000);
 }
 
+export const setJobGridHeight = () => {
+    const jobGrid = document.querySelector('.jobs__grid');
+    // BoundingClientRect is relative to the scroll of the page, so add the window.scrollY for 
+    // a value relative to the top left of the document.
+    const jobGridTop = jobGrid.getBoundingClientRect().top + window.scrollY;
+    const screenHeight = window.innerHeight;
+
+    const gridHeight = `${screenHeight - jobGridTop + 1 }px`;  // +1 displays scrollbars, which stops jankiness when updating the jobs
+    jobGrid.style.minHeight = gridHeight;
+
+}
+
 export const setJobModalPosition = () => {
     const modal = document.querySelector('.modal');
     // const menu = document.querySelector('.jobs__menu-wrapper') || document.querySelector('.sidebar');

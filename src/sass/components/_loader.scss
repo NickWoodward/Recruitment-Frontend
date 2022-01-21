@@ -1,10 +1,31 @@
+.loader-wrapper {
+  &--contact {
+    position: absolute;
+    content: '';
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: $color-primary-new;
+  }
+}
+
 .loader {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 4rem;
     width: 4rem;
-    margin: 2rem 0;
+    // margin: 2rem 0;
+
+    & svg {
+      height: 4rem;
+      width: 4rem;
+    }
 
     fill: $color-secondary;
     transform-origin: 44% 50%;
@@ -14,6 +35,59 @@
     &--jobs-menu {
       fill: $color-secondary-highlight;
     }
+
+    &--contact {
+      fill: white;
+    }
+
+    &--jobs {
+      grid-column: 1 / 3;
+      align-self: center;
+      justify-self: center;
+      transform: translateY(-40px);
+      margin: 8rem 8rem 0 8rem;
+    }
+
+    &--absolute {
+      position: absolute;
+    }
+}
+
+.loader__message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.6rem;
+  // width: 100%;
+  height: 100%;
+}
+.loader__message-wrapper {
+  &--contact {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background-color: $color-primary-new;
+  }
+}
+.loader__message-close {
+  &--contact {
+    display: flex;
+    // border: 1px solid red;
+    position: absolute;
+    content: '';
+    right: 0;
+    top: 0;
+    cursor: pointer;
+  }
+}
+.loader__close-svg {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 1rem;
+  fill: white;
 }
 
 @keyframes rotate {

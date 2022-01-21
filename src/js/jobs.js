@@ -11,6 +11,8 @@ import * as utils from "./utils/utils";
 import * as inputUtils from "./utils/inputUtils";
 
 import JobList from "./models/JobList";
+import Applications from './models/Applications';
+
 
 import { elements } from "./views/base";
 import { elementStrings } from "./views/base";
@@ -31,6 +33,8 @@ export default class JobsController {
         this.locationParam = this.searchParams.get('location');
 
         this.JobList = new JobList();
+        this.Applications = new Applications();
+
         this.activeNavItem;
         this.navItems;
         this.searchInputs = Array.from(document.querySelectorAll('.search-input'));
@@ -60,6 +64,7 @@ export default class JobsController {
             types:[],
             pqes:[],
         };
+    
 
         // If the page has search params from the search form on index.html add them to the seachParams (update menus once populated)
         if(this.titleParam) this.searchOptions.titles.push(this.titleParam);
@@ -79,9 +84,11 @@ export default class JobsController {
 
         // Used to determine if infinite scroll effect should continue by comparing to # job-card elements
         this.totalJobs = 0;
+        this.totalJobsInDB = 0;
 
         // Max # items loaded: 3 rows of 4 (No need to vary with columns as not bandwidth heavy)
         this.limit = 12;
+        this.loaderFlag = false;
         this.getJobs();
         this.currentJob;
         this.featuredJobs;
@@ -95,10 +102,10 @@ export default class JobsController {
         window.addEventListener("DOMContentLoaded", () => {
             utils.pageFadeIn();
             headerView.renderHeader("jobs");
+            jobView.setJobGridHeight();
             jobListView.initialiseScrollAnimation();
             jobsMenuView.initialiseTagsListAnimation();
             this.getFeaturedJobs();
-            
         });
 
 
@@ -271,16 +278,23 @@ export default class JobsController {
                 } else if(e.target.closest('.job-details')) {
                     
                     switch(jobView.getAction(e)) {
-                        case 'apply'    : applyView.renderApplyForm(); break;
+                        case 'apply'    : 
+                            // Get the jobId from the details or aside card
+                            const jobDetailsCard = e.target.closest('.job-details__table');
+                            const jobAsideCard = e.target.closest('.job-card--details');
+                            const jobId = jobDetailsCard? jobDetailsCard.dataset.id : jobAsideCard.dataset.id;
+                            this.renderApplyForm(jobId); 
+                            break;  
                         case 'view'     : this.swapJobs(e); break
                         case 'cancel'   : jobView.animateJobDetailsOut(this.closeModal.bind(null, modal)); break;
                         case 'sign-in'  : modal.parentElement.removeChild(modal); loginView.renderLogin(); break;  
                     }
                 } else if(e.target.closest('.apply')) {
-                    e.preventDefault();
+                    console.log('HELLO'); 
+                    // e.preventDefault();
                     switch(applyView.getAction(e)) {
                         case 'request':     
-                            console.log('request'); 
+                            e.preventDefault();
                             const jobId = e.target.closest('.apply').dataset.id;
                             const applicationDetails = applyView.getApplicationDetails();
                             console.log(jobId, applicationDetails);
@@ -417,57 +431,81 @@ export default class JobsController {
     }
 
     getJobs() {
-        this.JobList.getJobs(this.searchOptions)
-            .then(({ data, data: { jobs, totalJobs, message } } = {}) => {
-                if(jobs.length === 0) return;
-                this.totalJobs = totalJobs;
-                this.searchOptions.index += jobs.length;
-                // Passing the index to the render and animate functions allow gsap to animate only the most recent elements added to the page
-                jobListView.renderJobs(jobs, elements.jobsGrid, this.searchOptions.index);
-                jobListView.animateJobs(this.searchOptions.index);
+        // If it's not the first call and the index is >= to totalJobs it means there are no jobs left to display
+        if(this.searchOptions.index != 0 && this.searchOptions.index >= this.totalJobsInDB) return;
+        // Previous results still loading
+        if(this.loaderFlag === true) return;
 
-                console.log(this.searchOptions);
-                // Cards are grouped by the ajax call/searchOption index
-                // Selecting them this way avoids duplicating listeners on existing cards
-                document.querySelectorAll(`${elementStrings.jobCard}-${this.searchOptions.index}`).forEach(card => {
-                    card.addEventListener('click', async (e) => {
-                        const viewJobBtn = e.target.closest(elementStrings.viewJobBtn);
-                        const applyBtn = e.target.closest(elementStrings.applyBtn);
-                        if(viewJobBtn) {
-                            const jobCard = viewJobBtn.closest(elementStrings.jobCard);
-                            try {
-                                // Get the selected job
-                                const { data: { job } } = await this.JobList.getJob(jobCard.dataset.id);
-                                this.currentJob = job;
-            
-                                // Filter out this job from the Featured Array, and shorten it to the number of featured jobs to display
-                                this.featuredJobsAside = this.featuredJobs.filter(job => job.id !== this.currentJob.id);
-                                
+        const jobsGrid = document.querySelector('.jobs__grid');
+        console.log('getting jobs');
 
-                                // Render the Current Job and the aside
-                                jobView.renderJobDetails(this.currentJob, document.body, this.featuredJobsAside, e);
+        // If it's the first call to getJobs, display the loader out of flow of the document
+        if(this.searchOptions.index === 0) loader.renderLoader(jobsGrid, "jobs", "beforeend", false);
+        else loader.renderLoader(jobsGrid, "jobs", "afterend", true);
 
-                            } catch(e) {
-                                console.log(e);
+        this.loaderFlag = true;
+
+        setTimeout(() => {
+
+            this.JobList.getJobs(this.searchOptions)
+                .then(({ status, data, data: { jobs, totalJobs, totalJobsInDB, message } } = {}) => {
+                    console.log('called');
+                    this.totalJobsInDB = totalJobsInDB;
+                    if(status === 200)  {
+                        loader.clearLoader();
+                        this.loaderFlag = false;
+                    }
+                    if(jobs.length === 0 || status !== 200) return;
+                    this.totalJobs = totalJobs;
+                    this.searchOptions.index += jobs.length;
+                    // Passing the index to the render and animate functions allow gsap to animate only the most recent elements added to the page
+                    jobListView.renderJobs(jobs, elements.jobsGrid, this.searchOptions.index);
+                    jobListView.animateJobs(this.searchOptions.index);
+    
+                    // Cards are grouped by the ajax call/searchOption index
+                    // Selecting them this way avoids duplicating listeners on existing cards
+                    document.querySelectorAll(`${elementStrings.jobCard}-${this.searchOptions.index}`).forEach(card => {
+                        card.addEventListener('click', async (e) => {
+                            const viewJobBtn = e.target.closest(elementStrings.viewJobBtn);
+                            const applyBtn = e.target.closest(elementStrings.applyBtn);
+                            if(viewJobBtn) {
+                                const jobCard = viewJobBtn.closest(elementStrings.jobCard);
+                                try {
+                                    // Get the selected job
+                                    const { data: { job } } = await this.JobList.getJob(jobCard.dataset.id);
+                                    this.currentJob = job;
+                
+                                    // Filter out this job from the Featured Array, and shorten it to the number of featured jobs to display
+                                    this.featuredJobsAside = this.featuredJobs.filter(job => job.id !== this.currentJob.id);
+                                    
+    
+                                    // Render the Current Job and the aside
+                                    jobView.renderJobDetails(this.currentJob, document.body, this.featuredJobsAside, e);
+    
+                                } catch(e) {
+                                    console.log(e);
+                                }
+                
+                
+                            } else if(applyBtn) {
+                                const jobCard = applyBtn.closest(elementStrings.jobCard);
+                                // applyView.renderApplyForm(jobCard.dataset.id);
+                                this.renderApplyForm(jobCard.dataset.id);
                             }
-            
-            
-                        } else if(applyBtn) {
-                            const jobCard = applyBtn.closest(elementStrings.jobCard);
-                            applyView.renderApplyForm(jobCard.dataset.id);
-                        }
-                    });
+                        });
+                    })
+    
+                    // To prevent the scroll event triggering before the jobs render (because we're technically at the bottom of the screen 
+                    // when nothing is rendered), which would then duplicate the ajax call to getJobs(), the listener is added 
+                    // once the jobs are rendered.
+    
+                    // But it should only run once (see function below), not every time new jobs are fetched
+                    this.addEndOfPageListener();
+    
                 })
+                .catch((err) => console.log(err));
+        }, 2000);
 
-                // To prevent the scroll event triggering before the jobs render (because we're technically at the bottom of the screen 
-                // when nothing is rendered), which would then duplicate the ajax call to getJobs(), the listener is added 
-                // once the jobs are rendered.
-
-                // But it should only run once (see function below), not every time new jobs are fetched
-                this.addEndOfPageListener();
-
-            })
-            .catch((err) => console.log(err));
     }
 
     addEndOfPageListener() {
@@ -507,6 +545,18 @@ export default class JobsController {
     applyForJob(jobId, details) {
         for(let[key, value] of details.entries()) console.log(key, value);
         this.Applications.applyForJob(jobId, details)
+    }
+
+    renderApplyForm(id) {
+        applyView.renderApplyForm(id);
+        // Set a listener on the file picker that appears on the apply modal
+        const filePicker = document.querySelector('.request__input--cv');
+        console.log(filePicker);
+        filePicker.onchange = function() {
+            const path = document.querySelector('.request__input-path');
+            path.textContent = '';
+            path.insertAdjacentHTML('afterbegin', `<div>${filePicker.value.replace("C:\\fakepath\\", "")}</div>`);
+        }
     }
 
     initialiseJobsMenu() {

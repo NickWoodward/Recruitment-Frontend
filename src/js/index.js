@@ -6,10 +6,12 @@ import * as loginView from './views/loginView';
 import * as chatView from './views/chatView';
 import * as registerView from './views/registerView';
 import * as forgotPassView from './views/forgotPassView';
+import * as footer from './views/footerView';
 import * as applyView from './views/applyView';
 import * as jobsListView from './views/jobListView';
 import * as jobView from './views/jobView';
 import * as modal from './views/modalView';
+import * as utils from './utils/utils';
 
 import { initSocket } from './socket';
 import User from './models/User';
@@ -38,6 +40,7 @@ import '../assets/icons/chatbubble.svg';
 import '../assets/icons/arrow-up.svg';
 import '../assets/icons/paperplane.svg';
 import '../assets/icons/world.svg';
+import '../assets/icons/close-icon.svg';
 import '../assets/icons/copy.svg';
 import '../assets/icons/cog.svg';
 import '../assets/icons/tick.svg';
@@ -220,10 +223,37 @@ class IndexController {
                 chatView.addChatResponse(message, true);
                 // this.socket.emit('chatbox', message );
             } else if(contactForm) {
-                const formData = homeView.getContactForm();
+                const formData = footer.getContactForm();
+
+                footer.addContactLoader();
 
                 if(formData) {
-                    this.Contact.sendContactForm(formData);
+                    for(let values of formData.entries()) {
+                        console.log(values);
+                    }
+                    this.Contact.sendContactForm(formData)
+                        .then(res => {
+                            footer.removeContactLoader();
+
+                            console.log(res.status === 200);
+                            if(res.status === 200) {
+                                // Remove loader
+                                utils.displayLoaderMessage(document.querySelector('.footer__contact'), 'contact', res.data.msg);
+                                const message = document.querySelector('.loader__message-close--contact');
+
+                                this.boundRemoveContactMessage = utils.removeElement.bind(null, document.querySelector('.loader__message-wrapper--contact'));
+                                message.addEventListener('click', this.boundRemoveContactMessage);
+                                footer.clearContactForm();
+                            } else {
+                                throw new Error();
+                            }
+                        }).catch(err => {
+                            utils.displayLoaderMessage(document.querySelector('.footer__contact'), 'contact', 'Unable to send message, please email or contact us on 0203 7780 191');
+                            const message = document.querySelector('.loader__message-close--contact');
+
+                            this.boundRemoveContactMessage = utils.removeElement.bind(null, document.querySelector('.loader__message-wrapper--contact'));
+                            message.addEventListener('click', this.boundRemoveContactMessage);
+                        }) 
                 }
             }
         });

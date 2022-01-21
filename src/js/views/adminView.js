@@ -31,7 +31,6 @@ export const forceDownload = (res, filename, ext) => {
 export const formatApplications = (applications) => {
     // Headers should match the returned divs in createApplicationElement
     const headers = ['', 'NAME','SURNAME','POSITION','COMPANY','CV']
-    console.log(applications);
     const rows = applications.map(application => {
         
         return createApplicationElement(formatProperties(application, ['cvUrl']));
@@ -211,7 +210,6 @@ export const addJobDropdowns = (job) => {
         const [typesIndex] = jobTypes.filter(type => job.jobType === type.name).map(item => item.id);
         const [positionsIndex] = positions.filter(position => job.position === position.name).map(item => item.id);
         const [PQEIndex] = PQE.filter(pqe => job.pqe === pqe.id).map(item => item.id);
-        console.log(PQEIndex);
 
         typesDropdown.selectedIndex = typesIndex;
         positionsDropdown.selectedIndex = positionsIndex;
@@ -220,7 +218,6 @@ export const addJobDropdowns = (job) => {
 };
 
 export const removeJobDropdowns = ({type, position, pqe}) => {
-    console.log(pqe);
     const typeElement = document.querySelector('.job-summary__type');
     const positionElement = document.querySelector('.job-summary__position');
     const PQEElement = document.querySelector('.job-summary__PQE');
@@ -537,7 +534,16 @@ const getRowHeight = (tableName) => {
     const table = `
             <table class="table--test">
                 <thead class="thead thead--${tableName}"><tr><th>Test</th></tr></thead>
-                <tbody><tr class="row row--${tableName}"><td>test</td></tr></tbody>
+                <tbody>
+                    <tr class="row row--${tableName}">
+                        <td>test</td>
+                        ${
+                            tableName === 'applications' ? 
+                            '<td><div class="cv-btn--table"><svg class="cv-icon"><use xlink:href="svg/spritesheet.svg#doc"></svg></div></td>' : 
+                            ''
+                        }
+                    </tr>
+                </tbody>
             </table>
             <div class="pagination pagination--${tableName}">
                 <div class="pagination__previous">Previous</div>
@@ -788,37 +794,37 @@ export const addFeaturedCheckbox = (visible, featured) => {
 
 // @TODO: move from job section
 //@TODO: Same as the changeEditIcon?
-// export const changeNewIcon = (btnToDisplay, summaryType, skip) => {
-//     const newBtn = document.querySelector(`.${summaryType}-summary__btn--new`);
-//     const saveBtn = document.querySelector(`.${summaryType}-summary__btn--save-new`);
-//     const summaryControls = document.querySelector(`.${summaryType}-summary__controls`);
+export const changeNewIcon = (btnToDisplay, summaryType, skip) => {
+    const newBtn = document.querySelector(`.${summaryType}-summary__btn--new`);
+    const saveBtn = document.querySelector(`.${summaryType}-summary__btn--save-new`);
+    const summaryControls = document.querySelector(`.${summaryType}-summary__controls`);
 
-//     let markup;
-//     if(btnToDisplay === 'save') {
-//         utils.removeElement(newBtn);
-//         markup = `
-//             <div class="${summaryType}-summary__btn ${summaryType}-summary__btn--save-new">
-//                 <svg class="${summaryType}-summary__save-icon">
-//                     <use xlink:href="svg/spritesheet.svg#save-np">
-//                 </svg>
-//             </div>
-//         `;
-//     } else if(btnToDisplay === 'new') {
-//         utils.removeElement(saveBtn);
-//         markup = `
-//             <div class="${summaryType}-summary__btn ${summaryType}-summary__btn--new">
-//                 <svg class="${summaryType}-summary__edit-icon">
-//                     <use xlink:href="svg/spritesheet.svg#add">
-//                 </svg>
-//             </div>
-//         `;
-//     }
-//     summaryControls.insertAdjacentHTML('afterbegin', markup);
+    let markup;
+    if(btnToDisplay === 'save') {
+        utils.removeElement(newBtn);
+        markup = `
+            <div class="${summaryType}-summary__btn ${summaryType}-summary__btn--save-new">
+                <svg class="${summaryType}-summary__save-icon">
+                    <use xlink:href="svg/spritesheet.svg#save-np">
+                </svg>
+            </div>
+        `;
+    } else if(btnToDisplay === 'new') {
+        utils.removeElement(saveBtn);
+        markup = `
+            <div class="${summaryType}-summary__btn ${summaryType}-summary__btn--new">
+                <svg class="${summaryType}-summary__edit-icon">
+                    <use xlink:href="svg/spritesheet.svg#add">
+                </svg>
+            </div>
+        `;
+    }
+    summaryControls.insertAdjacentHTML('afterbegin', markup);
 
-//     // Disable other btns if save is active
-//     if(btnToDisplay === 'save') toggleActiveBtns(false, summaryType, skip);
-//     else toggleActiveBtns(true, summaryType, skip);
-// };
+    // Disable other btns if save is active
+    if(btnToDisplay === 'save') toggleActiveBtns(false, summaryType, skip);
+    else toggleActiveBtns(true, summaryType, skip);
+};
 
 export const getJobEdits = (currentJob) => {
     let { title, location, wage, type, position, PQE, featured, description } = getJobFormValues();
@@ -842,7 +848,6 @@ export const getJobEdits = (currentJob) => {
     position !== currentJob.position && (submit = true) ? formData.append('position', position): formData.append('position', currentJob.position);
 
     // Make sure the PQE is always a string in the format 'num+'
-    console.log(PQE, currentJob.pqe)
     PQE !== `${currentJob.pqe}+` && (submit = true) ? formData.append('pqe', PQE): formData.append('pqe', currentJob.pqe);
 
     description !== currentJob.description && (submit = true) ? formData.append('description', description):formData.append('description', currentJob.description);
