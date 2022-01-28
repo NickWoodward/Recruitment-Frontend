@@ -348,9 +348,13 @@ class AdminController {
                 this.Admin
                     .getApplications(this.state.applications.searchOptions)
                     .then(res => {
-                        this.applications = res.data.applications;
-                        this.state.applications.totalApplications = res.data.total;
+
+                        this.applications = res.data.applications.rows;
+                        this.state.applications.totalApplications = res.data.applications.count;
                         this.renderApplicationTable();
+
+                        adminView.populateApplicationSummary(this.applications[0]);
+                        //this.addApplicationSummaryListeners();
                     })
                     .catch(err => {
                         console.log(err);
@@ -647,6 +651,7 @@ class AdminController {
 
     renderApplicationTable() {
         // Format applications/headers into html elements
+        console.log(this.applications);
         const {headers, rows} = adminView.formatApplications(this.applications);
         const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
         const tableWrapper = document.querySelector('.applications-table__wrapper');
@@ -663,10 +668,11 @@ class AdminController {
         adminView.renderPagination(index, limit, totalApplications, tableWrapper, 'applications');
 
         const applicationRows = document.querySelectorAll('.row--applications');
-        const activeRow = Array.from(applicationRows).find(row => row.querySelector(`[data-id="${this.state.applications.currentApplication.applicantId}"]`)) || applicationRows[0];
-        
-        console.log(activeRow, applicationRows);
+        const activeRow = Array.from(applicationRows).find(row => row.querySelector(`[data-id="${this.state.applications.currentApplication.applicationId}"]`)) || applicationRows[0];
+
         utils.changeActiveRow(activeRow, applicationRows);
+        console.log(this.state.applications.currentApplication.applicationId);
+        console.log(activeRow, applicationRows);
 
         applicationRows.forEach(row => {
             row.addEventListener('click', (e) => {
@@ -1501,8 +1507,6 @@ class AdminController {
             }
     
         });
-
-
     }
 
     // saveBtn + newBtn = currently editing
@@ -1725,6 +1729,8 @@ class AdminController {
         // New page, new application
         applicationState.currentApplication = this.applications[0];
 
+        console.log(`CURRENT APPLICATION: ${this.applications[0]}`);
+
         const pages = Math.ceil(applicationState.totalApplications / applicationState.searchOptions.limit);
 
         if(applicationPrevious && !(applicationState.currentPage < 1)) {
@@ -1737,10 +1743,10 @@ class AdminController {
 
         this.Admin.getApplications(this.state.applications.searchOptions)
             .then(res => {
-                if(res.data.applications ) {
+                if(res.data.applications) {
                     // Store data
-                    this.applications = res.data.applications;
-                    this.state.applications.totalApplications = res.data.total;
+                    this.applications = res.data.applications.rows;
+                    this.state.applications.totalApplications = res.data.applications.count;
                     this.renderApplicationTable();
                 }
             })

@@ -299,8 +299,10 @@
 
 .apply {
     &__content {
+        position: relative;
         display: flex;
         background-color: $color-background;
+        
     }
 
     &__divider {

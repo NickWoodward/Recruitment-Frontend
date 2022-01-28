@@ -82,7 +82,8 @@
     grid-column: 1/2;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    // justify-content: space-between;
+    justify-content: flex-start;
     height: 100%;
 }
 .summary {
@@ -113,6 +114,90 @@
     border: none;
     box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
     padding: 3.5rem 0 2rem 0;
+}
+
+
+// ********** APPLICATION CONTENT STYLING ***********
+.application-summary {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 50rem;
+    min-height: 24rem;
+    margin-bottom: 2rem;
+    
+    &__details {
+        width: 100%;
+        padding: 2.5rem 2.5rem 0 2.5rem;
+    }
+    &__item {
+        margin-bottom: .3rem;
+        font-size: 1.6rem;
+        padding: .8rem 2.5rem .8rem .8rem;
+        border: 1px solid transparent;
+        &:hover {
+            cursor: default;
+        }
+    }
+    &__item--editable {
+        -moz-appearance: textfield;
+        -webkit-appearance: textfield;
+        background-color: white;
+        background-color: -moz-field;
+        border: 1px solid darkgray;
+        box-shadow: 1px 1px 1px 0 lightgray inset;  
+        &:hover {
+            cursor: auto;
+        }
+    }
+
+    &__controls {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        width: 100%;
+        margin-top: auto;
+        padding: 1.5rem 2rem;
+        // border: 1px solid red;
+    }
+    &__btn {
+        display: flex;
+        align-items: flex-end;
+        margin-right: 1.5rem;
+        cursor:pointer;
+
+    }
+    
+    &__btn--edit, &__btn--save {
+        transform: translateY(3px);
+    }
+
+    &__btn--new, &__btn--save-new {
+        margin-right: auto;
+    }
+
+    &__new-icon {
+        height: 3.5rem;
+        width: 3.5rem;
+        fill: $color-logo;
+    }
+
+    &__edit-icon {
+        height: 3.5rem;
+        width: 3.5rem;
+        fill: $color-logo;
+    }
+    &__delete-icon {
+        height: 3.3rem;
+        width: 3.3rem;
+        fill: $color-secondary;
+    }
+    &__save-icon {
+        height: 3.5rem;
+        width: 3.5rem;
+        fill: red;
+    }
 }
 
 // ********** USER CONTENT STYLING **********
@@ -532,6 +617,7 @@
     justify-content: flex-start;
     align-items: center;
     width: 50rem;
+    margin-bottom: 2rem;
     
     &__details {
         width: 100%;
@@ -625,6 +711,7 @@
     align-items: center;
     width: 50rem;
     min-height: 24rem;
+    margin-bottom: 2rem;
     
     &__details {
         width: 100%;

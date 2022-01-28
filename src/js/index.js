@@ -235,7 +235,6 @@ class IndexController {
                         .then(res => {
                             footer.removeContactLoader();
 
-                            console.log(res.status === 200);
                             if(res.status === 200) {
                                 // Remove loader
                                 utils.displayLoaderMessage(document.querySelector('.footer__contact'), 'contact', res.data.msg);

@@ -11,6 +11,19 @@
     align-items: center;
     background-color: $color-primary-new;
   }
+  &--apply {
+    position: absolute;
+    content: '';
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: $color-background;
+  }
+
 }
 
 .loader {
@@ -71,9 +84,29 @@
 
     background-color: $color-primary-new;
   }
+
+  &--apply {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background-color: $color-background;
+    border-radius: 5px;
+}
 }
 .loader__message-close {
   &--contact {
+    display: flex;
+    // border: 1px solid red;
+    position: absolute;
+    content: '';
+    right: 0;
+    top: 0;
+    cursor: pointer;
+  }
+  &--apply {
     display: flex;
     // border: 1px solid red;
     position: absolute;
@@ -88,6 +121,10 @@
   height: 2.5rem;
   margin: 1rem;
   fill: white;
+
+  &--apply {
+    fill: $color-primary-new;
+  }
 }
 
 @keyframes rotate {

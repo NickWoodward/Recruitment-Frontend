@@ -37,16 +37,36 @@ export const formatApplications = (applications) => {
     });
     return { headers, rows };
 }; 
-const createApplicationElement = ({applicationId, company, companyId, firstName, lastName, personId, applicantId, position, jobId, cvUrl = ''}) => {
+const createApplicationElement = ({
+    id,
+    applicantId,
+    applicant: {
+        cvUrl,
+        person: {
+            id: personId,
+            firstName,
+            lastName
+        }
+    },
+    job: {
+        id: jobId,
+        title,
+        company: {
+            id: companyId,
+            name: companyName
+        }
+    }
+}) => {
+
     let cvType;
     if(cvUrl) cvType = cvUrl.indexOf('doc') !== -1? 'doc':'pdf';
 
     const row = [
-        `<div class="td-data--applicationId" data-application=${applicationId}>${applicationId}</div>`,
+        `<div class="td-data--applicationId" data-application=${id}>${id}</div>`,
         `<div class="td-data--first-name" data-id=${personId}>${firstName}</div>`,
         `<div class="td-data--last-name" data-id=${personId}>${lastName}</div>`,
-        `<div class="td-data--position" data-id=${jobId}>${position}</div>`,
-        `<div class="td-data--company data-id=${companyId}">${company}</div>`,
+        `<div class="td-data--position" data-id=${jobId}>${title}</div>`,
+        `<div class="td-data--company data-id=${companyId}">${companyName}</div>`,
         `<div class="cv-btn--table" data-cvUrl=${applicantId}><svg class="cv-icon">
             ${cvUrl? 
                 (cvType === 'doc'? 
@@ -65,6 +85,58 @@ const formatProperties = (object, skip) => {
     }
     return object;
 };
+
+export const populateApplicationSummary = ({ id, applicationDate, jobId, job: { title, position, jobType, pqe, location, company: { name } } }) => {
+    const applicationSummary = document.querySelector('.application-summary');
+    // applicationSummary.setAttribute('data-id', application.applicantId);
+    document.querySelector('.application-summary__id').innerText = id;
+    document.querySelector('.application-summary__date').innerText = applicationDate;
+
+    document.querySelector('.application-summary__company').innerText = name;
+    // document.querySelector('.application-summary__last-name').innerText = application.lastName;
+    // document.querySelector('.application-summary__phone').innerText = application.phone;
+    // document.querySelector('.application-summary__email').innerText = application.email;
+    
+    // addCvElement(user);
+}
+
+const createApplicationSummary = (application) => {
+    const markup  = `
+        <div class="summary-wrapper">
+            <div class="application-summary summary">
+                <div class="application-summary__details">
+                    <div class="application-summary__item application-summary__id" data-placeholder="ID" contenteditable=false></div>
+                    <div class="application-summary__item application-summary__date" data-placeholder="Date" contenteditable=false></div>
+                    <div class="application-summary__item application-summary__company" data-placeholder="Company" contenteditable=false></div>
+                    <div class="application-summary__item application-summary__job" data-placeholder="Job" contenteditable=false></div>
+
+                </div>
+                <div class="application-summary__controls">
+                    <div class="application-summary__btn application-summary__btn--new">
+                        <svg class="application-summary__new-icon application-summary__icon">
+                            <use xlink:href="svg/spritesheet.svg#add">
+                        </svg>
+                    </div>
+                  
+                    <div class="application-summary__btn application-summary__btn--edit">
+                        <svg class="application-summary__edit-icon application-summary__icon">
+                            <use xlink:href="svg/spritesheet.svg#edit-np1">
+                        </svg>
+                    </div>
+                    <div class="application-summary__btn application-summary__btn--delete">
+                        <svg class="application-summary__delete-icon application-summary__icon">
+                            <use xlink:href="svg/spritesheet.svg#delete-np1">
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    `;
+
+    return markup;
+};
+
 
 
 //////////  USER PAGE  //////////
@@ -1378,8 +1450,7 @@ export const initialiseAdminPage = (page) => {
         case 'users':           createSummary = createUserSummary; break;
         case 'jobs':            createSummary = createJobSummary; break;
         case 'companies':       createSummary = createCompanySummary; break;
-        // No summary for applications
-        // case 'applications':    createSummary = createApplicationSummary; break;
+        case 'applications':    createSummary = createApplicationSummary; break;
     }
 
     // Insert placeholders

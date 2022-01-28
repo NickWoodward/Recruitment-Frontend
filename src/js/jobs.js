@@ -290,16 +290,54 @@ export default class JobsController {
                         case 'sign-in'  : modal.parentElement.removeChild(modal); loginView.renderLogin(); break;  
                     }
                 } else if(e.target.closest('.apply')) {
-                    console.log('HELLO'); 
                     // e.preventDefault();
                     switch(applyView.getAction(e)) {
                         case 'request':     
                             e.preventDefault();
                             const jobId = e.target.closest('.apply').dataset.id;
                             const applicationDetails = applyView.getApplicationDetails();
-                            console.log(jobId, applicationDetails);
-                            this.applyForJob(jobId, applicationDetails);
-                            console.log('sending application for job ' + jobId);
+                            const form = document.querySelector('.apply__content');
+                            
+                            const wrapper = `<div class="loader-wrapper loader-wrapper--apply"></div>`;
+                            form.insertAdjacentHTML('beforeend', wrapper);
+                            loader.renderLoader(document.querySelector('.loader-wrapper'), 'apply', 'afterbegin', false);
+                            let markup;
+
+                            setTimeout(() => {
+                                this.applyForJob(jobId, applicationDetails)
+                                .then(res => {
+                                    if(res.status === 201) {
+                                        utils.removeElement(document.querySelector('.loader'));
+
+                                        markup = `
+                                            <div class="loader__message-html">
+                                                <div class="loader__message-title">Application Received</div>
+                                                <div class="loader__message-content">We will be in contact soon</div>
+                                                <div class="loader__message-ref">REF: ${res.data.ref}</div>
+                                            </div>
+                                        `;
+                                    } else {
+                                        throw new Error();
+                                    }
+
+                                    utils.displayLoaderMessage(form, 'apply', markup);
+                                }).catch(err => {
+                                    utils.removeElement(document.querySelector('.loader'));
+
+                                    markup = `
+                                        <div class="loader__message-html">
+                                            <div class="loader__message-title">Error</div>
+                                            <div class="loader__message-content">
+                                                Sorry, your application was not successful. 
+                                                <span>Please contact us on 0203 7780 191</span>
+                                            </div>
+                                        </div>
+                                    `;
+
+                                    utils.displayLoaderMessage(form, 'apply', markup);
+                                });
+                            }, 10000);
+
                             break;
                         // case 'login':       console.log('login'); break;
                         // case 'forgot':      modal.parentElement.removeChild(modal);
@@ -544,7 +582,7 @@ export default class JobsController {
 
     applyForJob(jobId, details) {
         for(let[key, value] of details.entries()) console.log(key, value);
-        this.Applications.applyForJob(jobId, details)
+        return this.Applications.applyForJob(jobId, details);
     }
 
     renderApplyForm(id) {
