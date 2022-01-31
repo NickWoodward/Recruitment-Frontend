@@ -235,7 +235,8 @@ export default class JobsController {
             const menu = e.target.closest('.jobs__menu-wrapper');
 
             // If there's a modal, but the user has clicked on the menu or header, close it
-            if((header || menu) && document.querySelector('.modal')) {
+            if((header || menu ) && document.querySelector('.modal')) {
+                console.log('remove');
                 document.querySelector('.modal').parentElement.removeChild(document.querySelector('.modal'));
             }
            
@@ -323,20 +324,26 @@ export default class JobsController {
                                     utils.displayLoaderMessage(form, 'apply', markup);
                                 }).catch(err => {
                                     utils.removeElement(document.querySelector('.loader'));
-
                                     markup = `
-                                        <div class="loader__message-html">
-                                            <div class="loader__message-title">Error</div>
-                                            <div class="loader__message-content">
-                                                Sorry, your application was not successful. 
-                                                <span>Please contact us on 0203 7780 191</span>
-                                            </div>
+                                        <div class="loader__message-html loader__message-html--apply">
+                                            <div class="loader__message-title loader__message-title--apply">Error</div>
+                                                <div class="loader__message-content loader__message-content--apply">
+                                                ${err.response.data.email ?
+                                                    `<div>You've already applied to this job with the email ${err.response.data.email}.</div><div>We'll be in touch soon.</div>` :
+                                                    '<div>Sorry, your application was not successful.</div><div>Please contact us on 0203 7780 191</div>'
+                                                }
+                                                
+                                                </div>
+                                            
                                         </div>
                                     `;
 
+                                    if(err.response.data.message === "You've already applied to this job") {
+                                        
+                                    }
                                     utils.displayLoaderMessage(form, 'apply', markup);
                                 });
-                            }, 10000);
+                            }, 1000);
 
                             break;
                         // case 'login':       console.log('login'); break;

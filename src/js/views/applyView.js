@@ -5,7 +5,7 @@ export const getAction = (e) => {
     const login = e.target.closest('.login__submit--apply');
     const forgot = e.target.closest('.login__forgot-password--apply');
     const register = e.target.closest('.login__register-link--apply');
-    const cancel = e.target.closest('.modal') && (!e.target.closest('.apply__content') || e.target.closest('.apply__cancel-btn') );
+    const cancel = e.target.closest('.modal') && (!e.target.closest('.apply__content') || e.target.closest('.apply__cancel-btn') || e.target.closest('.loader__message-close--apply') );
 
     if(request) return 'request';
     if(login) return 'login';
