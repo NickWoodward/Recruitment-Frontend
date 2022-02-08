@@ -131,14 +131,33 @@
         width: 100%;
         padding: 2.5rem 2.5rem 0 2.5rem;
     }
+
+    &__section {
+        margin-bottom: 1rem;
+
+        &--application {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+    }
+
+    &__header {
+        color: $color-secondary;
+        font-size: 1.9rem;
+        font-weight: 400;
+    }
+    &__label {
+        font-weight: 600;
+    }
     &__item {
         margin-bottom: .3rem;
         font-size: 1.6rem;
-        padding: .8rem 2.5rem .8rem .8rem;
-        border: 1px solid transparent;
-        &:hover {
-            cursor: default;
-        }
+        padding: .5rem 2.5rem 0 .8rem;
+        // border: 1px solid transparent;
+        // &:hover {
+        //     cursor: default;
+        // }
     }
     &__item--editable {
         -moz-appearance: textfield;

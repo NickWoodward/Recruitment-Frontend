@@ -20,9 +20,9 @@ export default class Admin {
     }
 
     /////////// Application Methods ////////////
-    getApplications({index, limit}) {
+    getApplications({index, limit, orderField, orderDirection}) {
         console.log(index, limit);
-        return JRS.get('/admin/applications', { params: { index, limit} });
+        return JRS.get('/admin/applications', { params: { index, limit, orderField, orderDirection} });
     }
 
     ///////////  Job Methods  ///////////

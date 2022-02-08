@@ -86,16 +86,20 @@ const formatProperties = (object, skip) => {
     return object;
 };
 
-export const populateApplicationSummary = ({ id, applicationDate, jobId, job: { title, position, jobType, pqe, location, company: { name } } }) => {
+export const populateApplicationSummary = ({ id, applicationDate, jobId, job: { title, position, jobType, pqe, location, company: { id: companyId, name } }, applicant: { person: { firstName, lastName, id: personId, email, phone } } }) => {
     const applicationSummary = document.querySelector('.application-summary');
     // applicationSummary.setAttribute('data-id', application.applicantId);
-    document.querySelector('.application-summary__id').innerText = id;
-    document.querySelector('.application-summary__date').innerText = applicationDate;
+    document.querySelector('.application-summary__header').innerText = `Application #${id}`;
+    document.querySelector('.application-summary__field--date').innerText = applicationDate;
 
-    document.querySelector('.application-summary__company').innerText = name;
-    // document.querySelector('.application-summary__last-name').innerText = application.lastName;
-    // document.querySelector('.application-summary__phone').innerText = application.phone;
-    // document.querySelector('.application-summary__email').innerText = application.email;
+
+    document.querySelector('.application-summary__field--title').innerText = title;
+    document.querySelector('.application-summary__field--company').innerText = name;
+
+    document.querySelector('.application-summary__field--firstname').innerText = firstName;
+    document.querySelector('.application-summary__field--surname').innerText = lastName;
+    document.querySelector('.application-summary__field--email').innerText = email;
+    document.querySelector('.application-summary__field--phone').innerText = phone;
     
     // addCvElement(user);
 }
@@ -105,12 +109,44 @@ const createApplicationSummary = (application) => {
         <div class="summary-wrapper">
             <div class="application-summary summary">
                 <div class="application-summary__details">
-                    <div class="application-summary__item application-summary__id" data-placeholder="ID" contenteditable=false></div>
-                    <div class="application-summary__item application-summary__date" data-placeholder="Date" contenteditable=false></div>
-                    <div class="application-summary__item application-summary__company" data-placeholder="Company" contenteditable=false></div>
-                    <div class="application-summary__item application-summary__job" data-placeholder="Job" contenteditable=false></div>
 
+                    <div class="application-summary__section application-summary__section--application">
+                        <div class="application-summary__header"></div>
+
+                        <div class="application-summary__item">
+                            <div class="application-summary__field application-summary__field--date" data-placeholder="Date" contenteditable=false></div>
+                        </div>
+                    </div>
+
+                    <div class="application-summary__section application-summary__section--job">
+                        <div class="application-summary__item">
+                            <div class="application-summary__label application-summary__label--title">Position:</div>
+                            <div class="application-summary__field application-summary__field--title" data-placeholder="Job Title" contenteditable=false></div>
+                        </div>
+                        <div class="application-summary__item">
+                            <div class="application-summary__label application-summary__label--company">Company:</div>
+                            <div class="application-summary__field application-summary__field--company" data-placeholder="Company" contenteditable=false></div>
+                        </div>
+                    </div>
+
+                    <div class="application-summary__section application-summary__section--person">
+                        <div class="application-summary__item">
+                            <div class="application-summary__label application-summary__label--name">Name:</div>
+                            <div class="application-summary__field application-summary__field--firstname" data-placeholder="Name" contenteditable=false></div>
+                            <div class="application-summary__field application-summary__field--surname" data-placeholder="Surname" contenteditable=false></div>
+                        </div>
+                        <div class="application-summary__item">
+                            <div class="application-summary__label application-summary__label--email">Email:</div>
+                            <div class="application-summary__field application-summary__field--email" data-placeholder="Email" contenteditable=false></div>
+                        </div>
+                        <div class="application-summary__item">
+                            <div class="application-summary__label application-summary__label--phone">Phone:</div>
+                            <div class="application-summary__field application-summary__field--phone" data-placeholder="Phone" contenteditable=false></div>
+                        </div>
+                    </div>
+                    
                 </div>
+
                 <div class="application-summary__controls">
                     <div class="application-summary__btn application-summary__btn--new">
                         <svg class="application-summary__new-icon application-summary__icon">
@@ -200,7 +236,7 @@ export const populateUserSummary = (user) => {
     document.querySelector('.user-summary__last-name').innerText = user.lastName;
     document.querySelector('.user-summary__phone').innerText = user.phone;
     document.querySelector('.user-summary__email').innerText = user.email;
-    
+    console.log(user);
     addCvElement(user);
 }
 
@@ -354,6 +390,7 @@ export const makeEditable = (elements, makeEditable, exclude) => {
 }
 
 export const addCvElement = user => {
+    console.log(user);
     const cvWrapper = document.querySelector('.user-summary__cv-wrapper');
     const cvName = user.cvName;
     const cvType = user.cvType;

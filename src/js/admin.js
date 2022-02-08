@@ -87,7 +87,7 @@ class AdminController {
                     index: 0,
                     limit: 6,
                     orderField: "createdAt",
-                    orderDirection: "DESC"
+                    orderDirection: "ASC"
                 }
             },
             jobsTable: {
@@ -354,7 +354,7 @@ class AdminController {
                         this.renderApplicationTable();
 
                         adminView.populateApplicationSummary(this.applications[0]);
-                        //this.addApplicationSummaryListeners();
+                        this.addApplicationSummaryListeners();
                     })
                     .catch(err => {
                         console.log(err);
@@ -678,15 +678,20 @@ class AdminController {
             row.addEventListener('click', (e) => {
                 const targetRow = e.target.closest('.row');
                 const rowId = targetRow.querySelector('.td-data--applicationId').dataset.application;
+                console.log(this.applications);
                 const application = this.applications.filter(application => {
-                    return parseInt(rowId) === application.applicationId;
+                    return parseInt(rowId) === application.id;
                 });
-
+                console.log(application);
                 utils.changeActiveRow(targetRow, applicationRows);
                 this.state.applications.currentApplication = application[0];
-                // adminView.populateUserSummary(user[0]);
+                adminView.populateApplicationSummary(application[0]);
             });
         });
+    }
+
+    addApplicationSummaryListeners() {
+
     }
 
     renderJobsTable() {
@@ -1748,6 +1753,8 @@ class AdminController {
                     this.applications = res.data.applications.rows;
                     this.state.applications.totalApplications = res.data.applications.count;
                     this.renderApplicationTable();
+                    adminView.populateApplicationSummary(this.applications[0]);
+
                 }
             })
             .catch(err => console.log(err));

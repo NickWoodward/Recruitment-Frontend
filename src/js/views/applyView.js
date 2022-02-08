@@ -24,6 +24,55 @@ export const getApplicationDetails = () => {
     return formData;
 }
 
+// export const renderApplyForm = (id) => {
+//     const markup = `
+//         <div class="modal apply" data-id="${id}">
+
+//             <div class="apply__content">
+//                 <div class="request">
+                    
+//                     <form class="request__form">
+//                         <div class="request__field">
+//                             <label class="request__label--first-name request__label" for="request__input--first-name">First Name</label>
+//                             <input class="request__input--first-name request__input" id="request__input--first-name" />
+//                         </div>
+//                         <div class="request__field">
+//                             <label class="request__label--surname request__label" for="request__input--surname">Surname</label>
+//                             <input class="request__input--surname request__input" id="request__input--surname" />
+//                         </div>
+//                         <div class="request__field">
+//                             <label class="request__label--email request__label" for="request__input--email request__input">Email</label>
+//                             <input class="request__input--email request__input" id="request__input--email" />
+//                         </div>
+//                         <div class="request__field">
+//                             <label class="request__label--phone request__label" for="request__input--phone">Phone</label>
+//                             <input class="request__input--phone request__input" id="request__input--phone" />
+//                         </div>
+//                         <div class="request__field request__field--cv">
+//                         <!-- Input inside label for custom styling -->
+//                             <div class="request__label request__label--dummy">CV</div>
+//                             <div class="request__file-picker">
+//                                 <label class="request__label--cv request__label" for="request__input--cv">
+//                                 Upload
+//                                     <input class="request__input--cv request__input" id="request__input--cv" name="cv" type=file />
+//                                 </label>
+//                                 <div class="request__input-path"><span>No file chosen</span></div>
+//                             </div>
+
+//                         </div>
+//                         <button class="request__submit btn">Submit</button>
+
+//                     </form>
+//                 </div>
+//             </div>
+            
+//         </div>
+//     `;
+
+//     document.body.insertAdjacentHTML('beforeend', markup);
+//     animateApplyFormIn();
+// };
+
 export const renderApplyForm = (id) => {
     const markup = `
         <div class="modal apply" data-id="${id}">
@@ -34,19 +83,19 @@ export const renderApplyForm = (id) => {
                     <form class="request__form">
                         <div class="request__field">
                             <label class="request__label--first-name request__label" for="request__input--first-name">First Name</label>
-                            <input class="request__input--first-name request__input" id="request__input--first-name" />
+                            <input type="text" class="request__input--first-name request__input" id="request__input--first-name" />
                         </div>
                         <div class="request__field">
                             <label class="request__label--surname request__label" for="request__input--surname">Surname</label>
-                            <input class="request__input--surname request__input" id="request__input--surname" />
+                            <input type="text" class="request__input--surname request__input" id="request__input--surname" />
                         </div>
                         <div class="request__field">
                             <label class="request__label--email request__label" for="request__input--email request__input">Email</label>
-                            <input class="request__input--email request__input" id="request__input--email" />
+                            <input type="email" class="request__input--email request__input" id="request__input--email" />
                         </div>
                         <div class="request__field">
                             <label class="request__label--phone request__label" for="request__input--phone">Phone</label>
-                            <input class="request__input--phone request__input" id="request__input--phone" />
+                            <input type="tel" class="request__input--phone request__input" id="request__input--phone" />
                         </div>
                         <div class="request__field request__field--cv">
                         <!-- Input inside label for custom styling -->
@@ -54,11 +103,10 @@ export const renderApplyForm = (id) => {
                             <div class="request__file-picker">
                                 <label class="request__label--cv request__label" for="request__input--cv">
                                 Upload
-                                    <input class="request__input--cv request__input" id="request__input--cv" name="cv" type=file />
+                                    <input type="file" accept=".doc, .docx, .pdf" class="request__input--cv request__input" id="request__input--cv" name="cv" type=file />
                                 </label>
                                 <div class="request__input-path"><span>No file chosen</span></div>
                             </div>
-
                         </div>
                         <button class="request__submit btn">Submit</button>
 
