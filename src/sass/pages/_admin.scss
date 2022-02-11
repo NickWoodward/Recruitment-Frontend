@@ -62,6 +62,7 @@
     display: flex;
     height: 100%;
     width: 100%;
+    overflow: hidden;
 }
 
 .admin__content {
@@ -71,8 +72,9 @@
     width: 90%;
     height: 100%;
     padding: 5rem;
+    opacity: 0;
 
-    &--companies {
+    &--companies, &--applications, &--jobs, &--users {
         display: grid;
         grid-gap: 1rem;
     }
@@ -140,24 +142,39 @@
             justify-content: space-between;
             align-items: baseline;
         }
+        &--job {
+            display: flex;
+            flex-flow: column wrap;
+            align-items: space-between;
+            height: 20rem;
+            // border: 1px solid red;
+        }
     }
 
     &__header {
         color: $color-secondary;
         font-size: 1.9rem;
         font-weight: 400;
+        width: 100%;
+        padding: 1rem .5rem;
+        background-color: rgb(249, 250, 251);
     }
     &__label {
         font-weight: 600;
     }
-    &__item {
+    &__item, &__id {
         margin-bottom: .3rem;
         font-size: 1.6rem;
-        padding: .5rem 2.5rem 0 .8rem;
+        padding: .5rem 2.5rem 0 0;
         // border: 1px solid transparent;
         // &:hover {
         //     cursor: default;
         // }
+    }
+    &__item {
+        padding-left: .5rem;
+        // border: 1px solid blue;
+        width: 50%;
     }
     &__item--editable {
         -moz-appearance: textfield;
@@ -225,7 +242,6 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    margin-right: 12rem;
     width: 50rem;
     
     &__details {
@@ -399,7 +415,6 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    margin-right: 12rem;
     width: 50rem;
     // max-height: 100rem;
 

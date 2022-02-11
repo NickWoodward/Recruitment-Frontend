@@ -33,6 +33,8 @@ import Admin from './models/Admin';
 
 import { elements, elementStrings } from './views/base';
 
+import gsap from 'gsap';
+
 class AdminController {
     constructor() {
 
@@ -126,6 +128,7 @@ class AdminController {
             // Render Header
             headerView.renderHeader("admin");
 
+            gsap.set(elements.adminContent, { opacity: 1 });
             adminView.initialiseAdminPage('jobs');
 
             // Calculate # of rows to render
@@ -281,124 +284,122 @@ class AdminController {
 
             adminView.changeActiveMenuItem(e);
 
-            if(jobs && !document.querySelector('.admin__content--jobs')) {
-                // Clear admin page / rename content class / render placeholders
-                adminView.initialiseAdminPage('jobs');
-                // Calculate # of rows to render / api limit
-                this.state.companies.searchOptions.limit = adminView.calculateRows('jobs');
+            // const height = gsap.getProperty(elements.adminContent, 'height');
+            let height = 100;
 
-                // Jobs data initially loaded on DOMLoaded (+company data for editing)
-                this.renderJobsTable();
 
-                if(this.jobs.length > 0) {
-                    adminView.populateJobSummary(this.jobs[0]); 
-                    this.addJobSummaryListeners();
-                } else { 
-                    // @TODO Placeholder for no jobs
-                }
-            }
-            if(users && !document.querySelector('.admin__content--users')) {
-                // Clear admin page / rename content class / render placeholders
-                adminView.initialiseAdminPage('users');
+            gsap.fromTo(elements.adminContent, 
+                {
+                    opacity: 1
+                },
+                {
+                    opacity: 0,
+                    duration: .3,
+                    onComplete: () => {
+                    
+                        if(jobs && !document.querySelector('.admin__content--jobs')) {
+                    
+                            // Clear admin page / rename content class / render placeholders
+                            adminView.initialiseAdminPage('jobs');
+                            // Calculate # of rows to render / api limit
+                            this.state.companies.searchOptions.limit = adminView.calculateRows('jobs');
+            
+                            // Jobs data initially loaded on DOMLoaded (+company data for editing)
+                            this.renderJobsTable();
+            
+                            if(this.jobs.length > 0) {
+                                adminView.populateJobSummary(this.jobs[0]); 
+                                this.addJobSummaryListeners();
 
-                // Calculate # of rows to render / api limit
-                this.state.users.searchOptions.limit = adminView.calculateRows('users');
+                                gsap.fromTo(elements.adminContent, { opacity: 0 }, { opacity: 1, duration: .8 })
 
-                // Get User data
-                this.Admin.getUsers(this.state.users.searchOptions)
-                    .then((res) => {
-                        // Store and render data
-                        this.users = res.data.applicants;
-                        this.state.users.totalUsers = res.data.total;
-
-                        this.renderUsersTable();
-                        if(this.users.length > 0) {
-                            adminView.populateUserSummary(this.users[0]);
-                            this.addUserSummaryListeners();
-                        } else {
-                            // @TODO: Render placeholder
+                            } else { 
+                                // @TODO Placeholder for no jobs
+                            }
                         }
+                        if(users && !document.querySelector('.admin__content--users')) {
+                            // Clear admin page / rename content class / render placeholders
+                            adminView.initialiseAdminPage('users');
+            
+                            // Calculate # of rows to render / api limit
+                            this.state.users.searchOptions.limit = adminView.calculateRows('users');
+            
+                            // Get User data
+                            this.Admin.getUsers(this.state.users.searchOptions)
+                                .then((res) => {
+                                    // Store and render data
+                                    this.users = res.data.applicants;
+                                    this.state.users.totalUsers = res.data.total;
+            
+                                    this.renderUsersTable();
+                                    if(this.users.length > 0) {
+                                        adminView.populateUserSummary(this.users[0]);
+                                        this.addUserSummaryListeners();
+
+                                        gsap.fromTo(elements.adminContent, { opacity: 0 }, { opacity: 1, duration: .8 })
+
+                                    } else {
+                                        // @TODO: Render placeholder
+                                    }
+                            });
+                            
+                        }
+                        if(applications) {
+            
+                            // Clear admin page / rename content class / render placeholders
+                            adminView.initialiseAdminPage('applications');
+            
+                            // Calculate # of rows to render / api limit
+                            this.state.applications.searchOptions.limit = adminView.calculateRows('applications');
+            
+                            this.Admin
+                                .getApplications(this.state.applications.searchOptions)
+                                .then(res => {
+            
+                                    this.applications = res.data.applications.rows;
+                                    this.state.applications.totalApplications = res.data.applications.count;
+                                    this.renderApplicationTable();
+            
+                                    adminView.populateApplicationSummary(this.applications[0]);
+                                    this.addApplicationSummaryListeners();
+
+                                    gsap.fromTo(elements.adminContent, { opacity: 0 }, { opacity: 1, duration: .8 })
+
+                                })
+                                .catch(err => {
+                                    console.log(err);
+                                });
+            
+                        }
+                        if(companies) {
+                            adminView.initialiseAdminPage('companies');
+            
+                            // Calculate # of rows to render / api limit
+                            this.state.companies.searchOptions.limit = adminView.calculateRows('companies');
+            
+                            this.Admin
+                                .getCompanies(this.state.companies.searchOptions)
+                                .then(res => {
+                                    this.companies = res.data.companies;
+                                    this.state.companies.totalCompanies = res.data.total;
+                                    if(this.companies.length > 0) {
+                                        this.state.companies.currentCompany = this.companies[0];
+            
+                                        this.renderCompaniesTable();
+                                        adminView.populateCompanySummary(this.companies[0]);
+            
+                                        adminView.populateAddressSummary(this.companies[0].id, this.companies[0].addresses[0]);
+                                        adminView.populateContactSummary(this.companies[0].id, this.companies[0].people[0]);
+                                        this.addCompanySummaryListeners();
+
+                                        gsap.fromTo(elements.adminContent, { opacity: 0 }, { opacity: 1, duration: .8 })
+
+                                    }
+                                })
+                        }
+    
+                    }
                 });
-                
-            }
-            if(applications) {
-                // this.Applications
-                //     .getApplications()
-                //     .then(res => {
-                //         this.applications = res.data.applications;
-                //         if(this.applications.length > 0) {
-                //             this.renderApplicationsContent();
-                //             // Add application button listeners
-                //             document.querySelectorAll('.cv-btn--table').forEach(btn => {
-                //                 btn.addEventListener('click', (e) => this.downloadCv(e));
-                //             });
-                //         } else {
-                //             // Show image saying no applications
-                //         }
-
-                //     })
-                //     .catch(err => console.log(err));
-
-                // Clear admin page / rename content class / render placeholders
-                adminView.initialiseAdminPage('applications');
-
-                // Calculate # of rows to render / api limit
-                this.state.applications.searchOptions.limit = adminView.calculateRows('applications');
-
-                this.Admin
-                    .getApplications(this.state.applications.searchOptions)
-                    .then(res => {
-
-                        this.applications = res.data.applications.rows;
-                        this.state.applications.totalApplications = res.data.applications.count;
-                        this.renderApplicationTable();
-
-                        adminView.populateApplicationSummary(this.applications[0]);
-                        this.addApplicationSummaryListeners();
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    });
-
-                // this.Applications.getApplications()
-                //     .then(res => {
-                //         // Store and render data
-                //         this.applications = res.data.applicants;
-                //         // this.state.applications.totalApplications = res.data.total;
-
-                //         this.renderApplicationTable();
-                //         // if(this.users.length > 0) {
-                //         //     adminView.populateApplicationSummary(this.applications[0]);
-                //         //     this.addUserSummaryListeners();
-                //         // } else {
-                //         //     // @TODO: Render placeholder
-                //         // }
-                //     })
-                //     .catch();
-            }
-            if(companies) {
-                adminView.initialiseAdminPage('companies');
-
-                // Calculate # of rows to render / api limit
-                this.state.companies.searchOptions.limit = adminView.calculateRows('companies');
-
-                this.Admin
-                    .getCompanies(this.state.companies.searchOptions)
-                    .then(res => {
-                        this.companies = res.data.companies;
-                        this.state.companies.totalCompanies = res.data.total;
-                        if(this.companies.length > 0) {
-                            this.state.companies.currentCompany = this.companies[0];
-
-                            this.renderCompaniesTable();
-                            adminView.populateCompanySummary(this.companies[0]);
-
-                            adminView.populateAddressSummary(this.companies[0].id, this.companies[0].addresses[0]);
-                            adminView.populateContactSummary(this.companies[0].id, this.companies[0].people[0]);
-                            this.addCompanySummaryListeners();
-                        }
-                    })
-            }
         });
 
 

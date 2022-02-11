@@ -5,6 +5,8 @@ import * as jobForm from './jobForm';
 import { renderJobDetails } from './jobView';
 import * as tableView from './tableView';
 
+import gsap from 'gsap';
+
 
 export const renderContent = (content, container) => {
     content.forEach(item => {
@@ -86,18 +88,56 @@ const formatProperties = (object, skip) => {
     return object;
 };
 
-export const populateApplicationSummary = ({ id, applicationDate, jobId, job: { title, position, jobType, pqe, location, company: { id: companyId, name } }, applicant: { person: { firstName, lastName, id: personId, email, phone } } }) => {
+export const populateApplicationSummary = ({ 
+    id, 
+    applicationDate, 
+    jobId, 
+    job: { 
+        title, 
+        position, 
+        jobType, 
+        pqe, 
+        location, 
+        company: { 
+            id: 
+            companyId, 
+            name,
+            people: [ 
+                {
+                    contact: { position: contactPosition },
+                    firstName: contactFirstName,
+                    lastName: contactLastName,
+                    phone: contactPhone,
+                    email: contactEmail
+                } 
+            ]
+        } 
+    }, 
+    applicant: { 
+        person: { 
+            firstName, 
+            lastName, 
+            id: personId, 
+            email, 
+            phone 
+        } 
+    } 
+}) => {
     const applicationSummary = document.querySelector('.application-summary');
     // applicationSummary.setAttribute('data-id', application.applicantId);
-    document.querySelector('.application-summary__header').innerText = `Application #${id}`;
+    document.querySelector('.application-summary__id').innerText = `Ref${id}`;
     document.querySelector('.application-summary__field--date').innerText = applicationDate;
-
 
     document.querySelector('.application-summary__field--title').innerText = title;
     document.querySelector('.application-summary__field--company').innerText = name;
+    document.querySelector('.application-summary__field--contact-firstname').innerText = contactFirstName;
+    document.querySelector('.application-summary__field--contact-surname').innerText = contactLastName;
+    document.querySelector('.application-summary__field--contact-position').innerText = contactPosition;
+    document.querySelector('.application-summary__field--contact-phone').innerText = contactPhone;
+    document.querySelector('.application-summary__field--contact-email').innerText = contactEmail;
 
-    document.querySelector('.application-summary__field--firstname').innerText = firstName;
-    document.querySelector('.application-summary__field--surname').innerText = lastName;
+    document.querySelector('.application-summary__field--applicant-firstname').innerText = firstName;
+    document.querySelector('.application-summary__field--applicant-surname').innerText = lastName;
     document.querySelector('.application-summary__field--email').innerText = email;
     document.querySelector('.application-summary__field--phone').innerText = phone;
     
@@ -111,29 +151,50 @@ const createApplicationSummary = (application) => {
                 <div class="application-summary__details">
 
                     <div class="application-summary__section application-summary__section--application">
-                        <div class="application-summary__header"></div>
+                        <div class="application-summary__id"></div>
 
                         <div class="application-summary__item">
                             <div class="application-summary__field application-summary__field--date" data-placeholder="Date" contenteditable=false></div>
                         </div>
                     </div>
 
+                    <div class="application-summary__header">Position</div>
+
                     <div class="application-summary__section application-summary__section--job">
                         <div class="application-summary__item">
-                            <div class="application-summary__label application-summary__label--title">Position:</div>
+                            <div class="application-summary__label application-summary__label--title">Title:</div>
                             <div class="application-summary__field application-summary__field--title" data-placeholder="Job Title" contenteditable=false></div>
                         </div>
                         <div class="application-summary__item">
                             <div class="application-summary__label application-summary__label--company">Company:</div>
                             <div class="application-summary__field application-summary__field--company" data-placeholder="Company" contenteditable=false></div>
                         </div>
+                        <div class="application-summary__item">
+                            <div class="application-summary__label application-summary__label--contact-name">Contact:</div>
+                            <div class="application-summary__field application-summary__field--contact-firstname" data-placeholder="Contact Name" contenteditable=false></div>
+                            <div class="application-summary__field application-summary__field--contact-surname" data-placeholder="Contact Surname" contenteditable=false></div>
+                        </div>
+                        <div class="application-summary__item">
+                            <div class="application-summary__label application-summary__label--contact-position">Contact Position:</div>
+                            <div class="application-summary__field application-summary__field--contact-position" data-placeholder="Contact Position" contenteditable=false></div>
+                        </div>
+                        <div class="application-summary__item">
+                            <div class="application-summary__label application-summary__label--contact-phone">Contact Phone:</div>
+                            <div class="application-summary__field application-summary__field--contact-phone" data-placeholder="Contact Phone" contenteditable=false></div>
+                        </div>
+                        <div class="application-summary__item">
+                            <div class="application-summary__label application-summary__label--contact-email">Contact Email:</div>
+                            <div class="application-summary__field application-summary__field--contact-email" data-placeholder="Contact Email" contenteditable=false></div>
+                        </div>
                     </div>
 
                     <div class="application-summary__section application-summary__section--person">
+                        <div class="application-summary__header">Applicant</div>
+
                         <div class="application-summary__item">
-                            <div class="application-summary__label application-summary__label--name">Name:</div>
-                            <div class="application-summary__field application-summary__field--firstname" data-placeholder="Name" contenteditable=false></div>
-                            <div class="application-summary__field application-summary__field--surname" data-placeholder="Surname" contenteditable=false></div>
+                            <div class="application-summary__label application-summary__label--applicant-name">Applicant Name:</div>
+                            <div class="application-summary__field application-summary__field--applicant-firstname" data-placeholder="Applicant Name" contenteditable=false></div>
+                            <div class="application-summary__field application-summary__field--applicant-surname" data-placeholder="Applicant Surname" contenteditable=false></div>
                         </div>
                         <div class="application-summary__item">
                             <div class="application-summary__label application-summary__label--email">Email:</div>
@@ -1481,6 +1542,14 @@ export const initialiseAdminPage = (page) => {
     // Replace existing classname
     elements.adminContent.className = `admin__content admin__content--${page}`;
 
+    // Insert new Summary
+    insertSummary(page);
+
+    // Insert a Table wrapper
+    elements.adminContent.insertAdjacentHTML('beforeend', `<div class="${page}-table__wrapper"></div>`);
+};
+
+const insertSummary = (page) => {
     let createSummary;
 
     switch(page) {
@@ -1492,8 +1561,7 @@ export const initialiseAdminPage = (page) => {
 
     // Insert placeholders
     if(createSummary) elements.adminContent.insertAdjacentHTML('afterbegin', createSummary());
-    elements.adminContent.insertAdjacentHTML('beforeend', `<div class="${page}-table__wrapper"></div>`);
-};
+}
 
 
 
