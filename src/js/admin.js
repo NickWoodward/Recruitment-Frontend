@@ -16,6 +16,9 @@ import '../assets/icons/delete-np1.svg';
 import '../assets/icons/edit-np1.svg';
 import '../assets/icons/add.svg';
 
+import axios from 'axios';
+import gsap from 'gsap';
+
 import * as headerView from './views/headerView';
 import * as adminView from './views/adminView';
 import * as tableView from './views/tableView';
@@ -24,16 +27,16 @@ import * as jobForm from './views/jobForm';
 import * as jobView from './views/jobView';
 import * as utils from './utils/utils';
 import * as dummyData from './utils/dummyData';
+import * as loader from './views/loader';
 
 import JobList from './models/JobList';
 import UserModel from './models/User';
 import Applications from './models/Applications';
 import Companies from './models/Companies';
 import Admin from './models/Admin';
+import { cancelTokenSource } from './models/Admin';
 
 import { elements, elementStrings } from './views/base';
-
-import gsap from 'gsap';
 
 class AdminController {
     constructor() {
@@ -45,6 +48,7 @@ class AdminController {
         this.Companies = new Companies();
         this.Admin = new Admin();
         this.state= {
+            isActiveRequest: false,
             companies: {
                 totalCompanies: 0,
                 currentCompany: {},
@@ -128,28 +132,27 @@ class AdminController {
             // Render Header
             headerView.renderHeader("admin");
 
-            gsap.set(elements.adminContent, { opacity: 1 });
-            adminView.initialiseAdminPage('jobs');
+            // adminView.initialiseAdminPage('jobs');
 
-            // Calculate # of rows to render
-            this.state.jobs.searchOptions.limit = adminView.calculateRows('jobs');
+            // // Calculate # of rows to render
+            // this.state.jobs.searchOptions.limit = adminView.calculateRows('jobs');
 
-            this.Admin.getJobs(this.state.jobs.searchOptions)
-                .then(res => {
-                    this.jobs = res.data.jobs;
-                    this.state.jobs.totalJobs = res.data.total;
+            // this.Admin.getJobs(this.state.jobs.searchOptions)
+            //     .then(res => {
+            //         this.jobs = res.data.jobs;
+            //         this.state.jobs.totalJobs = res.data.total;
                     
-                    this.renderJobsTable();
-                    if(this.jobs.length > 0) {
-                        adminView.populateJobSummary(this.jobs[0]);
-                        this.addJobSummaryListeners();
-                        // adminView.addTableListeners('jobs');
-                    } else {
-                        // @TODO: Render placeholder
+            //         this.renderJobsTable();
+            //         if(this.jobs.length > 0) {
+            //             adminView.populateJobSummary(this.jobs[0]);
+            //             this.addJobSummaryListeners();
+            //             // adminView.addTableListeners('jobs');
+            //         } else {
+            //             // @TODO: Render placeholder
                         
-                    }
-                })
-                .catch(err => console.log(err));
+            //         }
+            //     })
+            //     .catch(err => console.log(err));
 
             this.Admin.getCompanies().then(res => {
                 this.companies = res.data.companies;
@@ -274,138 +277,449 @@ class AdminController {
         // MODALS
         document.body.addEventListener('click', this.checkModals.bind(this));
 
+        // elements.adminSidebar.addEventListener('click', async(e) => {
+        //     const applications = e.target.closest('.sidebar__item--applications');
+        //     const jobs = e.target.closest('.sidebar__item--jobs');
+        //     const companies = e.target.closest('.sidebar__item--companies');
+        //     const users = e.target.closest('.sidebar__item--users');
+        //     const settings = e.target.closest('.sidebar__item--settings');
+            
+        //     adminView.changeActiveMenuItem(e); 
+
+        //     // If there's an active request, cancel it
+        //     if(this.state.isActiveRequest) { 
+        //         cancelTokenSource();
+        //         this.state.isActiveRequest = false;
+        //     }
+
+        //     if(jobs && !document.querySelector('.admin__content--jobs')) {
+        //         // Clear admin page / rename content class / render placeholders
+        //         adminView.initialiseAdminPage('jobs');
+        //         // Calculate # of rows to render / api limit
+        //         this.state.companies.searchOptions.limit = adminView.calculateRows('jobs');
+
+        //         // Jobs data initially loaded on DOMLoaded (+company data for editing)
+        //         this.renderJobsTable();
+
+        //         if(this.jobs.length > 0) {
+        //             adminView.populateJobSummary(this.jobs[0]); 
+        //             this.addJobSummaryListeners();
+        //         } else { 
+        //             // @TODO Placeholder for no jobs
+        //         }
+        //     }
+        //     if(users && !document.querySelector('.admin__content--users')) {
+        //         this.state.isActiveRequest = true;
+        //         // Clear admin page / rename content class / render placeholders
+        //         adminView.initialiseAdminPage('users');
+
+        //         // Calculate # of rows to render / api limit
+        //         this.state.users.searchOptions.limit = adminView.calculateRows('users');
+
+        //         // Get User data
+        //         try {
+        //             const res = await this.Admin.getUsers(this.state.jobs.searchOptions);
+        //             this.state.isActiveRequest = false;
+
+        //             // Store and render data
+        //             this.users = res.data.applicants;
+        //             this.state.users.totalUsers = res.data.total;
+                    
+        //             this.renderUsersTable();
+        //             if(this.users.length > 0) {
+        //                 adminView.populateUserSummary(this.users[0]);
+        //                 this.addUserSummaryListeners();
+        //             } else {
+        //                 // @TODO: Render placeholder
+        //             }
+
+        //         } catch(err) {
+        //             this.state.isActiveRequest = false;
+        //             if (axios.isCancel(err)) {
+        //                 console.log('Request canceled', err.message);
+        //             } else {
+        //             // handle error
+        //             console.log(err);
+        //             }
+        //         }       
+        //     }
+        //     if(applications) {
+
+
+        //         // Clear admin page / rename content class / render placeholders
+        //         adminView.initialiseAdminPage('applications');
+
+        //         // Calculate # of rows to render / api limit
+        //         this.state.applications.searchOptions.limit = adminView.calculateRows('applications');
+
+        //         this.state.isActiveRequest = true;
+
+        //         this.Admin
+        //             .getApplications(this.state.applications.searchOptions)
+        //             .then(res => {
+        //                 this.state.isActiveRequest = false;
+        //                 this.applications = res.data.applications.rows;
+        //                 this.state.applications.totalApplications = res.data.applications.count;
+        //                 this.renderApplicationTable();
+
+        //                 adminView.populateApplicationSummary(this.applications[0]);
+        //                 this.addApplicationSummaryListeners();
+        //             })
+        //             .catch(err => {
+        //                 this.state.isActiveRequest = false;
+        //                 if (axios.isCancel(err)) {
+        //                     console.log('Request canceled', err.message);
+        //                 } else {
+        //                 // handle error
+        //                 console.log(err);
+        //                 }
+        //             });
+        //     }
+        //     if(companies) {
+        //         adminView.initialiseAdminPage('companies');
+
+        //         // Calculate # of rows to render / api limit
+        //         this.state.companies.searchOptions.limit = adminView.calculateRows('companies');
+
+        //         this.state.isActiveRequest = true;
+        //         this.Admin
+        //             .getCompanies(this.state.companies.searchOptions)
+        //             .then(res => {
+        //                 this.state.isActiveRequest = false;
+        //                 this.companies = res.data.companies;
+        //                 this.state.companies.totalCompanies = res.data.total;
+        //                 if(this.companies.length > 0) {
+        //                     this.state.companies.currentCompany = this.companies[0];
+
+        //                     this.renderCompaniesTable();
+        //                     adminView.populateCompanySummary(this.companies[0]);
+
+        //                     adminView.populateAddressSummary(this.companies[0].id, this.companies[0].addresses[0]);
+        //                     adminView.populateContactSummary(this.companies[0].id, this.companies[0].people[0]);
+        //                     this.addCompanySummaryListeners();
+        //                 }
+        //             }).catch(err => {
+        //                 this.state.isActiveRequest = false;
+        //                 if (axios.isCancel(err)) {
+        //                     console.log('Request canceled', err.message);
+        //                 } else {
+        //                 // handle error
+        //                 console.log(err);
+        //                 }
+        //             });
+        //     }
+        // });
+        
         // MENU LISTENERS
-        elements.adminSidebar.addEventListener('click', (e) => {
-            const applications = e.target.closest('.sidebar__item--applications');
-            const jobs = e.target.closest('.sidebar__item--jobs');
-            const companies = e.target.closest('.sidebar__item--companies');
-            const users = e.target.closest('.sidebar__item--users');
-            const settings = e.target.closest('.sidebar__item--settings');
-
-            adminView.changeActiveMenuItem(e);
-
-            // const height = gsap.getProperty(elements.adminContent, 'height');
-            let height = 100;
+        elements.adminSidebar.addEventListener('click', async(e) => {
 
 
-            gsap.fromTo(elements.adminContent, 
-                {
-                    opacity: 1
-                },
-                {
-                    opacity: 0,
-                    duration: .3,
-                    onComplete: () => {
-                    
-                        if(jobs && !document.querySelector('.admin__content--jobs')) {
-                    
-                            // Clear admin page / rename content class / render placeholders
-                            adminView.initialiseAdminPage('jobs');
-                            // Calculate # of rows to render / api limit
-                            this.state.companies.searchOptions.limit = adminView.calculateRows('jobs');
-            
-                            // Jobs data initially loaded on DOMLoaded (+company data for editing)
-                            this.renderJobsTable();
-            
-                            if(this.jobs.length > 0) {
-                                adminView.populateJobSummary(this.jobs[0]); 
-                                this.addJobSummaryListeners();
+            this.displayAdminContent(e);
+            adminView.changeActiveMenuItem(e); 
 
-                                gsap.fromTo(elements.adminContent, { opacity: 0 }, { opacity: 1, duration: .8 })
 
-                            } else { 
-                                // @TODO Placeholder for no jobs
-                            }
-                        }
-                        if(users && !document.querySelector('.admin__content--users')) {
-                            // Clear admin page / rename content class / render placeholders
-                            adminView.initialiseAdminPage('users');
-            
-                            // Calculate # of rows to render / api limit
-                            this.state.users.searchOptions.limit = adminView.calculateRows('users');
-            
-                            // Get User data
-                            this.Admin.getUsers(this.state.users.searchOptions)
-                                .then((res) => {
-                                    // Store and render data
-                                    this.users = res.data.applicants;
-                                    this.state.users.totalUsers = res.data.total;
-            
-                                    this.renderUsersTable();
-                                    if(this.users.length > 0) {
-                                        adminView.populateUserSummary(this.users[0]);
-                                        this.addUserSummaryListeners();
 
-                                        gsap.fromTo(elements.adminContent, { opacity: 0 }, { opacity: 1, duration: .8 })
+            // if(jobs && !document.querySelector('.admin__content--jobs')) {
+            //     // Clear admin page / rename content class / render placeholders
+            //     adminView.initialiseAdminPage('jobs');
+            //     // Calculate # of rows to render / api limit
+            //     this.state.companies.searchOptions.limit = adminView.calculateRows('jobs');
 
-                                    } else {
-                                        // @TODO: Render placeholder
-                                    }
-                            });
-                            
-                        }
-                        if(applications) {
-            
-                            // Clear admin page / rename content class / render placeholders
-                            adminView.initialiseAdminPage('applications');
-            
-                            // Calculate # of rows to render / api limit
-                            this.state.applications.searchOptions.limit = adminView.calculateRows('applications');
-            
-                            this.Admin
-                                .getApplications(this.state.applications.searchOptions)
-                                .then(res => {
-            
-                                    this.applications = res.data.applications.rows;
-                                    this.state.applications.totalApplications = res.data.applications.count;
-                                    this.renderApplicationTable();
-            
-                                    adminView.populateApplicationSummary(this.applications[0]);
-                                    this.addApplicationSummaryListeners();
+            //     // Jobs data initially loaded on DOMLoaded (+company data for editing)
+            //     this.renderJobsTable();
 
-                                    gsap.fromTo(elements.adminContent, { opacity: 0 }, { opacity: 1, duration: .8 })
+            //     if(this.jobs.length > 0) {
+            //         adminView.populateJobSummary(this.jobs[0]); 
+            //         this.addJobSummaryListeners();
+            //     } else { 
+            //         // @TODO Placeholder for no jobs
+            //     }
+            // }
+            // if(users && !document.querySelector('.admin__content--users')) {
+            //     // Clear admin page / rename content class / render placeholders
+            //     adminView.initialiseAdminPage('users');
 
-                                })
-                                .catch(err => {
-                                    console.log(err);
-                                });
-            
-                        }
-                        if(companies) {
-                            adminView.initialiseAdminPage('companies');
-            
-                            // Calculate # of rows to render / api limit
-                            this.state.companies.searchOptions.limit = adminView.calculateRows('companies');
-            
-                            this.Admin
-                                .getCompanies(this.state.companies.searchOptions)
-                                .then(res => {
-                                    this.companies = res.data.companies;
-                                    this.state.companies.totalCompanies = res.data.total;
-                                    if(this.companies.length > 0) {
-                                        this.state.companies.currentCompany = this.companies[0];
-            
-                                        this.renderCompaniesTable();
-                                        adminView.populateCompanySummary(this.companies[0]);
-            
-                                        adminView.populateAddressSummary(this.companies[0].id, this.companies[0].addresses[0]);
-                                        adminView.populateContactSummary(this.companies[0].id, this.companies[0].people[0]);
-                                        this.addCompanySummaryListeners();
+            //     // Calculate # of rows to render / api limit
+            //     this.state.users.searchOptions.limit = adminView.calculateRows('users');
 
-                                        gsap.fromTo(elements.adminContent, { opacity: 0 }, { opacity: 1, duration: .8 })
+            //     // Get User data
+            //     this.Admin.getUsers(this.state.users.searchOptions)
+            //         .then((res) => {
+            //             // Store and render data
+            //             this.users = res.data.applicants;
+            //             this.state.users.totalUsers = res.data.total;
 
-                                    }
-                                })
-                        }
-    
-                    }
-                });
+            //             this.renderUsersTable();
+            //             if(this.users.length > 0) {
+            //                 adminView.populateUserSummary(this.users[0]);
+            //                 this.addUserSummaryListeners();
+            //             } else {
+            //                 // @TODO: Render placeholder
+            //             }
+            //         }).catch(err => {
+            //             console.log(err)
+            //         });
+                
+            // }
+            // if(applications) {
+            //     // Create Admin element/add dummy table for row calculation
+            //     adminView.initAdmin('applications');
+
+            //     // Add a loader to the table wrapper
+            //     loader.renderLoader(
+            //         document.querySelector('.applications-table__wrapper'),
+            //         'applications-table',
+            //         'afterbegin',
+            //         false
+            //     );
+
+            // setTimeout(async()=>{
+            //    // Calculate the # of rows based on the styled tabled created in the init function
+            //    this.state.applications.searchOptions.limit = adminView.calculateRows('applications');
+
+            //    // Set active request flag to true
+            //    this.state.isActiveRequest = true;
+
+            //    try {
+            //        // Request and store application data
+            //        const { data: { applications: { rows, count } } } = await this.Admin.getApplications(this.state.applications.searchOptions);
+            //        this.applications = rows;
+            //        this.state.applications.totalApplications = count;
+
+            //        // Clear loader
+            //        loader.clearLoader();
+
+            //        this.renderApplicationTable();
+
+            //     //    adminView.populateApplicationSummary(this.applications[0]);
+            //     //    this.addApplicationSummaryListeners();
+
+            //    } catch(err) {
+            //        this.state.isActiveRequest = false;
+            //        if (axios.isCancel(err)) {
+            //            console.log('Request canceled', err.message);
+            //        } else {
+            //        // handle error
+            //        console.log(err);
+            //        }
+            //     }
+            // },2000);
+
+ 
+                
+
+
+
+                // // Clear admin page / rename content class / render placeholders
+                // adminView.initialiseAdminPage('applications');
+
+                // // Calculate # of rows to render / api limit
+                // this.state.applications.searchOptions.limit = adminView.calculateRows('applications');
+
+                // this.Admin
+                //     .getApplications(this.state.applications.searchOptions)
+                //     .then(res => {
+
+                //         this.applications = res.data.applications.rows;
+                //         this.state.applications.totalApplications = res.data.applications.count;
+                //         this.renderApplicationTable();
+
+                //         adminView.populateApplicationSummary(this.applications[0]);
+                //         this.addApplicationSummaryListeners();
+                //     })
+                //     .catch(err => {
+                //         console.log(err);
+                //     });
+            // }
+            // if(companies) {
+            //     adminView.initialiseAdminPage('companies');
+
+            //     // Calculate # of rows to render / api limit
+            //     this.state.companies.searchOptions.limit = adminView.calculateRows('companies');
+
+            //     this.Admin
+            //         .getCompanies(this.state.companies.searchOptions)
+            //         .then(res => {
+            //             this.companies = res.data.companies;
+            //             this.state.companies.totalCompanies = res.data.total;
+            //             if(this.companies.length > 0) {
+            //                 this.state.companies.currentCompany = this.companies[0];
+
+            //                 this.renderCompaniesTable();
+            //                 adminView.populateCompanySummary(this.companies[0]);
+
+            //                 adminView.populateAddressSummary(this.companies[0].id, this.companies[0].addresses[0]);
+            //                 adminView.populateContactSummary(this.companies[0].id, this.companies[0].people[0]);
+            //                 this.addCompanySummaryListeners();
+            //             }
+            //         }).catch(err => {
+            //             console.log(err)
+            //         });
+            // }
         });
 
 
         // PAGINATION CONTROLS
         document.body.addEventListener('click', this.handlePaginationEvent.bind(this));
             
+    }
+
+    displayAdminContent(e) {
+        const tl = gsap.timeline();
+
+        const adminMain = document.querySelector('.admin__main');
+        let adminTemplate;
+        let adminTable;
+        let adminSummary;
+
+        const applications = e.target.closest('.sidebar__item--applications');
+        const jobs = e.target.closest('.sidebar__item--jobs');
+        const companies = e.target.closest('.sidebar__item--companies');
+        const users = e.target.closest('.sidebar__item--users');
+        const settings = e.target.closest('.sidebar__item--settings');
+
+        // Animate the previous content out, alter the contents, then pause the animation until the response has been received
+        tl
+        .to(adminMain, { autoAlpha: 0 })
+        .add(() => {
+            adminView.clearAdminPage();
+
+            // Add a template to the main page
+            adminTemplate = adminView.createAdminTemplate('applications');
+            adminMain.appendChild(adminTemplate);
+            adminTable = document.querySelector('.applications-table__wrapper');
+            adminSummary = document.querySelector('.summary-wrapper');
+
+            // Add a loader to the table wrapper
+            loader.renderLoader(
+                adminTable,
+                'admin-table',
+                'afterbegin',
+                false
+            );
+            // Add a loader to the summary wrapper
+            loader.renderLoader(
+                adminSummary,
+                'admin-summary',
+                'afterbegin',
+                false
+            );
+        })
+        .to(adminMain, {autoAlpha: 1})
+        .pause();
+        
+        // Play the first part of the animation
+        tl.play();
+
+
+        if(applications) {
+        
+            setTimeout(async()=>{
+                this.state.applications.searchOptions.limit = adminView.calculateRows('applications');
+    
+                // Set active request flag to true
+                this.state.isActiveRequest = true;
+    
+                try {
+                    // Request and store application data
+                    const { data: { applications: { rows, count } } } = await this.Admin.getApplications(this.state.applications.searchOptions);
+                    this.applications = rows;
+                    this.state.applications.totalApplications = count;
+    
+                    // Change active request flag to false
+                    this.state.isActiveRequest = false;
+    
+                    tl
+                    .to(adminMain, {autoAlpha: 0})
+                    .add(() => {
+                        loader.clearLoader();
+                        this.renderApplicationTable();
+                        const applicationSummary = adminView.createApplicationSummary(this.applications[0]);
+                        adminSummary.insertAdjacentHTML('afterbegin', applicationSummary);
+            
+                    })
+                    .to(adminMain, { autoAlpha: 1 });
+    
+                    tl.play();
+                
+    
+    
+                //    adminView.populateApplicationSummary(this.applications[0]);
+                //    this.addApplicationSummaryListeners();
+    
+                } catch(err) {
+                    this.state.isActiveRequest = false;
+                    if (axios.isCancel(err)) {
+                        console.log('Request canceled', err.message);
+                    } else {
+                        // handle error
+                        console.log(err);
+                    }
+                }
+            },200);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        
+    //     if(applications) {
+            
+    //     setTimeout(async()=>{
+    //         this.state.applications.searchOptions.limit = adminView.calculateRows('applications');
+
+    //         // Set active request flag to true
+    //         this.state.isActiveRequest = true;
+
+    //         try {
+    //            // Request and store application data
+    //            const { data: { applications: { rows, count } } } = await this.Admin.getApplications(this.state.applications.searchOptions);
+    //            this.applications = rows;
+    //            this.state.applications.totalApplications = count;
+
+    //             // Change active request flag to false
+    //             this.state.isActiveRequest = false;
+
+    //             tl
+    //             .to(adminMain, {autoAlpha: 0})
+    //             .add(() => {
+    //                 loader.clearLoader();
+    //                 this.renderApplicationTable();
+    //                 const applicationSummary = adminView.createApplicationSummary(this.applications[0]);
+    //                 newContent.insertAdjacentHTML('afterbegin', applicationSummary);
+        
+    //             })
+    //             .to(adminMain, { autoAlpha: 1 });
+
+    //             tl.play();
+         
+
+
+    //         //    adminView.populateApplicationSummary(this.applications[0]);
+    //         //    this.addApplicationSummaryListeners();
+
+    //         } catch(err) {
+    //             this.state.isActiveRequest = false;
+    //             if (axios.isCancel(err)) {
+    //                 console.log('Request canceled', err.message);
+    //             } else {
+    //                 // handle error
+    //                 console.log(err);
+    //             }
+    //         }
+    //     },1000);
+        
     }
 
     downloadCv(e) {
@@ -652,10 +966,15 @@ class AdminController {
 
     renderApplicationTable() {
         // Format applications/headers into html elements
-        console.log(this.applications);
         const {headers, rows} = adminView.formatApplications(this.applications);
         const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
+        
+        // const markup = `<div class="applications-table__wrapper"></div>`;
+        // document.querySelector('.admin__content').insertAdjacentHTML('afterbegin', markup);
         const tableWrapper = document.querySelector('.applications-table__wrapper');
+
+        console.log('table');
+        console.log('table wrapper');
 
         // removeApplicationsTable & pagination if it exists
         const table = document.querySelector('.table--applications');
@@ -672,21 +991,18 @@ class AdminController {
         const activeRow = Array.from(applicationRows).find(row => row.querySelector(`[data-id="${this.state.applications.currentApplication.applicationId}"]`)) || applicationRows[0];
 
         utils.changeActiveRow(activeRow, applicationRows);
-        console.log(this.state.applications.currentApplication.applicationId);
-        console.log(activeRow, applicationRows);
 
         applicationRows.forEach(row => {
             row.addEventListener('click', (e) => {
                 const targetRow = e.target.closest('.row');
                 const rowId = targetRow.querySelector('.td-data--applicationId').dataset.application;
-                console.log(this.applications);
                 const application = this.applications.filter(application => {
                     return parseInt(rowId) === application.id;
                 });
-                console.log(application);
                 utils.changeActiveRow(targetRow, applicationRows);
                 this.state.applications.currentApplication = application[0];
-                adminView.populateApplicationSummary(application[0]);
+                const summary = document.querySelector('.summary-wrapper');
+                adminView.swapSummary(summary, adminView.createApplicationSummary(application[0])); 
             });
         });
     }
@@ -1730,12 +2046,16 @@ class AdminController {
             .catch(err => console.log(err));
     };
 
-    handleApplicationPagination(applicationBtn, applicationPrevious, applicationNext) {
+    async handleApplicationPagination(applicationBtn, applicationPrevious, applicationNext) {
+        const tl = gsap.timeline();
+        const tableWrapper = document.querySelector('.applications-table__wrapper');
+        const table = document.querySelector('.table--applications');
+        const summaryWrapper = document.querySelector('.summary-wrapper');
+        const summary = document.querySelector('.summary');
+
         const applicationState = this.state.applications;
         // New page, new application
         applicationState.currentApplication = this.applications[0];
-
-        console.log(`CURRENT APPLICATION: ${this.applications[0]}`);
 
         const pages = Math.ceil(applicationState.totalApplications / applicationState.searchOptions.limit);
 
@@ -1747,18 +2067,83 @@ class AdminController {
             this.movePage(applicationState, applicationBtn);
         }
 
-        this.Admin.getApplications(this.state.applications.searchOptions)
-            .then(res => {
-                if(res.data.applications) {
-                    // Store data
-                    this.applications = res.data.applications.rows;
-                    this.state.applications.totalApplications = res.data.applications.count;
-                    this.renderApplicationTable();
-                    adminView.populateApplicationSummary(this.applications[0]);
+        tl
+        .to(table, { autoAlpha: 0 })
+        .add(() => {
 
-                }
+            // Clear table & summary
+            utils.clearElement(tableWrapper);
+            utils.clearElement(summaryWrapper);
+
+            // Add a loader to the table wrapper
+            loader.renderLoader(
+                tableWrapper,
+                'admin-table',
+                'afterbegin',
+                false
+            );
+            // Add a loader to the summary wrapper
+            loader.renderLoader(
+                summaryWrapper,
+                'admin-summary',
+                'afterbegin',
+                false
+            );
+
+            gsap.fromTo('.loader', { autoAlpha: 0 }, { autoAlpha: 1 });
+        })
+        .to(table, {autoAlpha: 1})
+        .pause();
+
+        tl.play();
+
+        try {
+            const { data: { applications: { rows, count } } } = await this.Admin.getApplications(this.state.applications.searchOptions);
+        
+            this.applications = rows;
+            this.state.applications.totalApplications = count;
+            
+            // Change active request flag to false
+            this.state.isActiveRequest = false;
+
+            tl
+            .to(table, {autoAlpha: 0})
+            .add(() => {
+                loader.clearLoader();
+                this.renderApplicationTable();
+                const applicationSummary = adminView.createApplicationSummary(this.applications[0]);
+                // summaryWrapper.insertAdjacentHTML('afterbegin', applicationSummary);
+                gsap.fromTo('.table', {autoAlpha: 0}, { autoAlpha: 1 });
+
             })
-            .catch(err => console.log(err));
+            .to(summary, {gfdgfdgf});
+            gfdgfdgf
+            tl.play();
+
+        } catch(err) {
+this.state.isActiveRequest = false;
+            if (axios.isCancel(err)) {
+                console.log('Request canceled', err.message);
+            } else {
+                // handle error
+                console.log(err);
+            }
+        }
+
+
+
+        // this.Admin.getApplications(this.state.applications.searchOptions)
+        //     .then(res => {
+        //         if(res.data.applications) {
+        //             // Store data
+        //             this.applications = res.data.applications.rows;
+        //             this.state.applications.totalApplications = res.data.applications.count;
+        //             this.renderApplicationTable();
+        //             adminView.populateApplicationSummary(this.applications[0]);
+
+        //         }
+        //     })
+        //     .catch(err => console.log(err));
     }
 
     movePageBackwards(state) {

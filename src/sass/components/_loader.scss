@@ -25,7 +25,11 @@
   }
 
 }
-
+.rotate {     
+  display: flex;
+  transform-origin: 44% 50%;
+  animation: rotate 1.5s infinite linear; 
+}
 .loader {
     position: relative;
     display: flex;
@@ -35,15 +39,14 @@
     width: 4rem;
     // margin: 2rem 0;
 
+    z-index: 1000;
+
     & svg {
       height: 4rem;
       width: 4rem;
     }
 
     fill: $color-secondary;
-    transform-origin: 44% 50%;
-
-    animation: rotate 1.5s infinite linear;
 
     &--jobs-menu {
       fill: $color-secondary-highlight;
@@ -61,8 +64,18 @@
       margin: 8rem 8rem 0 8rem;
     }
 
+    &--admin {
+      top: 50%;
+      left: 50%;
+      transform: translateY(-50%) translateX(-50%);
+    }
+
     &--absolute {
       position: absolute;
+
+      top: 50%;
+      left: 50%;
+      transform: translateY(-50%) translateX(-50%);
     }
 }
 

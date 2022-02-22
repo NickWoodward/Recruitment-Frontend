@@ -57,8 +57,10 @@
 
 .admin-wrapper {
     height: 100vh;
+    width: 100%;
 }
 .admin__main {
+    position: relative;
     display: flex;
     height: 100%;
     width: 100%;
@@ -69,10 +71,9 @@
     position: relative;
     display: flex;
     align-items: flex-start;
-    width: 90%;
+    width: 100%;
     height: 100%;
     padding: 5rem;
-    opacity: 0;
 
     &--companies, &--applications, &--jobs, &--users {
         display: grid;
@@ -81,17 +82,23 @@
 }
 
 .summary-wrapper {
+    position: relative;
     grid-column: 1/2;
+    grid-row: 1/2;
     display: flex;
     flex-direction: column;
     // justify-content: space-between;
     justify-content: flex-start;
-    height: 100%;
+    min-height: 60rem;
+    width: 50rem;
+
+    box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+
 }
 .summary {
     background-color: white;
     border: none;
-    box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+    // box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
 
     &__btn--disabled {
         pointer-events: none;
@@ -105,11 +112,13 @@
 .users-table__wrapper, 
 .jobs-table__wrapper,
 .applications-table__wrapper {
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 
     grid-column: 2/3;
+    grid-row: 1/3;
     width: 75rem;
     height: 100%;
     
@@ -125,7 +134,7 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    width: 50rem;
+    width: 100%;
     min-height: 24rem;
     margin-bottom: 2rem;
     

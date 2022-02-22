@@ -1,11 +1,17 @@
 import JRS from '../api/jrs';
+import axios from 'axios';
 
-export default class Admin {
-    
+
+export let cancelTokenSource;
+
+export default class Admin {    
     //////////  Applicant Methods  ///////////
     getUsers({index, limit, orderField, orderDirection}) {
     
-        return JRS.get('/admin/applicants', { params: { index, limit, orderField, orderDirection } });
+        return JRS.get('/admin/applicants', { 
+            params: { index, limit, orderField, orderDirection },     
+            cancelToken: new axios.CancelToken(c => cancelTokenSource = c)
+    });
 
     }
     getCv (applicantId) {
@@ -23,8 +29,11 @@ export default class Admin {
 
     /////////// Application Methods ////////////
     getApplications({index, limit, orderField, orderDirection}) {
-        console.log(index, limit);
-        return JRS.get('/admin/applications', { params: { index, limit, orderField, orderDirection} });
+        return JRS.get('/admin/applications', { 
+            params: { index, limit, orderField, orderDirection}, 
+            cancelToken: new axios.CancelToken(c => cancelTokenSource = c)
+
+        });
     }
 
     ///////////  Job Methods  ///////////
@@ -38,7 +47,8 @@ export default class Admin {
                 orderField,
                 orderDirection,
                
-            }
+            },
+            cancelToken: new axios.CancelToken(c => cancelTokenSource = c)
         });
     }
 
@@ -64,7 +74,9 @@ export default class Admin {
                 index,
                 orderDirection,
                 orderField
-            }
+            },
+            cancelToken: new axios.CancelToken(c => cancelTokenSource = c)
+
         });
     }
 
