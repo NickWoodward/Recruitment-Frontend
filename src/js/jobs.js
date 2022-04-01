@@ -301,7 +301,12 @@ export default class JobsController {
                             
                             const wrapper = `<div class="loader-wrapper loader-wrapper--apply"></div>`;
                             form.insertAdjacentHTML('beforeend', wrapper);
-                            loader.renderLoader(document.querySelector('.loader-wrapper'), 'apply', 'afterbegin', false);
+                            loader.renderLoader({
+                                parent: document.querySelector('.loader-wrapper'), 
+                                type: 'apply', 
+                                position: 'afterbegin', 
+                                inFlow: false
+                            });
                             let markup;
 
                             setTimeout(() => {
@@ -476,6 +481,7 @@ export default class JobsController {
     }
 
     getJobs() {
+
         // If it's not the first call and the index is >= to totalJobs it means there are no jobs left to display
         if(this.searchOptions.index != 0 && this.searchOptions.index >= this.totalJobsInDB) return;
         // Previous results still loading
@@ -483,10 +489,17 @@ export default class JobsController {
 
         const jobsGrid = document.querySelector('.jobs__grid');
         console.log('getting jobs');
-
         // If it's the first call to getJobs, display the loader out of flow of the document
-        if(this.searchOptions.index === 0) loader.renderLoader(jobsGrid, "jobs", "beforeend", false);
-        else loader.renderLoader(jobsGrid, "jobs", "afterend", true);
+        if(this.searchOptions.index === 0) {
+            loader.renderLoader({
+                parent: jobsGrid, 
+                type: "jobs", 
+                position: "beforeend", 
+                inFlow: false
+            });
+        } else {
+            loader.renderLoader(jobsGrid, "jobs", "afterend", true);
+        }
 
         this.loaderFlag = true;
 
@@ -497,7 +510,7 @@ export default class JobsController {
                     console.log('called');
                     this.totalJobsInDB = totalJobsInDB;
                     if(status === 200)  {
-                        loader.clearLoader();
+                        loader.clearLoaders();
                         this.loaderFlag = false;
                     }
                     if(jobs.length === 0 || status !== 200) return;
@@ -607,14 +620,14 @@ export default class JobsController {
     initialiseJobsMenu() {
         // Insert loader while data is retrieved
         elements.jobsMenuContents.forEach((item) => {
-            loader.renderLoader(item, 'jobs-menu');
+            loader.renderLoader({ parent: item, type: 'jobs-menu' });
         });
 
         this.JobList.getMenuData()
             .then(({ data: { response: items } = {} } = {}) => {
                 // Remove loaders
                 elements.jobsMenuContents.forEach((item) => {
-                    loader.clearLoader(item);
+                    loader.clearLoaders();
                 });
 
                 const min = 0;

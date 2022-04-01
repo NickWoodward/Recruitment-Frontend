@@ -9,6 +9,11 @@
         width: 100%;
         
     }
+    &--applications {
+        width: 100%;
+        font-size: 1.5rem;
+
+    }
 }
 
 .td-data {
@@ -35,12 +40,12 @@
     }
 
     // Applications
-    &--position {
-        max-width: 12rem;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-    }
+    // &--position {
+    //     max-width: 12rem;
+    //     overflow: hidden;
+    //     white-space: nowrap;
+    //     text-overflow: ellipsis;
+    // }
 }
 
 // caption {
@@ -52,7 +57,6 @@
 
 table, thead, tbody, th, td, tr {
     display: block;
-    font-size: 1.5rem;
 }
 
 thead tr {
@@ -119,7 +123,10 @@ td:nth-of-type(8)::before {
 @media (min-width: 600px) {
     thead tr {
         position: static;
-        color: $color-secondary;
+        color: white;
+        background-color: $color-primary-new;
+    }
+    thead {
     }
     thead, tbody {
         display: table-row-group;
@@ -131,14 +138,56 @@ td:nth-of-type(8)::before {
         text-transform:initial;
     }
     td {
-        padding: 2rem 2.5rem;
-
+        padding: 2rem 2rem;
+    }
+    .table--applications .td-data--applicationId {
+        padding: 2rem 1rem 2rem 2.5rem;
+    }
+    // Set max cell widths
+    .table--applications {
+        & .td-data--first-name {
+            max-width:15rem;
+            width:15rem;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        & .td-data--last-name {
+            max-width:15rem;
+            width:15rem;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        & .td-data--position {
+            max-width:15rem;
+            width: 15rem;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        & .td-data--company {
+            max-width:15rem;
+            width: 15rem;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
     }
     th {
         font-size: 1.5rem;
-        font-weight: 700;
-        padding: 0 2.5rem 2rem 2.5rem;
+        font-weight: 400;
+        // padding: 2rem 2.5rem 2rem 2.5rem;
+        padding: 2.1rem 2.4rem;
     }
+    .table--applications .th--id {
+        width: 8.5rem;
+    }
+ 
+    tbody {
+        overflow: hidden;
+    }
+
     tr {
         position: relative;
         display: table-row;

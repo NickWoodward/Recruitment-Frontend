@@ -14,7 +14,7 @@ export const createTable = (title, theads = [], rows, displayIndex = false, rowC
     const markup = `
         <table class="table table--${title}">
 
-            <thead class="thead--${title}">
+            <thead class="thead thead--${title}">
                 <tr>${theadArr.map((thead) => {
                     if(thead === 'id' && !displayIndex) return;
                     return `<th>${thead.toUpperCase()}</th>`;
@@ -51,11 +51,11 @@ export const createTable = (title, theads = [], rows, displayIndex = false, rowC
 export const createTableTest = (title, theads, rows, displayIndex = false) => {
     const markup = `
         <table class="table table--${title}">
-            <thead class="thead--${title}">
+            <thead class="thead thead--${title}">
                 <tr>
                     ${theads.map((thead) => {
                         if(thead === 'id' && !displayIndex) return;
-                        return `<th>${thead.toUpperCase()}</th>`;
+                        return `<th class="th--${thead.toLowerCase()}">${thead}</th>`;
                     }).join('')} 
                 </tr>
             </thead>
@@ -63,7 +63,7 @@ export const createTableTest = (title, theads, rows, displayIndex = false) => {
                 ${
                     rows.map(row => {
                         return `<tr class="row row--${title}">${row.map(col => {
-                            return `<td>${col}</td>`
+                            return `${col}`
                         }).join('')}</tr>`
                     }).join('')
 
@@ -73,3 +73,19 @@ export const createTableTest = (title, theads, rows, displayIndex = false) => {
     `
     return markup;
 };
+
+export const updateTableContent = (title, rows) => {
+    const markup = `
+        <tbody>
+            ${
+                rows.map(row => {
+                    return `<tr class="row row--${title}">${row.map(col => {
+                        return `${col}`
+                    }).join('')}</tr>`
+                }).join('')
+
+            }
+        </tbody>
+    `;
+    return markup;
+}

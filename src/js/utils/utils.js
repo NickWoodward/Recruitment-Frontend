@@ -32,7 +32,6 @@ export const clearForm = (elements, defaults) => {
 }
 
 export const removeElement = (element) => {
-    console.log(element);
     element.parentElement.removeChild(element);
 }
 

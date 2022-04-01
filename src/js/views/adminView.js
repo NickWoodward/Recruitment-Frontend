@@ -4,6 +4,7 @@ import * as userForm from './userForm';
 import * as jobForm from './jobForm';
 import { renderJobDetails } from './jobView';
 import * as tableView from './tableView';
+import * as loader from './loader';
 
 import gsap from 'gsap';
 
@@ -32,7 +33,7 @@ export const forceDownload = (res, filename, ext) => {
 // 
 export const formatApplications = (applications) => {
     // Headers should match the returned divs in createApplicationElement
-    const headers = ['', 'NAME','SURNAME','POSITION','COMPANY','CV']
+    const headers = ['ID', 'Name','Surname','Position','Company','CV', 'Applied']
     const rows = applications.map(application => {
         
         return createApplicationElement(formatProperties(application, ['cvUrl']));
@@ -41,6 +42,7 @@ export const formatApplications = (applications) => {
 }; 
 const createApplicationElement = ({
     id,
+    applicationDate,
     applicantId,
     applicant: {
         cvUrl,
@@ -64,19 +66,20 @@ const createApplicationElement = ({
     if(cvUrl) cvType = cvUrl.indexOf('doc') !== -1? 'doc':'pdf';
 
     const row = [
-        `<div class="td-data--applicationId" data-application=${id}>${id}</div>`,
-        `<div class="td-data--first-name" data-id=${personId}>${firstName}</div>`,
-        `<div class="td-data--last-name" data-id=${personId}>${lastName}</div>`,
-        `<div class="td-data--position" data-id=${jobId}>${title}</div>`,
-        `<div class="td-data--company data-id=${companyId}">${companyName}</div>`,
-        `<div class="cv-btn--table" data-cvUrl=${applicantId}><svg class="cv-icon">
+        `<td class="td-data--applicationId" data-application=${id}>${id}</td>`,
+        `<td class="td-data--first-name" data-id=${personId}>${firstName}</td>`,
+        `<td class="td-data--last-name" data-id=${personId}>${lastName}</td>`,
+        `<td class="td-data--position" data-id=${jobId}>${title}</td>`,
+        `<td class="td-data--company data-id=${companyId}">${companyName}</td>`,
+        `<td class="cv-btn--table" data-cvUrl=${applicantId}><svg class="cv-icon">
             ${cvUrl? 
                 (cvType === 'doc'? 
                     '<use xlink:href="svg/spritesheet.svg#doc">':
                     '<use xlink:href="svg/spritesheet.svg#pdf">'
                 ): '<use xlink:href="svg/spritesheet.svg#upload">'}
-        </svg></div>`,
-        `<div class="td-data--delete"></div>`
+        </svg></td>`,
+        `<td class="td-data--application-date data-id=${id}">${applicationDate}</td>`,
+
     ];
     return row;
 };
@@ -234,16 +237,39 @@ export const populateApplicationSummary = ({
 //     return markup;
 // };
 export const swapSummary = (oldSummary, newSummary) => {
-    const adminMain = oldSummary.parentElement;
-    const tl = gsap.timeline();
 
+    const summaryWrapper = document.querySelector('.summary-wrapper');
+
+    const tl = gsap.timeline();
     tl
-    .to('.summary-wrapper', { autoAlpha: 0 })
-    .add(() => {
-        adminMain.removeChild(oldSummary);
-        adminMain.insertAdjacentHTML('afterbegin', newSummary);
-    })
-    .to('.summary-wrapper', { autoAlpha: 1 });
+      .to(summaryWrapper, { 
+          y: 70,
+        // scale: '.95', 
+        autoAlpha: 0, 
+        ease: 'ease-in',
+        duration: '.4'
+      })
+      .add(() => {
+        oldSummary.parentElement.removeChild(oldSummary);
+        summaryWrapper.insertAdjacentHTML('afterbegin', newSummary);
+
+
+        // This is the new summary
+      }).fromTo(
+          summaryWrapper, 
+          { 
+              y: 70, 
+            //   scale: '.95', 
+              autoAlpha: 0 
+          }, 
+          { 
+              y: 0, 
+            //   scale: 1, 
+              autoAlpha: 1, 
+              immediateRender: false,
+              duration: '.4'
+          }
+        )
 }
 
 export const createApplicationSummary = ({ 
@@ -281,7 +307,6 @@ export const createApplicationSummary = ({
         } 
     } 
 }) => {
-    console.log(applicationDate);
     const markup  = `
             <div class="application-summary summary">
                 <div class="application-summary__details">
@@ -431,7 +456,6 @@ export const populateUserSummary = (user) => {
     document.querySelector('.user-summary__last-name').innerText = user.lastName;
     document.querySelector('.user-summary__phone').innerText = user.phone;
     document.querySelector('.user-summary__email').innerText = user.email;
-    console.log(user);
     addCvElement(user);
 }
 
@@ -913,7 +937,7 @@ export const togglePlaceholders = (elements, toggle, values) => {
 //     elements.adminContent.insertAdjacentHTML('beforeend', `<div class="jobs-table__wrapper"></div>`);
 // };
 
-const createJobSummary = () => {
+export const createJobSummary = () => {
     // const markup = `
     //     <div class="job-summary summary">
     //         <div class="job-summary__details">
@@ -1648,10 +1672,13 @@ const renderCompany = (company) => {
  
 
 export const renderPagination = (current, limit, totalItems, container, table) => {
+    const pagination = document.querySelector('.pagination--applications');
+    if(pagination) utils.removeElement(pagination);   
     // Work out how many pages
     const pages = Math.ceil(totalItems / limit);
     // Current is the first (zero indexed) item on the page. current/limit = zero index page number
     current = current/limit;
+
     const itemMarkup = generatePaginationMarkup(pages, current, table);
     
     const markup = `
@@ -1663,6 +1690,122 @@ export const renderPagination = (current, limit, totalItems, container, table) =
     `;
     container.insertAdjacentHTML('beforeend', markup);
 };
+export const updatePagination = (index) => {
+    // Get the pagination items
+    const items = document.querySelectorAll('.pagination__item');
+
+    items.forEach(item => {
+        if(item.classList.contains('pagination__item--active')) {
+            item.classList.remove('pagination__item--active');
+        }
+    })
+
+    items[index].classList.add('pagination__item--active');
+
+    if(index === 0) {
+        document.querySelector('.pagination__previous').classList.add('pagination__previous--inactive');
+    }  else {
+        document.querySelector('.pagination__previous').classList.remove('pagination__previous--inactive');
+    }
+    if(index === items.length -1) {
+        document.querySelector('.pagination__next').classList.add('pagination__next--inactive');
+    } else {
+        document.querySelector('.pagination__next').classList.remove('pagination__next--inactive');
+    }
+}
+
+export const animateAdminContentIn = () => {
+    const tl = gsap.timeline()
+
+    return tl
+        .fromTo('.table', {autoAlpha: 0},{autoAlpha: 1, duration: '.5'})
+        // .from('.thead', { autoAlpha: 0, y: -20, duration: 1 }, '<')
+        .from('.row', {
+            y: -30, 
+            autoAlpha: 0,
+            stagger: {
+                each: .18
+            },
+            ease: 'power2.out',
+        
+        }, '<')
+}
+export const animateTableBodyIn = () => {
+    const tl = gsap.timeline()
+
+    return tl
+        .fromTo('tbody', {autoAlpha: 0},{autoAlpha: 1, duration: '.5'})
+        .from('.row', {
+            y: -30, 
+            autoAlpha: 0,
+            stagger: {
+                each: .18
+            },
+            delay: 2,
+            ease: 'power2.out',
+        
+        }, '<')
+}
+
+export const animateSummaryIn = () => {
+    return gsap.fromTo('.summary', { autoAlpha:0, x: -50 }, {autoAlpha: 1, x: 0 });
+}
+// export const animateSummaryOut = () => {
+//     return gsap.to('.summary',  { autoAlpha: 0 });
+// }
+
+export const animateAdminLoadersOut = () => {
+    return gsap.fromTo(
+        '.loader', 
+        { autoAlpha: 1 }, 
+        { 
+            autoAlpha: 0, 
+            duration: .4,
+            immediateRender: false,
+            onComplete: () => {
+                loader.clearLoaders()
+            }
+        }
+    );
+
+}
+
+
+
+export const animateAdminLoadersIn = () => {
+    return gsap.fromTo('.loader', {autoAlpha:0}, {autoAlpha:1, duration: '.2'});
+}
+
+export const animateTableContentOut = () => {
+    const tableContent = document.querySelector('tbody');
+    const summary = document.querySelector('.summary');
+    
+    const tl = gsap.timeline();
+
+    return (
+      tl.fromTo(tableContent, { autoAlpha: 1 }, {autoAlpha: 0, duration: .2})
+        .fromTo(summary, { autoAlpha: 1 }, {autoAlpha: 0, duration: .2}, '<')
+    );
+}
+export const renderAdminLoaders = () => {
+    const tableWrapper = document.querySelector('.table-wrapper');
+    const summaryWrapper = document.querySelector('.summary-wrapper');
+
+    // Add a loader to the table wrapper
+    // loader.renderLoader({
+    //     parent: tableWrapper,
+    //     type: 'admin-table',
+    //     position: 'afterbegin',
+    //     inFlow: false
+    // });
+    // Add a loader to the summary wrapper
+    loader.renderLoader({
+        parent: summaryWrapper,
+        type: 'admin-summary',
+        position: 'afterbegin',
+        inFlow: false
+    });
+}
 
 const generatePaginationMarkup = (pages, current, table) => {
     let markup = '';
@@ -1684,6 +1827,48 @@ export const clearAdminPage = (page) => {
         adminMain.removeChild(adminMain.firstChild);
     }
 }
+export const initAdminSection = (tl, sectionName) => {
+    
+    const adminMain = document.querySelector('.admin__main');
+    let adminTemplate;
+    let loaderContainers;
+
+    // Fade out the adminMain
+    tl
+      .to(adminMain, { autoAlpha: 0 })
+      .add(() => clearAdminPage());     
+      
+    // Create the admin template based on the page selected
+    adminTemplate = createAdminTemplate(sectionName);
+
+    // List the elements that will contain a loader, and the css selector
+    switch(sectionName) {
+        case 'applications':
+        case 'jobs':
+            loaderContainers = [['.table-wrapper', 'admin-table'], ['.summary-wrapper', 'summary-table']];
+            break;
+        case 'companies':
+            loaderContainers = [['.table-wrapper', 'admin-table']]
+    }
+
+    tl
+    .add(() => {
+        // Add the template to the main page
+        adminMain.appendChild(adminTemplate)
+        
+        // Add loaders where needed
+        loaderContainers.forEach(selector => {
+            loader.renderLoader({
+                parent: document.querySelector(selector[0]),
+                type: selector[1],
+                inFlow: false
+            });
+        });
+    })
+    .to(adminMain, {autoAlpha:1})
+
+} 
+
 // export const createContentTemplate = (page) => {
 //     const adminContent = document.createElement('div');
 //     adminContent.setAttribute('class', `admin__content admin__content--${page}`);
@@ -1694,10 +1879,12 @@ export const createAdminTemplate = (page) => {
     const adminContent = document.createElement('div');
     adminContent.setAttribute('class', `admin__content admin__content--${page}`);
 
-    // Create conditional here for different page types
-    if(page === 'applications') {
+    // Create conditional here for different page types/structure 
+    if(page === 'applications' || page === 'jobs') {
         addTableWrapper(adminContent);
         addSummaryWrapper(adminContent);
+    } else if(page === 'companies') {
+        addTableWrapper(adminContent);
     }
 
     return adminContent;
@@ -1711,10 +1898,11 @@ const addSummaryWrapper = (adminContent) => {
 }
 const addTableWrapper = (adminContent, classList) => {
     const markup = document.createElement('div');
-    markup.setAttribute('class', 'applications-table__wrapper');
+    markup.setAttribute('class', 'table-wrapper');
 
     adminContent.appendChild(markup);
 }
+
 
 
 export const initialiseAdminPage = (page) => {
