@@ -127,8 +127,9 @@ export const populateApplicationSummary = ({
     } 
 }) => {
     const applicationSummary = document.querySelector('.application-summary');
+    console.log('valled?');
     // applicationSummary.setAttribute('data-id', application.applicantId);
-    document.querySelector('.application-summary__id').innerText = `Ref${id}`;
+    document.querySelector('.application-summary__id').innerText = `ID: ${id}`;
     document.querySelector('.application-summary__field--date').innerText = applicationDate;
 
     document.querySelector('.application-summary__field--title').innerText = title;
@@ -272,47 +273,40 @@ export const swapSummary = (oldSummary, newSummary) => {
         )
 }
 
-export const createApplicationSummary = ({ 
-    id, 
-    applicationDate, 
-    jobId, 
-    job: { 
-        title, 
-        position, 
-        jobType, 
-        pqe, 
-        location, 
+export const createApplicationSummary = ({
+    id: applicationId,
+    applicationDate,
+    applicant: {
+        person: {
+            id: personId,
+            firstName: personFirstName,
+            lastName: personLastName,
+            email: personEmail,
+            phone: personPhone
+        }
+    },
+    job: {
+        title: jobTitle,
         company: { 
-            id: 
-            companyId, 
-            name,
-            people: [ 
-                {
-                    contact: { position: contactPosition },
-                    firstName: contactFirstName,
+            name: companyName,
+            contacts: [{
+                person: { 
+                    firstName: contactFirstName,  
                     lastName: contactLastName,
+                    position: contactPosition,
                     phone: contactPhone,
                     email: contactEmail
-                } 
-            ]
-        } 
-    }, 
-    applicant: { 
-        person: { 
-            firstName, 
-            lastName, 
-            id: personId, 
-            email, 
-            phone 
-        } 
-    } 
+                }
+            }]
+        }
+    }
 }) => {
     const markup  = `
             <div class="application-summary summary">
                 <div class="application-summary__details">
 
                     <div class="application-summary__section application-summary__section--application">
-                        <div class="application-summary__id">${id}</div>
+                        <div class="application-summary__id">${applicationId}</div>
 
                         <div class="application-summary__item">
                             <div class="application-summary__field application-summary__field--date" data-placeholder="Date" contenteditable=false>${applicationDate}</div>
@@ -324,11 +318,11 @@ export const createApplicationSummary = ({
                     <div class="application-summary__section application-summary__section--job">
                         <div class="application-summary__item">
                             <div class="application-summary__label application-summary__label--title">Title:</div>
-                            <div class="application-summary__field application-summary__field--title" data-placeholder="Job Title" contenteditable=false>${title}</div>
+                            <div class="application-summary__field application-summary__field--title" data-placeholder="Job Title" contenteditable=false>${jobTitle}</div>
                         </div>
                         <div class="application-summary__item">
                             <div class="application-summary__label application-summary__label--company">Company:</div>
-                            <div class="application-summary__field application-summary__field--company" data-placeholder="Company" contenteditable=false>${name}</div>
+                            <div class="application-summary__field application-summary__field--company" data-placeholder="Company" contenteditable=false>${companyName}</div>
                         </div>
                         <div class="application-summary__item">
                             <div class="application-summary__label application-summary__label--contact-name">Contact:</div>
@@ -354,16 +348,16 @@ export const createApplicationSummary = ({
 
                         <div class="application-summary__item">
                             <div class="application-summary__label application-summary__label--applicant-name">Applicant Name:</div>
-                            <div class="application-summary__field application-summary__field--applicant-firstname" data-placeholder="Applicant Name" contenteditable=false>${firstName}</div>
-                            <div class="application-summary__field application-summary__field--applicant-surname" data-placeholder="Applicant Surname" contenteditable=false>${lastName}</div>
+                            <div class="application-summary__field application-summary__field--applicant-firstname" data-placeholder="Applicant Name" contenteditable=false>${personFirstName}</div>
+                            <div class="application-summary__field application-summary__field--applicant-surname" data-placeholder="Applicant Surname" contenteditable=false>${personLastName}</div>
                         </div>
                         <div class="application-summary__item">
                             <div class="application-summary__label application-summary__label--email">Email:</div>
-                            <div class="application-summary__field application-summary__field--email" data-placeholder="Email" contenteditable=false>${email}</div>
+                            <div class="application-summary__field application-summary__field--email" data-placeholder="Email" contenteditable=false>${personEmail}</div>
                         </div>
                         <div class="application-summary__item">
                             <div class="application-summary__label application-summary__label--phone">Phone:</div>
-                            <div class="application-summary__field application-summary__field--phone" data-placeholder="Phone" contenteditable=false>${phone}</div>
+                            <div class="application-summary__field application-summary__field--phone" data-placeholder="Phone" contenteditable=false>${personPhone}</div>
                         </div>
                     </div>
                     

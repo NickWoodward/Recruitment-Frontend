@@ -155,9 +155,9 @@ class AdminController {
             //     })
             //     .catch(err => console.log(err));
 
-            this.Admin.getCompanies().then(res => {
-                this.companies = res.data.companies;
-            }).catch(err => console.log(err));
+            // this.Admin.getCompanies().then(res => {
+            //     this.companies = res.data.companies;
+            // }).catch(err => console.log(err));
         });
 
         // Handle editable elements when a user clicks elsewhere
