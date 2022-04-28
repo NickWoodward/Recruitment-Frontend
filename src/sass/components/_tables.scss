@@ -11,7 +11,7 @@
     }
     &--applications {
         width: 100%;
-        font-size: 1.5rem;
+        // font-size: 1.5rem;
 
     }
 }
@@ -138,11 +138,11 @@ td:nth-of-type(8)::before {
         text-transform:initial;
     }
     td {
-        padding: 2rem 2rem;
+        padding: 0 2rem;
     }
-    .table--applications .td-data--applicationId {
-        padding: 2rem 1rem 2rem 2.5rem;
-    }
+    // .table--applications .td-data--applicationId {
+    //     padding: 2rem 1rem 2rem 2.5rem;
+    // }
     // Set max cell widths
     .table--applications {
         & .td-data--first-name {

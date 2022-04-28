@@ -5,6 +5,8 @@ import * as jobForm from './jobForm';
 import { renderJobDetails } from './jobView';
 import * as tableView from './tableView';
 import * as loader from './loader';
+import Select from './customSelect';
+
 
 import gsap from 'gsap';
 
@@ -237,9 +239,12 @@ export const populateApplicationSummary = ({
 
 //     return markup;
 // };
-export const swapSummary = (oldSummary, newSummary) => {
+export const swapSummary = (oldSummary, newSummary, cb) => {
 
     const summaryWrapper = document.querySelector('.summary-wrapper');
+
+    const modal = document.querySelector('.application-summary__modal');
+    const confirmation = document.querySelector('.confirmation');
 
     const tl = gsap.timeline();
     tl
@@ -253,7 +258,17 @@ export const swapSummary = (oldSummary, newSummary) => {
       .add(() => {
         oldSummary.parentElement.removeChild(oldSummary);
         summaryWrapper.insertAdjacentHTML('afterbegin', newSummary);
+        document.querySelector('.application-summary').addEventListener('click', cb)
 
+
+        if(modal) {
+            modal.parentElement.removeChild(modal)
+            
+        };
+        if(confirmation) {
+            confirmation.parentElement.removeChild(confirmation)
+            
+        };
 
         // This is the new summary
       }).fromTo(
@@ -272,6 +287,22 @@ export const swapSummary = (oldSummary, newSummary) => {
           }
         )
 }
+
+// export const getApplicationSummaryListener = (data) => {
+//     console.log(data);
+//     return ((e) => {
+//         const newBtn = e.target.closest('.application-summary__btn--new');
+//         const deleteBtn = e.target.closest('.application-summary__btn--delete');
+
+//         if(newBtn) {
+//             console.log(data);
+//             renderNewApplicationModal(data);
+//         }
+//         if(deleteBtn) {
+//             console.log(data);
+//         }
+//     })
+// }
 
 export const createApplicationSummary = ({
     id: applicationId,
@@ -293,10 +324,11 @@ export const createApplicationSummary = ({
                 person: { 
                     firstName: contactFirstName,  
                     lastName: contactLastName,
-                    position: contactPosition,
                     phone: contactPhone,
                     email: contactEmail
-                }
+                },
+                person,
+                position: contactPosition,
             }]
         }
     }
@@ -316,35 +348,35 @@ export const createApplicationSummary = ({
                     <div class="application-summary__header">Position</div>
 
                     <div class="application-summary__section application-summary__section--job">
-                        <div class="application-summary__item">
+                        <div class="application-summary__item application-summary__item--job">
                             <div class="application-summary__label application-summary__label--title">Title:</div>
                             <div class="application-summary__field application-summary__field--title" data-placeholder="Job Title" contenteditable=false>${jobTitle}</div>
                         </div>
-                        <div class="application-summary__item">
+                        <div class="application-summary__item application-summary__item--job">
                             <div class="application-summary__label application-summary__label--company">Company:</div>
                             <div class="application-summary__field application-summary__field--company" data-placeholder="Company" contenteditable=false>${companyName}</div>
                         </div>
-                        <div class="application-summary__item">
+                        <div class="application-summary__item application-summary__item--job">
                             <div class="application-summary__label application-summary__label--contact-name">Contact:</div>
                             <div class="application-summary__field application-summary__field--contact-firstname" data-placeholder="Contact Name" contenteditable=false>${contactFirstName}</div>
                             <div class="application-summary__field application-summary__field--contact-surname" data-placeholder="Contact Surname" contenteditable=false>${contactLastName}</div>
                         </div>
-                        <div class="application-summary__item">
+                        <div class="application-summary__item application-summary__item--job">
                             <div class="application-summary__label application-summary__label--contact-position">Contact Position:</div>
                             <div class="application-summary__field application-summary__field--contact-position" data-placeholder="Contact Position" contenteditable=false>${contactPosition}</div>
                         </div>
-                        <div class="application-summary__item">
+                        <div class="application-summary__item application-summary__item--job">
                             <div class="application-summary__label application-summary__label--contact-phone">Contact Phone:</div>
                             <div class="application-summary__field application-summary__field--contact-phone" data-placeholder="Contact Phone" contenteditable=false>${contactPhone}</div>
                         </div>
-                        <div class="application-summary__item">
+                        <div class="application-summary__item application-summary__item--job">
                             <div class="application-summary__label application-summary__label--contact-email">Contact Email:</div>
                             <div class="application-summary__field application-summary__field--contact-email" data-placeholder="Contact Email" contenteditable=false>${contactEmail}</div>
                         </div>
                     </div>
 
+                    <div class="application-summary__header">Applicant</div>
                     <div class="application-summary__section application-summary__section--person">
-                        <div class="application-summary__header">Applicant</div>
 
                         <div class="application-summary__item">
                             <div class="application-summary__label application-summary__label--applicant-name">Applicant Name:</div>
@@ -370,23 +402,177 @@ export const createApplicationSummary = ({
                         </svg>
                     </div>
                   
-                    <div class="application-summary__btn application-summary__btn--edit">
-                        <svg class="application-summary__edit-icon application-summary__icon">
-                            <use xlink:href="svg/spritesheet.svg#edit-np1">
-                        </svg>
-                    </div>
                     <div class="application-summary__btn application-summary__btn--delete">
                         <svg class="application-summary__delete-icon application-summary__icon">
                             <use xlink:href="svg/spritesheet.svg#delete-np1">
                         </svg>
                     </div>
                 </div>
+
             </div>
     `;
 
     return markup;
 };
 
+export const renderNewApplicationModal = (data) => {
+    const summary = document.querySelector('.summary-wrapper');
+    const modal = createNewApplicationModal(data);
+
+    summary.insertAdjacentHTML('afterbegin', modal);
+
+    gsap.fromTo('.application-summary__modal', 
+        { autoAlpha: 0 }, 
+        { autoAlpha: 1, duration: .2 }
+    );
+
+    populateApplicationModal(data);
+
+    // Has to be after the application modal is created
+
+    // const submitNewBtn = document.querySelector('.new-application__submit');
+    // submitNewBtn.addEventListener('click',  async (e) => {
+    //     e.preventDefault();
+    //     // Get the job id from the select
+    //     const jobId = document.querySelector('.new-application__input--job').value;
+    //     const personId = document.querySelector('.new-application__input--applicant').value;
+
+    //     if(!jobId || !personId) {
+    //         console.log(`job: ${jobId}, person: ${personId}`);
+    //         const msg = !jobId? 'No Job Selected':'No Applicant Selected';
+    //         alertModal.displayAlert(
+    //             msg,
+    //             false,
+    //             document.querySelector('.application-summary__modal')
+    //         );
+    //         return
+    //     };
+
+    //     try {
+    //         const res = await data.api.createApplication(jobId, personId);
+    //         if(res.status === 200) {
+    //             console.log('success');
+    //             alertModal.displayAlert(
+    //                 'New Application Created',
+    //                 true,
+    //                 document.querySelector('.application-summary__modal')
+    //             ); 
+    //         }
+    //     } catch (err) {
+    //         if(err.response.data.message === 'Application already made') {
+    //             alertModal.displayAlert(
+    //                 err.response.data.message,
+    //                 false,
+    //                 document.querySelector('.application-summary__modal')
+    //             );
+    //         }
+    //     }
+    // });
+};
+
+const createNewApplicationModal = ({jobs, users, appNumber}) => {
+
+    const today = new Date();
+    const date = `${today.getDate()}/${today.getMonth()+1}/${+today.getFullYear()}`;
+    const modal = `
+        <div class="application-summary__modal application-summary__modal--new">
+
+            <div class="application-summary__modal-header">
+                <div>${appNumber}</div>
+                <div>${date}</div>
+            </div>
+            <div class="new-application__close">
+                <svg class="new-application__close-svg"><use xlink:href="svg/spritesheet.svg#cross"></svg>
+            </div>
+            <div class="new-application__form-wrapper">
+
+                <form class="new-application">
+                    <div class="new-application__field">
+                        <div class="new-application__label">Job:</div>
+                        <select name="job" id="job" class="new-application__input new-application__input--job">
+                            <!-- options added in js -->
+                        </select>
+                    </div>
+                    
+                    <div class="new-application__field">
+                        <div class="new-application__label">Applicant:</div>
+                        <select name="applicant" id="applicant" class="new-application__input new-application__input--applicant">
+                            <!-- options added in js -->
+                        </select>
+                    </div>
+
+                    <button class="new-application__submit">Submit</button>
+
+                </form>
+            </div>
+            <div class="alert-wrapper">
+                
+            </div>
+        </div>
+    `;
+
+    return modal;
+};
+
+export const animateApplicationAnimation = (success, msg) => {
+    const markup = `
+        <div class="alert alert--success">
+            <div class="alert__icon alert__icon--${success?'success':'error'}">
+                <svg class="alert__svg alert__svg--${success?'success':'error'}"><use xlink:href="svg/spritesheet.svg#${success?'tick':'cross'}"></svg>
+            </div>
+            <div class="alert__status">${ success? 'Success':'Error' }</div>
+            <div class="alert__message">${msg}</div>
+        </div>
+    `;
+
+    const alertWrapper = document.querySelector('.alert-wrapper');
+
+    applicationAlertTimeline.from(alertWrapper, {
+        autoAlpha: 0
+    }).to(alertWrapper, {
+        autoAlpha: 0
+    }, '+=3')
+
+}
+
+const populateApplicationModal = ({ jobs, users }) => {
+    const jobsInput = document.querySelector('.new-application__input--job');
+    const userInput = document.querySelector('.new-application__input--applicant');
+
+    // Order the jobs by the company name
+    jobs.sort((a, b) => a.companyName > b.companyName? 1:-1);
+
+    const jobPlaceholder = new Option('Jobs');
+    jobPlaceholder.setAttribute('disabled', 'disabled');
+    jobPlaceholder.setAttribute('hidden', 'hidden');
+    jobsInput.append(jobPlaceholder)
+
+    const userPlaceholder = new Option('Applicants');
+    userPlaceholder.setAttribute('disabled', 'disabled');
+    userPlaceholder.setAttribute('hidden', 'hidden');
+    userInput.append(userPlaceholder)
+
+    jobs.forEach(job => {
+        let group = jobsInput.querySelector(`optgroup[label="${job.companyName}"]`);
+        if(!group) {
+            group = document.createElement("optgroup");
+            group.label = job.companyName;
+        }
+        const option = new Option(`${job.title}`, job.id);
+        option.setAttribute('data-group', group.label.toLowerCase());
+        group.append(option);
+
+        jobsInput.appendChild(group);
+    });
+
+    users.forEach(applicant => {
+        const option = new Option(`${applicant.applicantId}: ${applicant.firstName} ${applicant.lastName}`, applicant.applicantId);
+        option.className = 'job-option';
+        userInput.add(option, undefined);
+    });
+
+    [jobsInput, userInput].forEach(input => new Select(input));
+}
 
 
 //////////  USER PAGE  //////////
@@ -841,60 +1027,165 @@ const getUserFormValues = () => {
     return { firstName, lastName, phone, email, cv };
 };
 
-
-
-// table name, function to get row height
 export const calculateRows = (tableName) => {
-    // Add a table wrapper to the DOM to find its styled height
-    const markup = `<div class="${tableName}-table__wrapper"></div>`;
-    const adminMain = document.querySelector('.admin__main');
-    adminMain.insertAdjacentHTML('afterbegin', markup);
+    // 1: Set a test table to be the full height of the container
+    const markup = `<div class="table-wrapper table-wrapper--${tableName}"></div>`;
+    const adminContent = document.querySelector('.admin__content');
+    adminContent.insertAdjacentHTML('afterbegin', markup);
+    const tableWrapperHeight = document.querySelector('.table-wrapper').offsetHeight;
 
-    const { headerHeight, rowHeight, paginationHeight } = getRowHeight(tableName);
-    const tableHeight = document.querySelector(`.${tableName}-table__wrapper`).offsetHeight;
-    const numOfRows = Math.floor((tableHeight - headerHeight - paginationHeight)/rowHeight);
-    // Remove test table wrapper
-    utils.removeElement(document.querySelector(`.${tableName}-table__wrapper`));
+    const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--table-header-height')) * 10;
+    const paginationHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pagination-height')) * 10;
+    const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * 10;
 
-    return numOfRows-1;
+    const numOfRows = Math.floor((tableWrapperHeight - parseFloat(headerHeight) - parseFloat(paginationHeight)) / parseFloat(rowHeight));
+
+    return numOfRows;
 }
-const getRowHeight = (tableName) => {
-    // Create dummy table to get row height
-    const table = `
-            <table class="table--test">
-                <thead class="thead thead--${tableName}"><tr><th>Test</th></tr></thead>
-                <tbody>
-                    <tr class="row row--${tableName}">
-                        <td>test</td>
-                        ${
-                            tableName === 'applications' ? 
-                            '<td><div class="cv-btn--table"><svg class="cv-icon"><use xlink:href="svg/spritesheet.svg#doc"></svg></div></td>' : 
-                            ''
-                        }
-                    </tr>
-                </tbody>
-            </table>
-            <div class="pagination pagination--${tableName}">
-                <div class="pagination__previous">Previous</div>
-                    <div class="pagination__item pagination__item--active">
-                        1
+
+// export const calculateRows = (tableName) => {
+//     // 1: Set a test table to be the full height of the container
+//     const markup = `<div class="table-wrapper table-wrapper--${tableName}"></div>`;
+//     const adminContent = document.querySelector('.admin__content');
+//     adminContent.insertAdjacentHTML('afterbegin', markup);
+//     const tableWrapper = document.querySelector('.table-wrapper');
+
+//     const testTable = `
+//         <table class="table--test">
+//             <thead class="thead thead--${tableName}"><tr><th>Test</th></tr></thead>
+//             <tbody>
+//                 <tr class="row row--${tableName}">
+//                     <td>test</td>
+//                    <!-- ${
+//                         tableName === 'applications' ? 
+//                         '<td><div class="cv-btn--table"><svg class="cv-icon"><use xlink:href="svg/spritesheet.svg#doc"></svg></div></td>' : 
+//                         ''
+//                     } -->
+//                 </tr>
+//             </tbody>
+//         </table>
+//         <div class="pagination pagination--${tableName}">
+//             <div class="pagination__previous">Previous</div>
+//                 <div class="pagination__item pagination__item--active">
+//                     1
+//                 </div>
+//             <div class="pagination__next">Next</div>
+//         </div>
+//     `;
+
+//     tableWrapper.insertAdjacentHTML('afterbegin', testTable);
+
+//     // 2: Get the table header height and pagination heights, take them away from the wrapper height
+//     const headerHeight = document.querySelector(`.thead--${tableName}`).offsetHeight;
+//     const paginationHeight = document.querySelector(`.pagination--${tableName}`).offsetHeight;
+//     const wrapperHeight = tableWrapper.offsetHeight;
+
+//     const availableHeight = wrapperHeight - headerHeight - paginationHeight;
+//     console.log(headerHeight, paginationHeight, wrapperHeight, availableHeight);
+
+//     // 3: Take availble height and divide by the row height
+//     const rowHeight = document.querySelector(`.row--${tableName}`).offsetHeight;
+//     const numOfRows = Math.floor(availableHeight / rowHeight);
+
+//     return numOfRows;
+// }
+
+// // table name, function to get row height
+// export const calculateRows = (tableName) => {
+//     // Add a table wrapper to the DOM to find its styled height
+//     const markup = `<div class="${tableName}-table__wrapper"></div>`;
+//     const adminMain = document.querySelector('.admin__main');
+//     adminMain.insertAdjacentHTML('afterbegin', markup);
+
+//     const { headerHeight, rowHeight, paginationHeight } = getRowHeight(tableName);
+//     const tableHeight = document.querySelector(`.${tableName}-table__wrapper`).offsetHeight;
+//     const numOfRows = Math.floor((tableHeight - headerHeight - paginationHeight)/rowHeight);
+//     // Remove test table wrapper
+//     utils.removeElement(document.querySelector(`.${tableName}-table__wrapper`));
+
+//     return numOfRows-1;
+// }
+// const getRowHeight = (tableName) => {
+//     // Create dummy table to get row height
+//     const table = `
+//             <table class="table--test">
+//                 <thead class="thead thead--${tableName}"><tr><th>Test</th></tr></thead>
+//                 <tbody>
+//                     <tr class="row row--${tableName}">
+//                         <td>test</td>
+//                         ${
+//                             tableName === 'applications' ? 
+//                             '<td><div class="cv-btn--table"><svg class="cv-icon"><use xlink:href="svg/spritesheet.svg#doc"></svg></div></td>' : 
+//                             ''
+//                         }
+//                     </tr>
+//                 </tbody>
+//             </table>
+//             <div class="pagination pagination--${tableName}">
+//                 <div class="pagination__previous">Previous</div>
+//                     <div class="pagination__item pagination__item--active">
+//                         1
+//                     </div>
+//                 <div class="pagination__next">Next</div>
+//             </div>
+//     `;
+
+//     // Add table to DOM
+//     document.querySelector(`.admin__content`).insertAdjacentHTML('afterbegin', table);
+//     const rowHeight = document.querySelector(`.row--${tableName}`).offsetHeight;
+//     const headerHeight = document.querySelector(`.thead--${tableName}`).offsetHeight;
+//     const paginationHeight = document.querySelector(`.pagination--${tableName}`).offsetHeight;
+
+//     console.log(`TestTable -- row: ${rowHeight}, header: ${headerHeight}, pagination: ${paginationHeight}`)
+
+//     // Remove table
+//     utils.removeElement(document.querySelector('.table--test'));
+//     utils.removeElement(document.querySelector(`.pagination--${tableName}`));
+//     return { headerHeight, rowHeight, paginationHeight };
+// }
+
+export const getDeleteApplicationHtml = (applicationId) => {
+    const applicationDate = document.querySelector('.application-summary__field--date').innerText;
+    const positionName = document.querySelector('.application-summary__field--title').innerText;
+    const positionCompany = document.querySelector('.application-summary__field--company').innerText;
+    const applicantName = `${document.querySelector('.application-summary__field--applicant-firstname').innerText} ${document.querySelector('.application-summary__field--applicant-surname').innerText}`;
+    
+    return (`
+            <div class='confirmation confirmation--delete'>
+                <div class="application-summary__modal-header">
+                    <div>${applicationId}</div>
+                    <div>${applicationDate}</div>
+                </div>
+                <div class='confirmation__header'>
+                    <div class='confirmation__svg-wrapper'>
+                        <svg class='confirmation__svg confirmation__svg--delete'><use xlink:href="svg/spritesheet.svg#alert-circled"></svg>
                     </div>
-                <div class="pagination__next">Next</div>
+                    <div class='confirmation__message'>Delete application ${applicationId}?</div>
+                </div>
+                <div class='confirmation__application'>
+                    <div class='confirmation__item'>
+                        <div class='confirmation__label'>Title:</div>
+                        <div class='confirmation__field'>${positionName}</div>
+                    </div>
+                    <div class='confirmation__item'>
+                        <div class='confirmation__label'>Company:</div>
+                        <div class='confirmation__field'>${positionCompany}</div>
+                    </div>
+                    <div class='confirmation__item'>
+                        <div class='confirmation__label'>Applicant:</div>
+                        <div class='confirmation__field'>${applicantName}</div>
+                    </div>
+                </div>
+                <div class='confirmation__controls'>
+                    <button class='confirmation__btn confirmation__btn--confirm'>Confirm</button>
+                    <button class='confirmation__btn confirmation__btn--cancel'>Cancel</button>
+                </div>
+                <div class="alert-wrapper">
+                
+                </div>
             </div>
-    `;
-
-    // Add table to DOM
-    document.querySelector(`.admin__content`).insertAdjacentHTML('afterbegin', table);
-    const rowHeight = document.querySelector(`.row--${tableName}`).offsetHeight;
-    const headerHeight = document.querySelector(`.thead--${tableName}`).offsetHeight;
-    const paginationHeight = document.querySelector(`.pagination--${tableName}`).offsetHeight;
-
-    // Remove table
-    utils.removeElement(document.querySelector('.table--test'));
-    utils.removeElement(document.querySelector(`.pagination--${tableName}`));
-    return { headerHeight, rowHeight, paginationHeight };
+    `);
 }
-
 
 // toggle = true, insert placeholder
 export const togglePlaceholders = (elements, toggle, values) => {

@@ -35,6 +35,12 @@ export default class Admin {
 
         });
     }
+    createApplication(jobId, applicantId) {
+        return JRS.post(`/admin/create/application/${jobId}/${applicantId}`);
+    }
+    deleteApplication(applicationId) {
+        return JRS.delete(`/admin/delete/application/${applicationId}`);
+    }
 
     ///////////  Job Methods  ///////////
     getJobs({limit, index, titles, locations, orderField, orderDirection} = {}) {

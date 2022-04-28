@@ -26,6 +26,9 @@
 
     --search-height: 25rem;
 
+    --table-header-height: 6rem;
+    --pagination-height: 6rem;
+    --row-height: 5rem;
 
     @include respond-desktop-medium()  {
         --job-card-height--details: 240px;
