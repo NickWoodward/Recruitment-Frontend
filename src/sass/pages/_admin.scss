@@ -141,6 +141,11 @@
     min-height: 18rem;
     margin-bottom: 1rem;
 
+    &__link {
+        color: firebrick;
+        text-decoration: underline;
+        cursor: pointer;
+    }
     
     &__details {
         width: 100%;
@@ -175,13 +180,32 @@
         
     }
 
+    &__cv-wrapper {
+        display: flex;
+        width: 4rem;
+        height: 4rem;
+        margin-top: 2rem;
+        cursor: pointer;
+    }
+    &__column {
+        display: flex;
+        width: 50%;
+        // height: 100%;
+
+        // &:not(&--cv) {
+        flex-direction: column;
+
+        // }
+    }
+
     &__section {
-        // margin-bottom: .5rem;
+        
 
         &--application {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            // align-items: center;
+
 
             height: 6rem;
             background-color: $color-primary-new;
@@ -192,8 +216,7 @@
         &--job, &--person {
             display: flex;
             flex-flow: column wrap;
-            justify-content: flex-start;
-            align-items: flex-start;
+            // justify-content: flex-end;
             // padding: 1.4rem 3rem;
             height: 18rem;
             // border: 1px solid red;
@@ -216,10 +239,18 @@
     &__item  {
         margin-bottom: 1rem;
         font-size: 1.6rem;
-
-        // border:1px solid blue;
         padding: 0 3rem;
 
+        &--cv {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: space-between;
+            width: 100%;
+            
+            // border: 1px solid lightgrey;
+        }
+        
         &--job {
             width: 50%;
         }

@@ -16,6 +16,9 @@ import '../assets/icons/save-np.svg';
 import '../assets/icons/delete-np1.svg';
 import '../assets/icons/edit-np1.svg';
 import '../assets/icons/add.svg';
+import '../assets/updated-icons/ios-minus-empty.svg';
+import '../assets/updated-icons/ios-minus-outline.svg';
+
 
 import axios from 'axios';
 import gsap from 'gsap';
@@ -92,7 +95,7 @@ class AdminController {
             applications: {
                 totalApplications: 0,
                 currentApplication: {},
-                currentPage: 0,
+                currentPage: 1,
                 searchOptions: {
                     index: 0,
                     limit: 6,
@@ -591,7 +594,7 @@ class AdminController {
             
     }
 
-    async displayAdminContent(sectionName) {
+    async displayAdminContent(sectionName, indexId) {
         const tl = gsap.timeline({defaults: {duration: .4}});
 
         adminView.initAdminSection(tl, sectionName);        
@@ -600,8 +603,10 @@ class AdminController {
         this.getNumOfRows(sectionName);
 
         try {
-            // Request and store data
-            await this.getData(sectionName);
+            // Index ID is only ever passed to getData from displayAdminContent
+            // This sets the first element in the table, and is used to navigate to specific records from other admin summaries
+            // EG: Clicking the application summary company href => company in the companies table
+            await this.getData(sectionName, indexId);
 
             tl.add(() => {
                 switch(sectionName) {
@@ -875,11 +880,11 @@ class AdminController {
         }
     }
 
-    async getData(sectionName) {
+    async getData(sectionName, indexId) {
+        console.log('getting');
         switch(sectionName) {
             case 'applications':
-                console.log(this.state.applications.searchOptions);
-                const { data: { applications: { rows: appRows, count: appCount } } } = await this.Admin.getApplications(this.state.applications.searchOptions);
+                const { data: { applications: { rows: appRows, count: appCount } } } = await this.Admin.getApplications(this.state.applications.searchOptions, indexId);
                 this.applications = appRows;
                 
                 this.state.applications.totalApplications = appCount;
@@ -892,16 +897,17 @@ class AdminController {
         }
     }
 
-    downloadCv(e) {
+    // downloadCv(e) {
+    //     const cvUrl = e.target.closest('.cv-wrapper').dataset.cvurl;
         
-        const cvUrl = e.target.closest('.cv-btn--table').dataset.cvurl;
-        if(cvUrl !== 'null')
-            this.Admin.getCv(cvUrl).then((res) => {
-                const contentDisposition = res.headers['content-disposition'];
-                let fileName = contentDisposition.split(';')[1].split('=')[1].toString();
-                adminView.forceDownload(res, fileName);
-            }).catch(err => console.log(err)); 
-    }
+    //     // const cvUrl = e.target.closest('.cv-btn--table').dataset.cvurl;
+    //     if(cvUrl !== 'null')
+    //         this.Admin.getCv(cvUrl).then((res) => {
+    //             const contentDisposition = res.headers['content-disposition'];
+    //             let fileName = contentDisposition.split(';')[1].split('=')[1].toString();
+    //             adminView.forceDownload(res, fileName);
+    //         }).catch(err => console.log(err)); 
+    // }
 
     checkModals(e) {
         const modal = e.target.closest('.modal');
@@ -1143,18 +1149,13 @@ class AdminController {
         const {headers, rows} = adminView.formatApplications(this.applications);
         const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
         
-        // const markup = `<div class="applications-table__wrapper"></div>`;
-        // document.querySelector('.admin__content').insertAdjacentHTML('afterbegin', markup);
         const tableWrapper = document.querySelector('.table-wrapper');
 
-        // removeApplicationsTable if it exists
         const table = document.querySelector('.table--applications');
 
-
-        // If no table visible, render both the header and content
+       // If no table visible, render both the header and content
         if(!table) { 
             tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('applications', headers, rows, false));
-
         // Else remove the tbody and render just the content
         } else {
             utils.removeElement(document.querySelector('tbody'));
@@ -1184,7 +1185,6 @@ class AdminController {
                 const application = this.applications.filter(application => {
                     return parseInt(rowId) === application.id;
                 });
-              
                 utils.changeActiveRow(targetRow, applicationRows);
                 this.state.applications.currentApplication = application[0];
                 const summary = document.querySelector('.summary');
@@ -1211,13 +1211,24 @@ class AdminController {
     }
 
     applicationSummaryListener (e) {
-        const applicationAlertAnimation = gsap.timeline({paused: true});
+        const newApplicationAlertAnimation = gsap.timeline({paused: true});
+        const deleteApplicationAlertAnimation = gsap.timeline({paused: true});
 
         const newBtn = e.target.closest('.application-summary__btn--new');
         const deleteBtn = e.target.closest('.application-summary__btn--delete');
+        const cvBtn = e.target.closest('.application-summary__cv-wrapper');
+
+        if(cvBtn) {
+            this.Admin.getCv(cvBtn.dataset.id)
+            .then(res => {
+                const contentDisposition = res.headers['content-disposition'];
+                let fileName = contentDisposition.split(';')[1].split('=')[1].toString();
+                adminView.forceDownload(res, fileName);
+             })
+             .catch(err => console.log(err));
+        }
 
         if(newBtn) {
-            console.log(this);
             adminView.renderNewApplicationModal({jobs: this.jobs, users: this.users, applications: this.applications, appNumber: this.getNextApplicationId() + 1});
         
             const applicationSummaryModal = document.querySelector('.application-summary__modal');
@@ -1227,7 +1238,7 @@ class AdminController {
             const alertWrapper = document.querySelector('.alert-wrapper');
 
             // Add the animation for the application alerts
-            applicationAlertAnimation
+            newApplicationAlertAnimation
                 .from(alertWrapper, {
                     autoAlpha: 0
                 })
@@ -1263,30 +1274,33 @@ class AdminController {
                 
                     alertWrapper.insertAdjacentHTML('afterbegin', alert);
 
-                    applicationAlertAnimation.play(0);
+                    newApplicationAlertAnimation.play(0);
                     return;
                 }
 
                 try {
                     const res = await this.Admin.createApplication(jobId, personId);
-                    if(res.status === 200) {
-                        console.log('success');
-                                       
+                    if(res.status === 200) {                                       
                         const alert = modalView.getAlert('Application Created', true);
                     
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
 
-                        applicationAlertAnimation.play(0);
+                        newApplicationAlertAnimation.play(0);
 
                         await this.getData('applications');
-                        this.updateApplicationTable();
+                        // this.updateApplicationTable();
+                        this.renderApplicationTable();
+                        // Update pagination
+                        const { totalApplications, searchOptions: {index: appIndex, limit: appLimit} } = this.state.applications;
+                        adminView.renderPagination(appIndex, appLimit, totalApplications, document.querySelector('.table-wrapper'), 'applications');
+                    
                     }
                 } catch (err) {
                     if(err.response.data.message === 'Application already made') {
                         const alert = modalView.getAlert(`Application Exists, ID: ${err.response.data.data.applicationId}`, false);
                     
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                        applicationAlertAnimation.play(0);
+                        newApplicationAlertAnimation.play(0);
                     }
                 }
 
@@ -1347,7 +1361,7 @@ class AdminController {
             const alertWrapper = document.querySelector('.alert-wrapper');
 
             // Add the animation for the application alerts
-            applicationAlertAnimation
+            deleteApplicationAlertAnimation
                 .from(alertWrapper, {
                     autoAlpha: 0
                 })
@@ -1375,23 +1389,56 @@ class AdminController {
                     const res = await this.Admin.deleteApplication(applicationId);
 
                     if(res.status === 200) {
+                        const tl = gsap.timeline();
                         const alert = modalView.getAlert(`Application ${applicationId} deleted`, true);
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                        applicationAlertAnimation.play(0);
+                        if(this.applications.length === 1) {
+                            // Simulates handling an application pagination event
+                            // this.simulateMouseEVent('click', document.querySelector('.pagination__previous'));
 
-                        // Update table
-                        await this.getData('applications');
-                        this.updateApplicationTable();
+                            // Set the pagination state (second param simulates pressing the previous button)
+                            this.setApplicationPagination(null, true, null);
+                            // // Set the pagination view
+                            adminView.updatePaginationView(this.state.applications.currentPage -1);
+
+                            // Get the data
+                            await this.getData('applications');
+
+                            // tl
+                            // .add(adminView.animateTableContentOut())
+                            // .add(adminView.animateAdminLoadersIn(), '<')
+
+                            this.changeTablePageAnimation(tl);
+
+                            // Update pagination
+                            const { totalApplications, searchOptions: {index: appIndex, limit: appLimit} } = this.state.applications;
+                            adminView.renderPagination(appIndex, appLimit, totalApplications, document.querySelector('.table-wrapper'), 'applications');
+                            // Remove the pagination element
+                            adminView.removeLastPaginationItem();
+                        } else {
+                            // Update table
+                            await this.getData('applications');
+                            // this.updateApplicationTable();
+                            this.renderApplicationTable();                            
+
+                            // Update pagination
+                            const { totalApplications, searchOptions: {index: appIndex, limit: appLimit} } = this.state.applications;
+                            adminView.renderPagination(appIndex, appLimit, totalApplications, document.querySelector('.table-wrapper'), 'applications');
+                        
+                            // After the page has potentially changed because of onComplete function
+                            deleteApplicationAlertAnimation.play(0);
+                        }
 
                         // Confirmation modal removed and summary swapped in the animation `onComplete()` above
                     }
+
                 
                 } catch (err) {
                     const alert = modalView.getAlert(`Error, please contact the administrator`, false);
                 
                     alertWrapper.insertAdjacentHTML('afterbegin', alert);
-
-                    applicationAlertAnimation.play(0);
+                    deleteApplicationAlertAnimation.play(0);
+                    console.log(err)
                 }
             });
 
@@ -1414,22 +1461,23 @@ class AdminController {
     }
 
     renderJobsTable() {
-        const { totalJobs, searchOptions: { index, limit } } = this.state.jobs;
-        
+
         // Format jobs/header into html elements
         const {headers, rows} = adminView.formatJobs(this.jobs);
+        const { totalJobs, searchOptions: { index, limit } } = this.state.jobs;
         
         const tableWrapper = document.querySelector('.table-wrapper');
 
-        // Remove table and pagination if they exist already
         const table = document.querySelector('.table--jobs');
-        // const pagination = document.querySelector('.pagination--jobs');
-        if(table) utils.removeElement(table);
-        // if(pagination) utils.removeElement(pagination);
-
-        tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableContent('jobs', headers, rows, false));
-
-        // adminView.renderPagination(index, limit, totalJobs, tableWrapper, 'jobs');
+       
+        // If no table visible, render both the header and content
+        if(!table) {
+            tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('jobs', headers, rows, false));  
+        } else {
+            // Else remove the tbody and render just the content
+            utils.removeElement(document.querySelector('tbody'));
+            document.querySelector('thead').insertAdjacentHTML('afterend', tableView.updateTableContent('jobs', rows));
+        }
 
         const jobRows = document.querySelectorAll('.row--jobs');
 
@@ -1452,6 +1500,50 @@ class AdminController {
                 utils.changeActiveRow(row, jobRows);
             });
         });
+
+
+
+
+
+
+
+        // // Format jobs/header into html elements
+        // const {headers, rows} = adminView.formatJobs(this.jobs);
+        // const { totalJobs, searchOptions: { index, limit } } = this.state.jobs;
+        
+        // const tableWrapper = document.querySelector('.table-wrapper');
+
+        // // Remove table and pagination if they exist already
+        // const table = document.querySelector('.table--jobs');
+        // // const pagination = document.querySelector('.pagination--jobs');
+        // if(table) utils.removeElement(table);
+        // // if(pagination) utils.removeElement(pagination);
+
+        // tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableContent('jobs', headers, rows, false));
+
+        // // adminView.renderPagination(index, limit, totalJobs, tableWrapper, 'jobs');
+
+        // const jobRows = document.querySelectorAll('.row--jobs');
+
+        // const activeRow = Array.from(jobRows).find(row => {
+        //     return row.querySelector(`[data-id="${this.state.jobs.currentJob.id}"]`)
+        // }) || jobRows[0];
+
+        // utils.changeActiveRow(activeRow, jobRows);
+
+        // // Add table row listeners
+        // jobRows.forEach(row => {
+        //     row.addEventListener('click', e => {
+        //         const rowId = row.querySelector('.td-data--company').dataset.id;
+        //         const job = this.jobs.filter((job, index) => {
+        //             if(parseInt(rowId) === job.id) this.state.jobsTable.index = index;
+        //             return parseInt(rowId) === job.id;
+        //         })[0];
+
+        //         adminView.populateJobSummary(job);
+        //         utils.changeActiveRow(row, jobRows);
+        //     });
+        // });
     }
 
     addJobSummaryListeners() {
@@ -2350,18 +2442,18 @@ class AdminController {
         // If no pagination btns are clicked, return
         if(!application) return;
 
-        // if there's an animation still running, ignore input
-        if(this.state.isActivePaginationAnimation) {
-            console.log('ignoring');
-            return;
-        }
-        // if there's an active request already, cancel the request and return
-        if(this.state.isActiveRequest){
-            cancelTokenSource();
-            this.state.isActiveRequest = false;
-            console.log('cancelled');
-            return;
-        }
+        // // if there's an animation still running, ignore input
+        // if(this.state.isActivePaginationAnimation) {
+        //     console.log('ignoring');
+        //     return;
+        // }
+        // // if there's an active request already, cancel the request and return
+        // if(this.state.isActiveRequest){
+        //     cancelTokenSource();
+        //     this.state.isActiveRequest = false;
+        //     console.log('cancelled');
+        //     return;
+        // }
 
         // set both animation and request state
         this.state.isActivePaginationAnimation = true;
@@ -2373,15 +2465,9 @@ class AdminController {
         // set up animation timeline (before data updated)
         tl
           .add(adminView.animateTableContentOut())
-        //   .add(adminView.animateSummaryOut(), '>')
+        //   .add(adminView.animateSummaryOut(), '<')
           .add(adminView.animateAdminLoadersIn(), '<')
 
-        // // Request to make
-        // let requestData;
-        // Fn to execute
-        // let setPagination;
-        let populateSummary;
-        let renderTable;
 
         // Choose which table's pagination is being updated, and with which functions
         if(userBtn || userPrevious || userNext) {
@@ -2390,43 +2476,14 @@ class AdminController {
             this.handleJobPagination(jobBtn, jobPrevious, jobNext);
         } else if(companyBtn || companyPrevious || companyNext) {
             this.handleCompanyPagination(companyBtn, companyPrevious, companyNext);
-        } else if(application) {
-            // requestData = this.requestApplicationsData.bind(this);
-            // setPagination = this.setApplicationPagination.bind(this, applicationBtn, applicationPrevious, applicationNext);
-            // populateSummary = adminView.populateApplicationSummary.bind(this, this.applications[0]);
-            // renderTable = adminView.animateTableBodyIn;
+        } else if(applicationBtn || applicationPrevious || applicationNext) {
+            this.handleApplicationPagination(applicationBtn, applicationPrevious, applicationNext, tl);
 
-            // Set Pagination state and get Data
-            this.setApplicationPagination.bind(this, applicationBtn, applicationPrevious, applicationNext);
-            await this.getData('applications');
-            this.state.isActiveRequest = false;
-
-            // Set the populateSummary Function to call later in the animation
-            const previousSummary = document.querySelector('.summary');
-            populateSummary = adminView.swapSummary.bind(previousSummary, adminView.createApplicationSummary(this.applications[0]), this.applicationSummaryListener.bind(this)); 
-
-            // Set the 
-            
         } else {
             return;
         }
 
-        this.updateApplicationTable();
-
-        tl
-          // Animate the loaders out
-          .add(adminView.animateAdminLoadersOut())
-          .add(() => {
-            // Populate Summary while not visible
-            populateSummary();
-
-            // Animate summary in
-            gsap.fromTo('.summary', {autoAlpha: 0}, {autoAlpha: 1});
-
-            this.updateApplicationTable();
-
-
-          })
+ 
 
         //// Set the pagination state
         // setPagination();
@@ -2587,21 +2644,58 @@ class AdminController {
     }
 
     setApplicationPagination(applicationBtn, applicationPrevious, applicationNext) {
-        console.log(this);
         const applicationState = this.state.applications;
-        // New page, new application
-        applicationState.currentApplication = this.applications[0];
+      
+        // // New page, new application
+        // applicationState.currentApplication = this.applications[0];
 
         const pages = Math.ceil(applicationState.totalApplications / applicationState.searchOptions.limit);
 
-        if(applicationPrevious && !(applicationState.currentPage < 1)) {
+        if(applicationPrevious && !(applicationState.currentPage <= 1)) {
+            console.log('backwards');
             this.movePageBackwards(applicationState);
-        } else if(applicationNext && !(applicationState.currentPage >= pages - 1)) {
+        } else if(applicationNext && !(applicationState.currentPage >= pages)) {
+            console.log('forwards');
             this.movePageForwards(applicationState);
         } else if(applicationBtn) {
+            console.log('move');
             this.movePage(applicationState, applicationBtn);
         }
-    
+    }
+
+    async handleApplicationPagination(applicationBtn, applicationPrevious, applicationNext, timeline) {
+
+        // Set the pagination state
+        this.setApplicationPagination(applicationBtn, applicationPrevious, applicationNext);
+        // Set the pagination view
+        adminView.updatePaginationView(this.state.applications.currentPage -1);
+
+        await this.getData('applications');
+        this.state.isActiveRequest = false;
+
+        this.changeTablePageAnimation(timeline);
+
+    }
+
+    changeTablePageAnimation(timeline) {
+        timeline
+          .add(adminView.animateAdminLoadersOut())
+          .add(() => {
+            // Populate summary while not visible
+            adminView.swapSummary(
+                document.querySelector('.summary'), 
+                adminView.createApplicationSummary(this.applications[0]), 
+                this.applicationSummaryListener.bind(this)
+            ); 
+                              
+            // Update the table
+            this.renderApplicationTable();
+
+            // Animate table in
+            adminView.animateTableBodyIn();
+
+            this.state.isActivePaginationAnimation = false;
+        })
 
     }
 
@@ -2695,9 +2789,17 @@ class AdminController {
     }
     movePage(state, btn) {
         state.searchOptions.index = btn.dataset.id * state.searchOptions.limit;
-        state.currentPage = state.searchOptions.index / state.searchOptions.limit;
-
+        state.currentPage = state.searchOptions.index / state.searchOptions.limit +1;
     }
+
+    simulateMouseEVent(type, elem) {
+        elem.dispatchEvent(new MouseEvent(type, {
+          view: window,
+          bubbles: true,
+          cancelable: true
+        }));
+        return elem; // make it chainable
+      }
 }
 
 new AdminController();

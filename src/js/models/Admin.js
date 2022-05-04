@@ -28,9 +28,9 @@ export default class Admin {
     }
 
     /////////// Application Methods ////////////
-    getApplications({index, limit, orderField, orderDirection}) {
+    getApplications({index, limit, orderField, orderDirection}, indexId) {
         return JRS.get('/admin/applications', { 
-            params: { index, limit, orderField, orderDirection}, 
+            params: { index, limit, orderField, orderDirection, indexId}, 
             cancelToken: new axios.CancelToken(c => cancelTokenSource = c)
 
         });

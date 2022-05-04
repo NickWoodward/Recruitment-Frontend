@@ -73,13 +73,17 @@ const createApplicationElement = ({
         `<td class="td-data--last-name" data-id=${personId}>${lastName}</td>`,
         `<td class="td-data--position" data-id=${jobId}>${title}</td>`,
         `<td class="td-data--company data-id=${companyId}">${companyName}</td>`,
-        `<td class="cv-btn--table" data-cvUrl=${applicantId}><svg class="cv-icon">
-            ${cvUrl? 
-                (cvType === 'doc'? 
-                    '<use xlink:href="svg/spritesheet.svg#doc">':
-                    '<use xlink:href="svg/spritesheet.svg#pdf">'
-                ): '<use xlink:href="svg/spritesheet.svg#upload">'}
-        </svg></td>`,
+        `<td class="td-data--cv" data-cvUrl=${applicantId}>
+            <div class="cv-wrapper">
+                <svg class="cv-icon">
+                    ${cvUrl? 
+                        (cvType === 'doc'? 
+                            '<use xlink:href="svg/spritesheet.svg#doc">':
+                            '<use xlink:href="svg/spritesheet.svg#pdf">'
+                        ): '<use xlink:href="svg/spritesheet.svg#ios-minus-empty">'}
+                </svg>
+            </div>
+        </td>`,
         `<td class="td-data--application-date data-id=${id}">${applicationDate}</td>`,
 
     ];
@@ -249,11 +253,9 @@ export const swapSummary = (oldSummary, newSummary, cb) => {
     const tl = gsap.timeline();
     tl
       .to(summaryWrapper, { 
-          y: 70,
-        // scale: '.95', 
         autoAlpha: 0, 
         ease: 'ease-in',
-        duration: '.4'
+        duration: .3
       })
       .add(() => {
         oldSummary.parentElement.removeChild(oldSummary);
@@ -274,16 +276,13 @@ export const swapSummary = (oldSummary, newSummary, cb) => {
       }).fromTo(
           summaryWrapper, 
           { 
-              y: 70, 
-            //   scale: '.95', 
-              autoAlpha: 0 
+              autoAlpha: 0
           }, 
           { 
-              y: 0, 
-            //   scale: 1, 
               autoAlpha: 1, 
               immediateRender: false,
-              duration: '.4'
+              duration: .6,
+              ease: 'ease-out'
           }
         )
 }
@@ -308,17 +307,21 @@ export const createApplicationSummary = ({
     id: applicationId,
     applicationDate,
     applicant: {
+        id: applicantId,
         person: {
             id: personId,
             firstName: personFirstName,
             lastName: personLastName,
             email: personEmail,
-            phone: personPhone
-        }
+            phone: personPhone,
+        },
+        cvUrl: cvUrl
     },
     job: {
+        id: jobId,
         title: jobTitle,
-        company: { 
+        company: {
+            id: companyId, 
             name: companyName,
             contacts: [{
                 person: { 
@@ -333,6 +336,10 @@ export const createApplicationSummary = ({
         }
     }
 }) => {
+    let cvType;
+    if(cvUrl) {
+        cvType = cvUrl.indexOf('.doc') !== -1 ? 'doc':'pdf';
+    } 
     const markup  = `
             <div class="application-summary summary">
                 <div class="application-summary__details">
@@ -341,7 +348,7 @@ export const createApplicationSummary = ({
                         <div class="application-summary__id">${applicationId}</div>
 
                         <div class="application-summary__item">
-                            <div class="application-summary__field application-summary__field--date" data-placeholder="Date" contenteditable=false>${applicationDate}</div>
+                            <div class="application-summary__field application-summary__field--date">${applicationDate}</div>
                         </div>
                     </div>
 
@@ -350,46 +357,63 @@ export const createApplicationSummary = ({
                     <div class="application-summary__section application-summary__section--job">
                         <div class="application-summary__item application-summary__item--job">
                             <div class="application-summary__label application-summary__label--title">Title:</div>
-                            <div class="application-summary__field application-summary__field--title" data-placeholder="Job Title" contenteditable=false>${jobTitle}</div>
+                            <div class="application-summary__field application-summary__field--title" data-id="${jobId}">
+                            <a class="application-summary__link">${jobTitle}</a>
+                            </div>
                         </div>
                         <div class="application-summary__item application-summary__item--job">
                             <div class="application-summary__label application-summary__label--company">Company:</div>
-                            <div class="application-summary__field application-summary__field--company" data-placeholder="Company" contenteditable=false>${companyName}</div>
+                            <div class="application-summary__field application-summary__field--company" data-id="${companyId}">
+                                <a class="application-summary__link">${companyName}</a>
+                            </div>
                         </div>
                         <div class="application-summary__item application-summary__item--job">
                             <div class="application-summary__label application-summary__label--contact-name">Contact:</div>
-                            <div class="application-summary__field application-summary__field--contact-firstname" data-placeholder="Contact Name" contenteditable=false>${contactFirstName}</div>
-                            <div class="application-summary__field application-summary__field--contact-surname" data-placeholder="Contact Surname" contenteditable=false>${contactLastName}</div>
+                            <div class="application-summary__field application-summary__field--contact-firstname">${contactFirstName}</div>
+                            <div class="application-summary__field application-summary__field--contact-surname">${contactLastName}</div>
                         </div>
                         <div class="application-summary__item application-summary__item--job">
                             <div class="application-summary__label application-summary__label--contact-position">Contact Position:</div>
-                            <div class="application-summary__field application-summary__field--contact-position" data-placeholder="Contact Position" contenteditable=false>${contactPosition}</div>
+                            <div class="application-summary__field application-summary__field--contact-position">${contactPosition}</div>
                         </div>
                         <div class="application-summary__item application-summary__item--job">
                             <div class="application-summary__label application-summary__label--contact-phone">Contact Phone:</div>
-                            <div class="application-summary__field application-summary__field--contact-phone" data-placeholder="Contact Phone" contenteditable=false>${contactPhone}</div>
+                            <div class="application-summary__field application-summary__field--contact-phone">${contactPhone}</div>
                         </div>
                         <div class="application-summary__item application-summary__item--job">
                             <div class="application-summary__label application-summary__label--contact-email">Contact Email:</div>
-                            <div class="application-summary__field application-summary__field--contact-email" data-placeholder="Contact Email" contenteditable=false>${contactEmail}</div>
+                            <div class="application-summary__field application-summary__field--contact-email">${contactEmail}</div>
                         </div>
                     </div>
 
                     <div class="application-summary__header">Applicant</div>
                     <div class="application-summary__section application-summary__section--person">
+                        <div class="application-summary__column">
+                            <div class="application-summary__item">
+                                <div class="application-summary__label application-summary__label--applicant-name">Applicant Name:</div>
+                                    <a class="application-summary__link">
+                                        <div class="application-summary__field application-summary__field--applicant-firstname" data-id="${applicantId}">${personFirstName}</div>
+                                        <div class="application-summary__field application-summary__field--applicant-surname" data-id="${applicantId}">${personLastName}</div>
+                                    </a>
+                                </div>
+                            <div class="application-summary__item">
+                                <div class="application-summary__label application-summary__label--email">Email:</div>
+                                <div class="application-summary__field application-summary__field--email">${personEmail}</div>
+                            </div>
+                            <div class="application-summary__item">
+                                <div class="application-summary__label application-summary__label--phone">Phone:</div>
+                                <div class="application-summary__field application-summary__field--phone">${personPhone}</div>
+                            </div>
+                        </div>
+                        <div class="application-summary__column application-summary__column--cv">
+                            <div class="application-summary__item application-summary__item--cv">
+                                <div class="application-summary__label application-summary__label--cv">Applicant CV:</div>
 
-                        <div class="application-summary__item">
-                            <div class="application-summary__label application-summary__label--applicant-name">Applicant Name:</div>
-                            <div class="application-summary__field application-summary__field--applicant-firstname" data-placeholder="Applicant Name" contenteditable=false>${personFirstName}</div>
-                            <div class="application-summary__field application-summary__field--applicant-surname" data-placeholder="Applicant Surname" contenteditable=false>${personLastName}</div>
-                        </div>
-                        <div class="application-summary__item">
-                            <div class="application-summary__label application-summary__label--email">Email:</div>
-                            <div class="application-summary__field application-summary__field--email" data-placeholder="Email" contenteditable=false>${personEmail}</div>
-                        </div>
-                        <div class="application-summary__item">
-                            <div class="application-summary__label application-summary__label--phone">Phone:</div>
-                            <div class="application-summary__field application-summary__field--phone" data-placeholder="Phone" contenteditable=false>${personPhone}</div>
+                                <div class="application-summary__cv-wrapper cv-wrapper" data-id='${personId}'>
+                                    ${cvType?`<svg class="application-summary__cv-svg"><use xlink:href="svg/spritesheet.svg#${cvType}"></svg>`:'None'}
+                                        
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -789,7 +813,6 @@ export const makeEditable = (elements, makeEditable, exclude) => {
 }
 
 export const addCvElement = user => {
-    console.log(user);
     const cvWrapper = document.querySelector('.user-summary__cv-wrapper');
     const cvName = user.cvName;
     const cvType = user.cvType;
@@ -1222,7 +1245,8 @@ export const togglePlaceholders = (elements, toggle, values) => {
 //     elements.adminContent.insertAdjacentHTML('beforeend', `<div class="jobs-table__wrapper"></div>`);
 // };
 
-export const createJobSummary = () => {
+export const createJobSummary = (job) => {
+    console.log(job);
     // const markup = `
     //     <div class="job-summary summary">
     //         <div class="job-summary__details">
@@ -1528,7 +1552,7 @@ const getJobFormValues = () => {
 
 export const formatJobs = (jobs) => {
     // Headers should match the returned divs in createJobsElement
-    const headers = ['#', 'COMPANY','TITLE','LOCATION', 'ADDED'];
+    const headers = ['ID', 'COMPANY','TITLE','LOCATION', 'ADDED'];
     const rows = jobs.map(job => {
         return createJobElement(job);
     });
@@ -1961,6 +1985,7 @@ export const renderPagination = (current, limit, totalItems, container, table) =
     if(pagination) utils.removeElement(pagination);   
     // Work out how many pages
     const pages = Math.ceil(totalItems / limit);
+   
     // Current is the first (zero indexed) item on the page. current/limit = zero index page number
     current = current/limit;
 
@@ -1975,7 +2000,7 @@ export const renderPagination = (current, limit, totalItems, container, table) =
     `;
     container.insertAdjacentHTML('beforeend', markup);
 };
-export const updatePagination = (index) => {
+export const updatePaginationView = (index) => {
     // Get the pagination items
     const items = document.querySelectorAll('.pagination__item');
 
@@ -1997,6 +2022,11 @@ export const updatePagination = (index) => {
     } else {
         document.querySelector('.pagination__next').classList.remove('pagination__next--inactive');
     }
+}
+export const removeLastPaginationItem = () => {
+    const items = document.querySelectorAll('.pagination__item');
+    console.log(items);
+    items[items.length - 1].parentElement.removeChild(items[items.length - 1]);
 }
 
 export const animateAdminContentIn = () => {
@@ -2026,7 +2056,6 @@ export const animateTableBodyIn = () => {
             stagger: {
                 each: .18
             },
-            delay: 2,
             ease: 'power2.out',
         
         }, '<')
@@ -2035,9 +2064,9 @@ export const animateTableBodyIn = () => {
 export const animateSummaryIn = () => {
     return gsap.fromTo('.summary', { autoAlpha:0, x: -50 }, {autoAlpha: 1, x: 0 });
 }
-// export const animateSummaryOut = () => {
-//     return gsap.to('.summary',  { autoAlpha: 0 });
-// }
+export const animateSummaryOut = () => {
+    return gsap.fromTo('.summary', { autoAlpha: 1 }, {autoAlpha: 0, duration: .2}, '<')
+}
 
 export const animateAdminLoadersOut = () => {
     return gsap.fromTo(
@@ -2063,13 +2092,9 @@ export const animateAdminLoadersIn = () => {
 
 export const animateTableContentOut = () => {
     const tableContent = document.querySelector('tbody');
-    const summary = document.querySelector('.summary');
-    
-    const tl = gsap.timeline();
 
     return (
-      tl.fromTo(tableContent, { autoAlpha: 1 }, {autoAlpha: 0, duration: .2})
-        .fromTo(summary, { autoAlpha: 1 }, {autoAlpha: 0, duration: .2}, '<')
+      gsap.fromTo(tableContent, { autoAlpha: 1 }, {autoAlpha: 0, duration: .2})
     );
 }
 export const renderAdminLoaders = () => {
@@ -2077,19 +2102,19 @@ export const renderAdminLoaders = () => {
     const summaryWrapper = document.querySelector('.summary-wrapper');
 
     // Add a loader to the table wrapper
-    // loader.renderLoader({
-    //     parent: tableWrapper,
-    //     type: 'admin-table',
-    //     position: 'afterbegin',
-    //     inFlow: false
-    // });
-    // Add a loader to the summary wrapper
     loader.renderLoader({
-        parent: summaryWrapper,
-        type: 'admin-summary',
+        parent: tableWrapper,
+        type: 'admin-table',
         position: 'afterbegin',
         inFlow: false
     });
+    // // Add a loader to the summary wrapper
+    // loader.renderLoader({
+    //     parent: summaryWrapper,
+    //     type: 'admin-summary',
+    //     position: 'afterbegin',
+    //     inFlow: false
+    // });
 }
 
 const generatePaginationMarkup = (pages, current, table) => {

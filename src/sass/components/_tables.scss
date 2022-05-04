@@ -16,6 +16,12 @@
     }
 }
 
+.cv-wrapper {
+    display: flex;
+    height: 3.6rem;
+    width: 4rem;
+}
+
 .td-data {
     &--jobId {
         max-width: 2rem;
@@ -146,8 +152,8 @@ td:nth-of-type(8)::before {
     // Set max cell widths
     .table--applications {
         & .td-data--first-name {
-            max-width:15rem;
-            width:15rem;
+            max-width:12rem;
+            width:12rem;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -160,18 +166,21 @@ td:nth-of-type(8)::before {
             text-overflow: ellipsis;
         }
         & .td-data--position {
-            max-width:15rem;
-            width: 15rem;
+            max-width:18rem;
+            width: 18rem;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
         }
         & .td-data--company {
-            max-width:15rem;
-            width: 15rem;
+            max-width:18rem;
+            width: 18rem;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
+        }
+        & .td-data--cv {
+            position: relative;
         }
     }
     th {

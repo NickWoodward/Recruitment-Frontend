@@ -334,7 +334,7 @@ export default class JobsController {
                                             <div class="loader__message-title loader__message-title--apply">Error</div>
                                                 <div class="loader__message-content loader__message-content--apply">
                                                 ${err.response.data.email ?
-                                                    `<div>You've already applied to this job with the email ${err.response.data.email}.</div><div>We'll be in touch soon.</div>` :
+                                                    `<div>You've already applied to this job with the email ${err.response.data.email}.</div>` :
                                                     '<div>Sorry, your application was not successful.</div><div>Please contact us on 0203 7780 191</div>'
                                                 }
                                                 
