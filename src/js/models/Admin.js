@@ -43,7 +43,7 @@ export default class Admin {
     }
 
     ///////////  Job Methods  ///////////
-    getJobs({limit, index, titles, locations, orderField, orderDirection} = {}) {
+    getJobs({limit, index, titles, locations, orderField, orderDirection} = {}, indexId) {
         return JRS.get('/admin/jobs', {
             params: {
                 limit,
@@ -52,7 +52,7 @@ export default class Admin {
                 locations,
                 orderField,
                 orderDirection,
-               
+                indexId
             },
             cancelToken: new axios.CancelToken(c => cancelTokenSource = c)
         });

@@ -445,7 +445,7 @@ class AdminController {
             const itemName = currentItem.classList[1].substring(currentItem.classList[1].indexOf('--') + 2);
 
             this.displayAdminContent(itemName);
-            adminView.changeActiveMenuItem(e); 
+            adminView.changeActiveMenuItem(e.target.closest(elementStrings.adminMenuItem)); 
 
 
 
@@ -633,28 +633,32 @@ class AdminController {
                         // Add pagination
                         const { totalJobs, searchOptions: {index: jobIndex, limit: jobLimit} } = this.state.jobs;
                         adminView.renderPagination(jobIndex, jobLimit, totalJobs, document.querySelector('.table-wrapper'), 'jobs');
-
+                        console.log(this.jobs);
                         // Add summary
                         const jobSummary = adminView.createJobSummary(this.jobs[0]);
                         document.querySelector('.summary-wrapper').insertAdjacentHTML('afterbegin', jobSummary);
 
                         // this.addJobSummaryListeners();
                         break;
+
+                    case 'companies': 
+                        // Render table 
+                        this.renderCompaniesTable();
                 }
 
                 // Remove loaders
-                const tl = gsap.timeline();
-                tl.to('.loader', {autoAlpha: 0, duration: .2, onComplete: () => loader.clearLoaders()});
+                const nestedTl = gsap.timeline();
+                nestedTl.to('.loader', {autoAlpha: 0, duration: .2, onComplete: () => loader.clearLoaders()});
 
                 // If the section has a table animate it in
                 if(sectionName === 'applications' || sectionName === 'jobs') {
-                  adminView.animateAdminContentIn(tl)
+                  adminView.animateAdminContentIn()
                   adminView.animateSummaryIn();
 
                 }
 
                 // Animate the pagination in
-                tl.fromTo('.pagination', { y: 20, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .6 }, '>');
+                nestedTl.fromTo('.pagination', { y: 20, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .6 }, '>');
             });
 
             // Request and store 
@@ -882,6 +886,7 @@ class AdminController {
 
     async getData(sectionName, indexId) {
         console.log('getting');
+
         switch(sectionName) {
             case 'applications':
                 const { data: { applications: { rows: appRows, count: appCount } } } = await this.Admin.getApplications(this.state.applications.searchOptions, indexId);
@@ -890,9 +895,14 @@ class AdminController {
                 this.state.applications.totalApplications = appCount;
                 break;
             case 'jobs':
-                const { data: { jobs, total } } = await this.Admin.getJobs(this.state.jobs.searchOptions);
+                const { data: { jobs, total } } = await this.Admin.getJobs(this.state.jobs.searchOptions, indexId);
                 this.jobs = jobs;
                 this.state.jobs.totalJobs = total;
+                break;
+            case 'companies':
+                const { data: { companies, total: companyTotal } } = await this.Admin.getCompanies(this.state.companies.searchOptions, indexId);
+                this.companies = companies;
+                this.state.companies.totalCompanies = total;
                 break;
         }
     }
@@ -1145,10 +1155,10 @@ class AdminController {
     // }
 
     renderApplicationTable() {
+
         // Format applications/headers into html elements
         const {headers, rows} = adminView.formatApplications(this.applications);
         const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
-        
         const tableWrapper = document.querySelector('.table-wrapper');
 
         const table = document.querySelector('.table--applications');
@@ -1156,7 +1166,7 @@ class AdminController {
        // If no table visible, render both the header and content
         if(!table) { 
             tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('applications', headers, rows, false));
-        // Else remove the tbody and render just the content
+            // Else remove the tbody and render just the content
         } else {
             utils.removeElement(document.querySelector('tbody'));
             document.querySelector('thead').insertAdjacentHTML('afterend', tableView.updateTableContent('applications', rows));
@@ -1214,10 +1224,32 @@ class AdminController {
         const newApplicationAlertAnimation = gsap.timeline({paused: true});
         const deleteApplicationAlertAnimation = gsap.timeline({paused: true});
 
+        // Buttons
         const newBtn = e.target.closest('.application-summary__btn--new');
         const deleteBtn = e.target.closest('.application-summary__btn--delete');
         const cvBtn = e.target.closest('.application-summary__cv-wrapper');
 
+        // Applicant/Job/Company links
+        const jobLink = e.target.closest('.application-summary__link--job');
+        const companyLink = e.target.closest('.application-summary__link--company');
+        const applicantLink = e.target.closest('.application-summary__link--applicant');
+
+        if(jobLink) {
+            const jobId = jobLink.parentElement.dataset.id;
+
+            this.displayAdminContent('jobs', jobId);
+            adminView.changeActiveMenuItem(document.querySelector('.sidebar__item--jobs')); 
+
+        }
+        if(companyLink) {
+            const companyId = companyLink.parentElement.dataset.id;
+            console.log(companyId); 
+        }
+        if(applicantLink) {
+            // Applicant link wraps around two divs with the data element
+            const applicantId = applicantLink.firstElementChild.dataset.id;
+            console.log(applicantId);
+        }
         if(cvBtn) {
             this.Admin.getCv(cvBtn.dataset.id)
             .then(res => {
@@ -1461,7 +1493,6 @@ class AdminController {
     }
 
     renderJobsTable() {
-
         // Format jobs/header into html elements
         const {headers, rows} = adminView.formatJobs(this.jobs);
         const { totalJobs, searchOptions: { index, limit } } = this.state.jobs;
@@ -1469,7 +1500,6 @@ class AdminController {
         const tableWrapper = document.querySelector('.table-wrapper');
 
         const table = document.querySelector('.table--jobs');
-       
         // If no table visible, render both the header and content
         if(!table) {
             tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('jobs', headers, rows, false));  
@@ -2044,49 +2074,67 @@ class AdminController {
     }
 
     renderCompaniesTable() {
-        // Extract state
-        const { totalCompanies, searchOptions: { index, limit } } = this.state.companies;
+        console.log(this.companies)
+        // Format applications/headers into html elements
+        const {headers, rows} = adminView.formatCompanies(this.companies);
 
-        // Format data into html elements
-        const { headers, rows } = adminView.formatCompanies(this.companies);
+        const tableWrapper = document.querySelector('.table-wrapper');
 
-        // Select html elements
-        const tableWrapper = document.querySelector('.companies-table__wrapper');
         const table = document.querySelector('.table--companies');
-        const pagination = document.querySelector('.pagination--companies');
 
-        // If the elements exist, remove them
-        if(table) utils.removeElement(table);
-        if(pagination) utils.removeElement(pagination);
-        tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('companies', headers, rows, false));
+        // If no table visible, render both the header and content
+        if(!table) { 
+            tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('companies', headers, rows, false));
+            // Else remove the tbody and render just the content
+        } else {
+            utils.removeElement(document.querySelector('tbody'));
+            document.querySelector('thead').insertAdjacentHTML('afterend', tableView.updateTableContent('companies', rows));
+        }
+    
+
+        // // Extract state
+        // const { totalCompanies, searchOptions: { index, limit } } = this.state.companies;
+
+        // // Format data into html elements
+        // const { headers, rows } = adminView.formatCompanies(this.companies);
+
+        // // Select html elements
+        // const tableWrapper = document.querySelector('.companies-table__wrapper');
+        // const table = document.querySelector('.table--companies');
+        // const pagination = document.querySelector('.pagination--companies');
+
+        // // If the elements exist, remove them
+        // if(table) utils.removeElement(table);
+        // if(pagination) utils.removeElement(pagination);
+        // tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('companies', headers, rows, false));
         
-        // Add pagination
-        adminView.renderPagination(index, limit, totalCompanies, tableWrapper, 'companies');
+        // // Add pagination
+        // adminView.renderPagination(index, limit, totalCompanies, tableWrapper, 'companies');
 
 
 
-        // Change active 
-        const companyRows = document.querySelectorAll('.row--companies');
-        const activeRow = Array.from(companyRows).find(row => row.querySelector(`[data-id="${this.state.companies.currentCompany.id}"]`)) || companyRows[0];
+        // // Change active 
+        // const companyRows = document.querySelectorAll('.row--companies');
+        // const activeRow = Array.from(companyRows).find(row => row.querySelector(`[data-id="${this.state.companies.currentCompany.id}"]`)) || companyRows[0];
         
 
-        utils.changeActiveRow(activeRow, companyRows);
+        // utils.changeActiveRow(activeRow, companyRows);
 
-        companyRows.forEach(row => {
-            row.addEventListener('click', (e) => {
-                const targetRow = e.target.closest('.row');
-                const rowId = targetRow.querySelector('.td-data--company-name').dataset.id;
-                const company = this.companies.filter(company => {
-                    return parseInt(rowId) === company.id;
-                })[0];
+        // companyRows.forEach(row => {
+        //     row.addEventListener('click', (e) => {
+        //         const targetRow = e.target.closest('.row');
+        //         const rowId = targetRow.querySelector('.td-data--company-name').dataset.id;
+        //         const company = this.companies.filter(company => {
+        //             return parseInt(rowId) === company.id;
+        //         })[0];
 
-                utils.changeActiveRow(targetRow, companyRows);
-                this.state.companies.currentCompany = company;
-                adminView.populateCompanySummary(company);
-                adminView.populateAddressSummary(company.id, company.addresses[0]);
-                adminView.populateContactSummary(company.id, company.people[0])
-            });
-        });
+        //         utils.changeActiveRow(targetRow, companyRows);
+        //         this.state.companies.currentCompany = company;
+        //         adminView.populateCompanySummary(company);
+        //         adminView.populateAddressSummary(company.id, company.addresses[0]);
+        //         adminView.populateContactSummary(company.id, company.people[0])
+        //     });
+        // });
     }
     addCompanySummaryListeners() {
         const summaryWrapper = document.querySelector('.summary-wrapper');
@@ -2585,7 +2633,6 @@ class AdminController {
                 // Set the table index to 0
                 this.state.jobsTable.index = 0;
                 this.renderJobsTable();
-
                 adminView.populateJobSummary(this.jobs[0]);
             }).catch(err => console.log(err));
     };

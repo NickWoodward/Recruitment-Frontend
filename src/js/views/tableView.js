@@ -70,7 +70,7 @@ export const createTableTest = (title, theads, rows, displayIndex = false) => {
                 }
             </tbody>
         </table>
-    `
+    `;
     return markup;
 };
 

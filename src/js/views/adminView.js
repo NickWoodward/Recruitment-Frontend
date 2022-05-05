@@ -358,13 +358,13 @@ export const createApplicationSummary = ({
                         <div class="application-summary__item application-summary__item--job">
                             <div class="application-summary__label application-summary__label--title">Title:</div>
                             <div class="application-summary__field application-summary__field--title" data-id="${jobId}">
-                            <a class="application-summary__link">${jobTitle}</a>
+                                <a class="application-summary__link application-summary__link--job">${jobTitle}</a>
                             </div>
                         </div>
                         <div class="application-summary__item application-summary__item--job">
                             <div class="application-summary__label application-summary__label--company">Company:</div>
                             <div class="application-summary__field application-summary__field--company" data-id="${companyId}">
-                                <a class="application-summary__link">${companyName}</a>
+                                <a class="application-summary__link application-summary__link--company">${companyName}</a>
                             </div>
                         </div>
                         <div class="application-summary__item application-summary__item--job">
@@ -391,7 +391,7 @@ export const createApplicationSummary = ({
                         <div class="application-summary__column">
                             <div class="application-summary__item">
                                 <div class="application-summary__label application-summary__label--applicant-name">Applicant Name:</div>
-                                    <a class="application-summary__link">
+                                    <a class="application-summary__link application-summary__link--applicant">
                                         <div class="application-summary__field application-summary__field--applicant-firstname" data-id="${applicantId}">${personFirstName}</div>
                                         <div class="application-summary__field application-summary__field--applicant-surname" data-id="${applicantId}">${personLastName}</div>
                                     </a>
@@ -1560,21 +1560,21 @@ export const formatJobs = (jobs) => {
 };
 const createJobElement = (job) => {
     const row = [
-        `<div class="td-data--jobId" data-id=${job.id}>${job.id}</div>`,
-        `<div class="td-data--company" data-id=${job.id}>${job.companyName}</div>`,
-        `<div class="td-data--title">${job.title}</div>`,
-        `<div class="td-data--location">${job.location}</div>`,
-        `<div class="td-data--location">${job.jobDate}</div>`
+        `<td class="td-data--jobId" data-id=${job.id}>${job.id}</td>`,
+        `<td class="td-data--company" data-id=${job.id}>${job.companyName}</td>`,
+        `<td class="td-data--title">${job.title}</td>`,
+        `<td class="td-data--location">${job.location}</td>`,
+        `<td class="td-data--location">${job.jobDate}</td>`
 
     ];
     return row;
 }; 
 
-export const changeActiveMenuItem = (e) => {
+export const changeActiveMenuItem = (newActiveItem) => {
     // Items contain the highlight, the links contain the fill and color for the text/icon
     const items = [ elements.adminMenuJobsItem, elements.adminMenuUsersItem, elements.adminMenuApplicationsItem, elements.adminMenuCompaniesItem, elements.adminMenuSettingsItem ];
 
-    const newActiveItem = e.target.closest(elementStrings.adminMenuItem);
+    // const newActiveItem = e.target.closest(elementStrings.adminMenuItem);
     if(newActiveItem) {
         const newActiveLink = newActiveItem.childNodes[1];
     
@@ -1715,9 +1715,9 @@ export const formatCompanies = (companies) => {
 };
 const createCompanyElement = ({ id, name, companyDate }) => {
     const row = [
-        `<div class="td-data--company-id">${id}</div>`,
-        `<div class="td-data--company-name" data-id=${id}>${name}</div>`,
-        `<div class="td-data--date" data-id=${id}>${companyDate}</div>`
+        `<td class="td-data--company-id">${id}</td>`,
+        `<td class="td-data--company-name" data-id=${id}>${name}</td>`,
+        `<td class="td-data--date" data-id=${id}>${companyDate}</td>`
     ];
     return row;
 }
