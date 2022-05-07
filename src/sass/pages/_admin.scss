@@ -102,6 +102,26 @@
     background-color: white;
     border: none;
     // box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+    &__column {
+        display: flex;
+        width: 50%;
+        flex-direction: column;
+    }
+    &__link {
+        color: firebrick;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+    &__heading {
+        color: $color-secondary;
+        font-size: 1.9rem;
+        font-weight: 400;
+        width: 100%;
+        padding: 1rem 3rem;
+        background-color: rgb(249, 250, 251);
+    
+        margin: 1.5rem 0;
+    }
 
     &__btn--disabled {
         pointer-events: none;
@@ -140,12 +160,6 @@
     width: 100%;
     min-height: 18rem;
     margin-bottom: 1rem;
-
-    &__link {
-        color: firebrick;
-        text-decoration: underline;
-        cursor: pointer;
-    }
     
     &__details {
         width: 100%;
@@ -187,16 +201,6 @@
         margin-top: 2rem;
         cursor: pointer;
     }
-    &__column {
-        display: flex;
-        width: 50%;
-        // height: 100%;
-
-        // &:not(&--cv) {
-        flex-direction: column;
-
-        // }
-    }
 
     &__section {
         
@@ -223,16 +227,7 @@
         }
     }
 
-    &__header {
-        color: $color-secondary;
-        font-size: 1.9rem;
-        font-weight: 400;
-        width: 100%;
-        padding: 1rem 3rem;
-        background-color: rgb(249, 250, 251);
-    
-        margin: 1.5rem 0;
-    }
+
     &__label {
         font-weight: 600;
     }
@@ -688,23 +683,54 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    width: 50rem;
-    // max-height: 100rem;
+    // width: 50rem;
+    
+    &__section {
+        display: flex;
 
-    // transition: max-height 0.2s ease;
+        &--header {
+            justify-content: space-between;
+            height: 6rem;
+            background-color: $color-primary-new;
+            font-size: 1.6rem;
+            font-weight: 400;
+            color: white;
+        }
+        &--description {
+            flex-direction: column;
+        }
+    }
     
     &__details {
-        padding: 3.5rem 3.8rem 3rem 3.8rem;
+        // padding: 3.5rem 3.8rem 3rem 3.8rem;
         width: 100%;
     }
-    &__field {
-        padding-left: .7rem;
-        padding-right: 1.3rem;
-        transition: padding 0.2s ease;
+    &__label {
+        font-weight: 600;
     }
-    &__header {
-        margin-bottom: 2.5rem;
+    &__item {
+
+        margin-bottom: 1rem;
+        font-size: 1.6rem;
+        padding: 0 3rem;
+
+        &--header {
+            display: flex;
+            align-items: center;
+            width: 50%;
+            height: 100%;
+            padding: 0 2rem;
+
+            &:last-of-type {
+                justify-content: flex-end;
+
+            }
+        }
+        &--job {
+            width: 50%;
+        }
     }
+
     &__title {
         color: $color-secondary;
         font-weight: 400;

@@ -168,7 +168,7 @@ export const populateApplicationSummary = ({
 //                         </div>
 //                     </div>
 
-//                     <div class="application-summary__header">Position</div>
+//                     <div class="summary__heading">Position</div>
 
 //                     <div class="application-summary__section application-summary__section--job">
 //                         <div class="application-summary__item">
@@ -199,7 +199,7 @@ export const populateApplicationSummary = ({
 //                     </div>
 
 //                     <div class="application-summary__section application-summary__section--person">
-//                         <div class="application-summary__header">Applicant</div>
+//                         <div class="summary__heading">Applicant</div>
 
 //                         <div class="application-summary__item">
 //                             <div class="application-summary__label application-summary__label--applicant-name">Applicant Name:</div>
@@ -352,19 +352,19 @@ export const createApplicationSummary = ({
                         </div>
                     </div>
 
-                    <div class="application-summary__header">Position</div>
+                    <div class="summary__heading">Position</div>
 
                     <div class="application-summary__section application-summary__section--job">
                         <div class="application-summary__item application-summary__item--job">
                             <div class="application-summary__label application-summary__label--title">Title:</div>
                             <div class="application-summary__field application-summary__field--title" data-id="${jobId}">
-                                <a class="application-summary__link application-summary__link--job">${jobTitle}</a>
+                                <a class="summary__link summary__link--job">${jobTitle}</a>
                             </div>
                         </div>
                         <div class="application-summary__item application-summary__item--job">
                             <div class="application-summary__label application-summary__label--company">Company:</div>
                             <div class="application-summary__field application-summary__field--company" data-id="${companyId}">
-                                <a class="application-summary__link application-summary__link--company">${companyName}</a>
+                                <a class="summary__link summary__link--company">${companyName}</a>
                             </div>
                         </div>
                         <div class="application-summary__item application-summary__item--job">
@@ -386,12 +386,12 @@ export const createApplicationSummary = ({
                         </div>
                     </div>
 
-                    <div class="application-summary__header">Applicant</div>
+                    <div class="summary__heading">Applicant</div>
                     <div class="application-summary__section application-summary__section--person">
-                        <div class="application-summary__column">
+                        <div class="summary__column">
                             <div class="application-summary__item">
                                 <div class="application-summary__label application-summary__label--applicant-name">Applicant Name:</div>
-                                    <a class="application-summary__link application-summary__link--applicant">
+                                    <a class="summary__link summary__link--applicant">
                                         <div class="application-summary__field application-summary__field--applicant-firstname" data-id="${applicantId}">${personFirstName}</div>
                                         <div class="application-summary__field application-summary__field--applicant-surname" data-id="${applicantId}">${personLastName}</div>
                                     </a>
@@ -405,7 +405,7 @@ export const createApplicationSummary = ({
                                 <div class="application-summary__field application-summary__field--phone">${personPhone}</div>
                             </div>
                         </div>
-                        <div class="application-summary__column application-summary__column--cv">
+                        <div class="summary__column summary__column--cv">
                             <div class="application-summary__item application-summary__item--cv">
                                 <div class="application-summary__label application-summary__label--cv">Applicant CV:</div>
 
@@ -1245,8 +1245,7 @@ export const togglePlaceholders = (elements, toggle, values) => {
 //     elements.adminContent.insertAdjacentHTML('beforeend', `<div class="jobs-table__wrapper"></div>`);
 // };
 
-export const createJobSummary = (job) => {
-    console.log(job);
+export const createJobSummary = ({companyId, companyName, title, featured, id, jobDate, jobType, description, location, position, pqe, wage}) => {
     // const markup = `
     //     <div class="job-summary summary">
     //         <div class="job-summary__details">
@@ -1282,63 +1281,120 @@ export const createJobSummary = (job) => {
     //     </div>
     // `;
     // return markup;
-
     const markup = `
-    <div class="job-summary summary">
-        <div class="job-summary__details">
-            <div class="job-summary__header">
-                <div class="job-summary__title job-summary__field">Head of HR</div> 
-                <div class="job-summary__company job-summary__field">Dell</div>
+        <div class="job-summary summary">
+            <div class="job-summary__details">
+
+                <div class="job-summary__section job-summary__section--header">
+                    <div class="job-summary__item job-summary__item--header">
+                        <div class="job-summary__id">${id}</div>
+                    </div>
+
+                    <div class="job-summary__item job-summary__item--header">
+                        <div class="job-summary__field job-summary__field--date">${jobDate}</div>
+                    </div>
+                </div>
+
+                <div class="summary__heading">Role</div>
+               
+                <div class="job-summary__section job-summary__section--job">
+                    <div class="job-summary__item job-summary__item--job">
+                        <div class="job-summary__label job-summary__label--title">Title:</div>
+                        <div class="job-summary__field job-summary__field--title">${title}</div>
+                    </div>
+
+                    <div class="job-summary__item job-summary__item--job">
+                        <div class="job-summary__label job-summary__label--title">Company:</div>
+                        <div class="job-summary__field job-summary__field--title">
+                            <a class="summary__link summary__link--company">${companyName}</a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="summary__heading">Details</div>
+
+                <div class="job-summary__section job-summary__section--info">
+
+                    <div class="summary__column">
+                        <div class="job-summary__item job-summary__item--info">
+                            <div class="job-summary__label job-summary__label--location">Location:</div>
+                            <div class="job-summary__field job-summary__field--location">
+                                ${location}
+                            </div>
+                        </div>
+
+                        <div class="job-summary__item job-summary__item--info">
+                            <div class="job-summary__label job-summary__label--wage">Wage:</div>
+                            <div class="job-summary__field job-summary__field--wage">
+                                ${utils.formatSalary(wage)}
+                            </div>
+                        </div>
+
+                        <div class="job-summary__item job-summary__item--info">
+                            <div class="job-summary__label job-summary__label--type">Type:</div>
+                            <div class="job-summary__field job-summary__field--type">
+                                ${jobType}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="summary__column">
+                        
+                        <div class="job-summary__item job-summary__item--info">
+                            <div class="job-summary__label job-summary__label--position">Position:</div>
+                            <div class="job-summary__field job-summary__field--position">
+                                ${position}
+                            </div>
+                        </div>
+                        <div class="job-summary__item job-summary__item--info">
+                            <div class="job-summary__label job-summary__label--pqe">PQE:</div>
+                            <div class="job-summary__field job-summary__field--pqe">
+                                ${pqe}
+                            </div>
+                        </div>
+
+                        <div class="job-summary__item job-summary__item--info">
+                            <div class="job-summary__label job-summary__label--featured">Featured:</div>
+                            <div class="job-summary__field job-summary__field--featured">
+                                ${featured? 'Yes':'No'}
+                            </div>
+                        </div>
+    
+                    </div>
+                </div>    
+
+                <div class="job-summary__section job-summary__section--description">
+                    <div class="summary__heading">Description</div>
+                    <div class="job-summary__description job-summary__field">${description}</div>
+                </div>
             </div>
-            <div class="job-summary__content">
-                <div class="job-summary__location-wrapper">
-                    <svg class="job-summary__location-icon"><use xlink:href="svg/spritesheet.svg#location"></svg>
-                    <div class="job-summary__location job-summary__field">Birmingham</div>
-                </div>
-                <div class="job-summary__wage-wrapper">
-                    <svg class="job-summary__wage-icon"><use xlink:href="svg/spritesheet.svg#sterling"></use></svg>
-                    <div class="job-summary__wage job-summary__field">£50000</div>
 
-                </div> 
-                <div class="job-summary__extra-wrapper">
-                    <svg class="job-summary__extra-icon"><use xlink:href="svg/spritesheet.svg#clock"></svg>
-                    <div class="job-summary__type job-summary__field">Permanent</div>
-                    <div class="job-summary__position job-summary__field">In House</div>
-                    <div class="job-summary__PQE job-summary__field">PQE: 3+</div>
-                </div> 
+            <div class="job-summary__controls">
+                    <div class="job-summary__btn job-summary__btn--new">
+                        <svg class="job-summary__new-icon job-summary__icon">
+                            <use xlink:href="svg/spritesheet.svg#add">
+                        </svg>
+                    </div>
+                    <div class="job-summary__btn job-summary__btn--hubspot">
+                        <svg class="job-summary__hubspot-icon job-summary__icon">
+                            <use xlink:href="svg/spritesheet.svg#hubspot">
+                        </svg>
+                    </div>
+                    <div class="job-summary__btn job-summary__btn--edit">
+                        <svg class="job-summary__edit-icon job-summary__icon">
+                            <use xlink:href="svg/spritesheet.svg#edit-np1">
+                        </svg>
+                    </div>
+                    <div class="job-summary__btn job-summary__btn--delete">
+                        <svg class="job-summary__delete-icon job-summary__icon">
+                            <use xlink:href="svg/spritesheet.svg#delete-np1">
+                        </svg>
+                    </div>
+                </div>
+        </div>                 
+    `;
 
-                <div class="job-summary__featured-wrapper">
-                    <div class="job-summary__featured job-summary__field">Featured?</div>
-                </div>
-
-                <div class="job-summary__description job-summary__field">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat</div>
-            </div>    
-            
-        </div>
-        <div class="job-summary__controls">
-                <div class="job-summary__btn job-summary__btn--new">
-                    <svg class="job-summary__new-icon job-summary__icon">
-                        <use xlink:href="svg/spritesheet.svg#add">
-                    </svg>
-                </div>
-                <div class="job-summary__btn job-summary__btn--hubspot">
-                    <svg class="job-summary__hubspot-icon job-summary__icon">
-                        <use xlink:href="svg/spritesheet.svg#hubspot">
-                    </svg>
-                </div>
-                <div class="job-summary__btn job-summary__btn--edit">
-                    <svg class="job-summary__edit-icon job-summary__icon">
-                        <use xlink:href="svg/spritesheet.svg#edit-np1">
-                    </svg>
-                </div>
-                <div class="job-summary__btn job-summary__btn--delete">
-                    <svg class="job-summary__delete-icon job-summary__icon">
-                        <use xlink:href="svg/spritesheet.svg#delete-np1">
-                    </svg>
-                </div>
-            </div>
-     </div>                 
- `;
  return markup;
 };
 

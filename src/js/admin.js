@@ -630,10 +630,16 @@ class AdminController {
                         // Render table
                         this.renderJobsTable();
 
+                        // If there's an indexId, set the active Id
+                        if(indexId) {
+                            this.state.jobs.currentJob.id = indexId;
+                        } else {
+                            this.state.jobs.currentJob.id = 0;
+                        }
+
                         // Add pagination
                         const { totalJobs, searchOptions: {index: jobIndex, limit: jobLimit} } = this.state.jobs;
                         adminView.renderPagination(jobIndex, jobLimit, totalJobs, document.querySelector('.table-wrapper'), 'jobs');
-                        console.log(this.jobs);
                         // Add summary
                         const jobSummary = adminView.createJobSummary(this.jobs[0]);
                         document.querySelector('.summary-wrapper').insertAdjacentHTML('afterbegin', jobSummary);
@@ -1230,9 +1236,9 @@ class AdminController {
         const cvBtn = e.target.closest('.application-summary__cv-wrapper');
 
         // Applicant/Job/Company links
-        const jobLink = e.target.closest('.application-summary__link--job');
-        const companyLink = e.target.closest('.application-summary__link--company');
-        const applicantLink = e.target.closest('.application-summary__link--applicant');
+        const jobLink = e.target.closest('.summary__link--job');
+        const companyLink = e.target.closest('.summary__link--company');
+        const applicantLink = e.target.closest('.summary__link--applicant');
 
         if(jobLink) {
             const jobId = jobLink.parentElement.dataset.id;
@@ -1514,20 +1520,28 @@ class AdminController {
         const activeRow = Array.from(jobRows).find(row => {
             return row.querySelector(`[data-id="${this.state.jobs.currentJob.id}"]`)
         }) || jobRows[0];
-
+console.log(this.state.jobs.currentJob.id);
         utils.changeActiveRow(activeRow, jobRows);
 
         // Add table row listeners
         jobRows.forEach(row => {
             row.addEventListener('click', e => {
+                const targetRow = e.target.closest('.row');
                 const rowId = row.querySelector('.td-data--company').dataset.id;
                 const job = this.jobs.filter((job, index) => {
                     if(parseInt(rowId) === job.id) this.state.jobsTable.index = index;
                     return parseInt(rowId) === job.id;
                 })[0];
 
-                adminView.populateJobSummary(job);
-                utils.changeActiveRow(row, jobRows);
+                // adminView.createJobSummary(job);
+                // utils.changeActiveRow(row, jobRows);
+                console.log(job);
+                utils.changeActiveRow(targetRow, jobRows);
+                console.log(targetRow, jobRows);
+                this.state.jobs.currentJob = job;
+                const summary = document.querySelector('.summary');
+                adminView.swapSummary(summary, adminView.createJobSummary(job), null); 
+            
             });
         });
 
