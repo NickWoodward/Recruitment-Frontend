@@ -53,10 +53,21 @@ class AdminController {
         this.Applications = new Applications();
         this.Companies = new Companies();
         this.Admin = new Admin();
+
+        this.jobTypes = Object.freeze({
+            INTERIM: 'Interim',
+            PERMANENT: 'Permanent'
+        });
+        this.jobPositions = Object.freeze({
+            INHOUSE: 'In House',
+            PRIVATE: 'Private Practice'
+        });
+
         this.state= {
             isActiveRequest: false,
             isActivePaginationAnimation: false,
             companies: {
+                companyNames: [],
                 totalCompanies: 0,
                 currentCompany: {},
                 currentAddressIndex: 0,
@@ -630,13 +641,6 @@ class AdminController {
                         // Render table
                         this.renderJobsTable();
 
-                        // If there's an indexId, set the active Id
-                        if(indexId) {
-                            this.state.jobs.currentJob.id = indexId;
-                        } else {
-                            this.state.jobs.currentJob.id = 0;
-                        }
-
                         // Add pagination
                         const { totalJobs, searchOptions: {index: jobIndex, limit: jobLimit} } = this.state.jobs;
                         adminView.renderPagination(jobIndex, jobLimit, totalJobs, document.querySelector('.table-wrapper'), 'jobs');
@@ -644,6 +648,7 @@ class AdminController {
                         const jobSummary = adminView.createJobSummary(this.jobs[0]);
                         document.querySelector('.summary-wrapper').insertAdjacentHTML('afterbegin', jobSummary);
 
+                        this.addJobsSummaryListeners();
                         // this.addJobSummaryListeners();
                         break;
 
@@ -1191,6 +1196,7 @@ class AdminController {
 
         const applicationRows = document.querySelectorAll('.row--applications');
         const activeRow = Array.from(applicationRows).find(row => row.querySelector(`[data-id="${this.state.applications.currentApplication.applicationId}"]`)) || applicationRows[0];
+        console.log('current application id');
 
         utils.changeActiveRow(activeRow, applicationRows);
 
@@ -1520,7 +1526,7 @@ class AdminController {
         const activeRow = Array.from(jobRows).find(row => {
             return row.querySelector(`[data-id="${this.state.jobs.currentJob.id}"]`)
         }) || jobRows[0];
-console.log(this.state.jobs.currentJob.id);
+
         utils.changeActiveRow(activeRow, jobRows);
 
         // Add table row listeners
@@ -1588,6 +1594,52 @@ console.log(this.state.jobs.currentJob.id);
         //         utils.changeActiveRow(row, jobRows);
         //     });
         // });
+    }
+
+    addJobsSummaryListeners() {
+        const jobSummary = document.querySelector('.job-summary');
+console.log('adding job listeners');
+        jobSummary.addEventListener(
+            'click', 
+            this.jobSummaryListener.bind(this)
+        );
+
+    }
+
+    async jobSummaryListener(e) {
+        // Animations
+        const newJobAlertAnimation = gsap.timeline({paused: true});
+        const deleteJobAlertAnimation = gsap.timeline({paused: true});
+
+        // Buttons
+        const newBtn = e.target.closest('.job-summary__btn--new');
+        const deleteBtn = e.target.closest('.job-summary__btn--delete');
+        const editBtn = e.target.closest('.job-summary__btn--edit');
+        const hubspotBtn = e.target.closest('.job-summary__btn--hubspot');
+
+        // Links
+        const companyLink = e.target.closest('.summary__link--company');
+
+        if(newBtn) {
+            console.log('newBtn');
+            // Get company list
+            const { data: { companyNames } } = await this.Admin.getCompanyNames();
+            this.state.companies.companyNames = companyNames;
+            
+            adminView.renderNewJobModal({ companies: this.state.companies.companyNames, jobTypes: this.jobTypes, jobPositions: this.jobPositions });
+        }
+        if(deleteBtn) {
+            console.log('deleteBtn');
+        }
+        if(editBtn) {
+            console.log('editBtn');
+        }
+        if(hubspotBtn) {
+            console.log('hubspotBtn');
+        }
+        if(companyLink) {
+            console.log('companyLink');
+        }
     }
 
     addJobSummaryListeners() {

@@ -663,6 +663,192 @@ export const populateUserSummary = (user) => {
     addCvElement(user);
 }
 
+export const renderNewJobModal = (data) => {
+    const summary = document.querySelector('.summary-wrapper');
+    const modal = createNewJobModal(data);
+
+    summary.insertAdjacentHTML('afterbegin', modal);
+
+    gsap.fromTo('.job-summary__modal',
+        {autoAlpha: 0},
+        {autoAlpha: 1, duration: .2}
+    );
+
+    populateNewJobModal(data);
+};
+
+
+const populateNewJobModal = ({companies, jobTypes, jobPositions}) => {
+    // Populate select elements
+    const companySelect = document.querySelector('.new-job__input--company');
+    const locationSelect = document.querySelector('.new-job__input--location');
+    const wageSelect = document.querySelector('.new-job__input--wage');
+    const typeSelect = document.querySelector('.new-job__input--type');
+    const positionSelect = document.querySelector('.new-job__input--position');
+    const pqeSelect = document.querySelector('.new-job__input--featured');
+
+    // Order the companies by name
+    companies.sort((a, b) => a.companyName > b.companyName? 1:-1);
+
+    const selects = [
+        [companySelect, 'Company'], 
+        [typeSelect, 'Type'], 
+        [positionSelect, 'Position']
+    ];
+
+    // Add placeholders
+    selects.forEach(select => {
+        const selectElement = select[0];
+        const placeholder= new Option(select[1]);
+
+        placeholder.setAttribute('disabled', 'disabled');
+        placeholder.setAttribute('hidden', 'hidden');
+
+        selectElement.appendChild(placeholder);
+    });
+
+    companies.forEach(company => {
+        const option = new Option(company.name, company.id);
+        option.className = 'company-option';
+        companySelect.add(option);
+    });
+
+    Object.entries(jobTypes).forEach(type => {
+        const option = new Option(type[1], type[1]);
+        option.className = 'type-option';
+        typeSelect.add(option);
+    });
+
+    Object.entries(jobPositions).forEach(position => {
+        const option = new Option(position[1], position[1]);
+        option.className = 'position-option';
+        positionSelect.add(option);
+    });
+
+    // Create Custom Selects
+    const customCompanySelect = new Select(companySelect);
+    const customTypeSelect = new Select(typeSelect);
+    const customPositionSelect = new Select(positionSelect);
+};
+
+const createNewJobModal = ({companies, jobNumber}) => {
+
+    const today = new Date();
+    const date = `${today.getDate()}/${today.getMonth()+1}/${+today.getFullYear()}`;
+    const modal = `
+        <div class="job-summary__modal job-summary__modal--new">
+
+            <div class="job-summary__modal-header">
+                <div>${jobNumber}</div>
+                <div>${date}</div>
+            </div>
+
+            <div class="summary__heading">Create Job</div>
+
+            <div class="new-job__close">
+                <svg class="new-job__close-svg"><use xlink:href="svg/spritesheet.svg#cross"></svg>
+            </div>
+            <div class="new-job__form-wrapper">
+
+                <form class="new-job">
+                    <div class="new-job__field">
+                        <label for="title" class="new-job__label">Title</label>
+                        <input type="text" placeholder="Job Title" id="title" class="new-job__input">
+                        <i class="new-job__icon new-job__icon--success"></i>
+                        <i class="new-job__icon new-job__icon--fail">
+                            <svg><use xlink:href="svg/spritesheet.svg#alert-circled"></svg>
+                        </i>
+                        <small class="new-job__error-msg"></small>
+                    </div>
+                    <div class="new-job__field">
+                        <label for="company" class="new-job__label">Company</label>
+                        <select name="company" id="company" class="new-job__input new-job__input--company">
+                            <!-- options added in js -->
+                        </select>
+                        <i class="new-job__icon new-job__icon--success new-job__icon--select"></i>
+                        <i class="new-job__icon new-job__icon--fail new-job__icon--select"></i>
+                        <small class="new-job__error-msg new-job__error-msg--select"></small>
+                    </div>
+                    
+                    <div class="new-job__field">
+                        <label for="location" class="new-job__label">Location</label>
+                        <select name="location" id="location" class="new-job__input new-job__input--location">
+                            <!-- options added in js -->
+                        </select>                        
+                        <i class="new-job__icon new-job__icon--success"></i>
+                        <i class="new-job__icon new-job__icon--fail"></i>
+                        <small class="new-job__error-msg"></small>
+                    </div>
+
+                    <div class="new-job__field">
+                        <label for="wage" class="new-job__label">Wage</label>
+                        <input type="text" placeholder="Wage" id="wage" class="new-job__input">
+                        <i class="new-job__icon new-job__icon--success"></i>
+                        <i class="new-job__icon new-job__icon--fail"></i>
+                        <small class="new-job__error-msg"></small>
+                    </div>
+
+                    <div class="new-job__field">
+                        <label for="wage" class="new-job__label">Wage</label>
+                        <input type="text" placeholder="Wage" id="wage" class="new-job__input">
+                        <i class="new-job__icon new-job__icon--success"></i>
+                        <i class="new-job__icon new-job__icon--fail"></i>
+                        <small class="new-job__error-msg"></small>
+                    </div>
+
+                    <div class="new-job__field">
+                        <label for="type" class="new-job__label">Type</label>
+                        <select name="type" id="type" class="new-job__input new-job__input--type">
+                            <!-- options added in js -->
+                        </select>
+                        <i class="new-job__icon new-job__icon--success new-job__icon--select"></i>
+                        <i class="new-job__icon new-job__icon--fail new-job__icon--select"></i>
+                        <small class="new-job__error-msg new-job__error-msg--select"></small>
+                    </div>
+
+                    <div class="new-job__field">
+                        <label for="position" class="new-job__label">Position</label>
+                        <select name="position" id="position" class="new-job__input new-job__input--position">
+                            <!-- options added in js -->
+                        </select>
+                        <i class="new-job__icon new-job__icon--success new-job__icon--select"></i>
+                        <i class="new-job__icon new-job__icon--fail new-job__icon--select"></i>
+                        <small class="new-job__error-msg new-job__error-msg--select"></small>
+                    </div>
+
+                    <div class="new-job__field">
+                        <label for="pqe" class="new-job__label">PQE</label>
+                        <select name="pqe" id="pqe" class="new-job__input new-job__input--pqe">
+                            <!-- options added in js -->
+                        </select>
+                        <i class="new-job__icon new-job__icon--success new-job__icon--select"></i>
+                        <i class="new-job__icon new-job__icon--fail new-job__icon--select"></i>
+                        <small class="new-job__error-msg new-job__error-msg--select"></small>
+                    </div>
+
+                    <div class="new-job__field">
+                        <label for="featured" class="new-job__label">Featured</label>
+                        <select name="featured" id="featured" class="new-job__input new-job__input--featured">
+                            <!-- options added in js -->
+                        </select>
+                        <i class="new-job__icon new-job__icon--success new-job__icon--select"></i>
+                        <i class="new-job__icon new-job__icon--fail new-job__icon--select"></i>
+                        <small class="new-job__error-msg new-job__error-msg--select"></small>
+                    </div>
+
+                    <button class="new-job__submit">Submit</button>
+
+                </form>
+            </div>
+            <div class="alert-wrapper">
+                
+            </div>
+        </div>
+    `;
+
+    return modal;
+};
+
 
 export const makeJobSummaryEditable = (editable, job) => {
     const jobTitle = document.querySelector('.job-summary__title');

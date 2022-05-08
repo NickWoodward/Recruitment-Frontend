@@ -85,6 +85,9 @@ export default class Admin {
 
         });
     }
+    getCompanyNames() {
+        return JRS.get('/admin/companyNames');
+    }
 
     createCompany(formData) {
         return JRS.post('/admin/create/company', formData);
