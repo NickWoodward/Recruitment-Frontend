@@ -22,15 +22,18 @@
     // width: 18rem;
     border: 1px solid lightgrey;
     padding: .9rem 1rem;
-    font-size: 1.8rem;
+    font-size: 1.7rem;
 
     cursor: pointer;
     user-select: none;
 }
+.custom-select-value.placeholder {
+    color: grey;
+}
 
 
 .custom-select-container:focus > .custom-select-value {
-    border-width: 2px;
+    // border-width: 2px;
     outline: none;
 }
 
@@ -48,7 +51,7 @@
     position: absolute;
     padding: 1rem 0;
     margin:0;
-    border: 2px solid lightgrey;
+    border: 1px solid lightgrey;
     border-top: none;
     width: 100%;
     max-height: 20rem;

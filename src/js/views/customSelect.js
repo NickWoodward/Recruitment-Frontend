@@ -1,6 +1,7 @@
 export default class Select {
     constructor(select) {
       this.sourceSelect = select
+      this.placeholder = this.sourceSelect.querySelector(`[disabled="disabled"]`)?.value
       this.selectOptions = getFormattedOptions(select.querySelectorAll("option"))
       this.customSelect = document.createElement("div")
       this.customLabel = document.createElement("span")
@@ -29,6 +30,9 @@ export default class Select {
       })
       if(!newSelectedOption) return;
 
+      // Placeholder class removed from label when any option selected
+      if(this.customLabel.classList.contains("placeholder")) this.customLabel.classList.remove("placeholder")
+
       const prevSelectedOption = this.selectedOption
       prevSelectedOption.selected = false
       prevSelectedOption.element.selected = false
@@ -36,17 +40,20 @@ export default class Select {
       newSelectedOption.selected = true
       newSelectedOption.element.selected = true
       this.customLabel.innerText = newSelectedOption.label
-      this.customOptions
-        .querySelector(`[data-value="${prevSelectedOption.value}"][data-group="${prevSelectedOption.group}"]`)
-        .classList.remove("selected")
+      
+      // Guard against the placeholder
+      if(prevSelectedOption.value !== this.placeholder){
+        this.customOptions
+          .querySelector(`[data-value="${prevSelectedOption.value}"][data-group="${prevSelectedOption.group}"]`)
+          .classList.remove("selected")
 
-      this.customOptions
-        .querySelector(`[data-value="${prevSelectedOption.value}"][data-group="${prevSelectedOption.group}"]`)
-        .classList.remove("selected")
-      this.customOptions
-        .querySelector(`[data-value="${prevSelectedOption.value}"][data-group="${prevSelectedOption.group}"]`).children[0]
-        .children[0].classList.remove('selected')
-        
+        // this.customOptions
+        //   .querySelector(`[data-value="${prevSelectedOption.value}"][data-group="${prevSelectedOption.group}"]`)
+        //   .classList.remove("selected")
+        this.customOptions
+          .querySelector(`[data-value="${prevSelectedOption.value}"][data-group="${prevSelectedOption.group}"]`).children[0]
+          .children[0].classList.remove('selected')
+      }
         
       const newCustomElement = this.customOptions.querySelector(
         `[data-value="${newSelectedOption.value}"][data-group="${newSelectedOption.group}"]`
@@ -55,13 +62,16 @@ export default class Select {
       newCustomElement.children[0].children[0].classList.add('selected')
       newCustomElement.scrollIntoView({ block: "nearest" })
     }
-  }
+}
   
   function setupCustomElement(select) {
     select.customSelect.classList.add("custom-select-container")
     select.customSelect.tabIndex = 0
   
     select.customLabel.classList.add("custom-select-value")
+    // Placeholder removed when any option selected
+    select.customLabel.classList.add("placeholder")
+
     select.customLabel.innerText = select.selectedOption.label
     select.customSelect.append(select.customLabel)
   
@@ -70,7 +80,9 @@ export default class Select {
     let group
 
     select.selectOptions.forEach((option, index) => {
+      // 0 is always the placeholder. If one not required, add 'hidden' attribute
       if(index === 0) return
+
       const optionElement = document.createElement("li")
       optionElement.classList.add("custom-select-option")
       optionElement.classList.toggle("selected", option.selected)

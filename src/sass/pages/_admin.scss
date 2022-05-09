@@ -113,6 +113,7 @@
         cursor: pointer;
     }
     &__heading {
+        position: relative;
         color: $color-secondary;
         font-size: 1.9rem;
         font-weight: 400;
@@ -121,6 +122,8 @@
         background-color: rgb(249, 250, 251);
     
         margin: 1.5rem 0;
+
+
     }
 
     &__btn--disabled {
@@ -208,9 +211,6 @@
         &--application {
             display: flex;
             justify-content: space-between;
-            // align-items: center;
-
-
             height: 6rem;
             background-color: $color-primary-new;
             font-size: 1.6rem;
@@ -679,11 +679,79 @@
     }
 }
 
+.new-job {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    
+    &__content {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 5rem;
+border:1px solid orange;
+        width: 100%;
+    }
+
+    &__close {
+        display: flex;
+        position: absolute;
+        top: 50%;
+        right: 0;
+        width: 3.5rem;
+        height: 3.5rem;
+        margin-right: 2rem;
+        transform: translateY(-50%);
+    }
+
+    &__field {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1rem;
+width:100%;
+        & i {
+            visibility: hidden;
+            position: absolute;
+        }
+    }
+    &__label {
+        font-weight: 600;
+        margin-bottom: .5rem;
+    }
+    &__input {
+        padding: .9rem 1rem;
+        font-size: 1.7rem;
+        border: 1px solid lightgrey;
+    }
+}
+
 .job-summary {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     // width: 50rem;
+
+    &__modal {
+        font-size: 1.6rem;
+        &-header {
+            display: flex;
+            height: 6rem;
+            background-color: $color-primary-new;
+            color: white;
+        }
+        &-item {
+            display: flex;
+            align-items: center;
+            &--id,&--date {
+                padding: 0 2rem;
+                width: 50%;
+            }
+            &--date {
+                justify-content: flex-end;
+            }
+        }
+    }
     
     &__section {
         display: flex;
@@ -695,6 +763,8 @@
             font-size: 1.6rem;
             font-weight: 400;
             color: white;
+
+            &>*{ border: 1px solid red; }
         }
         &--description {
             flex-direction: column;
@@ -729,6 +799,8 @@
         &--job {
             width: 50%;
         }
+
+
     }
 
     &__title {

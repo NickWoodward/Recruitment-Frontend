@@ -568,12 +568,12 @@ const populateApplicationModal = ({ jobs, users }) => {
 
     const jobPlaceholder = new Option('Jobs');
     jobPlaceholder.setAttribute('disabled', 'disabled');
-    jobPlaceholder.setAttribute('hidden', 'hidden');
+    jobPlaceholder.setAttribute('selected', 'selected');
     jobsInput.append(jobPlaceholder)
 
     const userPlaceholder = new Option('Applicants');
     userPlaceholder.setAttribute('disabled', 'disabled');
-    userPlaceholder.setAttribute('hidden', 'hidden');
+    userPlaceholder.setAttribute('selected', 'selected');
     userInput.append(userPlaceholder)
 
     jobs.forEach(job => {
@@ -678,14 +678,15 @@ export const renderNewJobModal = (data) => {
 };
 
 
-const populateNewJobModal = ({companies, jobTypes, jobPositions}) => {
+const populateNewJobModal = ({companies, jobTypes, jobPositions, jobPqes}) => {
     // Populate select elements
     const companySelect = document.querySelector('.new-job__input--company');
     const locationSelect = document.querySelector('.new-job__input--location');
     const wageSelect = document.querySelector('.new-job__input--wage');
     const typeSelect = document.querySelector('.new-job__input--type');
     const positionSelect = document.querySelector('.new-job__input--position');
-    const pqeSelect = document.querySelector('.new-job__input--featured');
+    const pqeSelect = document.querySelector('.new-job__input--pqe');
+    const featuredSelect = document.querySelector('.new-job__input--featured');
 
     // Order the companies by name
     companies.sort((a, b) => a.companyName > b.companyName? 1:-1);
@@ -693,7 +694,9 @@ const populateNewJobModal = ({companies, jobTypes, jobPositions}) => {
     const selects = [
         [companySelect, 'Company'], 
         [typeSelect, 'Type'], 
-        [positionSelect, 'Position']
+        [positionSelect, 'Position'],
+        [pqeSelect, 'Experience'],
+        [featuredSelect, 'Featured?']
     ];
 
     // Add placeholders
@@ -702,7 +705,8 @@ const populateNewJobModal = ({companies, jobTypes, jobPositions}) => {
         const placeholder= new Option(select[1]);
 
         placeholder.setAttribute('disabled', 'disabled');
-        placeholder.setAttribute('hidden', 'hidden');
+        placeholder.setAttribute('selected', 'selected');
+        placeholder.className = 'placeholder';
 
         selectElement.appendChild(placeholder);
     });
@@ -725,10 +729,25 @@ const populateNewJobModal = ({companies, jobTypes, jobPositions}) => {
         positionSelect.add(option);
     });
 
+    jobPqes.forEach(pqe => {
+        const option = new Option(`${pqe}+`, pqe);
+        option.className = 'pqe-option';
+        pqeSelect.add(option); 
+    });
+
+    [true, false].forEach(featured => {
+        const option = new Option(`${featured? 'Yes': 'No'}`, featured);
+        option.className = 'featured-option';
+        featuredSelect.add(option); 
+    });
+
+
     // Create Custom Selects
-    const customCompanySelect = new Select(companySelect);
-    const customTypeSelect = new Select(typeSelect);
-    const customPositionSelect = new Select(positionSelect);
+    new Select(companySelect);
+    new Select(typeSelect);
+    new Select(positionSelect);
+    new Select(pqeSelect);
+    new Select(featuredSelect);
 };
 
 const createNewJobModal = ({companies, jobNumber}) => {
@@ -739,19 +758,20 @@ const createNewJobModal = ({companies, jobNumber}) => {
         <div class="job-summary__modal job-summary__modal--new">
 
             <div class="job-summary__modal-header">
-                <div>${jobNumber}</div>
-                <div>${date}</div>
+                <div class="job-summary__modal-item job-summary__modal-item--id">${jobNumber}</div>
+                <div class="job-summary__modal-item job-summary__modal-item--date">${date}</div>
             </div>
 
-            <div class="summary__heading">Create Job</div>
-
-            <div class="new-job__close">
-                <svg class="new-job__close-svg"><use xlink:href="svg/spritesheet.svg#cross"></svg>
+            <div class="summary__heading summary__heading--new-job">Create Job
+                <div class="new-job__close">
+                    <svg class="new-job__close-svg"><use xlink:href="svg/spritesheet.svg#cross"></svg>
+                </div>
             </div>
-            <div class="new-job__form-wrapper">
 
-                <form class="new-job">
-                    <div class="new-job__field">
+
+            <form class="new-job">
+                <div class="new-job__content">
+                    <div class="new-job__field new-job__field--title">
                         <label for="title" class="new-job__label">Title</label>
                         <input type="text" placeholder="Job Title" id="title" class="new-job__input">
                         <i class="new-job__icon new-job__icon--success"></i>
@@ -760,7 +780,7 @@ const createNewJobModal = ({companies, jobNumber}) => {
                         </i>
                         <small class="new-job__error-msg"></small>
                     </div>
-                    <div class="new-job__field">
+                    <div class="new-job__field new-job__field--company">
                         <label for="company" class="new-job__label">Company</label>
                         <select name="company" id="company" class="new-job__input new-job__input--company">
                             <!-- options added in js -->
@@ -770,7 +790,7 @@ const createNewJobModal = ({companies, jobNumber}) => {
                         <small class="new-job__error-msg new-job__error-msg--select"></small>
                     </div>
                     
-                    <div class="new-job__field">
+                    <div class="new-job__field new-job__field--location">
                         <label for="location" class="new-job__label">Location</label>
                         <select name="location" id="location" class="new-job__input new-job__input--location">
                             <!-- options added in js -->
@@ -780,7 +800,7 @@ const createNewJobModal = ({companies, jobNumber}) => {
                         <small class="new-job__error-msg"></small>
                     </div>
 
-                    <div class="new-job__field">
+                    <div class="new-job__field new-job__field--wage">
                         <label for="wage" class="new-job__label">Wage</label>
                         <input type="text" placeholder="Wage" id="wage" class="new-job__input">
                         <i class="new-job__icon new-job__icon--success"></i>
@@ -788,15 +808,7 @@ const createNewJobModal = ({companies, jobNumber}) => {
                         <small class="new-job__error-msg"></small>
                     </div>
 
-                    <div class="new-job__field">
-                        <label for="wage" class="new-job__label">Wage</label>
-                        <input type="text" placeholder="Wage" id="wage" class="new-job__input">
-                        <i class="new-job__icon new-job__icon--success"></i>
-                        <i class="new-job__icon new-job__icon--fail"></i>
-                        <small class="new-job__error-msg"></small>
-                    </div>
-
-                    <div class="new-job__field">
+                    <div class="new-job__field new-job__field--type">
                         <label for="type" class="new-job__label">Type</label>
                         <select name="type" id="type" class="new-job__input new-job__input--type">
                             <!-- options added in js -->
@@ -806,7 +818,7 @@ const createNewJobModal = ({companies, jobNumber}) => {
                         <small class="new-job__error-msg new-job__error-msg--select"></small>
                     </div>
 
-                    <div class="new-job__field">
+                    <div class="new-job__field new-job__field--position">
                         <label for="position" class="new-job__label">Position</label>
                         <select name="position" id="position" class="new-job__input new-job__input--position">
                             <!-- options added in js -->
@@ -816,7 +828,7 @@ const createNewJobModal = ({companies, jobNumber}) => {
                         <small class="new-job__error-msg new-job__error-msg--select"></small>
                     </div>
 
-                    <div class="new-job__field">
+                    <div class="new-job__field new-job__field--pqe">
                         <label for="pqe" class="new-job__label">PQE</label>
                         <select name="pqe" id="pqe" class="new-job__input new-job__input--pqe">
                             <!-- options added in js -->
@@ -826,7 +838,7 @@ const createNewJobModal = ({companies, jobNumber}) => {
                         <small class="new-job__error-msg new-job__error-msg--select"></small>
                     </div>
 
-                    <div class="new-job__field">
+                    <div class="new-job__field new-job__field--featured">
                         <label for="featured" class="new-job__label">Featured</label>
                         <select name="featured" id="featured" class="new-job__input new-job__input--featured">
                             <!-- options added in js -->
@@ -835,11 +847,10 @@ const createNewJobModal = ({companies, jobNumber}) => {
                         <i class="new-job__icon new-job__icon--fail new-job__icon--select"></i>
                         <small class="new-job__error-msg new-job__error-msg--select"></small>
                     </div>
+                </div>
+                <button class="new-job__submit">Submit</button>
 
-                    <button class="new-job__submit">Submit</button>
-
-                </form>
-            </div>
+            </form>
             <div class="alert-wrapper">
                 
             </div>

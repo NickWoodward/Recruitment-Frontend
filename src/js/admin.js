@@ -62,6 +62,7 @@ class AdminController {
             INHOUSE: 'In House',
             PRIVATE: 'Private Practice'
         });
+        this.jobPqes = [1,2,3,4,5,6,7,8,9,10];
 
         this.state= {
             isActiveRequest: false,
@@ -1626,7 +1627,12 @@ console.log('adding job listeners');
             const { data: { companyNames } } = await this.Admin.getCompanyNames();
             this.state.companies.companyNames = companyNames;
             
-            adminView.renderNewJobModal({ companies: this.state.companies.companyNames, jobTypes: this.jobTypes, jobPositions: this.jobPositions });
+            adminView.renderNewJobModal({ 
+                companies: this.state.companies.companyNames, 
+                jobTypes: this.jobTypes, 
+                jobPositions: this.jobPositions,
+                jobPqes: this.jobPqes
+            });
         }
         if(deleteBtn) {
             console.log('deleteBtn');
