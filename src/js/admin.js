@@ -1274,7 +1274,7 @@ class AdminController {
         }
 
         if(newBtn) {
-            adminView.renderNewApplicationModal({jobs: this.jobs, users: this.users, applications: this.applications, appNumber: this.getNextApplicationId() + 1});
+            adminView.renderNewApplicationModal({jobs: this.jobs, users: this.users, applications: this.applications, appNumber: this.getNextId('applications')});
         
             const applicationSummaryModal = document.querySelector('.application-summary__modal');
             const submitNewBtn = document.querySelector('.new-application__submit');
@@ -1499,10 +1499,10 @@ class AdminController {
         }
     }
 
-    getNextApplicationId() {
-        return this.applications.reduce((previous, current) => {
+    getNextId(arr) {
+        return this[arr].reduce((previous, current) => {
             return current.id > previous? current.id:previous;
-        }, this.applications[0].id);
+        }, this[arr][0].id) + 1;
     }
 
     renderJobsTable() {
@@ -1622,7 +1622,7 @@ console.log('adding job listeners');
         const companyLink = e.target.closest('.summary__link--company');
 
         if(newBtn) {
-            console.log('newBtn');
+
             // Get company list
             const { data: { companyNames } } = await this.Admin.getCompanyNames();
             this.state.companies.companyNames = companyNames;
@@ -1631,7 +1631,34 @@ console.log('adding job listeners');
                 companies: this.state.companies.companyNames, 
                 jobTypes: this.jobTypes, 
                 jobPositions: this.jobPositions,
-                jobPqes: this.jobPqes
+                jobPqes: this.jobPqes,
+                jobNumber: this.getNextId('jobs')
+            });
+
+            const jobSummaryModal = document.querySelector('.job-summary__modal');
+            const jobForm = document.querySelector('.new-job');
+            const closeBtn = document.querySelector('.new-job__close');
+            const submitBtn = document.querySelector('.new-job__submit');
+
+            closeBtn.addEventListener('click', () => {
+                gsap.to(jobSummaryModal, {
+                    autoAlpha: 0,
+                    duration: 0.2,
+                    onComplete: () => jobSummaryModal.parentElement.removeChild(jobSummaryModal)
+                })
+            });
+           
+            jobForm.addEventListener('submit', () => {
+                utils.validateForm('job', { 
+                    companyId: 2,
+                    title: 'Legal',
+                    location: 'Reading',
+                    wage: 20000,
+                    jobType: 'Interim',
+                    position: 'In House',
+                    pqe: 2,
+                    featured: 3
+                });
             });
         }
         if(deleteBtn) {

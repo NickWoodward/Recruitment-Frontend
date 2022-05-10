@@ -666,7 +666,6 @@ export const populateUserSummary = (user) => {
 export const renderNewJobModal = (data) => {
     const summary = document.querySelector('.summary-wrapper');
     const modal = createNewJobModal(data);
-
     summary.insertAdjacentHTML('afterbegin', modal);
 
     gsap.fromTo('.job-summary__modal',
@@ -755,21 +754,17 @@ const createNewJobModal = ({companies, jobNumber}) => {
     const today = new Date();
     const date = `${today.getDate()}/${today.getMonth()+1}/${+today.getFullYear()}`;
     const modal = `
-        <div class="job-summary__modal job-summary__modal--new">
+        <div class="job-summary__modal job-summary__modal--new-job">
 
             <div class="job-summary__modal-header">
                 <div class="job-summary__modal-item job-summary__modal-item--id">${jobNumber}</div>
                 <div class="job-summary__modal-item job-summary__modal-item--date">${date}</div>
             </div>
-
-            <div class="summary__heading summary__heading--new-job">Create Job
+           
+            <form class="new-job">
                 <div class="new-job__close">
                     <svg class="new-job__close-svg"><use xlink:href="svg/spritesheet.svg#cross"></svg>
                 </div>
-            </div>
-
-
-            <form class="new-job">
                 <div class="new-job__content">
                     <div class="new-job__field new-job__field--title">
                         <label for="title" class="new-job__label">Title</label>
@@ -792,9 +787,8 @@ const createNewJobModal = ({companies, jobNumber}) => {
                     
                     <div class="new-job__field new-job__field--location">
                         <label for="location" class="new-job__label">Location</label>
-                        <select name="location" id="location" class="new-job__input new-job__input--location">
-                            <!-- options added in js -->
-                        </select>                        
+                        <input type="text" placeholder="Location" id="location" class="new-job__input">
+                    
                         <i class="new-job__icon new-job__icon--success"></i>
                         <i class="new-job__icon new-job__icon--fail"></i>
                         <small class="new-job__error-msg"></small>
@@ -802,7 +796,7 @@ const createNewJobModal = ({companies, jobNumber}) => {
 
                     <div class="new-job__field new-job__field--wage">
                         <label for="wage" class="new-job__label">Wage</label>
-                        <input type="text" placeholder="Wage" id="wage" class="new-job__input">
+                        <input type="number" placeholder="Wage" id="wage" class="new-job__input" min="10000" max="10000000" step="1000">
                         <i class="new-job__icon new-job__icon--success"></i>
                         <i class="new-job__icon new-job__icon--fail"></i>
                         <small class="new-job__error-msg"></small>
@@ -847,8 +841,9 @@ const createNewJobModal = ({companies, jobNumber}) => {
                         <i class="new-job__icon new-job__icon--fail new-job__icon--select"></i>
                         <small class="new-job__error-msg new-job__error-msg--select"></small>
                     </div>
+                    <button class="new-job__submit">Submit</button>
+
                 </div>
-                <button class="new-job__submit">Submit</button>
 
             </form>
             <div class="alert-wrapper">
