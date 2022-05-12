@@ -30,6 +30,7 @@ import * as userForm from './views/userForm';
 import * as jobForm from './views/jobForm';
 import * as jobView from './views/jobView';
 import * as utils from './utils/utils';
+import * as validator from './utils/validator';
 import * as dummyData from './utils/dummyData';
 import * as loader from './views/loader';
 import * as modalView from './views/modalView';
@@ -1599,7 +1600,6 @@ class AdminController {
 
     addJobsSummaryListeners() {
         const jobSummary = document.querySelector('.job-summary');
-console.log('adding job listeners');
         jobSummary.addEventListener(
             'click', 
             this.jobSummaryListener.bind(this)
@@ -1635,32 +1635,87 @@ console.log('adding job listeners');
                 jobNumber: this.getNextId('jobs')
             });
 
-            const jobSummaryModal = document.querySelector('.job-summary__modal');
-            const jobForm = document.querySelector('.new-job');
-            const closeBtn = document.querySelector('.new-job__close');
-            const submitBtn = document.querySelector('.new-job__submit');
+            const fields = adminView.getNewJobElements();
+            const {
+                jobSummaryModal, 
+                jobForm, 
+                titleField, 
+                companyField, 
+                locationField, 
+                wageField, 
+                typeField, 
+                positionField, 
+                pqeField, 
+                featuredField, 
+                descriptionField,
+                closeBtn, 
+                submitBtn 
+            } = fields;
 
             closeBtn.addEventListener('click', () => {
-                gsap.to(jobSummaryModal, {
-                    autoAlpha: 0,
-                    duration: 0.2,
-                    onComplete: () => jobSummaryModal.parentElement.removeChild(jobSummaryModal)
-                })
+                adminView.removeNewJobModal();
             });
            
-            jobForm.addEventListener('submit', () => {
-                utils.validateForm('job', { 
-                    companyId: 2,
-                    title: 'Legal',
-                    location: 'Reading',
-                    wage: 20000,
-                    jobType: 'Interim',
-                    position: 'In House',
-                    pqe: 2,
-                    featured: 3
-                });
+            jobForm.addEventListener('submit', e => {
+                e.preventDefault();
+
+                const data = adminView.getNewJobValues(fields);
+                const errors = validator.validateJob(data);
+
+                if(!errors) {
+                  Object.values(fields).forEach(field => validator.setSuccessFor(field));
+                  return;
+                } 
+                
+                if(errors.title) 
+                  validator.setErrorFor(titleField, errors.title); 
+                else validator.setSuccessFor(titleField);
+
+                if(errors.company)     
+                  validator.setErrorFor(companyField, errors.company);
+                else validator.setSuccessFor(companyField);
+
+                if(errors.location)  
+                  validator.setErrorFor(locationField, errors.location);
+                else validator.setSuccessFor(locationField);
+
+                if(errors.wage) 
+                  validator.setErrorFor(wageField, errors.wage);
+                else validator.setSuccessFor(wageField);
+
+                if(errors.type) 
+                  validator.setErrorFor(typeField, errors.type);
+                else validator.setSuccessFor(typeField);
+
+                if(errors.position) 
+                  validator.setErrorFor(positionField, errors.position);
+                else validator.setSuccessFor(positionField);
+
+                if(errors.pqe) 
+                  validator.setErrorFor(pqeField, errors.pqe);
+                else validator.setSuccessFor(pqeField);
+
+                if(errors.featured) 
+                  validator.setErrorFor(featuredField, errors.featured);
+                else validator.setSuccessFor(featuredField);
+
+                if(errors.description) 
+                  validator.setErrorFor(descriptionField, errors.description); 
+                else validator.setSuccessFor(descriptionField);
+            });
+
+
+            titleField.addEventListener('blur', (e) => {
+                const field = e.target;
+                if(field === document.querySelector('.form__submit--new-job')) return;
+
+                validator.validateJobField(e.target.value);
             });
         }
+
+
+
+
         if(deleteBtn) {
             console.log('deleteBtn');
         }

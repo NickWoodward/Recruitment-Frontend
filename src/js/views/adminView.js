@@ -665,28 +665,49 @@ export const populateUserSummary = (user) => {
 
 export const renderNewJobModal = (data) => {
     const summary = document.querySelector('.summary-wrapper');
+    // Coordinates to position the modal on top of the summary
+    const { left: summaryLeft, top: summaryTop, width: summaryWidth, height: summaryHeight} = summary.getBoundingClientRect();
+    const finalHeight = document.querySelector('.table-wrapper').getBoundingClientRect().height;
+    const adminWrapper = document.querySelector('.admin-wrapper');
     const modal = createNewJobModal(data);
-    summary.insertAdjacentHTML('afterbegin', modal);
+    adminWrapper.insertAdjacentHTML('afterbegin', modal);
 
-    gsap.fromTo('.job-summary__modal',
+    // Set the modal to the same position and dimensions as the summary
+    const modalElement = document.querySelector('.job-summary__modal');
+    modalElement.style.left = `${summaryLeft}px`;
+    modalElement.style.top = `${summaryTop}px`;
+    modalElement.style.width = `${summaryWidth}px`;
+    modalElement.style.height = `${summaryHeight}px`;
+
+    gsap.timeline().fromTo(modalElement,
         {autoAlpha: 0},
         {autoAlpha: 1, duration: .2}
-    );
+    ).to(modalElement, {
+        height: `${finalHeight}px`
+    });
 
     populateNewJobModal(data);
 };
 
+export const removeNewJobModal = () => {
+    gsap.timeline()
+        .to('.job-summary__modal', {
+            height: () => document.querySelector('.summary-wrapper').getBoundingClientRect().height
+        })
+        .to('.job-summary__modal', {
+            autoAlpha: 0,
+            duration: 0.2,
+            onComplete: () => jobSummaryModal.parentElement.removeChild(jobSummaryModal)
+        })
+}
 
 const populateNewJobModal = ({companies, jobTypes, jobPositions, jobPqes}) => {
     // Populate select elements
-    const companySelect = document.querySelector('.new-job__input--company');
-    const locationSelect = document.querySelector('.new-job__input--location');
-    const wageSelect = document.querySelector('.new-job__input--wage');
-    const typeSelect = document.querySelector('.new-job__input--type');
-    const positionSelect = document.querySelector('.new-job__input--position');
-    const pqeSelect = document.querySelector('.new-job__input--pqe');
-    const featuredSelect = document.querySelector('.new-job__input--featured');
-
+    const companySelect = document.querySelector('.form__company-input--new-job');
+    const typeSelect = document.querySelector('.form__type-input--new-job');
+    const positionSelect = document.querySelector('.form__position-input--new-job');
+    const pqeSelect = document.querySelector('.form__pqe-input--new-job');
+    const featuredSelect = document.querySelector('.form__featured-input--new-job');
     // Order the companies by name
     companies.sort((a, b) => a.companyName > b.companyName? 1:-1);
 
@@ -761,92 +782,101 @@ const createNewJobModal = ({companies, jobNumber}) => {
                 <div class="job-summary__modal-item job-summary__modal-item--date">${date}</div>
             </div>
            
-            <form class="new-job">
-                <div class="new-job__close">
-                    <svg class="new-job__close-svg"><use xlink:href="svg/spritesheet.svg#cross"></svg>
+            <form class="form--new-job">
+                <div class="form__close--new-job">
+                    <svg class="form__close-svg--new-job"><use xlink:href="svg/spritesheet.svg#cross"></svg>
                 </div>
-                <div class="new-job__content">
-                    <div class="new-job__field new-job__field--title">
-                        <label for="title" class="new-job__label">Title</label>
-                        <input type="text" placeholder="Job Title" id="title" class="new-job__input">
-                        <i class="new-job__icon new-job__icon--success"></i>
-                        <i class="new-job__icon new-job__icon--fail">
+                <div class="form__content--new-job">
+                    <div class="form__field--new-job form__title--new-job">
+                        <label for="title" class="form__label--new-job">Title</label>
+                        <input type="text" placeholder="Job Title" id="title" class="form__input--new-job form__title-input--new-job">
+                        <i class="form__icon--new-job form__icon--success"></i>
+                        <i class="form__icon form__icon--fail">
                             <svg><use xlink:href="svg/spritesheet.svg#alert-circled"></svg>
                         </i>
-                        <small class="new-job__error-msg"></small>
+                        <small class="form__error-msg"></small>
                     </div>
-                    <div class="new-job__field new-job__field--company">
-                        <label for="company" class="new-job__label">Company</label>
-                        <select name="company" id="company" class="new-job__input new-job__input--company">
+                    <div class="form__field--new-job form__company--new-job">
+                        <label for="company" class="form__label--new-job">Company</label>
+                        <select name="company" id="company" class="form__input--new-job form__company-input--new-job">
                             <!-- options added in js -->
                         </select>
-                        <i class="new-job__icon new-job__icon--success new-job__icon--select"></i>
-                        <i class="new-job__icon new-job__icon--fail new-job__icon--select"></i>
-                        <small class="new-job__error-msg new-job__error-msg--select"></small>
+                        <i class="form__icon form__icon--success form__icon--select"></i>
+                        <i class="form__icon form__icon--fail form__icon--select"></i>
+                        <small class="form__error-msg form__error-msg--select"></small>
                     </div>
                     
-                    <div class="new-job__field new-job__field--location">
-                        <label for="location" class="new-job__label">Location</label>
-                        <input type="text" placeholder="Location" id="location" class="new-job__input">
+                    <div class="form__field--new-job form__location--new-job">
+                        <label for="location" class="form__label--new-job">Location</label>
+                        <input type="text" placeholder="Location" id="location" class="form__input--new-job form__location-input--new-job">
                     
-                        <i class="new-job__icon new-job__icon--success"></i>
-                        <i class="new-job__icon new-job__icon--fail"></i>
-                        <small class="new-job__error-msg"></small>
+                        <i class="form__icon form__icon--success"></i>
+                        <i class="form__icon form__icon--fail"></i>
+                        <small class="form__error-msg"></small>
                     </div>
 
-                    <div class="new-job__field new-job__field--wage">
-                        <label for="wage" class="new-job__label">Wage</label>
-                        <input type="number" placeholder="Wage" id="wage" class="new-job__input" min="10000" max="10000000" step="1000">
-                        <i class="new-job__icon new-job__icon--success"></i>
-                        <i class="new-job__icon new-job__icon--fail"></i>
-                        <small class="new-job__error-msg"></small>
+                    <div class="form__field--new-job form__wage--new-job">
+                        <label for="wage" class="form__label--new-job">Wage</label>
+                        <input type="number" placeholder="Wage" id="wage" class="form__input--new-job form__wage-input--new-job" min="10000" max="10000000" step="1000">
+                        <i class="form__icon form__icon--success"></i>
+                        <i class="form__icon form__icon--fail"></i>
+                        <small class="form__error-msg"></small>
                     </div>
 
-                    <div class="new-job__field new-job__field--type">
-                        <label for="type" class="new-job__label">Type</label>
-                        <select name="type" id="type" class="new-job__input new-job__input--type">
+                    <div class="form__field--new-job form__type--new-job">
+                        <label for="type" class="form__label--new-job">Type</label>
+                        <select name="type" id="type" class="form__input--new-job form__type-input--new-job">
                             <!-- options added in js -->
                         </select>
-                        <i class="new-job__icon new-job__icon--success new-job__icon--select"></i>
-                        <i class="new-job__icon new-job__icon--fail new-job__icon--select"></i>
-                        <small class="new-job__error-msg new-job__error-msg--select"></small>
+                        <i class="form__icon form__icon--success form__icon--select"></i>
+                        <i class="form__icon form__icon--fail form__icon--select"></i>
+                        <small class="form__error-msg form__error-msg--select"></small>
                     </div>
 
-                    <div class="new-job__field new-job__field--position">
-                        <label for="position" class="new-job__label">Position</label>
-                        <select name="position" id="position" class="new-job__input new-job__input--position">
+                    <div class="form__field--new-job form__position--new-job">
+                        <label for="position" class="form__label--new-job">Position</label>
+                        <select name="position" id="position" class="form__input--new-job form__position-input--new-job">
                             <!-- options added in js -->
                         </select>
-                        <i class="new-job__icon new-job__icon--success new-job__icon--select"></i>
-                        <i class="new-job__icon new-job__icon--fail new-job__icon--select"></i>
-                        <small class="new-job__error-msg new-job__error-msg--select"></small>
+                        <i class="form__icon form__icon--success form__icon--select"></i>
+                        <i class="form__icon form__icon--fail form__icon--select"></i>
+                        <small class="form__error-msg form__error-msg--select"></small>
                     </div>
 
-                    <div class="new-job__field new-job__field--pqe">
-                        <label for="pqe" class="new-job__label">PQE</label>
-                        <select name="pqe" id="pqe" class="new-job__input new-job__input--pqe">
+                    <div class="form__field--new-job form__pqe--new-job">
+                        <label for="pqe" class="form__label--new-job">PQE</label>
+                        <select name="pqe" id="pqe" class="form__input--new-job form__pqe-input--new-job">
                             <!-- options added in js -->
                         </select>
-                        <i class="new-job__icon new-job__icon--success new-job__icon--select"></i>
-                        <i class="new-job__icon new-job__icon--fail new-job__icon--select"></i>
-                        <small class="new-job__error-msg new-job__error-msg--select"></small>
+                        <i class="form__icon form__icon--success form__icon--select"></i>
+                        <i class="form__icon form__icon--fail form__icon--select"></i>
+                        <small class="form__error-msg form__error-msg--select"></small>
                     </div>
 
-                    <div class="new-job__field new-job__field--featured">
-                        <label for="featured" class="new-job__label">Featured</label>
-                        <select name="featured" id="featured" class="new-job__input new-job__input--featured">
+                    <div class="form__field--new-job form__featured--new-job">
+                        <label for="featured" class="form__label--new-job">Featured</label>
+                        <select name="featured" id="featured" class="form__input--new-job form__featured-input--new-job">
                             <!-- options added in js -->
                         </select>
-                        <i class="new-job__icon new-job__icon--success new-job__icon--select"></i>
-                        <i class="new-job__icon new-job__icon--fail new-job__icon--select"></i>
-                        <small class="new-job__error-msg new-job__error-msg--select"></small>
+                        <i class="form__icon form__icon--success form__icon--select"></i>
+                        <i class="form__icon form__icon--fail form__icon--select"></i>
+                        <small class="form__error-msg form__error-msg--select"></small>
                     </div>
-                    <button class="new-job__submit">Submit</button>
+
+                    <div class="form__field--new-job form__description--new-job">
+                        <label for="description" class="form__label--new-job">Description</label>
+                        <textarea name="description" id="description" class="form__input--new-job form__description-input--new-job"></textarea>
+                        <i class="form__icon form__icon--success form__icon--select"></i>
+                        <i class="form__icon form__icon--fail form__icon--select"></i>
+                        <small class="form__error-msg form__error-msg--select"></small>
+                    </div>
+
+                    <button class="form__submit--new-job">Submit</button>
 
                 </div>
 
             </form>
-            <div class="alert-wrapper">
+            <div class="alert-wrapper alert-wrapper--new-job alert-wrapper--hidden">
                 
             </div>
         </div>
@@ -855,6 +885,37 @@ const createNewJobModal = ({companies, jobNumber}) => {
     return modal;
 };
 
+export const getNewJobElements = () => {
+    const jobSummaryModal = document.querySelector('.job-summary__modal');
+    const jobForm = document.querySelector('.form--new-job');
+    const titleField = document.querySelector('.form__title-input--new-job');
+    const companyField = document.querySelector('.form__company-input--new-job');
+    const locationField = document.querySelector('.form__location-input--new-job');
+    const wageField = document.querySelector('.form__wage-input--new-job');
+    const typeField = document.querySelector('.form__type-input--new-job');
+    const positionField = document.querySelector('.form__position-input--new-job');
+    const pqeField = document.querySelector('.form__pqe-input--new-job');
+    const featuredField = document.querySelector('.form__featured-input--new-job');
+    const descriptionField = document.querySelector('.form__description-input--new-job');
+    const closeBtn = document.querySelector('.form__close--new-job');
+    const submitBtn = document.querySelector('.form__submit--new-job');
+
+    return { jobSummaryModal, jobForm, titleField, companyField, locationField, wageField, typeField, positionField, pqeField, featuredField, descriptionField, closeBtn, submitBtn }
+}
+
+export const getNewJobValues = ({titleField, companyField, locationField, wageField, typeField, positionField, pqeField, featuredField, descriptionField }) => {
+    // Fields that check the value have placeholders
+    const title = titleField.value.trim();
+    const company = companyField.value === 'Company'? -1:companyField.value.trim();
+    const location = locationField.value.trim();
+    const wage = wageField.value === 'Wage'? '':wageField.value.trim();
+    const type = typeField.value === 'Type'? '':typeField.value.trim();
+    const position = positionField.value === 'Position'? '':positionField.value.trim();
+    const pqe = pqeField.value === 'Experience'? '':pqeField.value.trim();
+    const featured = featuredField.value === 'Featured'? '':featuredField.value.trim();
+    const description = descriptionField.value.trim();
+    return { title, company, location, wage, type, position, pqe, featured, description };
+}
 
 export const makeJobSummaryEditable = (editable, job) => {
     const jobTitle = document.querySelector('.job-summary__title');

@@ -1,5 +1,4 @@
 import { gsap } from 'gsap';
-import Joi from 'joi';
 
 export const displayLoaderMessage = (container, type, msg) => {
 
@@ -158,63 +157,3 @@ export const timeAgo = (date) => {
     return `${interval} ${epoch}${suffix} ago`;
 };
 
-
-export const validateForm = (form, data) => {
-    // const { title, companyId, location, wage, type, position, pqe, featured } = data;
-    if(form === 'job') {
-        console.log(getJobFormSchema().validate(data));
-    }
-};
-
-const getJobFormSchema = () => {
-    return Joi.object({
-        title: Joi.string()
-                .trim()
-                .alphanum()
-                .min(3)
-                .max(50)
-                .required(),
-        companyId: Joi.number()
-                .integer()
-                .greater(0)
-                .required(),
-        wage: Joi.number()
-                .integer()
-                .min(10000)
-                .max(10000000)
-                .required(),
-        location: Joi.string()
-                .trim()
-                .alphanum()
-                .min(3)
-                .max(50)
-                .required(),
-        jobType: Joi.string()
-                .trim()
-                .alphanum()
-                .min(2)
-                .max(50)
-                .required(),
-        position: Joi.string()
-                .trim()
-                .alphanum()
-                .min(2)
-                .max(50)
-                .required(),
-        pqe: Joi.number()
-                .integer()
-                .greater(0)
-                .less(11)
-                .required(),
-        description: Joi.string()
-                .trim()
-                .alphanum()
-                .min(5)
-                .max(500),
-        featured: Joi.number()
-                .integer()
-                .greater(-1)
-                .less(2)
-                .required()   
-    });
-}
