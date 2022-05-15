@@ -47,9 +47,6 @@ export default class Select {
           .querySelector(`[data-value="${prevSelectedOption.value}"][data-group="${prevSelectedOption.group}"]`)
           .classList.remove("selected")
 
-        // this.customOptions
-        //   .querySelector(`[data-value="${prevSelectedOption.value}"][data-group="${prevSelectedOption.group}"]`)
-        //   .classList.remove("selected")
         this.customOptions
           .querySelector(`[data-value="${prevSelectedOption.value}"][data-group="${prevSelectedOption.group}"]`).children[0]
           .children[0].classList.remove('selected')
@@ -114,9 +111,10 @@ export default class Select {
       svgWrapper.appendChild(selectedSvg);
 
       optionElement.addEventListener("click", () => {
+        
         select.selectValue(option.value, option.group)
         select.customOptions.classList.remove("show")
-
+        select.customSelect.dispatchEvent(new Event('change', { bubbles: true }));
       })
 
       // Add option groups if present

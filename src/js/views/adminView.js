@@ -690,14 +690,15 @@ export const renderNewJobModal = (data) => {
 };
 
 export const removeNewJobModal = () => {
+    const jobSummary = document.querySelector('.job-summary__modal');
     gsap.timeline()
-        .to('.job-summary__modal', {
+        .to(jobSummary, {
             height: () => document.querySelector('.summary-wrapper').getBoundingClientRect().height
         })
-        .to('.job-summary__modal', {
+        .to(jobSummary, {
             autoAlpha: 0,
             duration: 0.2,
-            onComplete: () => jobSummaryModal.parentElement.removeChild(jobSummaryModal)
+            onComplete: () => jobSummary.parentElement.removeChild(jobSummary)
         })
 }
 
@@ -755,7 +756,7 @@ const populateNewJobModal = ({companies, jobTypes, jobPositions, jobPqes}) => {
         pqeSelect.add(option); 
     });
 
-    [true, false].forEach(featured => {
+    [0, 1].forEach(featured => {
         const option = new Option(`${featured? 'Yes': 'No'}`, featured);
         option.className = 'featured-option';
         featuredSelect.add(option); 
@@ -790,9 +791,11 @@ const createNewJobModal = ({companies, jobNumber}) => {
                     <div class="form__field--new-job form__title--new-job">
                         <label for="title" class="form__label--new-job">Title</label>
                         <input type="text" placeholder="Job Title" id="title" class="form__input--new-job form__title-input--new-job">
-                        <i class="form__icon--new-job form__icon--success"></i>
-                        <i class="form__icon form__icon--fail">
-                            <svg><use xlink:href="svg/spritesheet.svg#alert-circled"></svg>
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
                         </i>
                         <small class="form__error-msg"></small>
                     </div>
@@ -801,8 +804,12 @@ const createNewJobModal = ({companies, jobNumber}) => {
                         <select name="company" id="company" class="form__input--new-job form__company-input--new-job">
                             <!-- options added in js -->
                         </select>
-                        <i class="form__icon form__icon--success form__icon--select"></i>
-                        <i class="form__icon form__icon--fail form__icon--select"></i>
+                        <i class="form__icon form__icon--success form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
                         <small class="form__error-msg form__error-msg--select"></small>
                     </div>
                     
@@ -810,16 +817,24 @@ const createNewJobModal = ({companies, jobNumber}) => {
                         <label for="location" class="form__label--new-job">Location</label>
                         <input type="text" placeholder="Location" id="location" class="form__input--new-job form__location-input--new-job">
                     
-                        <i class="form__icon form__icon--success"></i>
-                        <i class="form__icon form__icon--fail"></i>
+                        <i class="form__icon form__icon--success">
+                            <svg><svg><use xlink:href="svg/spritesheet.svg#success"></svg></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
                         <small class="form__error-msg"></small>
                     </div>
 
                     <div class="form__field--new-job form__wage--new-job">
                         <label for="wage" class="form__label--new-job">Wage</label>
-                        <input type="number" placeholder="Wage" id="wage" class="form__input--new-job form__wage-input--new-job" min="10000" max="10000000" step="1000">
-                        <i class="form__icon form__icon--success"></i>
-                        <i class="form__icon form__icon--fail"></i>
+                        <input type="number" placeholder="Wage" id="wage" class="form__input--new-job form__wage-input--new-job" min="10000" max="10000000" step="any">
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
                         <small class="form__error-msg"></small>
                     </div>
 
@@ -828,8 +843,12 @@ const createNewJobModal = ({companies, jobNumber}) => {
                         <select name="type" id="type" class="form__input--new-job form__type-input--new-job">
                             <!-- options added in js -->
                         </select>
-                        <i class="form__icon form__icon--success form__icon--select"></i>
-                        <i class="form__icon form__icon--fail form__icon--select"></i>
+                        <i class="form__icon form__icon--success form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
                         <small class="form__error-msg form__error-msg--select"></small>
                     </div>
 
@@ -838,8 +857,12 @@ const createNewJobModal = ({companies, jobNumber}) => {
                         <select name="position" id="position" class="form__input--new-job form__position-input--new-job">
                             <!-- options added in js -->
                         </select>
-                        <i class="form__icon form__icon--success form__icon--select"></i>
-                        <i class="form__icon form__icon--fail form__icon--select"></i>
+                        <i class="form__icon form__icon--success form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
                         <small class="form__error-msg form__error-msg--select"></small>
                     </div>
 
@@ -848,8 +871,12 @@ const createNewJobModal = ({companies, jobNumber}) => {
                         <select name="pqe" id="pqe" class="form__input--new-job form__pqe-input--new-job">
                             <!-- options added in js -->
                         </select>
-                        <i class="form__icon form__icon--success form__icon--select"></i>
-                        <i class="form__icon form__icon--fail form__icon--select"></i>
+                        <i class="form__icon form__icon--success form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
                         <small class="form__error-msg form__error-msg--select"></small>
                     </div>
 
@@ -858,16 +885,24 @@ const createNewJobModal = ({companies, jobNumber}) => {
                         <select name="featured" id="featured" class="form__input--new-job form__featured-input--new-job">
                             <!-- options added in js -->
                         </select>
-                        <i class="form__icon form__icon--success form__icon--select"></i>
-                        <i class="form__icon form__icon--fail form__icon--select"></i>
+                        <i class="form__icon form__icon--success form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
                         <small class="form__error-msg form__error-msg--select"></small>
                     </div>
 
                     <div class="form__field--new-job form__description--new-job">
                         <label for="description" class="form__label--new-job">Description</label>
                         <textarea name="description" id="description" class="form__input--new-job form__description-input--new-job"></textarea>
-                        <i class="form__icon form__icon--success form__icon--select"></i>
-                        <i class="form__icon form__icon--fail form__icon--select"></i>
+                        <i class="form__icon form__icon--success form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
                         <small class="form__error-msg form__error-msg--select"></small>
                     </div>
 
@@ -885,28 +920,33 @@ const createNewJobModal = ({companies, jobNumber}) => {
     return modal;
 };
 
-export const getNewJobElements = () => {
-    const jobSummaryModal = document.querySelector('.job-summary__modal');
-    const jobForm = document.querySelector('.form--new-job');
+export const getNewJobFields = () => {
     const titleField = document.querySelector('.form__title-input--new-job');
-    const companyField = document.querySelector('.form__company-input--new-job');
     const locationField = document.querySelector('.form__location-input--new-job');
     const wageField = document.querySelector('.form__wage-input--new-job');
+
+    const descriptionField = document.querySelector('.form__description-input--new-job');
+  
+    return { titleField, locationField, wageField, descriptionField }
+}
+
+export const getNewJobCustomSelects = () => {
+    // These are the hidden selects behind the custom selects
+    const companyField = document.querySelector('.form__company-input--new-job');
     const typeField = document.querySelector('.form__type-input--new-job');
     const positionField = document.querySelector('.form__position-input--new-job');
     const pqeField = document.querySelector('.form__pqe-input--new-job');
     const featuredField = document.querySelector('.form__featured-input--new-job');
-    const descriptionField = document.querySelector('.form__description-input--new-job');
-    const closeBtn = document.querySelector('.form__close--new-job');
-    const submitBtn = document.querySelector('.form__submit--new-job');
 
-    return { jobSummaryModal, jobForm, titleField, companyField, locationField, wageField, typeField, positionField, pqeField, featuredField, descriptionField, closeBtn, submitBtn }
+    return { companyField, typeField, positionField, pqeField, featuredField };
 }
 
-export const getNewJobValues = ({titleField, companyField, locationField, wageField, typeField, positionField, pqeField, featuredField, descriptionField }) => {
-    // Fields that check the value have placeholders
+export const getNewJobValues = (
+    {titleField, locationField, wageField, descriptionField }, 
+    { companyField, typeField, positionField, pqeField, featuredField }
+) => {
     const title = titleField.value.trim();
-    const company = companyField.value === 'Company'? -1:companyField.value.trim();
+    const companyId = companyField.value === 'Company'? -1:companyField.value.trim();
     const location = locationField.value.trim();
     const wage = wageField.value === 'Wage'? '':wageField.value.trim();
     const type = typeField.value === 'Type'? '':typeField.value.trim();
@@ -914,7 +954,7 @@ export const getNewJobValues = ({titleField, companyField, locationField, wageFi
     const pqe = pqeField.value === 'Experience'? '':pqeField.value.trim();
     const featured = featuredField.value === 'Featured'? '':featuredField.value.trim();
     const description = descriptionField.value.trim();
-    return { title, company, location, wage, type, position, pqe, featured, description };
+    return { title, companyId, location, wage, type, position, pqe, featured, description };
 }
 
 export const makeJobSummaryEditable = (editable, job) => {
@@ -2290,7 +2330,7 @@ const renderCompany = (company) => {
  
 
 export const renderPagination = (current, limit, totalItems, container, table) => {
-    const pagination = document.querySelector('.pagination--applications');
+    const pagination = document.querySelector(`.pagination--${table}`);
     if(pagination) utils.removeElement(pagination);   
     // Work out how many pages
     const pages = Math.ceil(totalItems / limit);

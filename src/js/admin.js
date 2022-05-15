@@ -10,7 +10,6 @@ import '../assets/icons/pin-angle.svg';
 import '../assets/icons/cross.svg';
 import '../assets/icons/upload-np.svg';
 import '../assets/icons/pdf.svg';
-import '../assets/icons/pdf.svg';
 import '../assets/icons/doc.svg';
 import '../assets/icons/save-np.svg';
 import '../assets/icons/delete-np1.svg';
@@ -18,6 +17,8 @@ import '../assets/icons/edit-np1.svg';
 import '../assets/icons/add.svg';
 import '../assets/updated-icons/ios-minus-empty.svg';
 import '../assets/updated-icons/ios-minus-outline.svg';
+import '../assets/icons/success.svg';
+import '../assets/icons/error.svg';
 
 
 import axios from 'axios';
@@ -154,8 +155,10 @@ class AdminController {
             headerView.renderHeader("admin");
 
             // On first load get jobs and users for the application page (to allow adding new applications)
-            const jobsResponse = await this.Admin.getJobs(this.state.jobs.searchOptions);
-            this.jobs = jobsResponse.data.jobs;
+             this.state.jobs.jobNames = await this.Admin.getJobNames(); 
+             console.log(this.state.jobs.jobNames);
+            // const jobsResponse = await this.Admin.getJobs(this.state.jobs.searchOptions);
+            // this.jobs = jobsResponse.data.jobs;
 
             const usersResponse = await this.Admin.getUsers(this.state.users.searchOptions);
             this.users = usersResponse.data.applicants;
@@ -624,6 +627,7 @@ class AdminController {
             tl.add(() => {
                 switch(sectionName) {
                     case 'applications': 
+
                         // Render table
                         this.renderApplicationTable();
 
@@ -640,6 +644,8 @@ class AdminController {
                         break;
 
                     case 'jobs':
+
+
                         // Render table
                         this.renderJobsTable();
 
@@ -898,19 +904,18 @@ class AdminController {
     }
 
     async getData(sectionName, indexId) {
-        console.log('getting');
-
         switch(sectionName) {
             case 'applications':
                 const { data: { applications: { rows: appRows, count: appCount } } } = await this.Admin.getApplications(this.state.applications.searchOptions, indexId);
                 this.applications = appRows;
-                
+
                 this.state.applications.totalApplications = appCount;
                 break;
             case 'jobs':
                 const { data: { jobs, total } } = await this.Admin.getJobs(this.state.jobs.searchOptions, indexId);
                 this.jobs = jobs;
                 this.state.jobs.totalJobs = total;
+                console.log(this.jobs);
                 break;
             case 'companies':
                 const { data: { companies, total: companyTotal } } = await this.Admin.getCompanies(this.state.companies.searchOptions, indexId);
@@ -1198,7 +1203,6 @@ class AdminController {
 
         const applicationRows = document.querySelectorAll('.row--applications');
         const activeRow = Array.from(applicationRows).find(row => row.querySelector(`[data-id="${this.state.applications.currentApplication.applicationId}"]`)) || applicationRows[0];
-        console.log('current application id');
 
         utils.changeActiveRow(activeRow, applicationRows);
 
@@ -1257,12 +1261,10 @@ class AdminController {
         }
         if(companyLink) {
             const companyId = companyLink.parentElement.dataset.id;
-            console.log(companyId); 
         }
         if(applicantLink) {
             // Applicant link wraps around two divs with the data element
             const applicantId = applicantLink.firstElementChild.dataset.id;
-            console.log(applicantId);
         }
         if(cvBtn) {
             this.Admin.getCv(cvBtn.dataset.id)
@@ -1283,7 +1285,7 @@ class AdminController {
 
             const alertWrapper = document.querySelector('.alert-wrapper');
 
-            // Add the animation for the application alerts
+            // Add the animation for the application alerts (paused)
             newApplicationAlertAnimation
                 .from(alertWrapper, {
                     autoAlpha: 0
@@ -1543,9 +1545,7 @@ class AdminController {
 
                 // adminView.createJobSummary(job);
                 // utils.changeActiveRow(row, jobRows);
-                console.log(job);
                 utils.changeActiveRow(targetRow, jobRows);
-                console.log(targetRow, jobRows);
                 this.state.jobs.currentJob = job;
                 const summary = document.querySelector('.summary');
                 adminView.swapSummary(summary, adminView.createJobSummary(job), null); 
@@ -1623,6 +1623,8 @@ class AdminController {
 
         if(newBtn) {
 
+            let alert;
+
             // Get company list
             const { data: { companyNames } } = await this.Admin.getCompanyNames();
             this.state.companies.companyNames = companyNames;
@@ -1635,44 +1637,74 @@ class AdminController {
                 jobNumber: this.getNextId('jobs')
             });
 
-            const fields = adminView.getNewJobElements();
-            const {
-                jobSummaryModal, 
-                jobForm, 
-                titleField, 
-                companyField, 
-                locationField, 
-                wageField, 
-                typeField, 
-                positionField, 
-                pqeField, 
-                featuredField, 
-                descriptionField,
-                closeBtn, 
-                submitBtn 
-            } = fields;
+            const alertWrapper = document.querySelector('.alert-wrapper');
+            const jobForm = document.querySelector('.form--new-job');
+            const closeBtn = document.querySelector('.form__close--new-job');
+            const submitBtn = document.querySelector('.form__submit--new-job');
+
+
+            // Custom selects and fields need to be separated for validation
+            const fields = adminView.getNewJobFields();
+            const { titleField, locationField, wageField, descriptionField } = fields;
+            const selects = adminView.getNewJobCustomSelects();
+            const { companyField, typeField, positionField, pqeField, featuredField } = selects;
+
+            // Add the animation for the job alerts (paused)
+            newJobAlertAnimation
+            .from(alertWrapper, {
+                autoAlpha: 0
+            })
+            .to(alertWrapper, {
+                autoAlpha: 0
+            }, '+=3')
 
             closeBtn.addEventListener('click', () => {
                 adminView.removeNewJobModal();
             });
            
-            jobForm.addEventListener('submit', e => {
+            jobForm.addEventListener('submit', async e => {
                 e.preventDefault();
+                // Clear the alert wrapper contents
+                while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
 
-                const data = adminView.getNewJobValues(fields);
+                const data = adminView.getNewJobValues(fields, selects); 
                 const errors = validator.validateJob(data);
 
+                // If no errors, submit the form
                 if(!errors) {
-                  Object.values(fields).forEach(field => validator.setSuccessFor(field));
-                  return;
-                } 
-                
+                    try {
+                        const res = await this.Admin.createJob(data);
+
+                        if(res.status !== 201) {
+                            alert = modalView.getAlert('Job Not Created', false);
+                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                            newJobAlertAnimation.play(0);
+                        } else {
+                            alert = modalView.getAlert('Job Created', true);
+                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                            newJobAlertAnimation.play(0);
+
+                            await this.getData('jobs');
+
+                            this.renderJobsTable();
+                            // Update pagination
+                            const { totalJobs, searchOptions: {index: jobIndex, limit: jobLimit} } = this.state.jobs;
+                            adminView.renderPagination(jobIndex, jobLimit, totalJobs, document.querySelector('.table-wrapper'), 'jobs');
+                    
+                        }
+                    } catch(err) {
+                        console.log(err);
+
+                    }
+                    return;
+                }
+                                
                 if(errors.title) 
                   validator.setErrorFor(titleField, errors.title); 
                 else validator.setSuccessFor(titleField);
 
-                if(errors.company)     
-                  validator.setErrorFor(companyField, errors.company);
+                if(errors.companyId)     
+                  validator.setErrorFor(companyField, errors.companyId);
                 else validator.setSuccessFor(companyField);
 
                 if(errors.location)  
@@ -1702,18 +1734,58 @@ class AdminController {
                 if(errors.description) 
                   validator.setErrorFor(descriptionField, errors.description); 
                 else validator.setSuccessFor(descriptionField);
+
             });
 
 
-            titleField.addEventListener('blur', (e) => {
-                const field = e.target;
-                if(field === document.querySelector('.form__submit--new-job')) return;
+            jobForm.addEventListener('focusout', (e) => {
+                if(e.target === submitBtn) return;
+                const data = adminView.getNewJobValues(fields, selects);
+                const { value, name } = this.getJobDataToValidate(e, data, fields, selects);
+                const error = validator.validateJobField({value: value, name: name});
 
-                validator.validateJobField(e.target.value);
+                if(error) validator.setErrorFor(e.target, error);
+                else validator.setSuccessFor(e.target);
+            });
+
+            // This is why fields and custom selects had to be split
+            // The focus listener has to be on the custom select, not the hidden source select
+            Object.values(fields).forEach(field => {
+                field.addEventListener('focus', e => {
+                    if(field.parentElement.classList.contains('success')) {
+                        field.parentElement.classList.remove('success');
+                    }
+                    if(field.parentElement.classList.contains('error')) {
+                        field.parentElement.classList.remove('error');
+                    }
+                    // Remove the success msg
+                    field.nextElementSibling.nextElementSibling.nextElementSibling.innerText = '';
+                });
+            });
+            // The selects need both validation removal on focus, and revalidation on change
+            Object.values(selects).forEach(field => {
+                field.nextElementSibling.addEventListener('focus', e => {
+                    if(field.parentElement.classList.contains('success')) {
+                        field.parentElement.classList.remove('success');
+                    }
+                    if(field.parentElement.classList.contains('error')) {
+                        field.parentElement.classList.remove('error');
+                    }
+                    // Remove the success msg
+                    field.nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling.innerText = '';
+                });
+            });
+
+            jobForm.addEventListener('change', (e) => {                
+                const data = adminView.getNewJobValues(fields, selects);
+                const { value, name } = this.getJobDataToValidate(e, data, fields, selects);   
+             
+                const error = validator.validateJobField({value: value, name: name});
+
+                if(error) validator.setErrorFor(e.target, error);
+                else validator.setSuccessFor(e.target);
             });
         }
-
-
 
 
         if(deleteBtn) {
@@ -1948,6 +2020,66 @@ class AdminController {
                 }).catch(err => console.log(err));
             }
         });
+    }
+
+    getJobDataToValidate(
+        e, 
+        data, 
+        {
+            titleField,
+            locationField,
+            wageField,
+            descriptionField
+        }, 
+        {
+            companyField,
+            typeField,
+            positionField,
+            pqeField,
+            featuredField
+        }
+    ) {
+        let name;
+        let value;
+        if(e.target === titleField) {
+            name = 'title';
+            value = data[name]
+        } 
+        // CompanyField is a select, the following element is the custom select that's focused
+        if(e.target === companyField.nextElementSibling) {
+            name = 'companyId';
+            value = data[name]
+        }
+        if(e.target === locationField) {
+            name = 'location';
+            value = data[name]
+        }
+        if(e.target === wageField) {
+            name = 'wage';
+            value = data[name]
+        }
+        if(e.target === typeField.nextElementSibling) {
+            name = 'type';
+            value = data[name]
+        }
+        if(e.target === positionField.nextElementSibling) {
+            name = 'position';
+            value = data[name]
+        }
+        if(e.target === pqeField.nextElementSibling) {
+            name = 'pqe';
+            value = data[name]
+        }
+        if(e.target === featuredField.nextElementSibling) {
+            name = 'featured';
+            value = data[name]
+        }
+        if(e.target === descriptionField) {
+            name = 'description';
+            value = data[name]
+        }
+
+        return { name, value }
     }
 
     renderUsersTable() {
@@ -2228,7 +2360,6 @@ class AdminController {
     }
 
     renderCompaniesTable() {
-        console.log(this.companies)
         // Format applications/headers into html elements
         const {headers, rows} = adminView.formatCompanies(this.companies);
 

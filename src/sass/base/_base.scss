@@ -6,6 +6,16 @@
     box-sizing: inherit;
 }
 
+// Get rid of the autofill bg color
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+  transition: background-color 600000s 0s, color 600000s 0s;
+}
+
+textarea, input {
+    font-size: inherit;
+    font-family: inherit;
+}
 
 .edit {
     position: absolute;

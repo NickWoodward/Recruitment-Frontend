@@ -9,7 +9,7 @@ const newJobSchema = Joi.object({
             "string.max": `Must be < than 50`,
             "any.required": `Required`,
           }),
-    company: 
+    companyId: 
         Joi.number().integer().greater(0).less(50).required().messages({
             "number.base": `Select an option`,
             "number.empty": `Select an option`,
@@ -23,7 +23,7 @@ const newJobSchema = Joi.object({
             "number.base": `Enter a number`,
             "number.empty": `Enter a number`,
             "number.min": `Must be > 3`,
-            "number.max": `Must be < than 50`,
+            "number.max": `Must be < than 10 million`,
             "any.required": `Enter a number`,
           }),
     location: 
@@ -92,9 +92,8 @@ const validate = (data, schema) => {
     })
     return errors;
 }
-const validateProperty = ({ field, name }, schema) => {
-    console.log(field)
-    const { error } = schema.extract(name).validate(field);
+const validateProperty = ({ value, name }, schema) => {
+    const { error } = schema.extract(name).validate(value);
     if(!error) return null;
     return error.details[0].message;
 };
@@ -104,18 +103,20 @@ export const setErrorFor = (input, message) => {
     const small = formControl.querySelector('small');
 
     small.innerText = message;
+    if(formControl.classList.contains('success')) formControl.classList.remove('success');
     formControl.classList.add('error') ;
 }
   
 export const setSuccessFor = (input) => {
     const formControl = input.parentElement;
+    const small = formControl.querySelector('small');
+
+
+    if(formControl.classList.contains('error')) {
+        small.innerText = '';
+        formControl.classList.remove('error');
+    }
     formControl.classList.add('success');
 }
   
-
-export const validateForm = (form, data) => {
-    if(form === 'job') {
-        console.log(getJobFormSchema().validate(data, {abortEarly: false}));
-    }
-};
 

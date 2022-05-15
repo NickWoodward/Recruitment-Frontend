@@ -44,6 +44,7 @@ export default class Admin {
 
     ///////////  Job Methods  ///////////
     getJobs({limit, index, titles, locations, orderField, orderDirection} = {}, indexId) {
+
         return JRS.get('/admin/jobs', {
             params: {
                 limit,
@@ -58,19 +59,21 @@ export default class Admin {
         });
     }
 
+    getJobNames() {
+        return JRS.get('/admin/jobnames');
+    }
+
     editJob(jobId, formData) {
         return JRS.post(`/admin/edit/job/${jobId}`, formData);
     }
 
     createJob(formData) {
-        // for(let[key, value] of formData.entries()) console.log(key, value);
         return JRS.post(`/admin/create/job`, formData);
     }
 
     deleteJob(jobId) {
         return JRS.delete(`/admin/delete/job/${jobId}`);
     }
-
 
     ////////// Company Methods ///////////
     getCompanies({limit, index, orderField, orderDirection} = {}) {
