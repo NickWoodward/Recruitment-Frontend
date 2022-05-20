@@ -89,7 +89,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    min-height: 61rem;
+    min-height: 59rem;
 
     border-radius: 5px;
     overflow: hidden;
@@ -116,12 +116,49 @@
         font-size: 1.9rem;
         font-weight: 400;
         width: 100%;
-        padding: 1rem 3rem;
+        padding: .8rem 2.5rem;
         background-color: rgb(249, 250, 251);
     
-        margin: 1.5rem 0;
+        margin: 1rem 0 1rem 0;
+    }
 
+    &__item  {
+        margin-bottom: 1.4rem;
+        font-size: 1.6rem;
+        padding: 0 3rem;
+        overflow-x: hidden;
 
+        &--cv {
+            display: flex;
+            align-items: flex-start;
+            width: 100%;
+        }
+        
+        &--job {
+            width: 50%;
+        }
+    }
+
+    &__controls {
+        position: absolute;
+        top: 0;
+        right: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        width: 5rem;
+        margin-top: auto;
+        padding: 0 1.5rem;
+    }
+
+    &__cv-wrapper {
+        display: flex;
+        width: 2.9rem;
+        height: 2.9rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+    
     }
 
     &__btn--disabled {
@@ -160,7 +197,6 @@
     align-items: center;
     width: 100%;
     min-height: 18rem;
-    margin-bottom: 1rem;
     
     &__details {
         width: 100%;
@@ -192,19 +228,16 @@
     &__field--date {
         display: flex;
         justify-content: flex-end;
-        
+    }
+    &__field--applicant-firstname {
+        display: inline-block;
+        text-decoration: underline;
     }
 
-    &__cv-wrapper {
-        display: flex;
-        width: 4rem;
-        height: 4rem;
-        margin-top: 2rem;
-        cursor: pointer;
-    }
+  
 
     &__section {
-        
+        position: relative;
 
         &--application {
             display: flex;
@@ -218,36 +251,38 @@
         &--job, &--person {
             display: flex;
             flex-flow: column wrap;
-            // justify-content: flex-end;
-            // padding: 1.4rem 3rem;
-            height: 18rem;
-            // border: 1px solid red;
+        }
+        &--job {
+            height: 17rem;
+        }
+        &--person {
+            height: 15rem;
+
         }
     }
 
 
     &__label {
+        margin-bottom: .1rem;
         font-weight: 600;
     }
-    &__item  {
-        margin-bottom: 1rem;
-        font-size: 1.6rem;
-        padding: 0 3rem;
+    // &__item  {
+    //     margin-bottom: 1.4rem;
+    //     font-size: 1.6rem;
+    //     padding: 0 3rem;
 
-        &--cv {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            justify-content: space-between;
-            width: 100%;
+    //     &--cv {
+    //         display: flex;
+    //         align-items: flex-start;
+    //         width: 100%;
             
-            // border: 1px solid lightgrey;
-        }
+    //         // border: 1px solid lightgrey;
+    //     }
         
-        &--job {
-            width: 50%;
-        }
-    }
+    //     &--job {
+    //         width: 50%;
+    //     }
+    // }
  
     &__item--editable {
         -moz-appearance: textfield;
@@ -261,19 +296,18 @@
         }
     }
 
-    &__controls {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        width: 100%;
-        margin-top: auto;
-        padding: 1rem 2rem;
-        // border: 1px solid red;
-    }
+    // &__controls {
+    //     display: flex;
+    //     align-items: center;
+    //     justify-content: flex-end;
+    //     width: 100%;
+    //     margin-top: auto;
+    //     padding: 1.5rem;
+    // }
     &__btn {
         display: flex;
         align-items: flex-end;
-        margin-right: 1.5rem;
+        // margin-right: 1.5rem;
         cursor:pointer;
 
     }
@@ -282,14 +316,16 @@
         transform: translateY(3px);
     }
 
-    &__btn--new, &__btn--save-new {
-        margin-right: auto;
-    }
+    // &__btn--new, &__btn--save-new {
+    //     margin-right: auto;
+    // }
 
     &__new-icon {
-        height: 3.5rem;
-        width: 3.5rem;
+        height: 3.2rem;
+        width: 3.2rem;
+        margin-bottom: 1rem;
         fill: $color-logo;
+        transform: translateY(2px);
     }
 
     &__edit-icon {
@@ -298,8 +334,9 @@
         fill: $color-logo;
     }
     &__delete-icon {
-        height: 3.3rem;
-        width: 3.3rem;
+        height: 2.9rem;
+        width: 2.9rem;
+        
         fill: $color-secondary;
     }
     &__save-icon {
@@ -446,7 +483,7 @@
         width: 3rem;
     }
 
-    &__application {
+    &__application, &__job {
         margin-top: 1rem;
     }
 
@@ -520,12 +557,14 @@
             cursor: auto;
         }
     }
-    &__cv-wrapper {
-        display: flex;
-        align-items: center;
-        margin-top: 2rem;
-        font-size: 1.3rem;
-    }
+    // &__cv-wrapper {
+    //     display: flex;
+    //     align-items: center;
+    //     margin-top: 2rem;
+    //     margin-bottom: 1rem;
+
+    //     font-size: 1.3rem;
+    // }
     &__cv-path, &__upload-path {
         margin-left: 1.5rem;
         cursor: pointer;
@@ -555,7 +594,8 @@
         justify-content: flex-end;
         width: 100%;
         margin-top: auto;
-        padding: 2rem 2rem;
+        padding: 1rem 1rem 1.5rem 1rem;
+
         // border: 1px solid red;
     }
     &__btn {
@@ -584,9 +624,10 @@
     }
 
     &__new-icon {
-        height: 3.5rem;
-        width: 3.5rem;
+        height: 3.2rem;
+        width: 3.2rem;
         fill: $color-logo;
+        transform: translateY(2px);
     }
 
     &__edit-icon {
@@ -682,7 +723,6 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    // width: 50rem;
 
     &__modal {
         font-size: 1.6rem;
@@ -690,7 +730,7 @@
         border-radius: 5px;
         overflow: hidden;
 
-        &--new-job {
+        &--new-job, &--edit-job {
             position: absolute;
             height: 100%;
             background-color: white;
@@ -698,10 +738,20 @@
         }
 
         &-header {
+            flex-grow: 0;
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
             height: 6rem;
             background-color: $color-primary-new;
+
+            font-size: 1.6rem;
             color: white;
+
+            &>div {
+                padding: 0 2rem;
+            }
         }
         &-item {
             display: flex;
@@ -884,47 +934,13 @@
     }
 
  
-
-
-
-    // &__item {
-    //     display: block;
-    //     margin-bottom: .3rem;
-    //     font-size: 1.6rem;
-    //     width: 100%;
-    //     padding: 1rem 2.5rem .8rem 2rem;
-    //     border: 1px solid transparent;
-    //     &:hover {
-    //         cursor: default;
-    //     }
-    // }
-    // &__text-area {
-    //     margin-top: 2.5rem;
-    //     padding-top: 2rem;
-    //     background-color: white;
-    //     height: 20rem;
-    // }
-    // &__item--editable {
-    //     -moz-appearance: textfield;
-    //     -webkit-appearance: textfield;
-    //     background-color: white;
-    //     background-color: -moz-field;
-    //     border: 1px solid darkgray;
-    //     box-shadow: 1px 1px 1px 0 lightgray inset;  
-    //     &:hover {
-    //         cursor: auto;
-    //     }
-    // }
-
-
     &__controls {
         display: flex;
         align-items: center;
         justify-content: flex-end;
         width: 100%;
         margin-top: auto;
-        padding: 2rem 2rem;
-        // border: 1px solid red;
+        padding: 0 1.5rem 1.5rem 1.5rem;
     }
     &__btn {
         display: flex;
@@ -946,19 +962,20 @@
     }
 
     &__new-icon {
-        height: 3.5rem;
-        width: 3.5rem;
+        height: 3.2rem;
+        width: 3.2rem;
         fill: $color-logo;
+        transform: translateY(2px);
     }
 
     &__edit-icon {
-        height: 3.5rem;
-        width: 3.5rem;
+        height: 3.2rem;
+        width: 3.2rem;
         fill: $color-logo;
     }
     &__delete-icon {
-        height: 3.3rem;
-        width: 3.3rem;
+        height: 3rem;
+        width: 3rem;
         fill: $color-secondary;
     }
     &__save-icon {
@@ -967,9 +984,10 @@
         fill: red;
     }
     &__hubspot-icon {
-        height: 2.9rem;
-        width: 2.9rem;
-        fill: #f8761f
+        height: 2.6rem;
+        width: 2.6rem;
+        fill: #f8761f;
+        transform: translateY(2px);
     }
 
     
@@ -984,7 +1002,6 @@
     justify-content: flex-start;
     align-items: center;
     width: 50rem;
-    margin-bottom: 2rem;
     
     &__details {
         width: 100%;
@@ -1041,9 +1058,10 @@
     }
 
     &__new-icon {
-        height: 3.5rem;
-        width: 3.5rem;
+        height: 3.2rem;
+        width: 3.2rem;
         fill: $color-logo;
+        transform: translateY(2px);
     }
 
     &__edit-icon {

@@ -247,7 +247,7 @@ export const swapSummary = (oldSummary, newSummary, cb) => {
 
     const summaryWrapper = document.querySelector('.summary-wrapper');
 
-    const modal = document.querySelector('.application-summary__modal');
+    const modal = document.querySelector('.summary__modal');
     const confirmation = document.querySelector('.confirmation');
 
     const tl = gsap.timeline();
@@ -260,12 +260,11 @@ export const swapSummary = (oldSummary, newSummary, cb) => {
       .add(() => {
         oldSummary.parentElement.removeChild(oldSummary);
         summaryWrapper.insertAdjacentHTML('afterbegin', newSummary);
-        document.querySelector('.application-summary').addEventListener('click', cb)
+        document.querySelector('.summary').addEventListener('click', cb)
 
 
         if(modal) {
             modal.parentElement.removeChild(modal)
-            
         };
         if(confirmation) {
             confirmation.parentElement.removeChild(confirmation)
@@ -347,92 +346,98 @@ export const createApplicationSummary = ({
                     <div class="application-summary__section application-summary__section--application">
                         <div class="application-summary__id">${applicationId}</div>
 
-                        <div class="application-summary__item">
+                        <div class="application-summary__item summary__item">
                             <div class="application-summary__field application-summary__field--date">${applicationDate}</div>
                         </div>
                     </div>
 
                     <div class="summary__heading">Position</div>
 
-                    <div class="application-summary__section application-summary__section--job">
-                        <div class="application-summary__item application-summary__item--job">
-                            <div class="application-summary__label application-summary__label--title">Title:</div>
-                            <div class="application-summary__field application-summary__field--title" data-id="${jobId}">
-                                <a class="summary__link summary__link--job">${jobTitle}</a>
+                        <div class="application-summary__section application-summary__section--job">
+                            <div class="summary__column">
+                                <div class="application-summary__item application-summary__item--job summary__item">
+                                    <div class="application-summary__label application-summary__label--title">Title:</div>
+                                    <div class="application-summary__field application-summary__field--title" data-id="${jobId}">
+                                        <a class="summary__link summary__link--job">${jobTitle}</a>
+                                    </div>
+                                </div>
+                                <div class="application-summary__item application-summary__item--job summary__item">
+                                    <div class="application-summary__label application-summary__label--company">Company:</div>
+                                    <div class="application-summary__field application-summary__field--company" data-id="${companyId}">
+                                        <a class="summary__link summary__link--company">${companyName}</a>
+                                    </div>
+                                </div>
+                                <div class="application-summary__item application-summary__item--job summary__item">
+                                    <div class="application-summary__label application-summary__label--contact-name">Contact:</div>
+                                    <div class="application-summary__field application-summary__field--contact">${contactFirstName} ${contactLastName}</div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="application-summary__item application-summary__item--job">
-                            <div class="application-summary__label application-summary__label--company">Company:</div>
-                            <div class="application-summary__field application-summary__field--company" data-id="${companyId}">
-                                <a class="summary__link summary__link--company">${companyName}</a>
+
+                            <div class="summary__column">
+                                <div class="application-summary__item application-summary__item--job summary__item">
+                                    <div class="application-summary__label application-summary__label--contact-position">Contact Position:</div>
+                                    <div class="application-summary__field application-summary__field--contact-position">${contactPosition}</div>
+                                </div>
+                                <div class="application-summary__item application-summary__item--job summary__item">
+                                    <div class="application-summary__label application-summary__label--contact-phone">Contact Phone:</div>
+                                    <div class="application-summary__field application-summary__field--contact-phone">${contactPhone}</div>
+                                </div>
+                                <div class="application-summary__item application-summary__item--job summary__item">
+                                    <div class="application-summary__label application-summary__label--contact-email">Contact Email:</div>
+                                    <div class="application-summary__field application-summary__field--contact-email">${contactEmail}</div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="application-summary__item application-summary__item--job">
-                            <div class="application-summary__label application-summary__label--contact-name">Contact:</div>
-                            <div class="application-summary__field application-summary__field--contact-firstname">${contactFirstName}</div>
-                            <div class="application-summary__field application-summary__field--contact-surname">${contactLastName}</div>
-                        </div>
-                        <div class="application-summary__item application-summary__item--job">
-                            <div class="application-summary__label application-summary__label--contact-position">Contact Position:</div>
-                            <div class="application-summary__field application-summary__field--contact-position">${contactPosition}</div>
-                        </div>
-                        <div class="application-summary__item application-summary__item--job">
-                            <div class="application-summary__label application-summary__label--contact-phone">Contact Phone:</div>
-                            <div class="application-summary__field application-summary__field--contact-phone">${contactPhone}</div>
-                        </div>
-                        <div class="application-summary__item application-summary__item--job">
-                            <div class="application-summary__label application-summary__label--contact-email">Contact Email:</div>
-                            <div class="application-summary__field application-summary__field--contact-email">${contactEmail}</div>
-                        </div>
                     </div>
 
                     <div class="summary__heading">Applicant</div>
+
                     <div class="application-summary__section application-summary__section--person">
                         <div class="summary__column">
-                            <div class="application-summary__item">
+                            <div class="application-summary__item summary__item">
                                 <div class="application-summary__label application-summary__label--applicant-name">Applicant Name:</div>
-                                    <a class="summary__link summary__link--applicant">
-                                        <div class="application-summary__field application-summary__field--applicant-firstname" data-id="${applicantId}">${personFirstName}</div>
-                                        <div class="application-summary__field application-summary__field--applicant-surname" data-id="${applicantId}">${personLastName}</div>
-                                    </a>
-                                </div>
-                            <div class="application-summary__item">
+                                <a class="summary__link summary__link--applicant">
+                                    <div class="application-summary__field application-summary__field--applicant" data-id="${applicantId}">${personFirstName} ${personLastName}</div>
+                                </a>
+                            </div>
+                            <div class="application-summary__item summary__item">
                                 <div class="application-summary__label application-summary__label--email">Email:</div>
                                 <div class="application-summary__field application-summary__field--email">${personEmail}</div>
                             </div>
-                            <div class="application-summary__item">
+                        </div>
+
+                        <div class="summary__column">
+                            <div class="application-summary__item summary__item">
                                 <div class="application-summary__label application-summary__label--phone">Phone:</div>
                                 <div class="application-summary__field application-summary__field--phone">${personPhone}</div>
                             </div>
-                        </div>
-                        <div class="summary__column summary__column--cv">
-                            <div class="application-summary__item application-summary__item--cv">
+
+                            <div class="application-summary__item summary__item application-summary__item--cv">
                                 <div class="application-summary__label application-summary__label--cv">Applicant CV:</div>
 
-                                <div class="application-summary__cv-wrapper cv-wrapper" data-id='${personId}'>
-                                    ${cvType?`<svg class="application-summary__cv-svg"><use xlink:href="svg/spritesheet.svg#${cvType}"></svg>`:'None'}
-                                        
-                                </div>
+                                
+                            </div>
+                        </div>
+
+                        <div class="application-summary__controls summary__controls">
+                            <div class="application-summary__btn application-summary__btn--new">
+                                <svg class="application-summary__new-icon application-summary__icon">
+                                    <use xlink:href="svg/spritesheet.svg#add">
+                                </svg>
+                            </div>
+        
+                            <div class="application-summary__cv-wrapper summary__cv-wrapper" data-id='${personId}'>
+                                ${cvType?`<svg class="application-summary__cv-svg"><use xlink:href="svg/spritesheet.svg#${cvType}"></svg>`:'None'}
+                            </div>
+        
+                            <div class="application-summary__btn application-summary__btn--delete">
+                                <svg class="application-summary__delete-icon application-summary__icon">
+                                    <use xlink:href="svg/spritesheet.svg#delete-np1">
+                                </svg>
                             </div>
                         </div>
                     </div>
                     
                 </div>
-
-                <div class="application-summary__controls">
-                    <div class="application-summary__btn application-summary__btn--new">
-                        <svg class="application-summary__new-icon application-summary__icon">
-                            <use xlink:href="svg/spritesheet.svg#add">
-                        </svg>
-                    </div>
-                  
-                    <div class="application-summary__btn application-summary__btn--delete">
-                        <svg class="application-summary__delete-icon application-summary__icon">
-                            <use xlink:href="svg/spritesheet.svg#delete-np1">
-                        </svg>
-                    </div>
-                </div>
-
             </div>
     `;
 
@@ -499,7 +504,7 @@ const createNewApplicationModal = ({jobs, users, appNumber}) => {
     const today = new Date();
     const date = `${today.getDate()}/${today.getMonth()+1}/${+today.getFullYear()}`;
     const modal = `
-        <div class="application-summary__modal application-summary__modal--new">
+        <div class="application-summary__modal application-summary__modal--new summary__modal">
 
             <div class="application-summary__modal-header">
                 <div>${appNumber}</div>
@@ -663,15 +668,24 @@ export const populateUserSummary = (user) => {
     addCvElement(user);
 }
 
-export const renderNewJobModal = (data) => {
+export const renderJobModal = (data, type) => {
     const summary = document.querySelector('.summary-wrapper');
     // Coordinates to position the modal on top of the summary
     const { left: summaryLeft, top: summaryTop, width: summaryWidth, height: summaryHeight} = summary.getBoundingClientRect();
     const finalHeight = document.querySelector('.table-wrapper').getBoundingClientRect().height;
     const adminWrapper = document.querySelector('.admin-wrapper');
-    const modal = createNewJobModal(data);
-    adminWrapper.insertAdjacentHTML('afterbegin', modal);
 
+    switch(type) {
+        case 'new': 
+            adminWrapper.insertAdjacentHTML('afterbegin', createNewJobModal(data));
+            populateNewJobModal(data);
+            break;
+        case 'edit':
+            adminWrapper.insertAdjacentHTML('afterbegin', createEditJobModal(data));
+            populateEditJobModal(data);
+            break;
+    }
+   
     // Set the modal to the same position and dimensions as the summary
     const modalElement = document.querySelector('.job-summary__modal');
     modalElement.style.left = `${summaryLeft}px`;
@@ -685,11 +699,9 @@ export const renderNewJobModal = (data) => {
     ).to(modalElement, {
         height: `${finalHeight}px`
     });
-
-    populateNewJobModal(data);
 };
 
-export const removeNewJobModal = () => {
+export const removeJobModal = () => {
     const jobSummary = document.querySelector('.job-summary__modal');
     gsap.timeline()
         .to(jobSummary, {
@@ -761,18 +773,11 @@ const populateNewJobModal = ({companies, jobTypes, jobPositions, jobPqes}) => {
         option.className = 'featured-option';
         featuredSelect.add(option); 
     });
-
-
     // Create Custom Selects
-    new Select(companySelect);
-    new Select(typeSelect);
-    new Select(positionSelect);
-    new Select(pqeSelect);
-    new Select(featuredSelect);
+    selects.forEach(select => createSelect(select[0], true));
 };
 
 const createNewJobModal = ({companies, jobNumber}) => {
-
     const today = new Date();
     const date = `${today.getDate()}/${today.getMonth()+1}/${+today.getFullYear()}`;
     const modal = `
@@ -920,41 +925,315 @@ const createNewJobModal = ({companies, jobNumber}) => {
     return modal;
 };
 
-export const getNewJobFields = () => {
-    const titleField = document.querySelector('.form__title-input--new-job');
-    const locationField = document.querySelector('.form__location-input--new-job');
-    const wageField = document.querySelector('.form__wage-input--new-job');
+const populateEditJobModal = ({companies, job, jobTypes, jobPositions, jobPqes}) => {
+        // Populate select elements
+        const companySelect = document.querySelector('.form__company-input--edit-job');
+        const typeSelect = document.querySelector('.form__type-input--edit-job');
+        const positionSelect = document.querySelector('.form__position-input--edit-job');
+        const pqeSelect = document.querySelector('.form__pqe-input--edit-job');
+        const featuredSelect = document.querySelector('.form__featured-input--edit-job');
+        
+        const selects = [companySelect, typeSelect, positionSelect, pqeSelect, featuredSelect];
 
-    const descriptionField = document.querySelector('.form__description-input--new-job');
+        // Order the companies by name
+        companies.sort((a, b) => a.companyName > b.companyName? 1:-1);
+    
+        // Create the select options and set the relevant job option in the select
+        companies.forEach(company => {
+            const option = new Option(company.name, company.id);
+            option.className = 'company-option';
+            if(company.name === job.companyName) option.setAttribute('selected', 'selected');
+            companySelect.add(option);
+        });
+    
+        Object.entries(jobTypes).forEach(type => {
+            const option = new Option(type[1], type[1]);
+            option.className = 'type-option';
+            // if(type[1] === job.type) option.setAttribute('selected', 'selected');
+            typeSelect.add(option);
+        });
+    
+        Object.entries(jobPositions).forEach(position => {
+            const option = new Option(position[1], position[1]);
+            option.className = 'position-option';
+            if(position[1] === job.position) option.setAttribute('selected', 'selected');
+            positionSelect.add(option);
+        });
+    
+        jobPqes.forEach(pqe => {
+            const option = new Option(`${pqe}+`, pqe);
+            option.className = 'pqe-option';
+            if(pqe === job.pqe) option.setAttribute('selected', 'selected');
+            pqeSelect.add(option); 
+        });
+    
+        [0, 1].forEach(featured => {
+            const option = new Option(`${featured? 'Yes': 'No'}`, featured);
+            option.className = 'featured-option';
+            if(featured === job.featured) option.setAttribute('selected', 'selected');
+            featuredSelect.add(option); 
+        });
+    
+        selects.forEach(select => createSelect(select));
+};
+
+const createSelect = (select) => new Select(select);
+
+const createEditJobModal = ({companies, job, jobNumber}) => {
+    const today = new Date();
+    const date = `${today.getDate()}/${today.getMonth()+1}/${+today.getFullYear()}`;
+    const modal = `
+        <div class="job-summary__modal job-summary__modal--edit-job">
+
+            <div class="job-summary__modal-header">
+                <div class="job-summary__modal-item job-summary__modal-item--id">${job.id}</div>
+                <div class="job-summary__modal-item job-summary__modal-item--date">${job.jobDate}</div>
+            </div>
+           
+            <form class="form--edit-job">
+                <div class="form__close--edit-job">
+                    <svg class="form__close-svg--edit-job"><use xlink:href="svg/spritesheet.svg#cross"></svg>
+                </div>
+                <div class="form__content--edit-job">
+                    <div class="form__field--edit-job form__title--edit-job">
+                        <label for="title" class="form__label--edit-job">Title</label>
+                        <input type="text" placeholder="${job.title}" id="title" class="form__input--edit-job form__title-input--edit-job">
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+                    <div class="form__field--edit-job form__company--edit-job">
+                        <label for="company" class="form__label--edit-job">Company</label>
+                        <select name="company" id="company" data-placeholder="${job.companyId}" class="form__input--edit-job form__company-input--edit-job">
+                            <!-- options added in js -->
+                        </select>
+                        <i class="form__icon form__icon--success form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg form__error-msg--select"></small>
+                    </div>
+                    
+                    <div class="form__field--edit-job form__location--edit-job">
+                        <label for="location" class="form__label--edit-job">Location</label>
+                        <input type="text"  placeholder="${job.location}" id="location" class="form__input--edit-job form__location-input--edit-job">
+                    
+                        <i class="form__icon form__icon--success">
+                            <svg><svg><use xlink:href="svg/spritesheet.svg#success"></svg></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+
+                    <div class="form__field--edit-job form__wage--edit-job">
+                        <label for="wage" class="form__label--edit-job">Wage</label>
+                        <input type="number" placeholder="${job.wage}" id="wage" class="form__input--edit-job form__wage-input--edit-job" min="10000" max="10000000" step="any">
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+
+                    <div class="form__field--edit-job form__type--edit-job">
+                        <label for="type" class="form__label--edit-job">Type</label>
+                        <select name="type" data-placeholder="${job.jobType}" id="type" class="form__input--edit-job form__type-input--edit-job">
+                            <!-- options added in js -->
+                        </select>
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+
+                    <div class="form__field--edit-job form__position--edit-job">
+                        <label for="position" class="form__label--edit-job">Position</label>
+                        <select name="position" data-placeholder="${job.position}" id="position" class="form__input--edit-job form__position-input--edit-job">
+                            <!-- options added in js -->
+                        </select>
+                        <i class="form__icon form__icon--success form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg form__error-msg--select"></small>
+                    </div>
+
+                    <div class="form__field--edit-job form__pqe--edit-job">
+                        <label for="pqe" class="form__label--edit-job">PQE</label>
+                        <select name="pqe" data-placeholder="${job.pqe}" id="pqe" class="form__input--edit-job form__pqe-input--edit-job">
+                            <!-- options added in js -->
+                        </select>
+                        <i class="form__icon form__icon--success form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg form__error-msg--select"></small>
+                    </div>
+
+                    <div class="form__field--edit-job form__featured--edit-job">
+                        <label for="featured" class="form__label--edit-job">Featured</label>
+                        <select name="featured" data-placeholder="${job.featured}" id="featured" class="form__input--edit-job form__featured-input--edit-job">
+                            <!-- options added in js -->
+                        </select>
+                        <i class="form__icon form__icon--success form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg form__error-msg--select"></small>
+                    </div>
+
+                    <div class="form__field--edit-job form__description--edit-job">
+                        <label for="description" class="form__label--edit-job">Description</label>
+                        <textarea placeholder="${job.description}" name="description" id="description" class="form__input--edit-job form__description-input--edit-job">${job.description}
+                        </textarea>
+                        <i class="form__icon form__icon--success form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error form__icon--select">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg form__error-msg--select"></small>
+                    </div>
+
+                    <button class="form__submit--edit-job">Submit</button>
+
+                </div>
+
+            </form>
+            <div class="alert-wrapper alert-wrapper--edit-job alert-wrapper--hidden">
+                
+            </div>
+        </div>
+    `;
+
+    return modal;
+};
+
+
+export const getJobFields = (type) => {
+    const titleField = document.querySelector(`.form__title-input--${type}-job`);
+    const locationField = document.querySelector(`.form__location-input--${type}-job`);
+    const wageField = document.querySelector(`.form__wage-input--${type}-job`);
+
+    const descriptionField = document.querySelector(`.form__description-input--${type}-job`);
   
     return { titleField, locationField, wageField, descriptionField }
 }
 
-export const getNewJobCustomSelects = () => {
+export const getJobCustomSelects = (type) => {
     // These are the hidden selects behind the custom selects
-    const companyField = document.querySelector('.form__company-input--new-job');
-    const typeField = document.querySelector('.form__type-input--new-job');
-    const positionField = document.querySelector('.form__position-input--new-job');
-    const pqeField = document.querySelector('.form__pqe-input--new-job');
-    const featuredField = document.querySelector('.form__featured-input--new-job');
+    const companyField = document.querySelector(`.form__company-input--${type}-job`);
+    const typeField = document.querySelector(`.form__type-input--${type}-job`);
+    const positionField = document.querySelector(`.form__position-input--${type}-job`);
+    const pqeField = document.querySelector(`.form__pqe-input--${type}-job`);
+    const featuredField = document.querySelector(`.form__featured-input--${type}-job`);
 
     return { companyField, typeField, positionField, pqeField, featuredField };
 }
 
-export const getNewJobValues = (
-    {titleField, locationField, wageField, descriptionField }, 
-    { companyField, typeField, positionField, pqeField, featuredField }
-) => {
-    const title = titleField.value.trim();
-    const companyId = companyField.value === 'Company'? -1:companyField.value.trim();
-    const location = locationField.value.trim();
-    const wage = wageField.value === 'Wage'? '':wageField.value.trim();
-    const type = typeField.value === 'Type'? '':typeField.value.trim();
-    const position = positionField.value === 'Position'? '':positionField.value.trim();
-    const pqe = pqeField.value === 'Experience'? '':pqeField.value.trim();
-    const featured = featuredField.value === 'Featured'? '':featuredField.value.trim();
-    const description = descriptionField.value.trim();
-    return { title, companyId, location, wage, type, position, pqe, featured, description };
+export const getJobValues = (fields, selects, editMode) => {
+
+    const {titleField, locationField, wageField, descriptionField } = fields;
+    const { companyField, typeField, positionField, pqeField, featuredField } = selects;
+
+    const values = { changed: false };
+
+    // Fields =>
+    // (field.value: empty && field.placeholder: text) = the field is empty
+    // (select.value: text && select.placeholder: undefined) = the select is empty
+
+
+    Object.values(fields).forEach(field => {
+        // If !value, return placeholder
+        // For the description, just return value 
+        switch(field) {
+            case titleField: 
+                if(editMode) {
+                    values.title = titleField.value? titleField.value : titleField.placeholder;
+                    values.changed = !!titleField.value && titleField.value !== titleField.placeholder ? true : values.changed;
+                } else {
+                    values.title = titleField.value.trim();
+                }
+                break;
+            case locationField: 
+                if(editMode) {
+                    values.location = locationField.value? locationField.value : locationField.placeholder;
+                    values.changed = !!locationField.value && locationField.value !== locationField.placeholder ? true : values.changed;
+
+                } else { 
+                    values.location = locationField.value.trim();
+                }
+                break;
+            case wageField:
+                if(editMode) {
+                    values.wage = wageField.value? wageField.value : wageField.placeholder;
+                    values.changed = !!wageField.value && wageField.value !== wageField.placeholder ? true : values.changed;
+                    console.log('wage ', 'changed? ', values.changed);
+                } else 
+                    values.wage = wageField.value.trim();
+                break;
+            case descriptionField:
+                values.description = descriptionField.value;
+                values.changed = descriptionField.placeholder !== descriptionField.value.trim() ? true : values.changed;
+                break;
+        }
+    });
+
+    Object.values(selects).forEach(select => {
+
+        switch(select) {
+            case companyField:
+                values.companyId = companyField.value === 'Company'? -1 : companyField.value;
+                if(editMode){
+                    values.changed = companyField.value !== companyField.dataset.placeholder? true : values.changed;
+                }
+                break;
+            case typeField:
+                values.type = typeField.value === 'Type'? '' : typeField.value;
+                if(editMode){
+                    values.changed = typeField.value !== typeField.dataset.placeholder? true : values.changed;
+                }
+                break;
+            case positionField:
+                values.position = positionField.value === 'Position'? '' : positionField.value;
+                if(editMode){
+                    values.changed = positionField.value.trim() !== positionField.dataset.placeholder? true : values.changed;
+                }
+                break
+            case pqeField:
+                values.pqe = pqe.value === 'Experience'? '' : pqeField.value;
+                if(editMode){
+                    values.changed = pqeField.value !== pqeField.dataset.placeholder? true : values.changed;
+                }
+                break;
+            case featuredField:
+                values.featured = featured.value === 'Featured?'? '' : featuredField.value
+                if(editMode) {
+                     values.changed = Boolean(Number(featuredField.value)) != Boolean(Number(featuredField.dataset.placeholder))? true : values.changed;
+                }
+        }
+    });
+    console.log('editMode: ', editMode, 'changed: ', values.changed);
+    return values;
 }
 
 export const makeJobSummaryEditable = (editable, job) => {
@@ -1459,7 +1738,48 @@ export const calculateRows = (tableName) => {
 //     utils.removeElement(document.querySelector(`.pagination--${tableName}`));
 //     return { headerHeight, rowHeight, paginationHeight };
 // }
-
+export const getDeleteJobHtml = (jobId) => {
+    const jobDate = document.querySelector('.job-summary__field--date').innerText;
+    const positionName = document.querySelector('.job-summary__field--title').innerText;
+    const positionCompany = document.querySelector('.job-summary__field--company').innerText;
+    const location = document.querySelector('.job-summary__field--location').innerText;
+    
+    return (`
+            <div class='confirmation confirmation--delete'>
+                <div class="job-summary__modal-header">
+                    <div>${jobId}</div>
+                    <div>${jobDate}</div>
+                </div>
+                <div class='confirmation__header'>
+                    <div class='confirmation__svg-wrapper'>
+                        <svg class='confirmation__svg confirmation__svg--delete'><use xlink:href="svg/spritesheet.svg#alert-circled"></svg>
+                    </div>
+                    <div class='confirmation__message'>Delete job ${jobId}?</div>
+                </div>
+                <div class='confirmation__job'>
+                    <div class='confirmation__item'>
+                        <div class='confirmation__label'>Title:</div>
+                        <div class='confirmation__field'>${positionName}</div>
+                    </div>
+                    <div class='confirmation__item'>
+                        <div class='confirmation__label'>Company:</div>
+                        <div class='confirmation__field'>${positionCompany}</div>
+                    </div>
+                    <div class='confirmation__item'>
+                        <div class='confirmation__label'>Location:</div>
+                        <div class='confirmation__field'>${location}</div>
+                    </div>
+                </div>
+                <div class='confirmation__controls'>
+                    <button class='confirmation__btn confirmation__btn--confirm'>Confirm</button>
+                    <button class='confirmation__btn confirmation__btn--cancel'>Cancel</button>
+                </div>
+                <div class="alert-wrapper">
+                
+                </div>
+            </div>
+    `);
+}
 export const getDeleteApplicationHtml = (applicationId) => {
     const applicationDate = document.querySelector('.application-summary__field--date').innerText;
     const positionName = document.querySelector('.application-summary__field--title').innerText;
@@ -1597,8 +1917,8 @@ export const createJobSummary = ({companyId, companyName, title, featured, id, j
                     </div>
 
                     <div class="job-summary__item job-summary__item--job">
-                        <div class="job-summary__label job-summary__label--title">Company:</div>
-                        <div class="job-summary__field job-summary__field--title">
+                        <div class="job-summary__label job-summary__label--company">Company:</div>
+                        <div class="job-summary__field job-summary__field--company">
                             <a class="summary__link summary__link--company">${companyName}</a>
                         </div>
                     </div>
@@ -1664,27 +1984,27 @@ export const createJobSummary = ({companyId, companyName, title, featured, id, j
             </div>
 
             <div class="job-summary__controls">
-                    <div class="job-summary__btn job-summary__btn--new">
-                        <svg class="job-summary__new-icon job-summary__icon">
-                            <use xlink:href="svg/spritesheet.svg#add">
-                        </svg>
-                    </div>
-                    <div class="job-summary__btn job-summary__btn--hubspot">
-                        <svg class="job-summary__hubspot-icon job-summary__icon">
-                            <use xlink:href="svg/spritesheet.svg#hubspot">
-                        </svg>
-                    </div>
-                    <div class="job-summary__btn job-summary__btn--edit">
-                        <svg class="job-summary__edit-icon job-summary__icon">
-                            <use xlink:href="svg/spritesheet.svg#edit-np1">
-                        </svg>
-                    </div>
-                    <div class="job-summary__btn job-summary__btn--delete">
-                        <svg class="job-summary__delete-icon job-summary__icon">
-                            <use xlink:href="svg/spritesheet.svg#delete-np1">
-                        </svg>
-                    </div>
+                <div class="job-summary__btn job-summary__btn--new">
+                    <svg class="job-summary__new-icon job-summary__icon">
+                        <use xlink:href="svg/spritesheet.svg#add">
+                    </svg>
                 </div>
+                <div class="job-summary__btn job-summary__btn--hubspot">
+                    <svg class="job-summary__hubspot-icon job-summary__icon">
+                        <use xlink:href="svg/spritesheet.svg#hubspot">
+                    </svg>
+                </div>
+                <div class="job-summary__btn job-summary__btn--edit">
+                    <svg class="job-summary__edit-icon job-summary__icon">
+                        <use xlink:href="svg/spritesheet.svg#edit-np1">
+                    </svg>
+                </div>
+                <div class="job-summary__btn job-summary__btn--delete">
+                    <svg class="job-summary__delete-icon job-summary__icon">
+                        <use xlink:href="svg/spritesheet.svg#delete-np1">
+                    </svg>
+                </div>
+            </div>
         </div>                 
     `;
 
@@ -2372,11 +2692,11 @@ export const updatePaginationView = (index) => {
         document.querySelector('.pagination__next').classList.remove('pagination__next--inactive');
     }
 }
-export const removeLastPaginationItem = () => {
-    const items = document.querySelectorAll('.pagination__item');
-    console.log(items);
-    items[items.length - 1].parentElement.removeChild(items[items.length - 1]);
-}
+// export const removeLastPaginationItem = () => {
+//     const items = document.querySelectorAll('.pagination__item');
+//     console.log(items, items[items.length - 1]);
+//     // items[items.length - 1].parentElement.removeChild(items[items.length - 1]);
+// }
 
 export const animateAdminContentIn = () => {
     const tl = gsap.timeline()
@@ -2385,10 +2705,10 @@ export const animateAdminContentIn = () => {
         .fromTo('.table', {autoAlpha: 0},{autoAlpha: 1, duration: '.5'})
         // .from('.thead', { autoAlpha: 0, y: -20, duration: 1 }, '<')
         .from('.row', {
-            y: -30, 
+            y: -15, 
             autoAlpha: 0,
             stagger: {
-                each: .18
+                each: .12
             },
             ease: 'power2.out',
         
@@ -2400,10 +2720,10 @@ export const animateTableBodyIn = () => {
     return tl
         .fromTo('tbody', {autoAlpha: 0},{autoAlpha: 1, duration: '.5'})
         .from('.row', {
-            y: -30, 
+            y: -15, 
             autoAlpha: 0,
             stagger: {
-                each: .18
+                each: .12
             },
             ease: 'power2.out',
         
@@ -2411,7 +2731,7 @@ export const animateTableBodyIn = () => {
 }
 
 export const animateSummaryIn = () => {
-    return gsap.fromTo('.summary', { autoAlpha:0, x: -50 }, {autoAlpha: 1, x: 0 });
+    return gsap.fromTo('.summary', { autoAlpha:0 }, {autoAlpha: 1 });
 }
 export const animateSummaryOut = () => {
     return gsap.fromTo('.summary', { autoAlpha: 1 }, {autoAlpha: 0, duration: .2}, '<')

@@ -1,14 +1,14 @@
 
 .form {
 
-    &--new-job {
+    &--new-job, &--edit-job {
         position: relative;
         display: flex;
         flex-direction: column;
     }
 
     &__close {
-        &--new-job {
+        &--new-job, &--edit-job {
             display: flex;
             position: absolute;
             top: 0;
@@ -22,7 +22,7 @@
     }
 
     &__content {
-        &--new-job {
+        &--new-job, &--edit-job {
             position: relative;
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -35,7 +35,7 @@
     }
 
     &__field {
-        &--new-job {
+        &--new-job, &--edit-job {
             position: relative;
             display: flex;
             flex-direction: column;
@@ -56,19 +56,19 @@
 
     }
     &__title, &__company, &__description {
-        &--new-job {
+        &--new-job, &--edit-job {
             grid-column: 1/3;
         }
     }
 
     &__label {
-        &--new-job {
+        &--new-job, &--edit-job {
             font-weight: 600;
             margin-bottom: .5rem;
         }
     }
     &__input {
-        &--new-job {
+        &--new-job, &--edit-job {
             padding: .9rem 1rem;
             font-size: 1.7rem;
             border: 1px solid lightgrey;
@@ -96,7 +96,7 @@
     }
 
     &__submit {
-        &--new-job {
+        &--new-job, &--edit-job {
             grid-column: 1/3;
             font-size: 1.7rem;
             margin-top: 1rem;
@@ -106,37 +106,5 @@
             border-radius: 5px;
             cursor: pointer;
         }
-    }
-}
-
-
-.new-job {
-
-    
-    &__content {
-
-    }
-
-    &__close {
-
-    }
-
-    &__field {
-
-
-        &--title, &--company {
-        }
-
-        & i {
-        }
-    }
-    &__label {
-
-    }
-    &__input {
-
-    }
-    &__submit {
-
     }
 }

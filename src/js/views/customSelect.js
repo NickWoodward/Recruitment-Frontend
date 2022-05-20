@@ -77,8 +77,7 @@ export default class Select {
     let group
 
     select.selectOptions.forEach((option, index) => {
-      // 0 is always the placeholder. If one not required, add 'hidden' attribute
-      if(index === 0) return
+      if(select.placeholder && index === 0) return
 
       const optionElement = document.createElement("li")
       optionElement.classList.add("custom-select-option")

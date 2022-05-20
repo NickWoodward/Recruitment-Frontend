@@ -86,6 +86,7 @@ class AdminController {
                 totalJobs: 0,
                 currentJob: {},
                 currentPage: 0,
+                jobNames: [],
                 searchOptions: {
                     index: 0,
                     limit: 6,
@@ -99,6 +100,7 @@ class AdminController {
                 totalUsers: 0,
                 currentUser: {},
                 currentPage: 0,
+                applicantNames: [],
                 searchOptions: {
                     index: 0,
                     limit: 6,
@@ -154,9 +156,10 @@ class AdminController {
             // Render Header
             headerView.renderHeader("admin");
 
-            // On first load get jobs and users for the application page (to allow adding new applications)
-             this.state.jobs.jobNames = await this.Admin.getJobNames(); 
-             console.log(this.state.jobs.jobNames);
+            // // On first load get jobs and users for the application page (to allow adding new applications)
+            // const { data: { names } } =  await this.Admin.getJobNames();
+            //  this.state.jobs.jobNames = names;
+
             // const jobsResponse = await this.Admin.getJobs(this.state.jobs.searchOptions);
             // this.jobs = jobsResponse.data.jobs;
 
@@ -627,7 +630,6 @@ class AdminController {
             tl.add(() => {
                 switch(sectionName) {
                     case 'applications': 
-
                         // Render table
                         this.renderApplicationTable();
 
@@ -644,7 +646,7 @@ class AdminController {
                         break;
 
                     case 'jobs':
-
+                        this.state.jobs.currentJob = this.jobs[0];
 
                         // Render table
                         this.renderJobsTable();
@@ -906,6 +908,7 @@ class AdminController {
     async getData(sectionName, indexId) {
         switch(sectionName) {
             case 'applications':
+                console.log('GETTING');
                 const { data: { applications: { rows: appRows, count: appCount } } } = await this.Admin.getApplications(this.state.applications.searchOptions, indexId);
                 this.applications = appRows;
 
@@ -915,7 +918,7 @@ class AdminController {
                 const { data: { jobs, total } } = await this.Admin.getJobs(this.state.jobs.searchOptions, indexId);
                 this.jobs = jobs;
                 this.state.jobs.totalJobs = total;
-                console.log(this.jobs);
+
                 break;
             case 'companies':
                 const { data: { companies, total: companyTotal } } = await this.Admin.getCompanies(this.state.companies.searchOptions, indexId);
@@ -1173,12 +1176,11 @@ class AdminController {
     // }
 
     renderApplicationTable() {
-
+  
         // Format applications/headers into html elements
         const {headers, rows} = adminView.formatApplications(this.applications);
         const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
         const tableWrapper = document.querySelector('.table-wrapper');
-
         const table = document.querySelector('.table--applications');
 
        // If no table visible, render both the header and content
@@ -1202,6 +1204,7 @@ class AdminController {
         // adminView.renderPagination(index, limit, totalApplications, tableWrapper, 'applications');
 
         const applicationRows = document.querySelectorAll('.row--applications');
+       
         const activeRow = Array.from(applicationRows).find(row => row.querySelector(`[data-id="${this.state.applications.currentApplication.applicationId}"]`)) || applicationRows[0];
 
         utils.changeActiveRow(activeRow, applicationRows);
@@ -1238,7 +1241,7 @@ class AdminController {
 
     }
 
-    applicationSummaryListener (e) {
+    async applicationSummaryListener (e) {
         const newApplicationAlertAnimation = gsap.timeline({paused: true});
         const deleteApplicationAlertAnimation = gsap.timeline({paused: true});
 
@@ -1277,7 +1280,15 @@ class AdminController {
         }
 
         if(newBtn) {
-            adminView.renderNewApplicationModal({jobs: this.jobs, users: this.users, applications: this.applications, appNumber: this.getNextId('applications')});
+            // Get Job names for the job select
+            const { data: { names } } =  await this.Admin.getJobNames();
+            this.state.jobs.jobNames = names;
+
+            // Get User names for the applicant select
+            const { data: { applicants: applicantNames } } =  await this.Admin.getUserNames();
+            this.state.users.applicantNames = applicantNames;
+
+            adminView.renderNewApplicationModal({jobs: this.state.jobs.jobNames, users: this.state.users.applicantNames, applications: this.applications, appNumber: this.getNextId('applications')});
         
             const applicationSummaryModal = document.querySelector('.application-summary__modal');
             const submitNewBtn = document.querySelector('.new-application__submit');
@@ -1351,44 +1362,6 @@ class AdminController {
                         newApplicationAlertAnimation.play(0);
                     }
                 }
-
-                
-
-
-                // // Get the job id from the select
-                // const jobId = document.querySelector('.new-application__input--job').value;
-                // const personId = document.querySelector('.new-application__input--applicant').value;
-
-                // if(!jobId || !personId) {
-                //     console.log(`job: ${jobId}, person: ${personId}`);
-                //     const msg = !jobId? 'No Job Selected':'No Applicant Selected';
-                //     alertModal.displayAlert(
-                //         msg,
-                //         false,
-                //         document.querySelector('.application-summary__modal')
-                //     );
-                //     return
-                // };
-
-                // try {
-                //     const res = await this.Admin.createApplication(jobId, personId);
-                //     if(res.status === 200) {
-                //         console.log('success');
-                //         alertModal.displayAlert(
-                //             'New Application Created',
-                //             true,
-                //             document.querySelector('.application-summary__modal')
-                //         ); 
-                //     }
-                // } catch (err) {
-                //     if(err.response.data.message === 'Application already made') {
-                //         alertModal.displayAlert(
-                //             err.response.data.message,
-                //             false,
-                //             document.querySelector('.application-summary__modal')
-                //         );
-                //     }
-                // }
             });
 
         }
@@ -1441,9 +1414,6 @@ class AdminController {
                         const alert = modalView.getAlert(`Application ${applicationId} deleted`, true);
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
                         if(this.applications.length === 1) {
-                            // Simulates handling an application pagination event
-                            // this.simulateMouseEVent('click', document.querySelector('.pagination__previous'));
-
                             // Set the pagination state (second param simulates pressing the previous button)
                             this.setApplicationPagination(null, true, null);
                             // // Set the pagination view
@@ -1456,13 +1426,12 @@ class AdminController {
                             // .add(adminView.animateTableContentOut())
                             // .add(adminView.animateAdminLoadersIn(), '<')
 
-                            this.changeTablePageAnimation(tl);
+                            this.changeTablePageAnimation(tl, 'applications');
 
                             // Update pagination
                             const { totalApplications, searchOptions: {index: appIndex, limit: appLimit} } = this.state.applications;
                             adminView.renderPagination(appIndex, appLimit, totalApplications, document.querySelector('.table-wrapper'), 'applications');
-                            // Remove the pagination element
-                            adminView.removeLastPaginationItem();
+                            
                         } else {
                             // Update table
                             await this.getData('applications');
@@ -1492,8 +1461,6 @@ class AdminController {
 
             cancel.addEventListener('click', () => {
                 while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
-
-                console.log('cancel');
             });
 
 
@@ -1548,7 +1515,7 @@ class AdminController {
                 utils.changeActiveRow(targetRow, jobRows);
                 this.state.jobs.currentJob = job;
                 const summary = document.querySelector('.summary');
-                adminView.swapSummary(summary, adminView.createJobSummary(job), null); 
+                adminView.swapSummary(summary, adminView.createJobSummary(job), this.jobSummaryListener.bind(this)); 
             
             });
         });
@@ -1610,6 +1577,7 @@ class AdminController {
     async jobSummaryListener(e) {
         // Animations
         const newJobAlertAnimation = gsap.timeline({paused: true});
+        const editJobAlertAnimation = gsap.timeline({paused: true});
         const deleteJobAlertAnimation = gsap.timeline({paused: true});
 
         // Buttons
@@ -1622,20 +1590,19 @@ class AdminController {
         const companyLink = e.target.closest('.summary__link--company');
 
         if(newBtn) {
-
             let alert;
 
             // Get company list
             const { data: { companyNames } } = await this.Admin.getCompanyNames();
             this.state.companies.companyNames = companyNames;
-            
-            adminView.renderNewJobModal({ 
+
+            adminView.renderJobModal({ 
                 companies: this.state.companies.companyNames, 
                 jobTypes: this.jobTypes, 
                 jobPositions: this.jobPositions,
                 jobPqes: this.jobPqes,
                 jobNumber: this.getNextId('jobs')
-            });
+            }, 'new');
 
             const alertWrapper = document.querySelector('.alert-wrapper');
             const jobForm = document.querySelector('.form--new-job');
@@ -1644,9 +1611,9 @@ class AdminController {
 
 
             // Custom selects and fields need to be separated for validation
-            const fields = adminView.getNewJobFields();
+            const fields = adminView.getJobFields('new');
             const { titleField, locationField, wageField, descriptionField } = fields;
-            const selects = adminView.getNewJobCustomSelects();
+            const selects = adminView.getJobCustomSelects('new');
             const { companyField, typeField, positionField, pqeField, featuredField } = selects;
 
             // Add the animation for the job alerts (paused)
@@ -1659,21 +1626,23 @@ class AdminController {
             }, '+=3')
 
             closeBtn.addEventListener('click', () => {
-                adminView.removeNewJobModal();
+                adminView.removeJobModal();
             });
            
             jobForm.addEventListener('submit', async e => {
+                console.log('called');
                 e.preventDefault();
                 // Clear the alert wrapper contents
                 while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
 
-                const data = adminView.getNewJobValues(fields, selects); 
-                const errors = validator.validateJob(data);
+                const data = adminView.getJobValues(fields, selects); 
+                const { changed, ...values } = data;
+                const errors = validator.validateJob(values);
 
                 // If no errors, submit the form
                 if(!errors) {
                     try {
-                        const res = await this.Admin.createJob(data);
+                        const res = await this.Admin.createJob(values);
 
                         if(res.status !== 201) {
                             alert = modalView.getAlert('Job Not Created', false);
@@ -1685,6 +1654,8 @@ class AdminController {
                             newJobAlertAnimation.play(0);
 
                             await this.getData('jobs');
+
+                            this.state.jobs.currentJob = res.data.job;
 
                             this.renderJobsTable();
                             // Update pagination
@@ -1740,7 +1711,7 @@ class AdminController {
 
             jobForm.addEventListener('focusout', (e) => {
                 if(e.target === submitBtn) return;
-                const data = adminView.getNewJobValues(fields, selects);
+                const data = adminView.getJobValues(fields, selects);
                 const { value, name } = this.getJobDataToValidate(e, data, fields, selects);
                 const error = validator.validateJobField({value: value, name: name});
 
@@ -1777,7 +1748,7 @@ class AdminController {
             });
 
             jobForm.addEventListener('change', (e) => {                
-                const data = adminView.getNewJobValues(fields, selects);
+                const data = adminView.getJobValues(fields, selects);
                 const { value, name } = this.getJobDataToValidate(e, data, fields, selects);   
              
                 const error = validator.validateJobField({value: value, name: name});
@@ -1789,10 +1760,231 @@ class AdminController {
 
 
         if(deleteBtn) {
-            console.log('deleteBtn');
+
+            const jobId = document.querySelector('.job-summary__id').innerText;
+            const summaryWrapper = document.querySelector('.summary-wrapper');
+            const confirmationHtml = adminView.getDeleteJobHtml(jobId);
+
+            summaryWrapper.insertAdjacentHTML('afterbegin', confirmationHtml);
+            const confirmation = document.querySelector('.confirmation');
+            // Confirmation animation 
+            gsap.from(confirmation, {
+                autoAlpha: 0,
+                duration: .2
+            });
+
+            // Alert animation
+            const alertWrapper = document.querySelector('.alert-wrapper');
+
+            // Add the animation for the job alerts
+            deleteJobAlertAnimation
+                .from(alertWrapper, {
+                    autoAlpha: 0
+                })
+                .to(alertWrapper, {
+                    autoAlpha: 0
+                }, '+=1.5')
+                .to(confirmation, {
+                    autoAlpha: 0,
+                    onComplete: () => {
+                        confirmation.parentElement.removeChild(confirmation);
+                        // Get a new Summary
+                        adminView.swapSummary(document.querySelector('.summary'), adminView.createJobSummary(this.jobs[0]), this.jobSummaryListener.bind(this)); 
+                    }
+                })
+        
+
+            const confirm = document.querySelector('.confirmation__btn--confirm');
+            const cancel = document.querySelector('.confirmation__btn--cancel');
+
+
+            confirm.addEventListener('click', async() => {
+                // Clear the alert wrapper
+                while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+
+                try {
+                    const { status } = await this.Admin.deleteJob(jobId);
+
+                    if(status === 200) {
+                        const tl = gsap.timeline();
+                        const alert = modalView.getAlert(`Job ${jobId} deleted`, true);
+                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
+
+                        // Deal with pagination if only 1 item left on the page
+                        if(this.jobs.length === 1) {
+                            // 2nd arg is the 'prevBtn' argument
+                            this.setJobPaginationState(null, true, null);
+                            // Set the view
+                            adminView.updatePaginationView(this.state.jobs.currentPage -1);
+
+                            // Get the new data to display
+                            await this.getData('jobs');
+
+                            this.changeTablePageAnimation(tl, 'jobs');
+
+                            // Update the pagination items
+                            const { totalJobs, searchOptions: {index: jobIndex, limit: jobLimit} } = this.state.jobs;
+                            adminView.renderPagination(jobIndex, jobLimit, totalJobs, document.querySelector('.table-wrapper'), 'jobs');
+                        
+                        } else {
+                            // Update the table
+                            await this.getData('jobs');
+                            this.renderJobsTable();
+
+                            // Update pagination
+                            const { totalJobs, searchOptions: {index: jobIndex, limit: jobLimit} } = this.state.jobs;
+                            adminView.renderPagination(jobIndex, jobLimit, totalJobs, document.querySelector('.table-wrapper'), 'jobs');
+                        
+                            // After the page has potentially changed because of onComplete function
+                            deleteJobAlertAnimation.play(0);
+                        }
+                    }
+
+                } catch(err) {
+                    const alert = modalView.getAlert(`Error, please contact the administrator`, false);
+                
+                    alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                    deleteJobAlertAnimation.play(0);
+                    console.log(err)
+                }
+            });
         }
         if(editBtn) {
-            console.log('editBtn');
+            const jobId = document.querySelector('.job-summary__id').innerText;
+            let alert;
+
+            // Get companies list
+            const { data: { companyNames } } = await this.Admin.getCompanyNames();
+            this.state.companies.companyNames = companyNames;
+
+            adminView.renderJobModal({ 
+                companies: this.state.companies.companyNames, 
+                job: this.state.jobs.currentJob,
+                jobTypes: this.jobTypes, 
+                jobPositions: this.jobPositions,
+                jobPqes: this.jobPqes,
+                jobNumber: this.getNextId('jobs')
+            }, 'edit');
+
+            const alertWrapper = document.querySelector('.alert-wrapper');
+            const jobForm = document.querySelector('.form--edit-job');
+            const closeBtn = document.querySelector('.form__close--edit-job');
+            const summaryModal = document.querySelector('.job-summary__modal');
+
+
+            // Custom selects and fields need to be separated for validation
+            const fields = adminView.getJobFields('edit');
+            const { titleField, locationField, wageField, descriptionField } = fields;
+            const selects = adminView.getJobCustomSelects('edit');
+            const { companyField, typeField, positionField, pqeField, featuredField } = selects;
+
+            // Add the animation for the job alerts (paused)
+            editJobAlertAnimation
+            .from(alertWrapper, {
+                autoAlpha: 0
+            })
+            .to(alertWrapper, {
+                autoAlpha: 0,
+            }, '+=1.5')
+
+            closeBtn.addEventListener('click', () => {
+                adminView.removeJobModal();
+            });
+
+            jobForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                // Clear the alert wrapper contents
+                while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+                const data = adminView.getJobValues(fields, selects, 'edit'); 
+                const { changed, ...values } = data;
+                const errors = validator.validateJob(values);
+
+                if(!changed) {
+                    alert = modalView.getAlert(`No Fields Changed`, false);
+                    alertWrapper.insertAdjacentHTML('afterbegin', alert);
+
+                    editJobAlertAnimation.play(0);
+                    return;
+                }
+
+                if(!errors) {
+                    try {
+                        const res = await this.Admin.editJob(jobId, values);
+                        if(res.status !== 200) {
+                            alert = modalView.getAlert('Job Not Edited', false);
+                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                            editJobAlertAnimation.play(0);
+                        } else {
+                            alert = modalView.getAlert('Job Edited', true);
+                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
+
+                            this.state.jobs.currentJob = res.data.job;
+
+                            await this.getData('jobs');
+                            this.renderJobsTable();
+
+                            // Update pagination
+                            const { totalJobs, searchOptions: {index: jobIndex, limit: jobLimit} } = this.state.jobs;
+                            adminView.renderPagination(jobIndex, jobLimit, totalJobs, document.querySelector('.table-wrapper'), 'jobs');
+
+                            editJobAlertAnimation.add(() => {
+                                gsap.to(summaryModal, {
+                                    autoAlpha: 0,
+                                    onComplete: () => {
+                                        summaryModal.parentElement.removeChild(summaryModal);
+
+                                        // Update the summary
+                                        const summary = document.querySelector('.summary');
+                                        adminView.swapSummary(summary, adminView.createJobSummary(this.state.jobs.currentJob), this.jobSummaryListener.bind(this)); 
+                                    }
+                                });
+                            });
+                            editJobAlertAnimation.play(0);
+
+                        }
+                    } catch(err) {
+                        console.log(err);
+                    }
+                    return;
+                }
+
+
+                if(errors.title) 
+                    validator.setErrorFor(titleField, errors.title); 
+                else validator.setSuccessFor(titleField);
+
+                if(errors.companyId)     
+                    validator.setErrorFor(companyField, errors.companyId);
+                else validator.setSuccessFor(companyField);
+
+                if(errors.location)  
+                    validator.setErrorFor(locationField, errors.location);
+                else validator.setSuccessFor(locationField);
+
+                if(errors.wage) 
+                    validator.setErrorFor(wageField, errors.wage);
+                else validator.setSuccessFor(wageField);
+
+                if(errors.type) 
+                    validator.setErrorFor(typeField, errors.type);
+                else validator.setSuccessFor(typeField);
+
+                if(errors.position) 
+                    validator.setErrorFor(positionField, errors.position);
+                else validator.setSuccessFor(positionField);
+
+                if(errors.pqe) 
+                    validator.setErrorFor(pqeField, errors.pqe);
+                else validator.setSuccessFor(pqeField);
+
+                if(errors.featured) 
+                    validator.setErrorFor(featuredField, errors.featured);
+                else validator.setSuccessFor(featuredField);
+
+                if(errors.description) 
+                    validator.setErrorFor(descriptionField, errors.description); 
+                else validator.setSuccessFor(descriptionField);
+            });
         }
         if(hubspotBtn) {
             console.log('hubspotBtn');
@@ -2754,7 +2946,6 @@ class AdminController {
 
     async handlePaginationEvent(e) {
         const tl = gsap.timeline();
-
         // pagination btns
         const userBtn = e.target.closest('.pagination__item--users');
         const jobBtn = e.target.closest('.pagination__item--jobs');
@@ -2770,10 +2961,14 @@ class AdminController {
         const applicationNext = e.target.closest('.pagination__next--applications');
         const paginationItem = e.target.closest('.pagination__item');
 
+
         const application = applicationPrevious || applicationNext || applicationBtn;
+        const job = jobPrevious || jobNext || jobBtn;
+        const company = companyPrevious || companyNext || companyBtn;
+        const user = userPrevious || userNext || userBtn;
 
         // If no pagination btns are clicked, return
-        if(!application) return;
+        if(!application && !job && !company && !user) return;
 
         // // if there's an animation still running, ignore input
         // if(this.state.isActivePaginationAnimation) {
@@ -2806,7 +3001,7 @@ class AdminController {
         if(userBtn || userPrevious || userNext) {
             this.handleUserPagination(userBtn, userPrevious, userNext);
         } else if(jobBtn || jobPrevious || jobNext){
-            this.handleJobPagination(jobBtn, jobPrevious, jobNext);
+            this.handleJobPagination(jobBtn, jobPrevious, jobNext, tl);
         } else if(companyBtn || companyPrevious || companyNext) {
             this.handleCompanyPagination(companyBtn, companyPrevious, companyNext);
         } else if(applicationBtn || applicationPrevious || applicationNext) {
@@ -2883,44 +3078,82 @@ class AdminController {
             })
             .catch(err => console.log(err));
     };
-    handleJobPagination(jobBtn, jobPrevious, jobNext) {
-        const tl = gsap.timeline();
 
-
-        // If there's an active request, cancel it
-        if(this.state.isActiveRequest) { 
-            cancelTokenSource();
-            this.state.isActiveRequest = false;
-            console.log('cancelled')
-        }
-
+    setJobPaginationState(jobBtn, jobPrevious, jobNext) {
         const jobState = this.state.jobs;
-        // Changing page = new current job
-        jobState.currentJob = this.jobs[0];
+        // // Changing page = new current job
+        // jobState.currentJob = this.jobs[0];
 
         const pages = Math.ceil(jobState.totalJobs / jobState.searchOptions.limit);
 
-        if(jobPrevious && !(jobState.currentPage < 1)) {
+        if(jobPrevious && !(jobState.currentPage <= 1)) {
+            console.log('backwards');
+
             this.movePageBackwards(jobState);
         }
-        if(jobNext && !(jobState.currentPage >= pages-1)) {
+        if(jobNext && !(jobState.currentPage >= pages)) {
+            console.log('forwards');
+
             this.movePageForwards(jobState);
         }
         if(jobBtn) {
+            console.log('move');
+
             this.movePage(jobState, jobBtn);
         }
 
-        this.Admin.getJobs(this.state.jobs.searchOptions)
-            .then(res => {
-                this.jobs = res.data.jobs;
-                this.state.jobs.totalJobs = res.data.total;
+    }
 
-                // Set the table index to 0
-                this.state.jobsTable.index = 0;
-                this.renderJobsTable();
-                adminView.populateJobSummary(this.jobs[0]);
-            }).catch(err => console.log(err));
-    };
+    async handleJobPagination(jobBtn, jobPrevious, jobNext, timeline) {
+        // Set the state
+        this.setJobPaginationState(jobBtn, jobPrevious, jobNext);
+        // Update the view
+        adminView.updatePaginationView(this.state.jobs.currentPage -1);
+
+        // get the new data
+        await this.getData('jobs');
+        this.state.isActiveRequest = false;
+
+        this.changeTablePageAnimation(timeline, 'jobs');
+    }
+
+    // handleJobPagination(jobBtn, jobPrevious, jobNext) {
+    //     const tl = gsap.timeline();
+
+    //     // If there's an active request, cancel it
+    //     if(this.state.isActiveRequest) { 
+    //         cancelTokenSource();
+    //         this.state.isActiveRequest = false;
+    //         console.log('cancelled')
+    //     }
+
+    //     const jobState = this.state.jobs;
+    //     // Changing page = new current job
+    //     jobState.currentJob = this.jobs[0];
+
+    //     const pages = Math.ceil(jobState.totalJobs / jobState.searchOptions.limit);
+
+    //     if(jobPrevious && !(jobState.currentPage < 1)) {
+    //         this.movePageBackwards(jobState);
+    //     }
+    //     if(jobNext && !(jobState.currentPage >= pages-1)) {
+    //         this.movePageForwards(jobState);
+    //     }
+    //     if(jobBtn) {
+    //         this.movePage(jobState, jobBtn);
+    //     }
+
+    //     this.Admin.getJobs(this.state.jobs.searchOptions)
+    //         .then(res => {
+    //             this.jobs = res.data.jobs;
+    //             this.state.jobs.totalJobs = res.data.total;
+
+    //             // Set the table index to 0
+    //             this.state.jobsTable.index = 0;
+    //             this.renderJobsTable();
+    //             adminView.populateJobSummary(this.jobs[0]);
+    //         }).catch(err => console.log(err));
+    // };
 
     handleCompanyPagination(companyBtn, companyPrevious, companyNext) {
         const companyState = this.state.companies;
@@ -2993,6 +3226,7 @@ class AdminController {
             console.log('move');
             this.movePage(applicationState, applicationBtn);
         }
+
     }
 
     async handleApplicationPagination(applicationBtn, applicationPrevious, applicationNext, timeline) {
@@ -3005,23 +3239,43 @@ class AdminController {
         await this.getData('applications');
         this.state.isActiveRequest = false;
 
-        this.changeTablePageAnimation(timeline);
+        this.changeTablePageAnimation(timeline, 'applications');
 
     }
 
-    changeTablePageAnimation(timeline) {
+    changeTablePageAnimation(timeline, table) {
+        let listener;
+        let createSummary;
+
+        switch(table) {
+            case 'applications': 
+                listener = this.applicationSummaryListener.bind(this);
+                createSummary = adminView.createApplicationSummary.bind(this, this.applications[0]); 
+                break;
+            case 'jobs':
+                listener = this.jobSummaryListener.bind(this);
+                createSummary = adminView.createJobSummary.bind(this, this.jobs[0]);
+                break;
+        }
         timeline
           .add(adminView.animateAdminLoadersOut())
           .add(() => {
             // Populate summary while not visible
             adminView.swapSummary(
                 document.querySelector('.summary'), 
-                adminView.createApplicationSummary(this.applications[0]), 
-                this.applicationSummaryListener.bind(this)
+                createSummary(), 
+                listener
             ); 
-                              
+                         
             // Update the table
-            this.renderApplicationTable();
+            switch(table) {
+                case 'applications': 
+                    this.renderApplicationTable();
+                    break;
+                case 'jobs':
+                    this.renderJobsTable();
+                    break;
+            }
 
             // Animate table in
             adminView.animateTableBodyIn();
