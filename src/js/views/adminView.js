@@ -413,12 +413,11 @@ export const createApplicationSummary = ({
 
                             <div class="application-summary__item summary__item application-summary__item--cv">
                                 <div class="application-summary__label application-summary__label--cv">Applicant CV:</div>
-
-                                
+                                <div class="application-summary__field application-summary__field--cv">${cvType? 'Yes':'No'}</div>
                             </div>
                         </div>
 
-                        <div class="application-summary__controls summary__controls">
+                        <div class="summary__controls summary__controls--application">
                             <div class="application-summary__btn application-summary__btn--new">
                                 <svg class="application-summary__new-icon application-summary__icon">
                                     <use xlink:href="svg/spritesheet.svg#add">
@@ -1187,7 +1186,6 @@ export const getJobValues = (fields, selects, editMode) => {
                 if(editMode) {
                     values.wage = wageField.value? wageField.value : wageField.placeholder;
                     values.changed = !!wageField.value && wageField.value !== wageField.placeholder ? true : values.changed;
-                    console.log('wage ', 'changed? ', values.changed);
                 } else 
                     values.wage = wageField.value.trim();
                 break;
@@ -1203,6 +1201,8 @@ export const getJobValues = (fields, selects, editMode) => {
         switch(select) {
             case companyField:
                 values.companyId = companyField.value === 'Company'? -1 : companyField.value;
+                values.companyName = select.options[select.selectedIndex].innerText;
+
                 if(editMode){
                     values.changed = companyField.value !== companyField.dataset.placeholder? true : values.changed;
                 }
@@ -1232,7 +1232,6 @@ export const getJobValues = (fields, selects, editMode) => {
                 }
         }
     });
-    console.log('editMode: ', editMode, 'changed: ', values.changed);
     return values;
 }
 
@@ -1784,7 +1783,7 @@ export const getDeleteApplicationHtml = (applicationId) => {
     const applicationDate = document.querySelector('.application-summary__field--date').innerText;
     const positionName = document.querySelector('.application-summary__field--title').innerText;
     const positionCompany = document.querySelector('.application-summary__field--company').innerText;
-    const applicantName = `${document.querySelector('.application-summary__field--applicant-firstname').innerText} ${document.querySelector('.application-summary__field--applicant-surname').innerText}`;
+    const applicantName = `${document.querySelector('.application-summary__field--applicant').innerText}`;
     
     return (`
             <div class='confirmation confirmation--delete'>
@@ -1977,34 +1976,36 @@ export const createJobSummary = ({companyId, companyName, title, featured, id, j
                     </div>
                 </div>    
 
+                <div class="summary__heading">Description</div>
+
                 <div class="job-summary__section job-summary__section--description">
-                    <div class="summary__heading">Description</div>
                     <div class="job-summary__description job-summary__field">${description}</div>
+
+                    <div class="summary__controls summary__controls--job">
+                        <div class="job-summary__btn job-summary__btn--new">
+                            <svg class="job-summary__new-icon job-summary__icon">
+                                <use xlink:href="svg/spritesheet.svg#add">
+                            </svg>
+                        </div>
+                        <div class="job-summary__btn job-summary__btn--hubspot">
+                            <svg class="job-summary__hubspot-icon job-summary__icon">
+                                <use xlink:href="svg/spritesheet.svg#hubspot">
+                            </svg>
+                        </div>
+                        <div class="job-summary__btn job-summary__btn--edit">
+                            <svg class="job-summary__edit-icon job-summary__icon">
+                                <use xlink:href="svg/spritesheet.svg#edit-np1">
+                            </svg>
+                        </div>
+                        <div class="job-summary__btn job-summary__btn--delete">
+                            <svg class="job-summary__delete-icon job-summary__icon">
+                                <use xlink:href="svg/spritesheet.svg#delete-np1">
+                            </svg>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="job-summary__controls">
-                <div class="job-summary__btn job-summary__btn--new">
-                    <svg class="job-summary__new-icon job-summary__icon">
-                        <use xlink:href="svg/spritesheet.svg#add">
-                    </svg>
-                </div>
-                <div class="job-summary__btn job-summary__btn--hubspot">
-                    <svg class="job-summary__hubspot-icon job-summary__icon">
-                        <use xlink:href="svg/spritesheet.svg#hubspot">
-                    </svg>
-                </div>
-                <div class="job-summary__btn job-summary__btn--edit">
-                    <svg class="job-summary__edit-icon job-summary__icon">
-                        <use xlink:href="svg/spritesheet.svg#edit-np1">
-                    </svg>
-                </div>
-                <div class="job-summary__btn job-summary__btn--delete">
-                    <svg class="job-summary__delete-icon job-summary__icon">
-                        <use xlink:href="svg/spritesheet.svg#delete-np1">
-                    </svg>
-                </div>
-            </div>
         </div>                 
     `;
 
@@ -2392,7 +2393,7 @@ const createCompanyElement = ({ id, name, companyDate }) => {
 }
 
 
-const createCompanySummary = (company) => {
+export const createCompanySummary = (company) => {
     const markup  = `
         <div class="summary-wrapper">
             <div class="company-summary summary">
@@ -2827,7 +2828,8 @@ export const initAdminSection = (tl, sectionName) => {
             loaderContainers = [['.table-wrapper', 'admin-table'], ['.summary-wrapper', 'summary-table']];
             break;
         case 'companies':
-            loaderContainers = [['.table-wrapper', 'admin-table']]
+            loaderContainers = [['.table-wrapper', 'admin-table']];
+            break;
     }
 
     tl
@@ -2860,24 +2862,26 @@ export const createAdminTemplate = (page) => {
 
     // Create conditional here for different page types/structure 
     if(page === 'applications' || page === 'jobs') {
-        addTableWrapper(adminContent);
-        addSummaryWrapper(adminContent);
+        addTableWrapper(adminContent, page);
+        addSummaryWrapper(adminContent, page);
     } else if(page === 'companies') {
         addTableWrapper(adminContent);
+        addSummaryWrapper(adminContent, page);
+
     }
 
     return adminContent;
 }
 
-const addSummaryWrapper = (adminContent) => {
+const addSummaryWrapper = (adminContent, page) => {
     const summary = document.createElement('div');
-    summary.setAttribute('class', 'summary-wrapper');
+    summary.setAttribute('class', `summary-wrapper summary-wrapper--${page}`);
 
     adminContent.appendChild(summary);
 }
-const addTableWrapper = (adminContent, classList) => {
+const addTableWrapper = (adminContent, page) => {
     const markup = document.createElement('div');
-    markup.setAttribute('class', 'table-wrapper');
+    markup.setAttribute('class', `table-wrapper table-wrapper--${page}`);
 
     adminContent.appendChild(markup);
 }
