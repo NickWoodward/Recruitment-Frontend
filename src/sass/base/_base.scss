@@ -16,6 +16,12 @@ textarea, input {
     font-size: inherit;
     font-family: inherit;
 }
+.scrollable {
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    overflow: hidden;
+}
 
 .edit {
     position: absolute;

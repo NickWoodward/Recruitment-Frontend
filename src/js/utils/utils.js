@@ -157,3 +157,18 @@ export const timeAgo = (date) => {
     return `${interval} ${epoch}${suffix} ago`;
 };
 
+export const getInnerDimensions = (element) => {
+    const cs = getComputedStyle(element);
+
+    const paddingX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+    const paddingY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+
+    const borderX = parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth);
+    const borderY = parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth);
+
+    // Element width and height minus padding and border
+    const elementWidth = element.offsetWidth - paddingX - borderX;
+    const elementHeight = element.offsetHeight - paddingY - borderY;
+
+    return { elementWidth, elementHeight };
+}

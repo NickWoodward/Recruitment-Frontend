@@ -671,7 +671,9 @@ export const renderJobModal = (data, type) => {
     const summary = document.querySelector('.summary-wrapper');
     // Coordinates to position the modal on top of the summary
     const { left: summaryLeft, top: summaryTop, width: summaryWidth, height: summaryHeight} = summary.getBoundingClientRect();
-    const finalHeight = document.querySelector('.table-wrapper').getBoundingClientRect().height;
+    const adminContent = document.querySelector('.admin__content');
+    const { elementHeight: height } = utils.getInnerDimensions(adminContent);
+    // const finalHeight = adminContent.getBoundingClientRect().height;
     const adminWrapper = document.querySelector('.admin-wrapper');
 
     switch(type) {
@@ -696,7 +698,7 @@ export const renderJobModal = (data, type) => {
         {autoAlpha: 0},
         {autoAlpha: 1, duration: .2}
     ).to(modalElement, {
-        height: `${finalHeight}px`
+        height: `${height}px`
     });
 };
 
@@ -1621,11 +1623,23 @@ const getUserFormValues = () => {
     return { firstName, lastName, phone, email, cv };
 };
 
+// export const calculateRows = (tableName) => {
+//     // 1: Set a test table to be the full height of the container
+//     const markup = `<div class="table-wrapper table-wrapper--${tableName}"></div>`;
+//     const adminContent = document.querySelector('.admin__content');
+//     adminContent.insertAdjacentHTML('afterbegin', markup);
+//     const tableWrapperHeight = document.querySelector('.table-wrapper').offsetHeight;
+
+//     const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--table-header-height')) * 10;
+//     const paginationHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pagination-height')) * 10;
+//     const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * 10;
+
+//     const numOfRows = Math.floor((tableWrapperHeight - parseFloat(headerHeight) - parseFloat(paginationHeight)) / parseFloat(rowHeight));
+
+//     return numOfRows;
+// }
 export const calculateRows = (tableName) => {
-    // 1: Set a test table to be the full height of the container
-    const markup = `<div class="table-wrapper table-wrapper--${tableName}"></div>`;
-    const adminContent = document.querySelector('.admin__content');
-    adminContent.insertAdjacentHTML('afterbegin', markup);
+
     const tableWrapperHeight = document.querySelector('.table-wrapper').offsetHeight;
 
     const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--table-header-height')) * 10;
@@ -1979,7 +1993,7 @@ export const createJobSummary = ({companyId, companyName, title, featured, id, j
                 <div class="summary__heading">Description</div>
 
                 <div class="job-summary__section job-summary__section--description">
-                    <div class="job-summary__description job-summary__field">${description}</div>
+                    <div class="job-summary__description job-summary__field scrollable" style="overflow:hidden">${description}</div>
 
                     <div class="summary__controls summary__controls--job">
                         <div class="job-summary__btn job-summary__btn--new">
@@ -2383,10 +2397,10 @@ export const formatCompanies = (companies) => {
     });
     return { headers, rows };
 };
-const createCompanyElement = ({ id, name, companyDate }) => {
+const createCompanyElement = ({ id, companyName, companyDate }) => {
     const row = [
         `<td class="td-data--company-id">${id}</td>`,
-        `<td class="td-data--company-name" data-id=${id}>${name}</td>`,
+        `<td class="td-data--company-name" data-id=${id}>${companyName}</td>`,
         `<td class="td-data--date" data-id=${id}>${companyDate}</td>`
     ];
     return row;
@@ -2395,7 +2409,6 @@ const createCompanyElement = ({ id, name, companyDate }) => {
 
 export const createCompanySummary = (company) => {
     const markup  = `
-        <div class="summary-wrapper">
             <div class="company-summary summary">
                 <div class="company-summary__details">
                     <div class="company-summary__item company-summary__company" data-placeholder="Company" contenteditable=false></div>
@@ -2422,13 +2435,12 @@ export const createCompanySummary = (company) => {
                         </svg>
                     </div>
                 </div>
-            </div>
-
-            ${createAddressSummary()}
-
-            ${createContactSummary()}
-        </div>
+            </div>         
     `;
+
+    // ${createAddressSummary()}
+
+    // ${createContactSummary()}
 
     return markup;
 };
@@ -2812,7 +2824,6 @@ export const initAdminSection = (tl, sectionName) => {
     const adminMain = document.querySelector('.admin__main');
     let adminTemplate;
     let loaderContainers;
-
     // Fade out the adminMain
     tl
       .to(adminMain, { autoAlpha: 0 })
@@ -2836,7 +2847,7 @@ export const initAdminSection = (tl, sectionName) => {
     .add(() => {
         // Add the template to the main page
         adminMain.appendChild(adminTemplate)
-        
+        console.log(document.querySelector('.table-wrapper--companies'))
         // Add loaders where needed
         loaderContainers.forEach(selector => {
             loader.renderLoader({
@@ -2865,7 +2876,7 @@ export const createAdminTemplate = (page) => {
         addTableWrapper(adminContent, page);
         addSummaryWrapper(adminContent, page);
     } else if(page === 'companies') {
-        addTableWrapper(adminContent);
+        addTableWrapper(adminContent, page);
         addSummaryWrapper(adminContent, page);
 
     }

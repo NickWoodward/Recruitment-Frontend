@@ -477,15 +477,16 @@ class AdminController {
 
         adminView.initAdminSection(tl, sectionName);        
 
-        // Calculate the # of rows that can fit on the page
-        this.getNumOfRows(sectionName);
 
         try {
             // Index ID is only ever passed to getData from displayAdminContent
             // This sets the first element in the table, and is used to navigate to specific records from other admin summaries
             // EG: Clicking the application summary company href => company in the companies table
-            await this.getData(sectionName, indexId);
-            tl.add(() => {
+            tl.add(async () => {
+                // Calculate the # of rows that can fit on the page
+                this.getNumOfRows(sectionName);
+                await this.getData(sectionName, indexId);
+
                 switch(sectionName) {
                     case 'applications': 
                         // Render table
@@ -521,7 +522,6 @@ class AdminController {
                         break;
 
                     case 'companies': 
-                        console.log(this.companies);
                         this.state.companies.currentCompany = this.companies[0];
 
                         // Render table 
@@ -543,7 +543,7 @@ class AdminController {
                 nestedTl.to('.loader', {autoAlpha: 0, duration: .2, onComplete: () => loader.clearLoaders()});
 
                 // If the section has a table animate it in
-                if(sectionName === 'applications' || sectionName === 'jobs') {
+                if(sectionName === 'applications' || sectionName === 'jobs' || sectionName === 'companies') {
                   adminView.animateAdminContentIn()
                   adminView.animateSummaryIn();
 
@@ -790,9 +790,10 @@ class AdminController {
                 this.state.jobs.totalJobs = total;
                 break;
             case 'companies':
-                const { data: { companies, total: companyTotal } } = await this.Admin.getCompanies(this.state.companies.searchOptions, indexId);
+                const { data: { companies, companyTotal } } = await this.Admin.getCompanies(this.state.companies.searchOptions, indexId);
                 this.companies = companies;
-                this.state.companies.totalCompanies = total;
+                console.assert(companyTotal !== undefined)
+                this.state.companies.totalCompanies = companyTotal;
                 break;
         }
     }
