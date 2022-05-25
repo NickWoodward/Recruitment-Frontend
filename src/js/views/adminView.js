@@ -2390,6 +2390,7 @@ const getJob = (e) => {
 //////////  COMPANIES PAGE  ///////////
 
 export const formatCompanies = (companies) => {
+    console.log(companies);
     // Headers should match the returned divs in createCompanyElement
     const headers = ['ID', 'NAME', 'CREATED'];
     const rows = companies.map(company => {
@@ -2397,6 +2398,7 @@ export const formatCompanies = (companies) => {
     });
     return { headers, rows };
 };
+
 const createCompanyElement = ({ id, companyName, companyDate }) => {
     const row = [
         `<td class="td-data--company-id">${id}</td>`,
@@ -2406,43 +2408,190 @@ const createCompanyElement = ({ id, companyName, companyDate }) => {
     return row;
 }
 
+// For the nested table in the company summary
+const formatCompanyJobs = (jobs) => {
+    const headers = ['ID','TITLE', 'ADDED'];
+    const rows = jobs.map(job => {
+        return createCompanyJobElement(job);
+    });
+    return { headers, rows };
+};
+const createCompanyJobElement = (job) => {
+    const row = [
+        `<td class="td-data--jobId" data-id=${job.jobId}>${job.jobId}</td>`,
+        `<td class="td-data--title">${job.title}</td>`,
+        `<td class="td-data--location">${job.jobDate}</td>`
+    ];
+    return row;
+}; 
 
-export const createCompanySummary = (company) => {
-    const markup  = `
-            <div class="company-summary summary">
-                <div class="company-summary__details">
-                    <div class="company-summary__item company-summary__company" data-placeholder="Company" contenteditable=false></div>
-                </div>
-                <div class="company-summary__controls">
-                    <div class="company-summary__btn company-summary__btn--new">
-                        <svg class="company-summary__new-icon company-summary__icon">
-                            <use xlink:href="svg/spritesheet.svg#add">
-                        </svg>
-                    </div>
-                    <div class="company-summary__btn company-summary__btn--hubspot">
-                        <svg class="company-summary__hubspot-icon company-summary__icon">
-                            <use xlink:href="svg/spritesheet.svg#hubspot">
-                        </svg>
-                    </div>
-                    <div class="company-summary__btn company-summary__btn--edit">
-                        <svg class="company-summary__edit-icon company-summary__icon">
-                            <use xlink:href="svg/spritesheet.svg#edit-np1">
-                        </svg>
-                    </div>
-                    <div class="company-summary__btn company-summary__btn--delete">
-                        <svg class="company-summary__delete-icon company-summary__icon">
-                            <use xlink:href="svg/spritesheet.svg#delete-np1">
-                        </svg>
-                    </div>
-                </div>
-            </div>         
-    `;
+
+export const createCompanySummary = ({id, companyName, companyDate, contacts, addresses, jobs}) => {
+    // const markup  = `
+    //         <div class="company-summary summary">
+    //             <div class="company-summary__details">
+
+    //                 <div class="company-summary__item company-summary__company" data-placeholder="Company" contenteditable=false></div>
+    //             </div>
+    //             <div class="company-summary__controls">
+    //                 <div class="company-summary__btn company-summary__btn--new">
+    //                     <svg class="company-summary__new-icon company-summary__icon">
+    //                         <use xlink:href="svg/spritesheet.svg#add">
+    //                     </svg>
+    //                 </div>
+    //                 <div class="company-summary__btn company-summary__btn--hubspot">
+    //                     <svg class="company-summary__hubspot-icon company-summary__icon">
+    //                         <use xlink:href="svg/spritesheet.svg#hubspot">
+    //                     </svg>
+    //                 </div>
+    //                 <div class="company-summary__btn company-summary__btn--edit">
+    //                     <svg class="company-summary__edit-icon company-summary__icon">
+    //                         <use xlink:href="svg/spritesheet.svg#edit-np1">
+    //                     </svg>
+    //                 </div>
+    //                 <div class="company-summary__btn company-summary__btn--delete">
+    //                     <svg class="company-summary__delete-icon company-summary__icon">
+    //                         <use xlink:href="svg/spritesheet.svg#delete-np1">
+    //                     </svg>
+    //                 </div>
+    //             </div>
+    //         </div>         
+    // `;
 
     // ${createAddressSummary()}
 
     // ${createContactSummary()}
 
+    const markup  = `
+        <div class="company-summary summary">
+            <div class="company-summary__details">
+
+                <div class="company-summary__section company-summary__section--header">
+                    <div class="company-summary__item summary__item company-summary__item--header">
+                        <div class="company-summary__id">${id}</div>
+                    </div>
+                    <div class="company-summary__item summary__item company-summary__item--company">
+                        <div class="company-summary__company-name">
+                            ${companyName}
+                        </div>
+                    </div>
+                    <div class="company-summary__item summary__item company-summary__item--header">
+                        <div class="company-summary__field company-summary__field--date">${companyDate}</div>
+                    </div>
+                </div>
+
+                <div class="summary__column-wrapper">
+                    <div class="summary__column summary__column--company">
+                        
+
+                        <div class="summary__heading">
+                            Contacts
+                            <div class="summary__sub-headings">
+                                Contact:
+                                ${contacts.map((contact, index) => `<div class="summary__sub-heading"> ${index+1}</div>`).join("")}
+                            </div>
+                        </div>
+                        
+
+                        <div class="company-summary__section company-summary__section--contacts">
+                            <div class="summary__column">    
+                                <div class="company-summary__item summary__item company-summary__item--contact-name">
+                                    <div class="company-summary__label company-summary__label--name">Name:</div>
+                                    <div class="company-summary__field company-summary__field--name">${contacts[0].firstName} ${contacts[0].lastName}</div>
+                                </div>
+                                <div class="company-summary__item summary__item company-summary__item--position">
+                                    <div class="company-summary__label company-summary__label--position">Position:</div>
+                                    <div class="company-summary__field company-summary__field--position">${contacts[0].position}</div>
+                                </div>
+                            </div>
+                            <div class="summary__column">
+                                <div class="company-summary__item summary__item company-summary__item--contact-phone">
+                                    <div class="company-summary__label company-summary__label--contact-phone">Phone:</div>
+                                    <div class="company-summary__field company-summary__field--contact-phone">${contacts[0].phone}</div>
+                                </div>
+                                <div class="company-summary__item summary__item company-summary__item--contact-email">
+                                    <div class="company-summary__label company-summary__label--contact-email">Email:</div>
+                                    <div class="company-summary__field company-summary__field--contact-email">${contacts[0].email}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="summary__heading">
+                            Addresses
+                            <div class="summary__sub-headings">
+                                Address:
+                                ${addresses.map((address, index) => `<div class="summary__sub-heading"> ${index+1}</div>`)}
+                            </div>
+                        </div>
+
+                        <div class="company-summary__section company-summary__section--addresses">
+                            <div class="summary__column">    
+                                <div class="company-summary__item summary__item company-summary__item--first-line">
+                                    <div class="company-summary__label company-summary__label--first-line">First Line:</div>
+                                    <div class="company-summary__field company-summary__field--first-line">${addresses[0].firstLine}</div>
+                                </div>
+                                <div class="company-summary__item summary__item company-summary__item--second-line">
+                                    <div class="company-summary__label company-summary__label--second-line">Second Line:</div>
+                                    <div class="company-summary__field company-summary__field--second-line">${addresses[0].secondLine ? 'addresses[0].secondLine':'-'}</div>
+                                </div>
+                            </div>
+                            <div class="summary__column">
+                                <div class="company-summary__item summary__item company-summary__item--city">
+                                    <div class="company-summary__label company-summary__label--city">Phone:</div>
+                                    <div class="company-summary__field company-summary__field--city">${addresses[0].city}</div>
+                                </div>
+                                <div class="company-summary__item summary__item company-summary__item--postcode">
+                                    <div class="company-summary__label company-summary__label--postcode">Postcode:</div>
+                                    <div class="company-summary__field company-summary__field--postcode">${addresses[0].postcode}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary__column summary__column--company">            
+                        <div class="summary__heading">
+                            Jobs
+                        </div>
+
+                        <div class="company-summary__section company-summary__section--jobs">
+                            <div class="company-summary__jobs-table-wrapper">
+                                ${getCompanyJobsTable(jobs)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="company-summary__controls">
+                <div class="company-summary__btn company-summary__btn--new">
+                    <svg class="company-summary__new-icon company-summary__icon">
+                        <use xlink:href="svg/spritesheet.svg#add">
+                    </svg>
+                </div>
+                <div class="company-summary__btn company-summary__btn--hubspot">
+                    <svg class="company-summary__hubspot-icon company-summary__icon">
+                        <use xlink:href="svg/spritesheet.svg#hubspot">
+                    </svg>
+                </div>
+                <div class="company-summary__btn company-summary__btn--edit">
+                    <svg class="company-summary__edit-icon company-summary__icon">
+                        <use xlink:href="svg/spritesheet.svg#edit-np1">
+                    </svg>
+                </div>
+                <div class="company-summary__btn company-summary__btn--delete">
+                    <svg class="company-summary__delete-icon company-summary__icon">
+                        <use xlink:href="svg/spritesheet.svg#delete-np1">
+                    </svg>
+                </div>
+            </div>
+        </div>         
+    `;
     return markup;
+};
+
+const getCompanyJobsTable = (jobs) => {
+    const {headers, rows} = formatCompanyJobs(jobs);
+    console.log(jobs);
+    return tableView.createTableTest('nested-jobs', headers, rows, false);
 };
 
 export const populateCompanySummary = ({ id, name }) => {
@@ -2847,7 +2996,6 @@ export const initAdminSection = (tl, sectionName) => {
     .add(() => {
         // Add the template to the main page
         adminMain.appendChild(adminTemplate)
-        console.log(document.querySelector('.table-wrapper--companies'))
         // Add loaders where needed
         loaderContainers.forEach(selector => {
             loader.renderLoader({

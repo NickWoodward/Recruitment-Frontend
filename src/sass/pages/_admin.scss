@@ -101,16 +101,17 @@
     // &--jobs {
     //     min-height: 58rem;
     // }
-    &--companies {
-        grid-column: 1/5;
-        grid-row: 1/4;
-    }
+
     &--applications {
         grid-column: 1/5;
         grid-row: 1/6;
     }
     &--jobs {
         grid-column: 1/5;
+        grid-row: 1/7;
+    }
+    &--companies {
+        grid-column: 4/13;
         grid-row: 1/7;
     }
 }
@@ -122,6 +123,16 @@
         display: flex;
         width: 50%;
         flex-direction: column;
+
+        &--company {
+            width: 100%;
+        }
+    }
+    &__column-wrapper {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 2rem;
+        padding: 1rem 2rem;
     }
     &__link {
         color: firebrick;
@@ -138,6 +149,36 @@
         background-color: rgb(249, 250, 251);
     
         margin: 1rem 0 1rem 0;
+
+    }
+    
+    &__sub-headings {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-right: 1rem;
+        color: $color-primary-new;
+        font-size: 1.3rem;
+        // border: 1px solid red;
+    }
+    &__sub-heading {
+        position: relative;
+        padding: .8rem .8rem .8rem 0;
+        &:first-of-type {
+            padding-left: .8rem;
+        } 
+
+        &::after {
+            position: absolute;
+            content: '';
+            top: 0;
+            left: 0;
+
+        }
     }
 
     &__item  {
@@ -218,7 +259,7 @@
         grid-row: 1/6;
     }
     &--companies {
-        grid-column: 5/13;
+        grid-column: 1/4;
         grid-row: 1/6;
     }
 }
@@ -246,19 +287,19 @@
         flex-basis: 50%;
         padding: 0 2rem;
 
-    // wrapper for the field--date element
-    & + .application-summary__item {
-        display: flex;
-        justify-content: flex-end;
-        padding: 0;
-        padding: 0 3rem;
-        height: 100%;
-        width: 50%;
-        align-items: center;
-        margin-bottom: 0;
-        border-radius: 5px;
+        // wrapper for the field--date element
+        & + .application-summary__item {
+            display: flex;
+            justify-content: flex-end;
+            padding: 0;
+            padding: 0 3rem;
+            height: 100%;
+            width: 50%;
+            align-items: center;
+            margin-bottom: 0;
+            border-radius: 5px;
 
-    }
+        }
     }
     &__field--date {
         display: flex;
@@ -965,10 +1006,6 @@
         padding: 1rem;
         border: 1px solid #f4f0ec;
 
-        &:focus-visible {
-            border: 1px solid #f4f0ec;
-            
-        }
     }
     &__select {
 
@@ -1031,20 +1068,15 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    width: 50rem;
     
     &__details {
         width: 100%;
-        padding: 2rem 2.5rem 0 2.5rem;
     }
     &__item {
         margin-bottom: .3rem;
         font-size: 1.6rem;
-        padding: .8rem 2.5rem .8rem .8rem;
         border: 1px solid transparent;
-        &:hover {
-            cursor: default;
-        }
+
     }
     &__item--editable {
         -moz-appearance: textfield;
@@ -1058,6 +1090,36 @@
         }
     }
  
+    &__section {
+        display: flex;
+
+        &--header {
+            justify-content: space-between;
+            align-items: center;
+            height: 6rem;
+            background-color: $color-primary-new;
+            font-size: 1.6rem;
+            font-weight: 400;
+            color: white;
+        }
+
+        &--jobs {
+            // width: 100%;
+        }
+    }
+
+    &__jobs-table-wrapper {
+        width: 100%;
+        margin: .5rem 0;
+        border: 3px solid #f9fafb;
+        border-bottom: 3px solid #f9fafb;
+
+    }
+
+    &__label {
+        margin-bottom: .1rem;
+        font-weight: 600;
+    }
 
     &__controls {
         display: flex;

@@ -792,7 +792,6 @@ class AdminController {
             case 'companies':
                 const { data: { companies, companyTotal } } = await this.Admin.getCompanies(this.state.companies.searchOptions, indexId);
                 this.companies = companies;
-                console.assert(companyTotal !== undefined)
                 this.state.companies.totalCompanies = companyTotal;
                 break;
         }

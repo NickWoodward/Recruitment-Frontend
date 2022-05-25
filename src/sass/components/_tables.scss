@@ -12,7 +12,9 @@
     &--applications {
         width: 100%;
         // font-size: 1.5rem;
-
+    }
+    &--nested-jobs {
+        width: 100%;
     }
 }
 
@@ -132,7 +134,12 @@ td:nth-of-type(8)::before {
         color: white;
         background-color: $color-primary-new;
     }
-    thead {
+    .thead {
+        &--nested-jobs tr {
+            background-color: white;
+            color: $color-secondary;
+            font-size: 1.2rem;
+        }
     }
     thead, tbody {
         display: table-row-group;
