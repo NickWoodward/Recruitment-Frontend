@@ -80,7 +80,24 @@ class AdminController {
                     limit: 6,
                     orderField: "createdAt",
                     orderDirection: "ASC"
-                }
+                },
+                companyJobPagination: {
+                    jobIndex: 0, 
+                    jobLimit: 0, 
+                    totaljobs: 0,
+                },
+                contactPagination: {
+                    contactIndex: 0,
+                    contactLimit: 0,
+                    totalContacts: 0
+                },
+                addressPagination: {
+                    addressIndex: 0,
+                    addressLimit: 0,
+                    totalAddresses: 0
+                },
+                paginatedJobs: []
+
             },
             jobs: {
                 totalJobs: 0,
@@ -494,7 +511,8 @@ class AdminController {
 
                         // Add pagination
                         const { totalApplications, searchOptions: {index: appIndex, limit: appLimit} } = this.state.applications;
-                        adminView.renderPagination(appIndex, appLimit, totalApplications, document.querySelector('.table-wrapper'), 'applications');
+                        const { pages: numAppPages, current: currentAppPage } = adminView.calculatePagination(appIndex, appLimit, totalApplications);
+                        adminView.renderPagination(numAppPages, currentAppPage, document.querySelector('.table-wrapper'), 'applications');
 
                         // Create and add a summary element
                         const applicationSummary = adminView.createApplicationSummary(this.applications[0]);
@@ -512,7 +530,8 @@ class AdminController {
 
                         // Add pagination
                         const { totalJobs, searchOptions: {index: jobIndex, limit: jobLimit} } = this.state.jobs;
-                        adminView.renderPagination(jobIndex, jobLimit, totalJobs, document.querySelector('.table-wrapper'), 'jobs');
+                        const { pages: numJobPages, current: currentJobPage } = adminView.calculatePagination(jobIndex, jobLimit, totalJobs);
+                        adminView.renderPagination(numJobPages, currentJobPage, document.querySelector('.table-wrapper'), 'jobs');
                         // Add summary
                         const jobSummary = adminView.createJobSummary(this.jobs[0]);
                         document.querySelector('.summary-wrapper').insertAdjacentHTML('afterbegin', jobSummary);
@@ -524,15 +543,62 @@ class AdminController {
                     case 'companies': 
                         this.state.companies.currentCompany = this.companies[0];
 
+
+                    //// Main Company Table ////
+
                         // Render table 
                         this.renderCompaniesTable();
 
-                        // Add pagination
+                        // Add pagination for the company table
                         const { totalCompanies, searchOptions: {index: companiesIndex, limit: companiesLimit} } = this.state.companies;
-                        adminView.renderPagination(companiesIndex, companiesLimit, totalCompanies, document.querySelector('.table-wrapper'), 'companies');
+                        const { 
+                            pages: numCompanyPages, 
+                            current: currentCompanyPage 
+                        } = adminView.calculatePagination(companiesIndex, companiesLimit, totalCompanies);
+                        adminView.renderPagination(numCompanyPages, currentCompanyPage, document.querySelector('.table-wrapper'), 'companies');
+
+                    //// End
+
+                    //// Company Summary /////
+
                         // Add summary
                         const companySummary = adminView.createCompanySummary(this.companies[0]);
                         document.querySelector('.summary-wrapper').insertAdjacentHTML('afterbegin', companySummary);
+
+                        //// Nested Company Jobs table
+
+                        // Set the state for the summary's nested table
+                        this.getNumOfRows('nested-jobs');
+                        this.state.companies.companyJobPagination.totalJobs = this.state.companies.currentCompany.jobs.length;
+
+                        // Paginate companyJobs array
+                        const { totalJobs: totalCompanyJobs, jobIndex: companyJobsIndex, jobLimit: companyJobsLimit } = this.state.companies.companyJobPagination;
+                        this.state.companies.paginatedJobs = this.state.companies.currentCompany.jobs.slice(companyJobsIndex, companyJobsIndex + companyJobsLimit);
+                        this.renderCompanyJobsTable();
+
+                        const { 
+                            pages: numCompanyJobPages, 
+                            current: currentCompanyJobPage 
+                        } = adminView.calculatePagination(companyJobsIndex, companyJobsLimit, totalCompanyJobs);
+
+                        adminView.renderPagination(numCompanyJobPages, currentCompanyJobPage, document.querySelector('.table-wrapper--nested-jobs'), 'nested-jobs');
+this.state.companies.currentCompany.contacts.push({})
+
+                        //// Nested Contacts pagination
+                        this.state.companies.contactPagination.totalContacts = this.state.companies.currentCompany.contacts.length;
+                        const { totalContacts, contactIndex } = this.state.companies.contactPagination;
+
+                        // No need to calculate contact pagination - displayed 1 at a time, so number of pages = contacts.length
+                        adminView.renderPagination(totalContacts, contactIndex, document.querySelector('.pagination-wrapper--contacts'), 'contacts');
+
+this.state.companies.currentCompany.addresses.push({})
+                        //// Nested Addresses pagination
+                        this.state.companies.addressPagination.totalAddresses = this.state.companies.currentCompany.addresses.length;
+                        const { totalAddresses, addressIndex } = this.state.companies.addressPagination;
+                   
+                        // No need to calculate address pagination - displayed 1 at a time, so number of pages = address.length
+                        adminView.renderPagination(totalAddresses, addressIndex, document.querySelector('.pagination-wrapper--addresses'), 'addresses');
+
 
                         // this.addCompanySummaryListeners();
                         break;
@@ -773,6 +839,9 @@ class AdminController {
                 break;
             case 'users':
                 this.state.users.searchOptions.limit = adminView.calculateRows(sectionName);
+                break;
+            case 'nested-jobs':
+                this.state.companies.companyJobPagination.jobLimit = adminView.calculateRows(sectionName);
         }
     }
 
@@ -2442,10 +2511,26 @@ class AdminController {
         });
     }
 
+    renderCompanyJobsTable() {
+        // Format the paginated jobs into html elements
+        const {headers, rows} = adminView.formatCompanyJobs(this.state.companies.paginatedJobs);
+
+        const tableWrapper = document.querySelector('.table-wrapper--nested-jobs');
+        const table = document.querySelector('.table--nested-jobs');
+
+        // If no table visible, render both the header and content
+        if(!table) { 
+            tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('nested-jobs', headers, rows, false));
+            // Else remove the tbody and render just the content
+        } else {
+            utils.removeElement(document.querySelector('tbody'));
+            document.querySelector('thead').insertAdjacentHTML('afterend', tableView.updateTableContent('nested-jobs', rows));
+        }
+    };
+
     renderCompaniesTable() {
         // Format applications/headers into html elements
         const {headers, rows} = adminView.formatCompanies(this.companies);
-        const { totalCompanies, searchOptions: {index, limit} } = this.state.companies;
 
         const tableWrapper = document.querySelector('.table-wrapper');
         const table = document.querySelector('.table--companies');
@@ -2504,6 +2589,9 @@ class AdminController {
         //     });
         // });
     }
+
+
+
     addCompanySummaryListeners() {
         const summaryWrapper = document.querySelector('.summary-wrapper');
 

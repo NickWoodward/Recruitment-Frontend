@@ -607,7 +607,7 @@ const populateApplicationModal = ({ jobs, users }) => {
 
 export const formatUsers = (users) => {
     // Headers should match the returned divs in createUserElement
-    const headers = ['ID', 'NAME', 'SURNAME', 'JOINED'];
+    const headers = ['ID', 'Name', 'Surname', 'Joined'];
     const rows = users.map(user => {
         return createUserElement(formatProperties(user, ['applicantId', 'createdAt', 'jobs']));
     });
@@ -1639,8 +1639,8 @@ const getUserFormValues = () => {
 //     return numOfRows;
 // }
 export const calculateRows = (tableName) => {
-
-    const tableWrapperHeight = document.querySelector('.table-wrapper').offsetHeight;
+console.log(tableName);
+    const tableWrapperHeight = document.querySelector(`.table-wrapper--${tableName}`).offsetHeight;
 
     const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--table-header-height')) * 10;
     const paginationHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pagination-height')) * 10;
@@ -2236,7 +2236,7 @@ const getJobFormValues = () => {
 
 export const formatJobs = (jobs) => {
     // Headers should match the returned divs in createJobsElement
-    const headers = ['ID', 'COMPANY','TITLE','LOCATION', 'ADDED'];
+    const headers = ['ID', 'Company','Title','Location', 'Added'];
     const rows = jobs.map(job => {
         return createJobElement(job);
     });
@@ -2392,7 +2392,7 @@ const getJob = (e) => {
 export const formatCompanies = (companies) => {
     console.log(companies);
     // Headers should match the returned divs in createCompanyElement
-    const headers = ['ID', 'NAME', 'CREATED'];
+    const headers = ['ID', 'Name', 'Added'];
     const rows = companies.map(company => {
         return createCompanyElement(formatProperties(company, ['companyId', 'companyDate']));
     });
@@ -2409,7 +2409,7 @@ const createCompanyElement = ({ id, companyName, companyDate }) => {
 }
 
 // For the nested table in the company summary
-const formatCompanyJobs = (jobs) => {
+export const formatCompanyJobs = (jobs) => {
     const headers = ['ID','TITLE', 'ADDED'];
     const rows = jobs.map(job => {
         return createCompanyJobElement(job);
@@ -2480,8 +2480,8 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
                     </div>
                 </div>
 
-                <div class="summary__column-wrapper">
-                    <div class="summary__column summary__column--company">
+                <div class="summary__column-wrapper summary__column-wrapper--company">
+                    <div class="summary__column summary__column--company summary__column--company-summary">
                         
 
                         <div class="summary__heading">
@@ -2514,7 +2514,9 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
                                     <div class="company-summary__field company-summary__field--contact-email">${contacts[0].email}</div>
                                 </div>
                             </div>
+                            
                         </div>
+                        <div class="pagination-wrapper pagination-wrapper--contacts"></div>
 
                         <div class="summary__heading">
                             Addresses
@@ -2546,15 +2548,16 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
                                 </div>
                             </div>
                         </div>
+                        <div class="pagination-wrapper pagination-wrapper--addresses"></div>
+
                     </div>
-                    <div class="summary__column summary__column--company">            
+                    <div class="summary__column summary__column--company summary__column--company-jobs-table">            
                         <div class="summary__heading">
                             Jobs
                         </div>
 
                         <div class="company-summary__section company-summary__section--jobs">
-                            <div class="company-summary__jobs-table-wrapper">
-                                ${getCompanyJobsTable(jobs)}
+                            <div class="company-summary__jobs-table-wrapper table-wrapper--nested-jobs">
                             </div>
                         </div>
                     </div>
@@ -2586,12 +2589,6 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
         </div>         
     `;
     return markup;
-};
-
-const getCompanyJobsTable = (jobs) => {
-    const {headers, rows} = formatCompanyJobs(jobs);
-    console.log(jobs);
-    return tableView.createTableTest('nested-jobs', headers, rows, false);
 };
 
 export const populateCompanySummary = ({ id, name }) => {
@@ -2809,28 +2806,52 @@ const renderCompany = (company) => {
         </div>
         `
 };
- 
 
-export const renderPagination = (current, limit, totalItems, container, table) => {
-    const pagination = document.querySelector(`.pagination--${table}`);
-    if(pagination) utils.removeElement(pagination);   
-    // Work out how many pages
-    const pages = Math.ceil(totalItems / limit);
-   
-    // Current is the first (zero indexed) item on the page. current/limit = zero index page number
-    current = current/limit;
+export const calculatePagination = (current, limit, totalItems) => {
+        // Work out how many pages
+        const pages = Math.ceil(totalItems / limit);
+        // Current is the first (zero indexed) item on the page. current/limit = zero index page number
+        current = current/limit;
 
-    const itemMarkup = generatePaginationMarkup(pages, current, table);
-    
+        return { pages, current };
+}
+
+export const renderPagination = (pages, current, container, tableName) => {
+    // Remove pagination if present
+    const pagination = document.querySelector(`.pagination--${tableName}`);
+    if(pagination) utils.removeElement(pagination);  
+
+    // Generate the individual pagination numbers
+    const itemMarkup = generatePaginationMarkup(pages, current, tableName);
+
     const markup = `
-        <div class="pagination pagination--${table}">
-            <div class="pagination__previous pagination__previous--${table} ${current === 0? 'pagination__previous--inactive':''}">Previous</div>
+        <div class="pagination pagination--${tableName}">
+            <div class="pagination__previous pagination__previous--${tableName} ${current === 0? 'pagination__previous--inactive':''}">Previous</div>
             <div class="pagination__item-wrapper">${itemMarkup}</div>
-            <div class="pagination__next pagination__next--${table} ${current === pages-1? 'pagination__next--inactive':''}">Next</div>
+            <div class="pagination__next pagination__next--${tableName} ${current === pages-1? 'pagination__next--inactive':''}">Next</div>
         </div>
     `;
     container.insertAdjacentHTML('beforeend', markup);
-};
+}
+
+// export const renderPagination = (current, limit, totalItems, container, table) => {
+//     const pagination = document.querySelector(`.pagination--${table}`);
+//     if(pagination) utils.removeElement(pagination);   
+//     // Work out how many pages
+//     const pages = Math.ceil(totalItems / limit);
+//     // Current is the first (zero indexed) item on the page. current/limit = zero index page number
+//     current = current/limit;
+//     const itemMarkup = generatePaginationMarkup(pages, current, table);
+    
+//     const markup = `
+//         <div class="pagination pagination--${table}">
+//             <div class="pagination__previous pagination__previous--${table} ${current === 0? 'pagination__previous--inactive':''}">Previous</div>
+//             <div class="pagination__item-wrapper">${itemMarkup}</div>
+//             <div class="pagination__next pagination__next--${table} ${current === pages-1? 'pagination__next--inactive':''}">Next</div>
+//         </div>
+//     `;
+//     container.insertAdjacentHTML('beforeend', markup);
+// };
 export const updatePaginationView = (index) => {
     // Get the pagination items
     const items = document.querySelectorAll('.pagination__item');
