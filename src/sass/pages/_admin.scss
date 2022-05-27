@@ -111,7 +111,7 @@
         grid-row: 1/7;
     }
     &--companies {
-        grid-column: 5/13;
+        grid-column: 4/13;
         grid-row: 1/7;
     }
 }
@@ -139,9 +139,9 @@
         &--company {
             display: grid;
             grid-template-columns: repeat(16, 1fr);
-            grid-gap: 2rem;
+            grid-gap: 4rem;
             flex-grow: 1;
-            padding: 1rem 2rem;
+            padding: 2rem 4rem;
         }
     }
     &__link {
@@ -269,7 +269,7 @@
         grid-row: 1/6;
     }
     &--companies {
-        grid-column: 1/5;
+        grid-column: 1/4;
         grid-row: 1/6;
     }
     &--nested-jobs {
@@ -1076,7 +1076,27 @@
 }
 
 //////////  COMPANY SUMMARY STYLING  ///////////
+.company-jobs-placeholder {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    background-color: #f9fafb;
 
+    font-size: 1.5rem;
+
+    &__message {
+        padding: 1rem;
+    }
+    &__add-link {
+        padding: 1rem;
+        text-decoration: underline;
+        color: $color-secondary;
+        cursor: pointer;
+    }
+}
 
 .company-summary {
     display: flex;

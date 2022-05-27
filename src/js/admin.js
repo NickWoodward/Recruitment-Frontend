@@ -494,7 +494,6 @@ class AdminController {
 
         adminView.initAdminSection(tl, sectionName);        
 
-
         try {
             // Index ID is only ever passed to getData from displayAdminContent
             // This sets the first element in the table, and is used to navigate to specific records from other admin summaries
@@ -549,6 +548,7 @@ class AdminController {
                         // Render table 
                         this.renderCompaniesTable();
 
+
                         // Add pagination for the company table
                         const { totalCompanies, searchOptions: {index: companiesIndex, limit: companiesLimit} } = this.state.companies;
                         const { 
@@ -565,42 +565,28 @@ class AdminController {
                         const companySummary = adminView.createCompanySummary(this.companies[0]);
                         document.querySelector('.summary-wrapper').insertAdjacentHTML('afterbegin', companySummary);
 
-                        //// Nested Company Jobs table
+                        // // Add pagination for nested contacts, addresses, and jobs elements
+                        // this.addCompanyNestedPagination();
 
-                        // Set the state for the summary's nested table
-                        this.getNumOfRows('nested-jobs');
-                        this.state.companies.companyJobPagination.totalJobs = this.state.companies.currentCompany.jobs.length;
+                        // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
+                        this.setCompanyJobsState();
 
-                        // Paginate companyJobs array
-                        const { totalJobs: totalCompanyJobs, jobIndex: companyJobsIndex, jobLimit: companyJobsLimit } = this.state.companies.companyJobPagination;
-                        this.state.companies.paginatedJobs = this.state.companies.currentCompany.jobs.slice(companyJobsIndex, companyJobsIndex + companyJobsLimit);
-                        this.renderCompanyJobsTable();
+                        // Render the summary company jobs table
+                        if(this.state.companies.paginatedJobs.length > 0) {
+                            // remove any placeholders
+                            const placeholder = document.querySelector('.company-jobs-placeholder');
+                            if(placeholder) placeholder.parentElement.removeChild(placeholder);
 
-                        const { 
-                            pages: numCompanyJobPages, 
-                            current: currentCompanyJobPage 
-                        } = adminView.calculatePagination(companyJobsIndex, companyJobsLimit, totalCompanyJobs);
+                            this.renderCompanyJobsTable();
+                        } else {
+                            // render a placeholder saying 'no jobs'
+                            document.querySelector('.table-wrapper--nested-jobs')
+                                .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
+                        } 
+                        // Add pagination for nested contacts, addresses, and jobs elements
+                        this.addCompanyNestedPagination();
 
-                        adminView.renderPagination(numCompanyJobPages, currentCompanyJobPage, document.querySelector('.table-wrapper--nested-jobs'), 'nested-jobs');
-this.state.companies.currentCompany.contacts.push({})
-
-                        //// Nested Contacts pagination
-                        this.state.companies.contactPagination.totalContacts = this.state.companies.currentCompany.contacts.length;
-                        const { totalContacts, contactIndex } = this.state.companies.contactPagination;
-
-                        // No need to calculate contact pagination - displayed 1 at a time, so number of pages = contacts.length
-                        adminView.renderPagination(totalContacts, contactIndex, document.querySelector('.pagination-wrapper--contacts'), 'contacts');
-
-this.state.companies.currentCompany.addresses.push({})
-                        //// Nested Addresses pagination
-                        this.state.companies.addressPagination.totalAddresses = this.state.companies.currentCompany.addresses.length;
-                        const { totalAddresses, addressIndex } = this.state.companies.addressPagination;
-                   
-                        // No need to calculate address pagination - displayed 1 at a time, so number of pages = address.length
-                        adminView.renderPagination(totalAddresses, addressIndex, document.querySelector('.pagination-wrapper--addresses'), 'addresses');
-
-
-                        // this.addCompanySummaryListeners();
+                        this.addCompanySummaryListeners();
                         break;
                 }
 
@@ -608,11 +594,10 @@ this.state.companies.currentCompany.addresses.push({})
                 const nestedTl = gsap.timeline();
                 nestedTl.to('.loader', {autoAlpha: 0, duration: .2, onComplete: () => loader.clearLoaders()});
 
-                // If the section has a table animate it in
+                // Animate summaries in for the first time (different to switching). Tables animated in the render methods
                 if(sectionName === 'applications' || sectionName === 'jobs' || sectionName === 'companies') {
-                  adminView.animateAdminContentIn()
+                //   adminView.animateTableContentIn()
                   adminView.animateSummaryIn();
-
                 }
 
                 // Animate the pagination in
@@ -824,6 +809,36 @@ this.state.companies.currentCompany.addresses.push({})
     //         }
     //     },1000);
         
+    }
+
+    addCompanyNestedPagination() {
+        //// Nested Company Jobs table
+
+        // Paginate companyJobs array
+        const { totalJobs: totalCompanyJobs, jobIndex: companyJobsIndex, jobLimit: companyJobsLimit } = this.state.companies.companyJobPagination;
+
+        const { 
+            pages: numCompanyJobPages, 
+            current: currentCompanyJobPage 
+        } = adminView.calculatePagination(companyJobsIndex, companyJobsLimit, totalCompanyJobs);
+
+        adminView.renderPagination(numCompanyJobPages, currentCompanyJobPage, document.querySelector('.table-wrapper--nested-jobs'), 'nested-jobs');
+
+        //// Nested Contacts pagination
+        this.state.companies.contactPagination.totalContacts = this.state.companies.currentCompany.contacts.length;
+        const { totalContacts, contactIndex } = this.state.companies.contactPagination;
+
+        // No need to calculate contact pagination - displayed 1 at a time, so number of pages = contacts.length
+        adminView.renderPagination(totalContacts, contactIndex, document.querySelector('.pagination-wrapper--contacts'), 'contacts');
+
+        //// Nested Addresses pagination
+        this.state.companies.addressPagination.totalAddresses = this.state.companies.currentCompany.addresses.length;
+        const { totalAddresses, addressIndex } = this.state.companies.addressPagination;
+    
+        // No need to calculate address pagination - displayed 1 at a time, so number of pages = address.length
+        adminView.renderPagination(totalAddresses, addressIndex, document.querySelector('.pagination-wrapper--addresses'), 'addresses');
+
+
     }
 
     getNumOfRows(sectionName) {
@@ -1129,17 +1144,7 @@ this.state.companies.currentCompany.addresses.push({})
             utils.removeElement(document.querySelector('tbody'));
             document.querySelector('thead').insertAdjacentHTML('afterend', tableView.updateTableContent('applications', rows));
         }
-
-
-        // if(table) utils.removeElement(document.querySelector('tbody'));
-
-        // tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('applications', headers, rows, false));
-
-        // If there's no table header, add it
-        // if(!document.querySelector('thead')) document.querySelector('.table').insertAdjacentHTML('afterbegin', tableView.addTableHeader('applications', headers));
-       
-        // // Add pagination 
-        // adminView.renderPagination(index, limit, totalApplications, tableWrapper, 'applications');
+        adminView.animateTableContentIn('applications')
 
         const applicationRows = document.querySelectorAll('.row--applications');
        
@@ -1156,8 +1161,24 @@ this.state.companies.currentCompany.addresses.push({})
                 });
                 utils.changeActiveRow(targetRow, applicationRows);
                 this.state.applications.currentApplication = application[0];
+
+                // Change summary
                 const summary = document.querySelector('.summary');
-                adminView.swapSummary(summary, adminView.createApplicationSummary(application[0]), this.applicationSummaryListener.bind(this)); 
+                const newSummary = adminView.createApplicationSummary(application[0]);
+                // adminView.swapSummary(summary, adminView.createApplicationSummary(application[0]), this.applicationSummaryListener.bind(this)); 
+            
+                const tl = gsap.timeline();
+
+                tl.add(adminView.animateSummaryWrapperOut());
+                tl.add(() => {
+                    // Switch the summary
+                    adminView.switchSummary(summary, newSummary);
+                                
+                    // Add the listener to the new summary
+                    this.addApplicationSummaryListeners();
+                });
+                tl.add(adminView.animateSummaryWrapperIn());
+            
             });
         });
     }
@@ -1435,6 +1456,7 @@ this.state.companies.currentCompany.addresses.push({})
             utils.removeElement(document.querySelector('tbody'));
             document.querySelector('thead').insertAdjacentHTML('afterend', tableView.updateTableContent('jobs', rows));
         }
+        adminView.animateTableContentIn('jobs')
 
         const jobRows = document.querySelectorAll('.row--jobs');
 
@@ -1454,13 +1476,24 @@ this.state.companies.currentCompany.addresses.push({})
                     return parseInt(rowId) === job.id;
                 })[0];
 
-                // adminView.createJobSummary(job);
-                // utils.changeActiveRow(row, jobRows);
                 utils.changeActiveRow(targetRow, jobRows);
                 this.state.jobs.currentJob = job;
+
+                // Change the summary
                 const summary = document.querySelector('.summary');
-                adminView.swapSummary(summary, adminView.createJobSummary(job), this.jobSummaryListener.bind(this)); 
-            
+                const newSummary = adminView.createJobSummary(job);
+
+                const tl = gsap.timeline();
+
+                tl.add(adminView.animateSummaryWrapperOut());
+                tl.add(() => {
+                    // Switch the summary
+                    adminView.switchSummary(summary, newSummary);
+                                
+                    // Add the listener to the new summary
+                    this.addJobsSummaryListeners();
+                });
+                tl.add(adminView.animateSummaryWrapperIn());
             });
         });
 
@@ -1951,6 +1984,9 @@ this.state.companies.currentCompany.addresses.push({})
         }
         if(companyLink) {
             console.log('companyLink');
+            const companyId = document.querySelector('.job-summary__field--company').dataset.id;
+console.log(companyId);
+            this.displayAdminContent('companies', companyId);
         }
     }
 
@@ -2511,6 +2547,17 @@ this.state.companies.currentCompany.addresses.push({})
         });
     }
 
+    setCompanyJobsState() {
+        // Set the state for the summary's nested table
+        this.getNumOfRows('nested-jobs');
+        this.state.companies.companyJobPagination.totalJobs = this.state.companies.currentCompany.jobs.length;
+        const { jobIndex, jobLimit } = this.state.companies.companyJobPagination;
+
+        // Paginate the company jobs
+        this.state.companies.paginatedJobs = this.state.companies.currentCompany.jobs.slice(jobIndex, jobIndex + jobLimit);
+
+    }
+
     renderCompanyJobsTable() {
         // Format the paginated jobs into html elements
         const {headers, rows} = adminView.formatCompanyJobs(this.state.companies.paginatedJobs);
@@ -2526,6 +2573,8 @@ this.state.companies.currentCompany.addresses.push({})
             utils.removeElement(document.querySelector('tbody'));
             document.querySelector('thead').insertAdjacentHTML('afterend', tableView.updateTableContent('nested-jobs', rows));
         }
+
+        adminView.animateTableContentIn('nested-jobs')
     };
 
     renderCompaniesTable() {
@@ -2544,6 +2593,71 @@ this.state.companies.currentCompany.addresses.push({})
             document.querySelector('thead').insertAdjacentHTML('afterend', tableView.updateTableContent('companies', rows));
         }
     
+        adminView.animateTableContentIn('companies')
+
+        // Set active row
+        const companyRows = document.querySelectorAll('.row--companies');
+        const activeRow = Array.from(companyRows).find(row => {
+            return row.querySelector(`[data-id="${this.state.companies.currentCompany.id}"]`);
+        }) || companyRows[0];
+
+        utils.changeActiveRow(activeRow, companyRows);
+
+        // Add table row listeners
+        companyRows.forEach(row => {
+            row.addEventListener('click', e => {
+                const targetRow = e.target.closest('.row');
+                const rowId = row.querySelector('.td-data--company-name').dataset.id;
+                const company = this.companies.filter((company, index) => {
+                    return parseInt(rowId) === company.id;
+                });
+                utils.changeActiveRow(targetRow, companyRows);
+                this.state.companies.currentCompany = company[0];
+
+
+                // Change the summary
+                const summary = document.querySelector('.summary');
+                const newSummary = adminView.createCompanySummary(company[0])
+
+                const tl = gsap.timeline();
+
+                // adminView.swapSummary(summary, adminView.createCompanySummary(company[0]), this.companySummaryListener.bind(this), tl);
+                tl.add(adminView.animateSummaryWrapperOut());
+                tl.add(() => {
+                    // Switch the summary
+                    adminView.switchSummary(summary, newSummary);
+
+                    // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
+                    this.setCompanyJobsState();
+
+                    // Render the summary company jobs table
+                    if(this.state.companies.paginatedJobs.length > 0) {
+                        // remove any placeholders
+                        const placeholder = document.querySelector('.company-jobs-placeholder')
+
+                        if(placeholder) placeholder.parentElement.removeChild(placeholder);
+
+                        this.renderCompanyJobsTable();
+                    } else {
+                        // render a placeholder saying 'no jobs'
+                        document.querySelector('.table-wrapper--nested-jobs')
+                            .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
+                    } 
+
+                    // Add pagination for nested contacts, addresses, and jobs elements
+                    this.addCompanyNestedPagination();
+
+                    // Add the listener to the new summary
+                    document.querySelector('.summary').addEventListener('click', this.companySummaryListener)
+
+                    // Remove any modals
+                    adminView.removeSummaryModals();
+            
+                  })
+                  tl.add(adminView.animateSummaryWrapperIn());
+
+            });
+        });
 
         // // Extract state
         // const { totalCompanies, searchOptions: { index, limit } } = this.state.companies;
@@ -2590,243 +2704,281 @@ this.state.companies.currentCompany.addresses.push({})
         // });
     }
 
-
-
     addCompanySummaryListeners() {
-        const summaryWrapper = document.querySelector('.summary-wrapper');
-
-        summaryWrapper.addEventListener('click', e => {
-            const newBtn = e.target.closest('.company-summary__btn--new');
-            const editBtn = e.target.closest('.company-summary__btn--edit');
-            const deleteBtn = e.target.closest('.company-summary__btn--delete');
-            const saveBtn = e.target.closest('.company-summary__btn--save');
-            const hubspotBtn = e.target.closest('.company-summary__btn--hubspot');
-            const saveNewBtn = e.target.closest('.company-summary__btn--save-new');
-    
-            const companyElements = summaryWrapper.querySelectorAll('.company-summary__item');
-            const contactElements = summaryWrapper.querySelectorAll('.contact-summary__item');
-    
-            if(newBtn) {
-                console.log('newBtn');
-                // Save current company values
-                const companyId = document.querySelector('.company-summary').dataset.id;
-                this.state.companies.currentCompany = this.companies.find(company => company.id === parseInt(companyId));
-
-                document.body.addEventListener('keydown', this.handleCtrlQ);
-
-                adminView.changeSummaryIconState('creating', 'company');
-
-                adminView.makeEditable(companyElements, true, []);
-                adminView.makeAddressEditable(true, 'placeholder', this.state.companies.currentCompany.addresses[0]);
-                adminView.makeEditable(contactElements, true, []);
-
-                adminView.togglePlaceholders(companyElements, true, []);
-                adminView.togglePlaceholders(document.querySelectorAll('.address-summary__item'), true, []);
-                adminView.togglePlaceholders(contactElements, true, []);
-
-                summaryWrapper.addEventListener('focusin', adminView.focusInNewCompanyHandler);
-                summaryWrapper.addEventListener('focusout', adminView.focusOutNewCompanyHandler);
-            };
-            if(editBtn) {
-                console.log('edit');
-                // Save current company values
-                const companyId = document.querySelector('.company-summary').dataset.id;
-                this.state.companies.currentCompany = this.companies.find(company => company.id === parseInt(companyId));
-
-
-                adminView.changeSummaryIconState('editing', 'company');
-
-                adminView.makeEditable(companyElements, true, []);
-                adminView.makeAddressEditable(true, 'value', this.state.companies.currentCompany.addresses[0]);
-                adminView.makeEditable(contactElements, true, []);
-
-
-
-                // adminView.togglePlaceholders(companyElements, true, []);
-                // adminView.togglePlaceholders(document.querySelectorAll('.address-summary__item'), true, []);
-                // adminView.togglePlaceholders(contactElements, true, []);
-
-                document.body.addEventListener('keydown', this.handleCtrlQ);
-
-                this.boundFocusOutEditCompanyHandler = adminView.focusOutEditCompanyHandler.bind(this, this.state.companies.currentCompany);
-                summaryWrapper.addEventListener('focusin', adminView.focusInEditCompanyHandler);
-                summaryWrapper.addEventListener('focusout', this.boundFocusOutEditCompanyHandler);
-            }
-            if(deleteBtn) {
-                console.log('delete');
-                // Get company id
-                const companyId = document.querySelector('.company-summary').dataset.id;
-
-                this.Admin.deleteCompany(companyId).then(res => {
-                    // @TODO: handle success/failure
-                    
-                    // If it's the last company in the table, move back one page
-                    if(this.companies.length <= 1) {
-                        this.movePageBackwards(this.state.companies);
-                    }
-
-                    return this.Admin.getCompanies(this.state.companies.searchOptions);
-                }).then(res => {
-                    // @TODO: handle success/failure
-                    this.companies = res.data.companies;
-                    this.state.companies.totalCompanies = res.data.total;
-
-                    this.state.companies.currentCompany = this.companies[0];
-
-                    this.renderCompaniesTable();
-
-                    // Repopulate the summaries
-                    adminView.populateCompanySummary(this.state.companies.currentCompany);
-                    adminView.populateAddressSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.addresses[0]);
-                    adminView.populateContactSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.people[0]);
-                }).catch(err => console.log(err));
-
-            }
-            if(saveBtn) {
-                console.log('save');
-                // Remove the item listeners
-                document.body.removeEventListener('keydown', this.handleCtrlQ);
-
-                summaryWrapper.removeEventListener('focusin', adminView.focusInNewCompanyHandler);
-                summaryWrapper.removeEventListener('focusout', adminView.focusOutNewCompanyHandler);
-
-                // Get all user input
-                const companyForm = adminView.getNewCompany();
-                const addressForm = adminView.getNewAddress();
-                const contactForm = adminView.getNewContact();
-                
-                const formData = new FormData();
-
-                for(let [key, value] of companyForm.entries()) formData.append(`${key}`, value);
-                for(let [key, value] of addressForm.entries()) formData.append(`${key}`, value);
-                for(let [key, value] of contactForm.entries()) formData.append(`${key}`, value);
-
-                // for(let [key, value] of addressForm.entries()) console.log(`${key}`, value);
-                // for(let [key, value] of contactForm.entries()) console.log(`${key}`, value);
-
-                
-                // Get Company, Address and Contact ids
-                const companyId = adminView.getSummaryCompanyId();
-                const addressId = adminView.getSummaryAddressId();
-                const contactId = adminView.getSummaryContactId();
-
-                if(companyForm && addressForm && contactForm) {
-                    let formCompany;
-
-                    // Make API call here to create company
-                    this.Admin.editCompany(companyId, contactId, addressId, formData)
-                        .then(response => {
-                            if(response.status !== 200) {
-                                // @TODO: error handling
-                                console.log('error');
-                            }
-                            formCompany = response.data.company;
-
-                            return this.Admin.getCompanies(this.state.companies.searchOptions);
-                        })
-                        .then(response => {
-                            this.state.companies.totalCompanies = response.data.total;
-                            this.companies = response.data.companies;
-
-                            // Search for the recently created company in the returned company list
-                            const currentCompany = this.companies.find(company => {
-                                return formCompany.id === company.id;
-                            });
-
-                            this.state.companies.currentCompany = currentCompany? currentCompany : this.companies[0];
-
-                            // Change the address summary back to a text area
-                            // Change the contact and company summary inputs to non editable
-                            adminView.makeEditable(companyElements, false, []);
-                            adminView.makeAddressEditable(false, '', this.state.companies.currentCompany.addresses[0]);
-                            adminView.makeEditable(contactElements, false, []);
-
-                            // Repopulate the summaries
-                            adminView.populateCompanySummary(this.state.companies.currentCompany);
-                            adminView.populateAddressSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.addresses[0]);
-                            adminView.populateContactSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.people[0]);
-
-                            adminView.changeSummaryIconState('edited', 'company');
-
-                            this.renderCompaniesTable();
-                        }).catch(err => {
-                            console.log(err);
-                        })
-                }
-            }
-            if(hubspotBtn) console.log('hub');
-            if(saveNewBtn) {
-                console.log('savenewBtn');
-                document.body.removeEventListener('keydown', this.handleCtrlQ);
-                summaryWrapper.removeEventListener('focusin', adminView.focusInNewCompanyHandler);
-                summaryWrapper.removeEventListener('focusout', adminView.focusOutNewCompanyHandler);
-
-                // Get all user input
-                const companyForm = adminView.getNewCompany();
-                const addressForm = adminView.getNewAddress();
-                const contactForm = adminView.getNewContact();
-
-                const formData = new FormData();
-
-                for(let [key, value] of companyForm.entries()) formData.append(`${key}`, value);
-                for(let [key, value] of addressForm.entries()) formData.append(`${key}`, value);
-                for(let [key, value] of contactForm.entries()) formData.append(`${key}`, value);
-
-                for(let [key, value] of addressForm.entries()) console.log(`${key}`, value);
-
-                if(companyForm && addressForm && contactForm) {
-                    let formCompany;
-
-                    // Make API call here to create company
-                    this.Admin
-                        .createCompany(formData)
-                        .then(response => {
-                            if(response.status !== 201) {
-                                // @TODO: error handling
-                                console.log('error');
-                            }
-                            formCompany = response.data.company;
-
-                            return this.Admin.getCompanies(this.state.companies.searchOptions);
-                        })
-                        .then(response => {
-                            this.state.companies.totalCompanies = response.data.total;
-                            this.companies = response.data.companies;
-
-                            // Search for the recently created company in the returned company list
-                            const currentCompany = this.companies.find(company => {
-                                return formCompany.id === company.id;
-                            });
-
-                            this.state.companies.currentCompany = currentCompany? currentCompany : this.companies[0];
-
-                            // Change the address summary back to a text area
-                            // Change the contact and company summary inputs to non editable
-                            adminView.makeEditable(companyElements, false, []);
-                            adminView.makeAddressEditable(false, '', this.state.companies.currentCompany.addresses[0]);
-                            adminView.makeEditable(contactElements, false, []);
-
-                            // Repopulate the summaries
-                            adminView.populateCompanySummary(this.state.companies.currentCompany);
-                            adminView.populateAddressSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.addresses[0]);
-                            adminView.populateContactSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.people[0]);
-
-                            adminView.changeSummaryIconState('created', 'company');
-
-                            this.renderCompaniesTable();
-
-                        })
-                        .catch(err => console.log(err));
-                    // Get companies and render companies table
-
-                    // Populate the summary forms with the created company if visible in the table, [0] if not
-                } else {
-                    // @TODO: handle validation problems here (make the form methods return an array with problem fields)
-                }
-            }
-    
-        });
+        const companySummary = document.querySelector('.company-summary');
+        companySummary.addEventListener(
+            'click',
+            this.companySummaryListener.bind(this)
+        );
     }
+
+    async companySummaryListener(e) {
+        // Animations
+        const newCompanyAlertAnimation = gsap.timeline({paused: true});
+        const editCompanyAlertAnimation = gsap.timeline({paused: true});
+        const deleteJobAlertAnimation = gsap.timeline({paused: true});
+
+        // Buttons
+        const newBtn = e.target.closest('.company__summary__btn--new');
+        const hubspotBtn = e.target.closest('.company__summary__btn--hubspot');
+        const editBtn = e.target.closest('.company__summary__btn--edit');
+        const deleteBtn = e.target.closest('.company__summary__btn--delete');
+        const jobBtn = e.target.closest('.row');
+
+        // Links
+        const addJobLink = e.target.closest('.company-jobs-placeholder__add-link');
+        if(addJobLink) {
+            console.log(this);
+            this.displayAdminContent('jobs')
+            const select = document.querySelector('.form__company-input--job');
+            console.log(select);
+        }
+
+        if(jobBtn) {
+            const jobId = jobBtn.firstElementChild.dataset.id;
+            this.displayAdminContent('jobs', jobId);
+            adminView.changeActiveMenuItem(document.querySelector('.sidebar__item--jobs')); 
+
+        }
+    }
+
+
+
+    // addCompanySummaryListeners() {
+    //     const summaryWrapper = document.querySelector('.summary-wrapper');
+
+    //     summaryWrapper.addEventListener('click', e => {
+    //         const newBtn = e.target.closest('.company-summary__btn--new');
+    //         const editBtn = e.target.closest('.company-summary__btn--edit');
+    //         const deleteBtn = e.target.closest('.company-summary__btn--delete');
+    //         const saveBtn = e.target.closest('.company-summary__btn--save');
+    //         const hubspotBtn = e.target.closest('.company-summary__btn--hubspot');
+    //         const saveNewBtn = e.target.closest('.company-summary__btn--save-new');
+    
+    //         const companyElements = summaryWrapper.querySelectorAll('.company-summary__item');
+    //         const contactElements = summaryWrapper.querySelectorAll('.contact-summary__item');
+    
+    //         if(newBtn) {
+    //             console.log('newBtn');
+    //             // Save current company values
+    //             const companyId = document.querySelector('.company-summary').dataset.id;
+    //             this.state.companies.currentCompany = this.companies.find(company => company.id === parseInt(companyId));
+
+    //             document.body.addEventListener('keydown', this.handleCtrlQ);
+
+    //             adminView.changeSummaryIconState('creating', 'company');
+
+    //             adminView.makeEditable(companyElements, true, []);
+    //             adminView.makeAddressEditable(true, 'placeholder', this.state.companies.currentCompany.addresses[0]);
+    //             adminView.makeEditable(contactElements, true, []);
+
+    //             adminView.togglePlaceholders(companyElements, true, []);
+    //             adminView.togglePlaceholders(document.querySelectorAll('.address-summary__item'), true, []);
+    //             adminView.togglePlaceholders(contactElements, true, []);
+
+    //             summaryWrapper.addEventListener('focusin', adminView.focusInNewCompanyHandler);
+    //             summaryWrapper.addEventListener('focusout', adminView.focusOutNewCompanyHandler);
+    //         };
+    //         if(editBtn) {
+    //             console.log('edit');
+    //             // Save current company values
+    //             const companyId = document.querySelector('.company-summary').dataset.id;
+    //             this.state.companies.currentCompany = this.companies.find(company => company.id === parseInt(companyId));
+
+
+    //             adminView.changeSummaryIconState('editing', 'company');
+
+    //             adminView.makeEditable(companyElements, true, []);
+    //             adminView.makeAddressEditable(true, 'value', this.state.companies.currentCompany.addresses[0]);
+    //             adminView.makeEditable(contactElements, true, []);
+
+
+
+    //             // adminView.togglePlaceholders(companyElements, true, []);
+    //             // adminView.togglePlaceholders(document.querySelectorAll('.address-summary__item'), true, []);
+    //             // adminView.togglePlaceholders(contactElements, true, []);
+
+    //             document.body.addEventListener('keydown', this.handleCtrlQ);
+
+    //             this.boundFocusOutEditCompanyHandler = adminView.focusOutEditCompanyHandler.bind(this, this.state.companies.currentCompany);
+    //             summaryWrapper.addEventListener('focusin', adminView.focusInEditCompanyHandler);
+    //             summaryWrapper.addEventListener('focusout', this.boundFocusOutEditCompanyHandler);
+    //         }
+    //         if(deleteBtn) {
+    //             console.log('delete');
+    //             // Get company id
+    //             const companyId = document.querySelector('.company-summary').dataset.id;
+
+    //             this.Admin.deleteCompany(companyId).then(res => {
+    //                 // @TODO: handle success/failure
+                    
+    //                 // If it's the last company in the table, move back one page
+    //                 if(this.companies.length <= 1) {
+    //                     this.movePageBackwards(this.state.companies);
+    //                 }
+
+    //                 return this.Admin.getCompanies(this.state.companies.searchOptions);
+    //             }).then(res => {
+    //                 // @TODO: handle success/failure
+    //                 this.companies = res.data.companies;
+    //                 this.state.companies.totalCompanies = res.data.total;
+
+    //                 this.state.companies.currentCompany = this.companies[0];
+
+    //                 this.renderCompaniesTable();
+
+    //                 // Repopulate the summaries
+    //                 adminView.populateCompanySummary(this.state.companies.currentCompany);
+    //                 adminView.populateAddressSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.addresses[0]);
+    //                 adminView.populateContactSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.people[0]);
+    //             }).catch(err => console.log(err));
+
+    //         }
+    //         if(saveBtn) {
+    //             console.log('save');
+    //             // Remove the item listeners
+    //             document.body.removeEventListener('keydown', this.handleCtrlQ);
+
+    //             summaryWrapper.removeEventListener('focusin', adminView.focusInNewCompanyHandler);
+    //             summaryWrapper.removeEventListener('focusout', adminView.focusOutNewCompanyHandler);
+
+    //             // Get all user input
+    //             const companyForm = adminView.getNewCompany();
+    //             const addressForm = adminView.getNewAddress();
+    //             const contactForm = adminView.getNewContact();
+                
+    //             const formData = new FormData();
+
+    //             for(let [key, value] of companyForm.entries()) formData.append(`${key}`, value);
+    //             for(let [key, value] of addressForm.entries()) formData.append(`${key}`, value);
+    //             for(let [key, value] of contactForm.entries()) formData.append(`${key}`, value);
+
+    //             // for(let [key, value] of addressForm.entries()) console.log(`${key}`, value);
+    //             // for(let [key, value] of contactForm.entries()) console.log(`${key}`, value);
+
+                
+    //             // Get Company, Address and Contact ids
+    //             const companyId = adminView.getSummaryCompanyId();
+    //             const addressId = adminView.getSummaryAddressId();
+    //             const contactId = adminView.getSummaryContactId();
+
+    //             if(companyForm && addressForm && contactForm) {
+    //                 let formCompany;
+
+    //                 // Make API call here to create company
+    //                 this.Admin.editCompany(companyId, contactId, addressId, formData)
+    //                     .then(response => {
+    //                         if(response.status !== 200) {
+    //                             // @TODO: error handling
+    //                             console.log('error');
+    //                         }
+    //                         formCompany = response.data.company;
+
+    //                         return this.Admin.getCompanies(this.state.companies.searchOptions);
+    //                     })
+    //                     .then(response => {
+    //                         this.state.companies.totalCompanies = response.data.total;
+    //                         this.companies = response.data.companies;
+
+    //                         // Search for the recently created company in the returned company list
+    //                         const currentCompany = this.companies.find(company => {
+    //                             return formCompany.id === company.id;
+    //                         });
+
+    //                         this.state.companies.currentCompany = currentCompany? currentCompany : this.companies[0];
+
+    //                         // Change the address summary back to a text area
+    //                         // Change the contact and company summary inputs to non editable
+    //                         adminView.makeEditable(companyElements, false, []);
+    //                         adminView.makeAddressEditable(false, '', this.state.companies.currentCompany.addresses[0]);
+    //                         adminView.makeEditable(contactElements, false, []);
+
+    //                         // Repopulate the summaries
+    //                         adminView.populateCompanySummary(this.state.companies.currentCompany);
+    //                         adminView.populateAddressSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.addresses[0]);
+    //                         adminView.populateContactSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.people[0]);
+
+    //                         adminView.changeSummaryIconState('edited', 'company');
+
+    //                         this.renderCompaniesTable();
+    //                     }).catch(err => {
+    //                         console.log(err);
+    //                     })
+    //             }
+    //         }
+    //         if(hubspotBtn) console.log('hub');
+    //         if(saveNewBtn) {
+    //             console.log('savenewBtn');
+    //             document.body.removeEventListener('keydown', this.handleCtrlQ);
+    //             summaryWrapper.removeEventListener('focusin', adminView.focusInNewCompanyHandler);
+    //             summaryWrapper.removeEventListener('focusout', adminView.focusOutNewCompanyHandler);
+
+    //             // Get all user input
+    //             const companyForm = adminView.getNewCompany();
+    //             const addressForm = adminView.getNewAddress();
+    //             const contactForm = adminView.getNewContact();
+
+    //             const formData = new FormData();
+
+    //             for(let [key, value] of companyForm.entries()) formData.append(`${key}`, value);
+    //             for(let [key, value] of addressForm.entries()) formData.append(`${key}`, value);
+    //             for(let [key, value] of contactForm.entries()) formData.append(`${key}`, value);
+
+    //             for(let [key, value] of addressForm.entries()) console.log(`${key}`, value);
+
+    //             if(companyForm && addressForm && contactForm) {
+    //                 let formCompany;
+
+    //                 // Make API call here to create company
+    //                 this.Admin
+    //                     .createCompany(formData)
+    //                     .then(response => {
+    //                         if(response.status !== 201) {
+    //                             // @TODO: error handling
+    //                             console.log('error');
+    //                         }
+    //                         formCompany = response.data.company;
+
+    //                         return this.Admin.getCompanies(this.state.companies.searchOptions);
+    //                     })
+    //                     .then(response => {
+    //                         this.state.companies.totalCompanies = response.data.total;
+    //                         this.companies = response.data.companies;
+
+    //                         // Search for the recently created company in the returned company list
+    //                         const currentCompany = this.companies.find(company => {
+    //                             return formCompany.id === company.id;
+    //                         });
+
+    //                         this.state.companies.currentCompany = currentCompany? currentCompany : this.companies[0];
+
+    //                         // Change the address summary back to a text area
+    //                         // Change the contact and company summary inputs to non editable
+    //                         adminView.makeEditable(companyElements, false, []);
+    //                         adminView.makeAddressEditable(false, '', this.state.companies.currentCompany.addresses[0]);
+    //                         adminView.makeEditable(contactElements, false, []);
+
+    //                         // Repopulate the summaries
+    //                         adminView.populateCompanySummary(this.state.companies.currentCompany);
+    //                         adminView.populateAddressSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.addresses[0]);
+    //                         adminView.populateContactSummary(this.state.companies.currentCompany.id, this.state.companies.currentCompany.people[0]);
+
+    //                         adminView.changeSummaryIconState('created', 'company');
+
+    //                         this.renderCompaniesTable();
+
+    //                     })
+    //                     .catch(err => console.log(err));
+    //                 // Get companies and render companies table
+
+    //                 // Populate the summary forms with the created company if visible in the table, [0] if not
+    //             } else {
+    //                 // @TODO: handle validation problems here (make the form methods return an array with problem fields)
+    //             }
+    //         }
+    
+    //     });
+    // }
 
     // saveBtn + newBtn = currently editing
     // saveBtn + editBtn = currently creating

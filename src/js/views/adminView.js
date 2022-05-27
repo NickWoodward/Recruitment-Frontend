@@ -243,6 +243,47 @@ export const populateApplicationSummary = ({
 
 //     return markup;
 // };
+
+export const animateSummaryWrapperOut = () => {
+    return gsap.to('.summary-wrapper', {
+        autoAlpha: 0,
+        ease: 'ease-in',
+        duration: .3
+    })
+}
+export const animateSummaryWrapperIn = () => {
+    return gsap.fromTo('.summary-wrapper', 
+        {
+            autoAlpha: 0
+        },
+        {
+            autoAlpha: 1, 
+            immediateRender: false,
+            duration: .6,
+            ease: 'ease-out'
+        }
+    )
+}
+
+export const switchSummary = (summary, newSummary) => {
+    const summaryWrapper = document.querySelector('.summary-wrapper');
+
+    // Remove the old summary and insert the new one
+    summary.parentElement.removeChild(summary);
+    summaryWrapper.insertAdjacentHTML('afterbegin', newSummary);
+}
+
+export const removeSummaryModals = () => {
+    const modal = document.querySelector('.summary__modal');
+    const confirmation = document.querySelector('.confirmation');
+    if(modal) {
+        modal.parentElement.removeChild(modal)
+    };
+    if(confirmation) {
+        confirmation.parentElement.removeChild(confirmation)  
+    };
+}
+
 export const swapSummary = (oldSummary, newSummary, cb) => {
 
     const summaryWrapper = document.querySelector('.summary-wrapper');
@@ -1931,7 +1972,7 @@ export const createJobSummary = ({companyId, companyName, title, featured, id, j
 
                     <div class="job-summary__item job-summary__item--job">
                         <div class="job-summary__label job-summary__label--company">Company:</div>
-                        <div class="job-summary__field job-summary__field--company">
+                        <div class="job-summary__field job-summary__field--company" data-id=${companyId}>
                             <a class="summary__link summary__link--company">${companyName}</a>
                         </div>
                     </div>
@@ -2425,6 +2466,17 @@ const createCompanyJobElement = (job) => {
     return row;
 }; 
 
+export const generateCompanyJobsPlaceholder = () => {
+    const markup = `
+        <div class="company-jobs-placeholder">
+            <div class="company-jobs-placeholder__message">No Current Jobs</div>
+            <div class="company-jobs-placeholder__add-link"><a>Add Job</a></div>
+        </div>
+    `;
+    return(markup);
+}
+
+
 
 export const createCompanySummary = ({id, companyName, companyDate, contacts, addresses, jobs}) => {
     // const markup  = `
@@ -2534,12 +2586,12 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
                                 </div>
                                 <div class="company-summary__item summary__item company-summary__item--second-line">
                                     <div class="company-summary__label company-summary__label--second-line">Second Line:</div>
-                                    <div class="company-summary__field company-summary__field--second-line">${addresses[0].secondLine ? 'addresses[0].secondLine':'-'}</div>
+                                    <div class="company-summary__field company-summary__field--second-line">${addresses[0].secondLine ? `${addresses[0].secondLine}`:'-'}</div>
                                 </div>
                             </div>
                             <div class="summary__column">
                                 <div class="company-summary__item summary__item company-summary__item--city">
-                                    <div class="company-summary__label company-summary__label--city">Phone:</div>
+                                    <div class="company-summary__label company-summary__label--city">City:</div>
                                     <div class="company-summary__field company-summary__field--city">${addresses[0].city}</div>
                                 </div>
                                 <div class="company-summary__item summary__item company-summary__item--postcode">
@@ -2817,6 +2869,9 @@ export const calculatePagination = (current, limit, totalItems) => {
 }
 
 export const renderPagination = (pages, current, container, tableName) => {
+    if(tableName === 'nested-jobs') {
+        console.log({pages}, {current})
+    }
     // Remove pagination if present
     const pagination = document.querySelector(`.pagination--${tableName}`);
     if(pagination) utils.removeElement(pagination);  
@@ -2828,7 +2883,7 @@ export const renderPagination = (pages, current, container, tableName) => {
         <div class="pagination pagination--${tableName}">
             <div class="pagination__previous pagination__previous--${tableName} ${current === 0? 'pagination__previous--inactive':''}">Previous</div>
             <div class="pagination__item-wrapper">${itemMarkup}</div>
-            <div class="pagination__next pagination__next--${tableName} ${current === pages-1? 'pagination__next--inactive':''}">Next</div>
+            <div class="pagination__next pagination__next--${tableName} ${current === pages-1 || pages === 0? 'pagination__next--inactive':''}">Next</div>
         </div>
     `;
     container.insertAdjacentHTML('beforeend', markup);
@@ -2881,13 +2936,13 @@ export const updatePaginationView = (index) => {
 //     // items[items.length - 1].parentElement.removeChild(items[items.length - 1]);
 // }
 
-export const animateAdminContentIn = () => {
+export const animateTableContentIn = (table) => {
     const tl = gsap.timeline()
 
     return tl
-        .fromTo('.table', {autoAlpha: 0},{autoAlpha: 1, duration: '.5'})
+        .fromTo(`.table--${table}`, {autoAlpha: 0},{autoAlpha: 1, duration: '.5'})
         // .from('.thead', { autoAlpha: 0, y: -20, duration: 1 }, '<')
-        .from('.row', {
+        .from(`.row--${table}`, {
             y: -15, 
             autoAlpha: 0,
             stagger: {
@@ -2916,9 +2971,9 @@ export const animateTableBodyIn = () => {
 export const animateSummaryIn = () => {
     return gsap.fromTo('.summary', { autoAlpha:0 }, {autoAlpha: 1 });
 }
-export const animateSummaryOut = () => {
-    return gsap.fromTo('.summary', { autoAlpha: 1 }, {autoAlpha: 0, duration: .2}, '<')
-}
+// export const animateSummaryOut = () => {
+//     return gsap.fromTo('.summary', { autoAlpha: 1 }, {autoAlpha: 0, duration: .2}, '<')
+// }
 
 export const animateAdminLoadersOut = () => {
     return gsap.fromTo(
