@@ -708,6 +708,31 @@ export const populateUserSummary = (user) => {
     addCvElement(user);
 }
 
+export const renderCompanyModal = (data, type) => {
+    const summary = document.querySelector('.summary-wrapper');
+    // Coordinates to position the modal on top of the summary
+    const { left: summaryLeft, top: summaryTop, width: summaryWidth, height: summaryHeight} = summary.getBoundingClientRect();
+
+    const adminWrapper = document.querySelector('.admin-wrapper');
+    
+    switch(type) {
+        case 'new': 
+            adminWrapper.insertAdjacentHTML('afterbegin', createNewCompanyModal(data));
+            break;
+    }
+    // Set the modal to the same position and dimensions as the summary
+    const modalElement = document.querySelector('.company-summary__modal');
+    modalElement.style.left = `${summaryLeft}px`;
+    modalElement.style.top = `${summaryTop}px`;
+    modalElement.style.width = `${summaryWidth}px`;
+    modalElement.style.height = `${summaryHeight}px`;
+
+    gsap.timeline().fromTo(modalElement,
+        {autoAlpha: 0},
+        {autoAlpha: 1, duration: .2}
+    );
+};
+
 export const renderJobModal = (data, type) => {
     const summary = document.querySelector('.summary-wrapper');
     // Coordinates to position the modal on top of the summary
@@ -1680,7 +1705,6 @@ const getUserFormValues = () => {
 //     return numOfRows;
 // }
 export const calculateRows = (tableName) => {
-console.log(tableName);
     const tableWrapperHeight = document.querySelector(`.table-wrapper--${tableName}`).offsetHeight;
 
     const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--table-header-height')) * 10;
@@ -2431,7 +2455,6 @@ const getJob = (e) => {
 //////////  COMPANIES PAGE  ///////////
 
 export const formatCompanies = (companies) => {
-    console.log(companies);
     // Headers should match the returned divs in createCompanyElement
     const headers = ['ID', 'Name', 'Added'];
     const rows = companies.map(company => {
@@ -2451,7 +2474,7 @@ const createCompanyElement = ({ id, companyName, companyDate }) => {
 
 // For the nested table in the company summary
 export const formatCompanyJobs = (jobs) => {
-    const headers = ['ID','TITLE', 'ADDED'];
+    const headers = ['ID','Title', 'Added'];
     const rows = jobs.map(job => {
         return createCompanyJobElement(job);
     });
@@ -2476,7 +2499,152 @@ export const generateCompanyJobsPlaceholder = () => {
     return(markup);
 }
 
+const createNewCompanyModal = ({ companyNumber }) => {
+    const today = new Date();
+    const date = `${today.getDate()}/${today.getMonth()+1}/${+today.getFullYear()}`;
+    const markup  = `
+    <div class="company-summary__modal company-summary__modal--new-company">
 
+        <div class="company-summary__modal-header">
+            <div class="company-summary__modal-item company-summary__modal-item--id">${companyNumber}</div>
+            <div>Create a New Company</div>
+            <div class="company-summary__modal-item company-summary__modal-item--date">${date}</div>
+        </div>
+    
+        <form class="form--new-company">
+            <div class="form__close--new-company">
+                <svg class="form__close-svg--new-company"><use xlink:href="svg/spritesheet.svg#cross"></svg>
+            </div>
+
+            <div class="form__content--new-company">
+
+
+                <div class="summary__column summary__column--new-company summary__column--new-company-contact">
+                    <div class="summary__heading summary__heading--contacts">Primary Contact</div>
+
+                    <div class="form__field--new-company form__contact-firstname--new-company">
+                        <label for="contact-firstname" class="form__label--new-company">First Name</label>
+                        <input type="text" placeholder="First Name" id="contact-firstname" class="form__input--new-company form__contact-firstname-input--new-company">
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+                    <div class="form__field--new-company form__contact-surname--new-company">
+                        <label for="contact-surname" class="form__label--new-company">Surname</label>
+                        <input type="text" placeholder="Surname" id="contact-surname" class="form__input--new-company form__contact-surname-input--new-company">
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+                    <div class="form__field--new-company form__position--new-company">
+                        <label for="position" class="form__label--new-company">Position</label>
+                        <input type="text" placeholder="Position" id="position" class="form__input--new-company form__position-input--new-company">
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+                    <div class="form__field--new-company form__phone--new-company">
+                        <label for="phone" class="form__label--new-company">Phone</label>
+                        <input type="text" placeholder="Phone" id="phone" class="form__input--new-company form__phone-input--new-company">
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+                    <div class="form__field--new-company form__email--new-company">
+                        <label for="email" class="form__label--new-company">Email</label>
+                        <input type="text" placeholder="Email" id="email" class="form__input--new-company form__email-input--new-company">
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+                </div>
+
+                <div class="summary__column summary__column--new-company summary__column--new-company-address">
+                    <div class="summary__heading summary__heading--contacts">Primary Address</div>
+
+                    <div class="form__field--new-company form__first-line--new-company">
+                        <label for="first-line" class="form__label--new-company">First Line</label>
+                        <input type="text" placeholder="First Line" id="first-line" class="form__input--new-company form__first-line-input--new-company">
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+
+                    <div class="form__field--new-company form__surname--new-company">
+                        <label for="surname" class="form__label--new-company">Surname</label>
+                        <input type="text" placeholder="Surname" id="surname" class="form__input--new-company form__surname-input--new-company">
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+
+                    <div class="form__field--new-company form__city--new-company">
+                        <label for="city" class="form__label--new-company">City</label>
+                        <input type="text" placeholder="City" id="city" class="form__input--new-company form__city-input--new-company">
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+
+                    <div class="form__field--new-company form__postcode--new-company">
+                        <label for="postcode" class="form__label--new-company">Postcode</label>
+                        <input type="text" placeholder="Postcode" id="postcode" class="form__input--new-company form__postcode-input--new-company">
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+
+                </div>
+                
+                <button class="form__submit--new-company">Submit</button>
+
+            </div>
+
+        </form>
+
+        <div class="alert-wrapper alert-wrapper--new-company alert-wrapper--hidden">
+            
+        </div>
+    </div>
+    `;
+    return markup;
+};
 
 export const createCompanySummary = ({id, companyName, companyDate, contacts, addresses, jobs}) => {
     // const markup  = `
@@ -2536,11 +2704,24 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
                     <div class="summary__column summary__column--company summary__column--company-summary">
                         
 
-                        <div class="summary__heading">
+                        <div class="summary__heading summary__heading--contacts">
                             Contacts
-                            <div class="summary__sub-headings">
-                                Contact:
-                                ${contacts.map((contact, index) => `<div class="summary__sub-heading"> ${index+1}</div>`).join("")}
+                            <div class="company-summary__controls company-summary__controls--contacts">
+                                <div class="company-summary__btn company-summary__btn--new-contact company-summary__btn--contacts">
+                                    <svg class="company-summary__new-icon company-summary__new-icon--contacts company-summary__icon">
+                                        <use xlink:href="svg/spritesheet.svg#add">
+                                    </svg>
+                                </div>
+                                <div class="company-summary__btn company-summary__btn--edit-contact company-summary__btn--contacts">
+                                    <svg class="company-summary__edit-icon company-summary__edit-icon--contacts company-summary__icon">
+                                        <use xlink:href="svg/spritesheet.svg#edit-np1">
+                                    </svg>
+                                </div>
+                                <div class="company-summary__btn company-summary__btn--delete-contact company-summary__btn--contacts">
+                                    <svg class="company-summary__delete-icon company-summary__delete-icon--contacts company-summary__icon">
+                                        <use xlink:href="svg/spritesheet.svg#delete-np1">
+                                    </svg>
+                                </div>
                             </div>
                         </div>
                         
@@ -2569,12 +2750,25 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
                             
                         </div>
                         <div class="pagination-wrapper pagination-wrapper--contacts"></div>
-
-                        <div class="summary__heading">
+ 
+                        <div class="summary__heading summary__heading--addresses">
                             Addresses
-                            <div class="summary__sub-headings">
-                                Address:
-                                ${addresses.map((address, index) => `<div class="summary__sub-heading"> ${index+1}</div>`)}
+                            <div class="company-summary__controls company-summary__controls company-summary__controls--addresses">
+                                <div class="company-summary__btn company-summary__btn--addresses company-summary__btn--new-address">
+                                    <svg class="company-summary__new-icon company-summary__new-icon--addresses company-summary__icon">
+                                        <use xlink:href="svg/spritesheet.svg#add">
+                                    </svg>
+                                </div>
+                                <div class="company-summary__btn company-summary__btn--addresses company-summary__btn--edit-address">
+                                    <svg class="company-summary__edit-icon company-summary__edit-icon--addresses company-summary__icon">
+                                        <use xlink:href="svg/spritesheet.svg#edit-np1">
+                                    </svg>
+                                </div>
+                                <div class="company-summary__btn company-summary__btn--addresses company-summary__btn--delete-address">
+                                    <svg class="company-summary__delete-icon company-summary__delete-icon--addresses company-summary__icon">
+                                        <use xlink:href="svg/spritesheet.svg#delete-np1">
+                                    </svg>
+                                </div>
                             </div>
                         </div>
 
@@ -2601,7 +2795,6 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
                             </div>
                         </div>
                         <div class="pagination-wrapper pagination-wrapper--addresses"></div>
-
                     </div>
                     <div class="summary__column summary__column--company summary__column--company-jobs-table">            
                         <div class="summary__heading">
@@ -2612,32 +2805,35 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
                             <div class="company-summary__jobs-table-wrapper table-wrapper--nested-jobs">
                             </div>
                         </div>
+
+
+                    </div>
+                    <div class="company-summary__controls company-summary__controls--company">
+                        <div class="company-summary__btn company-summary__btn--new">
+                            <svg class="company-summary__new-icon company-summary__icon">
+                                <use xlink:href="svg/spritesheet.svg#add">
+                            </svg>
+                        </div>
+                        <div class="company-summary__btn company-summary__btn--hubspot">
+                            <svg class="company-summary__hubspot-icon company-summary__icon">
+                                <use xlink:href="svg/spritesheet.svg#hubspot">
+                            </svg>
+                        </div>
+                        <div class="company-summary__btn company-summary__btn--edit">
+                            <svg class="company-summary__edit-icon company-summary__icon">
+                                <use xlink:href="svg/spritesheet.svg#edit-np1">
+                            </svg>
+                        </div>
+                        <div class="company-summary__btn company-summary__btn--delete">
+                            <svg class="company-summary__delete-icon company-summary__icon">
+                                <use xlink:href="svg/spritesheet.svg#delete-np1">
+                            </svg>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="company-summary__controls">
-                <div class="company-summary__btn company-summary__btn--new">
-                    <svg class="company-summary__new-icon company-summary__icon">
-                        <use xlink:href="svg/spritesheet.svg#add">
-                    </svg>
-                </div>
-                <div class="company-summary__btn company-summary__btn--hubspot">
-                    <svg class="company-summary__hubspot-icon company-summary__icon">
-                        <use xlink:href="svg/spritesheet.svg#hubspot">
-                    </svg>
-                </div>
-                <div class="company-summary__btn company-summary__btn--edit">
-                    <svg class="company-summary__edit-icon company-summary__icon">
-                        <use xlink:href="svg/spritesheet.svg#edit-np1">
-                    </svg>
-                </div>
-                <div class="company-summary__btn company-summary__btn--delete">
-                    <svg class="company-summary__delete-icon company-summary__icon">
-                        <use xlink:href="svg/spritesheet.svg#delete-np1">
-                    </svg>
-                </div>
-            </div>
+            
         </div>         
     `;
     return markup;
@@ -2869,9 +3065,7 @@ export const calculatePagination = (current, limit, totalItems) => {
 }
 
 export const renderPagination = (pages, current, container, tableName) => {
-    if(tableName === 'nested-jobs') {
-        console.log({pages}, {current})
-    }
+
     // Remove pagination if present
     const pagination = document.querySelector(`.pagination--${tableName}`);
     if(pagination) utils.removeElement(pagination);  

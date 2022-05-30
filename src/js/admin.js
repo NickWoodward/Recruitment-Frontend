@@ -876,6 +876,7 @@ class AdminController {
             case 'companies':
                 const { data: { companies, companyTotal } } = await this.Admin.getCompanies(this.state.companies.searchOptions, indexId);
                 this.companies = companies;
+                console.log(this.companies);
                 this.state.companies.totalCompanies = companyTotal;
                 break;
         }
@@ -1223,6 +1224,8 @@ class AdminController {
         }
         if(companyLink) {
             const companyId = companyLink.parentElement.dataset.id;
+            this.displayAdminContent('companies', companyId);
+            adminView.changeActiveMenuItem(document.querySelector('.sidebar__item--companies'));
         }
         if(applicantLink) {
             // Applicant link wraps around two divs with the data element
@@ -1983,10 +1986,11 @@ class AdminController {
             console.log('hubspotBtn');
         }
         if(companyLink) {
-            console.log('companyLink');
             const companyId = document.querySelector('.job-summary__field--company').dataset.id;
-console.log(companyId);
+
             this.displayAdminContent('companies', companyId);
+            adminView.changeActiveMenuItem(document.querySelector('.sidebar__item--companies'));
+
         }
     }
 
@@ -2648,7 +2652,7 @@ console.log(companyId);
                     this.addCompanyNestedPagination();
 
                     // Add the listener to the new summary
-                    document.querySelector('.summary').addEventListener('click', this.companySummaryListener)
+                    document.querySelector('.summary').addEventListener('click', (e) => this.companySummaryListener(e))
 
                     // Remove any modals
                     adminView.removeSummaryModals();
@@ -2708,7 +2712,7 @@ console.log(companyId);
         const companySummary = document.querySelector('.company-summary');
         companySummary.addEventListener(
             'click',
-            this.companySummaryListener.bind(this)
+            (e) => this.companySummaryListener(e)
         );
     }
 
@@ -2719,26 +2723,61 @@ console.log(companyId);
         const deleteJobAlertAnimation = gsap.timeline({paused: true});
 
         // Buttons
-        const newBtn = e.target.closest('.company__summary__btn--new');
-        const hubspotBtn = e.target.closest('.company__summary__btn--hubspot');
-        const editBtn = e.target.closest('.company__summary__btn--edit');
-        const deleteBtn = e.target.closest('.company__summary__btn--delete');
+        const newBtn = e.target.closest('.company-summary__btn--new');
+        const newContactBtn = e.target.closest('.company-summary__btn--new-contact');
+        const newAddressBtn = e.target.closest('.company-summary__btn--new-address');
+        const hubspotBtn = e.target.closest('.company-summary__btn--hubspot');
+        const editBtn = e.target.closest('.company-summary__btn--edit');
+        const editContactBtn = e.target.closest('.company-summary__btn--edit-contact');
+        const editAddressBtn = e.target.closest('.company-summary__btn--edit-address');
+        const deleteBtn = e.target.closest('.company-summary__btn--delete');
+        const deleteContactBtn = e.target.closest('.company-summary__btn--delete-contact');
+        const deleteAddressBtn = e.target.closest('.company-summary__btn--delete-address');
         const jobBtn = e.target.closest('.row');
 
         // Links
         const addJobLink = e.target.closest('.company-jobs-placeholder__add-link');
         if(addJobLink) {
-            console.log(this);
             this.displayAdminContent('jobs')
             const select = document.querySelector('.form__company-input--job');
-            console.log(select);
         }
 
         if(jobBtn) {
+            console.log(this);
             const jobId = jobBtn.firstElementChild.dataset.id;
             this.displayAdminContent('jobs', jobId);
             adminView.changeActiveMenuItem(document.querySelector('.sidebar__item--jobs')); 
+        }
 
+        if(newBtn) {
+            let alert;
+            adminView.renderCompanyModal({
+                companyNumber: this.getNextId('companies')
+            }, 'new');
+        }
+        if(newContactBtn) {
+            console.log('newContact');
+        }
+        if(newAddressBtn) {
+            console.log('newAddress');
+        }
+        if(editBtn) {
+            console.log('editBtn');
+        }
+        if(editContactBtn) {
+            console.log('editContact');
+        }
+        if(editAddressBtn) {
+            console.log('editAddress');
+        }
+        if(deleteBtn) {
+            console.log('deleteBtn');
+        }
+        if(deleteContactBtn) {
+            console.log('deleteContact');
+        }
+        if(deleteAddressBtn) {
+            console.log('deleteAddress');
         }
     }
 

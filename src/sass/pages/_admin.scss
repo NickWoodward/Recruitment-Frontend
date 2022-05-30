@@ -112,7 +112,7 @@
     }
     &--companies {
         grid-column: 4/13;
-        grid-row: 1/7;
+        grid-row: 1/8;
     }
 }
 .summary {
@@ -128,9 +128,24 @@
             width: 100%;
             &-summary {
                 grid-column: 1/8;
+                grid-row: 1/2;
             }
+
             &-jobs-table {
                 grid-column: 8/17;
+                grid-row: 1/2;
+            }
+        }
+
+        &--new-company {
+            width: 100%;
+            border: 1px solid red;
+
+            &-contact {
+                grid-column: 1/2;
+            }
+            &-address {
+                grid-column: 2/3;
             }
         }
         
@@ -139,10 +154,11 @@
         &--company {
             display: grid;
             grid-template-columns: repeat(16, 1fr);
-            grid-gap: 4rem;
+            column-gap: 4rem;
             flex-grow: 1;
-            padding: 2rem 4rem;
+            padding: 2rem 4rem 0 4rem;
         }
+       
     }
     &__link {
         color: firebrick;
@@ -160,6 +176,10 @@
     
         margin: 1rem 0 1rem 0;
 
+        &--contacts, &--addresses {
+            display:flex;
+            justify-content: space-between;
+        }
     }
     
     &__sub-headings {
@@ -227,6 +247,10 @@
         
         &--job {
             transform: translateY(-5px);
+        }
+
+        &--contacts {
+            margin-top: 0;
         }
     }
 
@@ -1025,10 +1049,10 @@
     &__select {
 
         // Slightly larger padding for the company name, slightly less lPad
-            padding-top: .7rem;
-            padding-bottom: .7rem;
+        padding-top: .7rem;
+        padding-bottom: .7rem;
 
-            padding-left: .3rem;
+        padding-left: .3rem;
     }
 
  
@@ -1105,29 +1129,71 @@
     align-items: center;
     height: 100%;
     
+    &__modal {
+        font-size: 1.6rem;
+        // box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+        border-radius: 5px;
+        overflow: hidden;
+
+        &--new-company, &--edit-company {
+            position: absolute;
+            height: 100%;
+            background-color: white;
+            z-index: 100;
+        }
+
+        &-header {
+            flex-grow: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            height: 6rem;
+            background-color: $color-primary-new;
+
+            font-size: 1.6rem;
+            color: white;
+
+            &>div {
+                padding: 0 2rem;
+            }
+        }
+        &-item {
+            display: flex;
+            align-items: center;
+            &--id,&--date {
+                padding: 0 2rem;
+                // width: 50%;
+            }
+            &--date {
+                justify-content: flex-end;
+            }
+        }
+    }
+
     &__details {
         display: flex;
         flex-direction: column;
         width: 100%;
         flex-grow: 1;
     }
-    &__item {
-        margin-bottom: .3rem;
-        font-size: 1.6rem;
-        border: 1px solid transparent;
+    // &__item {
+    //     margin-bottom: .3rem;
+    //     font-size: 1.6rem;
+    //     border: 1px solid transparent;
 
-    }
-    &__item--editable {
-        -moz-appearance: textfield;
-        -webkit-appearance: textfield;
-        background-color: white;
-        background-color: -moz-field;
-        border: 1px solid darkgray;
-        box-shadow: 1px 1px 1px 0 lightgray inset;  
-        &:hover {
-            cursor: auto;
-        }
-    }
+    // }
+    // &__item--editable {
+    //     -moz-appearance: textfield;
+    //     -webkit-appearance: textfield;
+    //     background-color: white;
+    //     background-color: -moz-field;
+    //     border: 1px solid darkgray;
+    //     box-shadow: 1px 1px 1px 0 lightgray inset;  
+    //     &:hover {
+    //         cursor: auto;
+    //     }
+    // }
  
     &__section {
         display: flex;
@@ -1168,44 +1234,62 @@
         justify-content: flex-end;
         width: 100%;
         margin-top: auto;
-        padding: 1.5rem 2rem;
+        padding: 1rem 0;
+        // border: 1px solid red;
+
+        &--contacts, &--addresses {
+            margin-top: 0;
+            padding: 0;
+        }
+        &--company {
+            grid-column: 1/17;
+        }
     }
     &__btn {
         display: flex;
         align-items: flex-end;
-        margin-right: 1.5rem;
+        margin-left: 1.5rem;
         cursor:pointer;
 
     }
 
     
-    &__btn--edit, &__btn--save {
-        transform: translateY(3px);
-    }
-    &__btn--hubspot {
-        margin-right: 2rem;
+    &__btn--edit, &__btn--edit-contact, &__btn--edit-address, &__btn--hubspot {
+        transform: translateY(2px);
     }
 
-    &__btn--new, &__btn--save-new {
-        margin-right: auto;
-    }
 
     &__new-icon {
         height: 3.2rem;
         width: 3.2rem;
         fill: $color-logo;
         transform: translateY(2px);
+
+        &--contacts, &--addresses {
+            height: 2.5rem;
+            width: 2.5rem;
+        }
     }
 
     &__edit-icon {
-        height: 3.5rem;
-        width: 3.5rem;
+        height: 2.9rem;
+        width: 2.9rem;
         fill: $color-logo;
+
+        &--contacts, &--addresses {
+            height: 2.4rem;
+            width: 2.4rem;
+        }
     }
     &__delete-icon {
-        height: 3.3rem;
-        width: 3.3rem;
+        height: 2.9rem;
+        width: 2.9rem;
         fill: $color-secondary;
+        &--contacts, &--addresses {
+            height: 2.3rem;
+            width: 2.3rem;
+            transform: translateY(1px);
+        }
     }
     &__save-icon {
         height: 3.5rem;
@@ -1213,9 +1297,9 @@
         fill: red;
     }
     &__hubspot-icon {
-        height: 2.9rem;
-        width: 2.9rem;
-        fill: $color-secondary;
+        height: 2.4rem;
+        width: 2.4rem;
+        fill: #f8761f;
     }
 }
 
