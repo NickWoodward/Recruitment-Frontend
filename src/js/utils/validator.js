@@ -62,7 +62,7 @@ const newJobSchema = Joi.object({
         Joi.string().trim().min(5).max(500).messages({
             "string.base": `Must be text`,
             "string.empty": `Cannot be empty`,
-            "string.min": `Must be > 3 letters`,
+            "string.min": `Must be > 5 letters`,
             "string.max": `Must be < than 50 letters`,
             "any.required": `Required`,
         }) ,
@@ -76,8 +76,93 @@ const newJobSchema = Joi.object({
         })   
 });
 
+const newCompanySchema = Joi.object({
+    companyName: 
+        Joi.string().trim().min(3).max(50).required().messages({
+            "string.base": `Must be text`,
+            "string.empty": `Cannot be empty`,
+            "string.min": `Must be > 3`,
+            "string.max": `Must be < than 50`,
+            "any.required": `Required`,
+        }),
+    firstName:
+        Joi.string().trim().min(3).max(50).required().messages({
+            "string.base": `Must be text`,
+            "string.empty": `Cannot be empty`,
+            "string.min": `Must be > 3`,
+            "string.max": `Must be < than 50`,
+            "any.required": `Required`,
+        }),
+    lastName: 
+        Joi.string().trim().min(3).max(50).required().messages({
+            "string.base": `Must be text`,
+            "string.empty": `Cannot be empty`,
+            "string.min": `Must be > 3`,
+            "string.max": `Must be < than 50`,
+            "any.required": `Required`,
+        }),
+    position: 
+        Joi.string().trim().min(2).max(50).required().messages({
+            "string.base": `Must be text`,
+            "string.empty": `Cannot be empty`,
+            "string.min": `Must be > 2`,
+            "string.max": `Must be < than 50`,
+            "any.required": `Required`,
+        }),
+    phone: 
+        Joi.string().trim().replace(/\s*/g,"").pattern(new RegExp(/^0([1-6][0-9]{8,10}|7[0-9]{9})$/)).messages({
+            "string.empty": `Cannot be empty`,
+            'string.pattern.base': `Please enter a UK phone number`
+        }),
+    email: 
+        Joi.string().trim().email({tlds:{allow: false}}).messages({
+            "string.empty": `Cannot be empty`,
+            'string.domain': 'Must contain a valid domain name',
+            'string.email': 'Must be a valid email',
+        }),
+    firstLine: 
+        Joi.string().trim().min(3).max(50).required().messages({
+            "string.base": `Must be text`,
+            "string.empty": `Cannot be empty`,
+            "string.min": `Must be > 3`,
+            "string.max": `Must be < than 50`,
+            "any.required": `Required`,
+        }),
+    secondLine: 
+        Joi.string().trim().min(3).max(50).required().messages({
+            "string.base": `Must be text`,
+            "string.empty": `Cannot be empty`,
+            "string.min": `Must be > 3`,
+            "string.max": `Must be < than 50`,
+            "any.required": `Required`,
+        }),
+    city: 
+        Joi.string().trim().min(3).max(50).required().messages({
+            "string.base": `Must be text`,
+            "string.empty": `Cannot be empty`,
+            "string.min": `Must be > 3`,
+            "string.max": `Must be < than 50`,
+            "any.required": `Required`,
+        }),
+    county: 
+        Joi.string().trim().min(3).max(50).required().messages({
+            "string.base": `Must be text`,
+            "string.empty": `Cannot be empty`,
+            "string.min": `Must be > 3`,
+            "string.max": `Must be < than 50`,
+            "any.required": `Required`,
+        }),
+    postcode:
+        Joi.string().trim().pattern(new RegExp(/^([a-zA-Z]{1,2}[a-zA-Z\d]{1,2})\s?(\d[a-zA-Z]{2})$/)).messages({
+            "string.empty": `Cannot be empty`,
+            'string.pattern.base': `Please enter a valid postcode`
+        }),
+})
+
 export const validateJob = (data) => validate(data, newJobSchema);
 export const validateJobField = (data) => validateProperty(data, newJobSchema);
+
+export const validateCompany = (data) => validate(data, newCompanySchema);
 
 // ************* Reusable validation code *************
 

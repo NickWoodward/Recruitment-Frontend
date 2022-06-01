@@ -19,6 +19,8 @@ import '../assets/updated-icons/ios-minus-empty.svg';
 import '../assets/updated-icons/ios-minus-outline.svg';
 import '../assets/icons/success.svg';
 import '../assets/icons/error.svg';
+import '../assets/icons/copy.svg';
+import '../assets/icons/applications.svg';
 
 
 import axios from 'axios';
@@ -844,19 +846,20 @@ class AdminController {
     getNumOfRows(sectionName) {
         switch(sectionName) {
             case 'applications': 
-                this.state.applications.searchOptions.limit = adminView.calculateRows(sectionName);
+                this.state.applications.searchOptions.limit = adminView.calculateRows(sectionName, true, true);
                 break;
             case 'jobs': 
-                this.state.jobs.searchOptions.limit = adminView.calculateRows(sectionName);
+                this.state.jobs.searchOptions.limit = adminView.calculateRows(sectionName, true, true);
                 break;
             case 'companies': 
-                this.state.companies.searchOptions.limit = adminView.calculateRows(sectionName);
+                this.state.companies.searchOptions.limit = adminView.calculateRows(sectionName, true, true);
                 break;
             case 'users':
-                this.state.users.searchOptions.limit = adminView.calculateRows(sectionName);
+                this.state.users.searchOptions.limit = adminView.calculateRows(sectionName, true, true);
                 break;
             case 'nested-jobs':
-                this.state.companies.companyJobPagination.jobLimit = adminView.calculateRows(sectionName);
+                this.state.companies.companyJobPagination.jobLimit = adminView.calculateRows(sectionName, true, true);
+                // console.log('jobLimit:', adminView.calculateRows(sectionName));
         }
     }
 
@@ -1215,6 +1218,18 @@ class AdminController {
         const companyLink = e.target.closest('.summary__link--company');
         const applicantLink = e.target.closest('.summary__link--applicant');
 
+        // Copy links
+        const emailCopy = e.target.closest('.application-summary__field--contact-email');
+
+        if(emailCopy){
+            const text = emailCopy.firstElementChild.text;
+
+            this.copyLink(emailCopy, text);
+        }
+
+
+
+
         if(jobLink) {
             const jobId = jobLink.parentElement.dataset.id;
 
@@ -1435,6 +1450,28 @@ class AdminController {
             });
 
         }
+    }
+
+    copyLink(element, value) {
+        navigator.clipboard.writeText(value).then(function() {
+            console.log('Async: Copying to clipboard was successful!');
+            gsap.timeline()
+            .to(element, {
+                scale: 1.1,
+                opacity: 0,
+                duration: .4
+            })
+            .fromTo(element, {
+                scale: 0.9,
+                opacity: 0
+            }, {
+                scale: 1,
+                opacity: 1,
+                immediateRender: false
+            }, '>');
+        }, function(err) {
+        console.error('Async: Could not copy text: ', err);
+        });
     }
 
     getNextId(arr) {
@@ -2742,6 +2779,13 @@ class AdminController {
             const select = document.querySelector('.form__company-input--job');
         }
 
+        // Copy Links
+        const emailCopy = e.target.closest('.company-summary__field--contact-email');
+        if(emailCopy) {
+            const text = emailCopy.firstElementChild.text;
+            this.copyLink(emailCopy, text);
+        }
+
         if(jobBtn) {
             console.log(this);
             const jobId = jobBtn.firstElementChild.dataset.id;
@@ -2754,9 +2798,142 @@ class AdminController {
             adminView.renderCompanyModal({
                 companyNumber: this.getNextId('companies')
             }, 'new');
+
+            const alertWrapper = document.querySelector('.alert-wrapper');
+            const companyForm = document.querySelector('.form--new-company');
+            const closeBtn = document.querySelector('.form__close--new-company');
+            const submitBtn = document.querySelector('.form__submit--new-company');
+
+            // Get the field elements
+            const fields = adminView.getCompanyFields('new');
+            const { 
+                companyNameField, 
+                contactFirstNameField,
+                contactSurnameField,
+                contactPositionField,
+                phoneField,
+                emailField,
+                firstLineField,
+                secondLineField,
+                cityField,
+                countyField,
+                postcodeField
+            } = fields;
+
+            // Add the animation for the company alerts (paused)
+            newCompanyAlertAnimation
+            .from(alertWrapper, {
+                autoAlpha: 0
+            })
+            .to(alertWrapper, {
+                autoAlpha: 0
+            }, '+=3')
+
+            closeBtn.addEventListener('click', () => {
+                adminView.removeCompanyModal();
+            });
+
+            companyForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                // Clear the alert wrapper contents
+                while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+
+                const data = adminView.getCompanyValues(fields); 
+                const { changed, ...values } = data;
+                const errors = validator.validateCompany(values);
+
+                if(!errors) {
+                    try {
+                        const res = await this.Admin.createCompany(values);
+
+                        if(res.status !== 201) {
+
+                            alert = modalView.getAlert('Company Not Created', false);
+                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                            newCompanyAlertAnimation.play(0);
+                        }else {
+                            alert = modalView.getAlert('Company Created', true);
+                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                            newCompanyAlertAnimation.play(0);
+
+                            await this.getData('companies');
+                            this.state.companies.currentCompany = res.data.company;
+
+                            this.renderCompaniesTable();
+                            // Update pagination
+                            const { totalCompanies, searchOptions: {index: companyIndex, limit: companyLimit} } = this.state.companies;
+                            adminView.renderPagination(companyIndex, companyLimit, document.querySelector('.table-wrapper'), 'companies');
+                    
+                        }
+                    } catch(err) {
+                        console.log(err)
+
+                        if(err?.response.status === 422){
+                            alert = modalView.getAlert(err.response.data.validationErrors[0].msg, false);
+                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                            newCompanyAlertAnimation.play(0);
+                        }
+
+                    }
+                } else {
+                    if(errors.companyName) 
+                        validator.setErrorFor(companyNameField, errors.companyName); 
+                    else validator.setSuccessFor(companyNameField);
+    
+                    if(errors.firstName)  
+                        validator.setErrorFor(contactFirstNameField, errors.firstName);
+                    else validator.setSuccessFor(contactFirstNameField);
+    
+                    if(errors.lastName) 
+                        validator.setErrorFor(contactSurnameField, errors.lastName);
+                    else validator.setSuccessFor(contactSurnameField);
+    
+                    if(errors.position) 
+                        validator.setErrorFor(contactPositionField, errors.position);
+                    else validator.setSuccessFor(contactPositionField);
+    
+                    if(errors.phone) 
+                        validator.setErrorFor(phoneField, errors.phone);
+                    else validator.setSuccessFor(phoneField);
+    
+                    if(errors.email) 
+                        validator.setErrorFor(emailField, errors.email);
+                    else validator.setSuccessFor(emailField);
+    
+                    if(errors.firstLine) 
+                        validator.setErrorFor(firstLineField, errors.firstLine);
+                    else validator.setSuccessFor(firstLineField);
+    
+                    if(errors.secondLine) 
+                        validator.setErrorFor(secondLineField, errors.secondLine); 
+                    else validator.setSuccessFor(secondLineField);
+
+                    if(errors.city) 
+                        validator.setErrorFor(cityField, errors.city); 
+                    else validator.setSuccessFor(cityField);
+                    if(errors.county) 
+                        validator.setErrorFor(countyField, errors.county); 
+                    else validator.setSuccessFor(countyField);
+                    if(errors.postcode) 
+                        validator.setErrorFor(postcodeField, errors.postcode); 
+                    else validator.setSuccessFor(postcodeField);
+                }
+            });
+
+            // Validate each field on lost focus
+            companyForm.addEventListener('focusout', e => {
+                if(e.target === submitBtn) return;
+                const data = adminView.getCompanyValues(fields);
+                // const { value, name } = this.getCompanyDataToValidate(e, data, fields);
+                console.log(data);
+                // const error = validator.validateCompanyField({ value, name });
+
+                // if(error) validator.setErrorFor(e.target, error);
+                // else validator.setSuccessFor(e.target);
+            });
         }
         if(newContactBtn) {
-            console.log('newContact');
+            console.log('newContact');``
         }
         if(newAddressBtn) {
             console.log('newAddress');
@@ -2779,6 +2956,26 @@ class AdminController {
         if(deleteAddressBtn) {
             console.log('deleteAddress');
         }
+    }
+
+    getCompanyDataToValidate(
+        e,
+        data,
+        {
+            companyName,
+            firstName,
+            lastName,
+            position,
+            phone,
+            email,
+            firstLine,
+            secondLine,
+            city,
+            county,
+            postcode
+        }
+    ) {
+
     }
 
 

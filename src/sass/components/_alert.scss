@@ -27,12 +27,17 @@
         
         padding: 1.5rem;
         background-color: rgba(255,255,255, 1);
-        border-bottom: 1px solid lightgray; 
+        // border-bottom: 1px solid lightgray; 
         z-index: 101;
 
         &--new-job {
             position: relative;
 
+        }
+        &--new-company {
+            grid-column: 2/3;
+            grid-row: 4/5;
+            margin-bottom: 1rem;
         }
 
         &--hidden {

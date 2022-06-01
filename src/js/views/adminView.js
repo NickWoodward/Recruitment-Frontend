@@ -395,7 +395,7 @@ export const createApplicationSummary = ({
                     <div class="summary__heading">Position</div>
 
                         <div class="application-summary__section application-summary__section--job">
-                            <div class="summary__column">
+                            <div class="summary__column summary__column--small">
                                 <div class="application-summary__item application-summary__item--job summary__item">
                                     <div class="application-summary__label application-summary__label--title">Title:</div>
                                     <div class="application-summary__field application-summary__field--title" data-id="${jobId}">
@@ -414,7 +414,7 @@ export const createApplicationSummary = ({
                                 </div>
                             </div>
 
-                            <div class="summary__column">
+                            <div class="summary__column summary__column--large">
                                 <div class="application-summary__item application-summary__item--job summary__item">
                                     <div class="application-summary__label application-summary__label--contact-position">Contact Position:</div>
                                     <div class="application-summary__field application-summary__field--contact-position">${contactPosition}</div>
@@ -425,7 +425,10 @@ export const createApplicationSummary = ({
                                 </div>
                                 <div class="application-summary__item application-summary__item--job summary__item">
                                     <div class="application-summary__label application-summary__label--contact-email">Contact Email:</div>
-                                    <div class="application-summary__field application-summary__field--contact-email">${contactEmail}</div>
+                                    <div class="application-summary__field application-summary__field--contact-email">
+                                        <a class="application-summary__field-text--contact-email">${contactEmail}</a>
+                                        <svg class="application-summary__copy-svg copy-svg--application"><use xlink:href="svg/spritesheet.svg#applications"></svg>    
+                                    </div>
                                 </div>
                             </div>
                     </div>
@@ -433,7 +436,7 @@ export const createApplicationSummary = ({
                     <div class="summary__heading">Applicant</div>
 
                     <div class="application-summary__section application-summary__section--person">
-                        <div class="summary__column">
+                        <div class="summary__column summary__column--small">
                             <div class="application-summary__item summary__item">
                                 <div class="application-summary__label application-summary__label--applicant-name">Applicant Name:</div>
                                 <a class="summary__link summary__link--applicant">
@@ -441,15 +444,16 @@ export const createApplicationSummary = ({
                                 </a>
                             </div>
                             <div class="application-summary__item summary__item">
-                                <div class="application-summary__label application-summary__label--email">Email:</div>
-                                <div class="application-summary__field application-summary__field--email">${personEmail}</div>
-                            </div>
-                        </div>
-
-                        <div class="summary__column">
-                            <div class="application-summary__item summary__item">
                                 <div class="application-summary__label application-summary__label--phone">Phone:</div>
                                 <div class="application-summary__field application-summary__field--phone">${personPhone}</div>
+                            </div>
+
+                        </div>
+
+                        <div class="summary__column summary__column--large">
+                            <div class="application-summary__item summary__item">
+                                <div class="application-summary__label application-summary__label--email">Email:</div>
+                                <div class="application-summary__field application-summary__field--email">${personEmail}</div>
                             </div>
 
                             <div class="application-summary__item summary__item application-summary__item--cv">
@@ -1704,11 +1708,10 @@ const getUserFormValues = () => {
 
 //     return numOfRows;
 // }
-export const calculateRows = (tableName) => {
+export const calculateRows = (tableName, header, pagination) => {
     const tableWrapperHeight = document.querySelector(`.table-wrapper--${tableName}`).offsetHeight;
-
-    const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--table-header-height')) * 10;
-    const paginationHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pagination-height')) * 10;
+    const headerHeight = header? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--table-header-height')) * 10 : 0;
+    const paginationHeight = pagination? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pagination-height')) * 10 : 0;
     const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * 10;
 
     const numOfRows = Math.floor((tableWrapperHeight - parseFloat(headerHeight) - parseFloat(paginationHeight)) / parseFloat(rowHeight));
@@ -2517,14 +2520,28 @@ const createNewCompanyModal = ({ companyNumber }) => {
             </div>
 
             <div class="form__content--new-company">
+                <div class="summary__column summary__column--new-company summary__column--new-company-company">
+                     <div class="summary__heading summary__heading--contacts">Company</div>
 
+                     <div class="form__field--new-company form__company-name--new-company">
+                        <label for="company-name" class="form__label--new-company">Company Name</label>
+                        <input type="text" placeholder="Company Name" id="company-name" class="form__input--new-company form__company-name-input--new-company">
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+                </div>
 
                 <div class="summary__column summary__column--new-company summary__column--new-company-contact">
-                    <div class="summary__heading summary__heading--contacts">Primary Contact</div>
+                    <div class="summary__heading summary__heading--contacts">Contact</div>
 
-                    <div class="form__field--new-company form__contact-firstname--new-company">
-                        <label for="contact-firstname" class="form__label--new-company">First Name</label>
-                        <input type="text" placeholder="First Name" id="contact-firstname" class="form__input--new-company form__contact-firstname-input--new-company">
+                    <div class="form__field--new-company form__contact-first-name--new-company">
+                        <label for="contact-first-name" class="form__label--new-company">First Name</label>
+                        <input type="text" placeholder="First Name" id="contact-first-name" class="form__input--new-company form__contact-first-name-input--new-company">
                         <i class="form__icon form__icon--success">
                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
                         </i>
@@ -2580,7 +2597,7 @@ const createNewCompanyModal = ({ companyNumber }) => {
                 </div>
 
                 <div class="summary__column summary__column--new-company summary__column--new-company-address">
-                    <div class="summary__heading summary__heading--contacts">Primary Address</div>
+                    <div class="summary__heading summary__heading--contacts">Address</div>
 
                     <div class="form__field--new-company form__first-line--new-company">
                         <label for="first-line" class="form__label--new-company">First Line</label>
@@ -2594,9 +2611,9 @@ const createNewCompanyModal = ({ companyNumber }) => {
                         <small class="form__error-msg"></small>
                     </div>
 
-                    <div class="form__field--new-company form__surname--new-company">
-                        <label for="surname" class="form__label--new-company">Surname</label>
-                        <input type="text" placeholder="Surname" id="surname" class="form__input--new-company form__surname-input--new-company">
+                    <div class="form__field--new-company form__second-line--new-company">
+                        <label for="second-line" class="form__label--new-company">Second Line</label>
+                        <input type="text" placeholder="Second Line" id="second-line" class="form__input--new-company form__second-line-input--new-company">
                         <i class="form__icon form__icon--success">
                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
                         </i>
@@ -2609,6 +2626,18 @@ const createNewCompanyModal = ({ companyNumber }) => {
                     <div class="form__field--new-company form__city--new-company">
                         <label for="city" class="form__label--new-company">City</label>
                         <input type="text" placeholder="City" id="city" class="form__input--new-company form__city-input--new-company">
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+
+                    <div class="form__field--new-company form__county--new-company">
+                        <label for="county" class="form__label--new-company">County</label>
+                        <input type="text" placeholder="County" id="county" class="form__input--new-company form__county-input--new-company">
                         <i class="form__icon form__icon--success">
                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
                         </i>
@@ -2633,18 +2662,165 @@ const createNewCompanyModal = ({ companyNumber }) => {
                 </div>
                 
                 <button class="form__submit--new-company">Submit</button>
+                <div class="alert-wrapper alert-wrapper--new-company alert-wrapper--hidden">
 
             </div>
 
         </form>
 
-        <div class="alert-wrapper alert-wrapper--new-company alert-wrapper--hidden">
             
         </div>
     </div>
     `;
     return markup;
 };
+
+export const getCompanyFields = (type) => {
+    const companyNameField = document.querySelector(`.form__company-name-input--${type}-company`);
+    const contactFirstNameField = document.querySelector(`.form__contact-first-name-input--${type}-company`);
+    const contactSurnameField = document.querySelector(`.form__contact-surname-input--${type}-company`);
+    const contactPositionField = document.querySelector(`.form__position-input--${type}-company`);
+    const phoneField = document.querySelector(`.form__phone-input--${type}-company`);
+    const emailField = document.querySelector(`.form__email-input--${type}-company`);
+    const firstLineField = document.querySelector(`.form__first-line-input--${type}-company`);
+    const secondLineField = document.querySelector(`.form__second-line-input--${type}-company`);
+    const cityField = document.querySelector(`.form__city-input--${type}-company`);
+    const countyField = document.querySelector(`.form__county-input--${type}-company`);
+    const postcodeField = document.querySelector(`.form__postcode-input--${type}-company`);
+  
+    return { 
+        companyNameField, 
+        contactFirstNameField, 
+        contactSurnameField, 
+        contactPositionField, 
+        phoneField, 
+        emailField, 
+        firstLineField, 
+        secondLineField, 
+        cityField, 
+        countyField,
+        postcodeField 
+    }
+}
+export const getCompanyValues = (fields, editMode) => {
+
+    const {                
+        companyNameField, 
+        contactFirstNameField,
+        contactSurnameField,
+        contactPositionField,
+        phoneField,
+        emailField,
+        firstLineField,
+        secondLineField,
+        cityField,
+        countyField,
+        postcodeField 
+    } = fields;
+
+    const values = { changed: false };
+
+    // Fields =>
+    // (field.value: empty && field.placeholder: text) = the field is empty
+
+    Object.values(fields).forEach(field => {
+        // If !value, return placeholder
+        switch(field) {
+            case companyNameField: 
+                if(editMode) {
+                    values.companyName = companyNameField.value? companyNameField.value : companyNameField.placeholder;
+                    values.changed = !!companyNameField.value && companyNameField.value !== companyNameField.placeholder ? true : values.changed;
+                } else {
+                    values.companyName = companyNameField.value.trim();
+                }
+                break;
+            case contactFirstNameField: 
+                if(editMode) {
+                    values.firstName = contactFirstNameField.value? contactFirstNameField.value : contactFirstNameField.placeholder;
+                    values.changed = !!contactFirstNameField.value && contactFirstNameField.value !== contactFirstNameField.placeholder ? true : values.changed;
+
+                } else { 
+                    values.firstName = contactFirstNameField.value.trim();
+                }
+                break;
+            case contactSurnameField:
+                if(editMode) {
+                    values.lastName = contactSurnameField.value? contactSurnameField.value : contactSurnameField.placeholder;
+                    values.changed = !!contactSurnameField.value && contactSurnameField.value !== contactSurnameField.placeholder ? true : values.changed;
+                } else 
+                    values.lastName = contactSurnameField.value.trim();
+                break;
+            case contactPositionField:
+                if(editMode) {
+                    values.position = contactPositionField.value? contactPositionField.value : contactPositionField.placeholder;
+                    values.changed = !!contactPositionField.value && contactPositionField.value !== contactPositionField.placeholder ? true : values.changed;
+                } else 
+                    values.position = contactPositionField.value.trim();
+                break;
+            case phoneField:
+                if(editMode) {
+                    values.phone = phoneField.value? phoneField.value : phoneField.placeholder;
+                    values.changed = !!phoneField.value && phoneField.value !== phoneField.placeholder ? true : values.changed;
+                } else 
+                    values.phone = phoneField.value.trim();
+                break;
+            case emailField:
+                if(editMode) {
+                    values.email = emailField.value? emailField.value : emailField.placeholder;
+                    values.changed = !!emailField.value && emailField.value !== emailField.placeholder ? true : values.changed;
+                } else 
+                    values.email = emailField.value.trim();
+                break;
+            case firstLineField:
+                if(editMode) {
+                    values.firstLine = firstLineField.value? firstLineField.value : firstLineField.placeholder;
+                    values.changed = !!firstLineField.value && firstLineField.value !== firstLineField.placeholder ? true : values.changed;
+                } else 
+                    values.firstLine = firstLineField.value.trim();
+                break;
+            case secondLineField:
+                if(editMode) {
+                    values.secondLine = secondLineField.value? secondLineField.value : secondLineField.placeholder;
+                    values.changed = !!secondLineField.value && secondLineField.value !== secondLineField.placeholder ? true : values.changed;
+                } else 
+                    values.secondLine = secondLineField.value.trim();
+                break;
+            case cityField:
+                if(editMode) {
+                    values.city = cityField.value? cityField.value : cityField.placeholder;
+                    values.changed = !!cityField.value && cityField.value !== cityField.placeholder ? true : values.changed;
+                } else 
+                    values.city = cityField.value.trim();
+                break;
+            case countyField:
+                if(editMode) {
+                    values.county = countyField.value? countyField.value : countyField.placeholder;
+                    values.changed = !!countyField.value && countyField.value !== countyField.placeholder ? true : values.changed;
+                } else 
+                    values.county = countyField.value.trim();
+                break;
+            case postcodeField:
+                if(editMode) {
+                    values.postcode = postcodeField.value? postcodeField.value : postcodeField.placeholder;
+                    values.changed = !!postcodeField.value && postcodeField.value !== postcodeField.placeholder ? true : values.changed;
+                } else 
+                    values.postcode = postcodeField.value.trim();
+                break;
+        }
+    });
+
+    return values;
+}
+
+export const removeCompanyModal = () => {
+    const companySummary = document.querySelector('.company-summary__modal');
+    gsap
+    .to(companySummary, {
+        autoAlpha: 0,
+        duration: 0.2,
+        onComplete: () => companySummary.parentElement.removeChild(companySummary)
+    })
+}
 
 export const createCompanySummary = ({id, companyName, companyDate, contacts, addresses, jobs}) => {
     // const markup  = `
@@ -2727,7 +2903,7 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
                         
 
                         <div class="company-summary__section company-summary__section--contacts">
-                            <div class="summary__column">    
+                            <div class="summary__column summary__column--small">    
                                 <div class="company-summary__item summary__item company-summary__item--contact-name">
                                     <div class="company-summary__label company-summary__label--name">Name:</div>
                                     <div class="company-summary__field company-summary__field--name">${contacts[0].firstName} ${contacts[0].lastName}</div>
@@ -2737,14 +2913,17 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
                                     <div class="company-summary__field company-summary__field--position">${contacts[0].position}</div>
                                 </div>
                             </div>
-                            <div class="summary__column">
+                            <div class="summary__column summary__column--large">
                                 <div class="company-summary__item summary__item company-summary__item--contact-phone">
                                     <div class="company-summary__label company-summary__label--contact-phone">Phone:</div>
                                     <div class="company-summary__field company-summary__field--contact-phone">${contacts[0].phone}</div>
                                 </div>
                                 <div class="company-summary__item summary__item company-summary__item--contact-email">
                                     <div class="company-summary__label company-summary__label--contact-email">Email:</div>
-                                    <div class="company-summary__field company-summary__field--contact-email">${contacts[0].email}</div>
+                                    <div class="company-summary__field company-summary__field--contact-email">
+                                        <a class="company-summary__field-text--contact-email">${contacts[0].email}</a>
+                                        <svg class="company-summary__copy-svg copy-svg--company"><use xlink:href="svg/spritesheet.svg#applications"></svg>    
+                                    </div>
                                 </div>
                             </div>
                             
@@ -2773,7 +2952,7 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
                         </div>
 
                         <div class="company-summary__section company-summary__section--addresses">
-                            <div class="summary__column">    
+                            <div class="summary__column summary__column--small">    
                                 <div class="company-summary__item summary__item company-summary__item--first-line">
                                     <div class="company-summary__label company-summary__label--first-line">First Line:</div>
                                     <div class="company-summary__field company-summary__field--first-line">${addresses[0].firstLine}</div>
@@ -2783,7 +2962,7 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
                                     <div class="company-summary__field company-summary__field--second-line">${addresses[0].secondLine ? `${addresses[0].secondLine}`:'-'}</div>
                                 </div>
                             </div>
-                            <div class="summary__column">
+                            <div class="summary__column summary__column--large">
                                 <div class="company-summary__item summary__item company-summary__item--city">
                                     <div class="company-summary__label company-summary__label--city">City:</div>
                                     <div class="company-summary__field company-summary__field--city">${addresses[0].city}</div>
@@ -2805,7 +2984,6 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
                             <div class="company-summary__jobs-table-wrapper table-wrapper--nested-jobs">
                             </div>
                         </div>
-
 
                     </div>
                     <div class="company-summary__controls company-summary__controls--company">
@@ -3065,7 +3243,8 @@ export const calculatePagination = (current, limit, totalItems) => {
 }
 
 export const renderPagination = (pages, current, container, tableName) => {
-
+console.log(tableName);
+console.log(container);
     // Remove pagination if present
     const pagination = document.querySelector(`.pagination--${tableName}`);
     if(pagination) utils.removeElement(pagination);  

@@ -96,6 +96,7 @@ export default class Admin {
     }
 
     createCompany(formData) {
+        console.log(formData);
         return JRS.post('/admin/create/company', formData);
     }
 
