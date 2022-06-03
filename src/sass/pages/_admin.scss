@@ -158,7 +158,7 @@
             }
         }
 
-        &--new-company {
+        &--new-company, &--new-contact, &--new-address {
             width: 100%;
             // border: 1px solid red;
             &-company {
@@ -220,6 +220,13 @@
             display:flex;
             justify-content: space-between;
         }
+
+        &--disabled {
+            color: lightgrey;
+
+        }
+
+    
     }
     
     &__sub-headings {
@@ -1200,7 +1207,9 @@
         border-radius: 5px;
         overflow: hidden;
 
-        &--new-company, &--edit-company {
+        &--new-company, &--edit-company,
+        &--new-contact, &--edit-contact,
+        &--new-address, &--edit-address  {
             position: absolute;
             height: 100%;
             background-color: white;

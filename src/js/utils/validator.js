@@ -78,26 +78,26 @@ const newJobSchema = Joi.object({
 
 const newCompanySchema = Joi.object({
     companyName: 
-        Joi.string().trim().min(3).max(50).required().messages({
+        Joi.string().trim().min(1).max(50).required().messages({
             "string.base": `Must be text`,
             "string.empty": `Cannot be empty`,
-            "string.min": `Must be > 3`,
+            "string.min": `Must be > 1`,
             "string.max": `Must be < than 50`,
             "any.required": `Required`,
         }),
     firstName:
-        Joi.string().trim().min(3).max(50).required().messages({
+        Joi.string().trim().min(2).max(50).required().messages({
             "string.base": `Must be text`,
             "string.empty": `Cannot be empty`,
-            "string.min": `Must be > 3`,
+            "string.min": `Must be > 2`,
             "string.max": `Must be < than 50`,
             "any.required": `Required`,
         }),
     lastName: 
-        Joi.string().trim().min(3).max(50).required().messages({
+        Joi.string().trim().min(2).max(50).required().messages({
             "string.base": `Must be text`,
             "string.empty": `Cannot be empty`,
-            "string.min": `Must be > 3`,
+            "string.min": `Must be > 2`,
             "string.max": `Must be < than 50`,
             "any.required": `Required`,
         }),
@@ -163,6 +163,7 @@ export const validateJob = (data) => validate(data, newJobSchema);
 export const validateJobField = (data) => validateProperty(data, newJobSchema);
 
 export const validateCompany = (data) => validate(data, newCompanySchema);
+export const validateCompanyField = (data) => validateProperty(data, newCompanySchema);
 
 // ************* Reusable validation code *************
 

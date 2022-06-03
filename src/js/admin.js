@@ -2745,6 +2745,69 @@ class AdminController {
         // });
     }
 
+    getCompanyDataToValidate(e, data, { 
+        companyNameField, 
+        contactFirstNameField,
+        contactSurnameField,
+        contactPositionField,
+        phoneField,
+        emailField,
+        firstLineField,
+        secondLineField,
+        cityField,
+        countyField,
+        postcodeField
+     }) {
+        let name;
+        let value;
+
+        if(e.target === companyNameField) {
+            name = 'companyName';
+            value = data[name];
+        }
+        if(e.target === contactFirstNameField) {
+
+            name = 'firstName';
+            value = data[name];
+        }
+        if(e.target === contactSurnameField) {
+            name = 'lastName';
+            value = data[name];
+        }
+        if(e.target === contactPositionField) {
+            name = 'position';
+            value = data[name];
+        }
+        if(e.target === phoneField) {
+            name = 'phone';
+            value = data[name];
+        }
+        if(e.target === emailField) {
+            name = 'email';
+            value = data[name];
+        }
+        if(e.target === firstLineField) {
+            name = 'firstLine';
+            value = data[name];
+        }
+        if(e.target === secondLineField) {
+            name = 'secondLine';
+            value = data[name];
+        }
+        if(e.target === cityField) {
+            name = 'city';
+            value = data[name];}
+        if(e.target === countyField) {
+            name = 'county';
+            value = data[name];
+        }
+        if(e.target === postcodeField) {
+            name = 'postcode';
+            value = data[name];
+        }
+        return { name: name, value: value }
+    }
+
     addCompanySummaryListeners() {
         const companySummary = document.querySelector('.company-summary');
         companySummary.addEventListener(
@@ -2924,19 +2987,74 @@ class AdminController {
             companyForm.addEventListener('focusout', e => {
                 if(e.target === submitBtn) return;
                 const data = adminView.getCompanyValues(fields);
-                // const { value, name } = this.getCompanyDataToValidate(e, data, fields);
-                console.log(data);
-                // const error = validator.validateCompanyField({ value, name });
+                const {name, value} = this.getCompanyDataToValidate(e, data, fields);
+               
+                const error = validator.validateCompanyField({ name,  value });
 
-                // if(error) validator.setErrorFor(e.target, error);
-                // else validator.setSuccessFor(e.target);
+                if(error) validator.setErrorFor(e.target, error);
+                else validator.setSuccessFor(e.target);
             });
+
+            Object.values(fields).forEach(field => {
+                field.addEventListener('focus', e => {
+                    if(field.parentElement.classList.contains('success')) {
+                        field.parentElement.classList.remove('success');
+                    }
+                    if(field.parentElement.classList.contains('error')) {
+                        field.parentElement.classList.remove('error');
+                    }
+                    // Remove the success msg
+                    field.nextElementSibling.nextElementSibling.nextElementSibling.innerText = '';
+                });
+            });
+
         }
         if(newContactBtn) {
-            console.log('newContact');``
+            let alert;
+
+            const { 
+                id,
+                companyName,
+                addresses,
+                contacts
+            } = this.state.companies.currentCompany;
+            adminView.renderCompanyModal({
+                companyNumber: id,
+                companyName,
+                contact: contacts[this.state.companies.contactPagination.contactIndex],
+                address: addresses[this.state.companies.addressPagination.addressIndex]
+            }, 'new-contact');
+
+            const alertWrapper = document.querySelector('.alert-wrapper');
+            const companyForm = document.querySelector('.form--new-contact');
+            const closeBtn = document.querySelector('.form__close--new-contact');
+            const submitBtn = document.querySelector('.form__submit--new-contact');
+
+            closeBtn.addEventListener('click', ()=>adminView.removeCompanyModal());
+
         }
         if(newAddressBtn) {
-            console.log('newAddress');
+            let alert;
+
+            const { 
+                id,
+                companyName,
+                addresses,
+                contacts
+            } = this.state.companies.currentCompany;
+            adminView.renderCompanyModal({
+                companyNumber: id,
+                companyName,
+                contact: contacts[this.state.companies.contactPagination.contactIndex],
+                address: addresses[this.state.companies.addressPagination.addressIndex]
+            }, 'new-address');
+
+            const alertWrapper = document.querySelector('.alert-wrapper');
+            const companyForm = document.querySelector('.form--new-address');
+            const closeBtn = document.querySelector('.form__close--new-address');
+            const submitBtn = document.querySelector('.form__submit--new-address');
+
+            closeBtn.addEventListener('click', ()=>adminView.removeCompanyModal());
         }
         if(editBtn) {
             console.log('editBtn');
@@ -2958,25 +3076,7 @@ class AdminController {
         }
     }
 
-    getCompanyDataToValidate(
-        e,
-        data,
-        {
-            companyName,
-            firstName,
-            lastName,
-            position,
-            phone,
-            email,
-            firstLine,
-            secondLine,
-            city,
-            county,
-            postcode
-        }
-    ) {
 
-    }
 
 
 

@@ -722,7 +722,15 @@ export const renderCompanyModal = (data, type) => {
     switch(type) {
         case 'new': 
             adminWrapper.insertAdjacentHTML('afterbegin', createNewCompanyModal(data));
+            break; 
+        case 'new-contact':
+            // The new contact modal is just an edited new company modal
+            const element = createEditCompanyModal(data, 'new-contact');
+            adminWrapper.insertAdjacentHTML('afterbegin', element);
             break;
+        case 'new-address':
+            adminWrapper.insertAdjacentHTML('afterbegin', createEditCompanyModal(data, 'new-address'));
+            break; 
     }
     // Set the modal to the same position and dimensions as the summary
     const modalElement = document.querySelector('.company-summary__modal');
@@ -2502,6 +2510,180 @@ export const generateCompanyJobsPlaceholder = () => {
     return(markup);
 }
 
+const createEditCompanyModal = ({companyNumber, companyName, contact, address, contact: {firstName, lastName, position, phone, email}, address: {firstLine, secondLine, city, county, postcode}}, type) => {
+    const today = new Date();
+    console.log(type, companyName, contact, address);
+    const date = `${today.getDate()}/${today.getMonth()+1}/${+today.getFullYear()}`;
+    const markup  = `
+    <div class="company-summary__modal company-summary__modal--${type}">
+
+        <div class="company-summary__modal-header">
+            <div class="company-summary__modal-item company-summary__modal-item--id">${companyNumber}</div>
+            <div>Create a New ${type === 'contact'? 'Contact':'Address'}</div>
+            <div class="company-summary__modal-item company-summary__modal-item--date">${date}</div>
+        </div>
+    
+        <form class="form--${type}">
+            <div class="form__close--${type}">
+                <svg class="form__close-svg--${type}"><use xlink:href="svg/spritesheet.svg#cross"></svg>
+            </div>
+
+            <div class="form__content--${type}">
+                <div class="summary__column summary__column--${type} summary__column--${type}-company">
+                     <div class="summary__heading summary__heading--disabled summary__heading--company">Company</div>
+
+                     <div class="form__field--${type} form__company-name--${type} disabled">
+                        <label for="company-name" class="form__label--${type}">Company Name</label>
+                        <input type="text" placeholder=${companyName} id="company-name" class="form__input--${type} form__company-name-input--${type}" disabled>
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+                </div>
+
+                <div class="summary__column summary__column--${type} summary__column--${type}-contact">
+                    <div class="summary__heading ${type==='new-address'? 'summary__heading--disabled' : ''} summary__heading--contacts">Contact</div>
+
+                    <div class="form__field--${type} form__contact-first-name--${type} ${type === 'new-address'? 'disabled':''}">
+                        <label for="contact-first-name" class="form__label--${type}">First Name</label>
+                        <input type="text" placeholder="${type !== 'new-contact'? firstName:'First Name'}" id="contact-first-name" class="form__input--${type} form__contact-first-name-input--${type}" ${type === 'new-address'? 'disabled':''}>
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+                    <div class="form__field--${type} form__contact-surname--${type} ${type === 'new-address'? 'disabled':''}">
+                        <label for="contact-surname" class="form__label--${type}">Surname</label>
+                        <input type="text" placeholder="${type !== 'new-contact'? lastName:'Surname'}" id="contact-surname" class="form__input--${type} form__contact-surname-input--${type}" ${type === 'new-address'? 'disabled':''}>
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+                    <div class="form__field--${type} form__position--${type} ${type === 'new-address'? 'disabled':''}">
+                        <label for="position" class="form__label--${type}">Position</label>
+                        <input type="text" placeholder="${type !== 'new-contact'? position:'Position'}" class="form__input--${type} form__position-input--${type}" ${type === 'new-address'? 'disabled':''}>
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+                    <div class="form__field--${type} form__phone--${type} ${type === 'new-address'? 'disabled':''}">
+                        <label for="phone" class="form__label--${type}">Phone</label>
+                        <input type="text" placeholder="${type !== 'new-contact'? phone:'Phone'}" id="phone" class="form__input--${type} form__phone-input--${type}" ${type === 'new-address'? 'disabled':''}>
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+                    <div class="form__field--${type} form__email--${type} ${type === 'new-address'? 'disabled':''}">
+                        <label for="email" class="form__label--${type}">Email</label>
+                        <input type="text" placeholder="${type !== 'new-contact'? email:'Email'}" id="email" class="form__input--${type} form__email-input--${type}" ${type === 'new-address'? 'disabled':''}>
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+                </div>
+
+                <div class="summary__column summary__column--${type} summary__column--${type}-address">
+                    <div class="summary__heading ${type==='new-contact'? 'summary__heading--disabled' : ''} summary__heading--addresses">Address</div>
+
+                    <div class="form__field--${type} form__first-line--${type} ${type === 'new-contact'? 'disabled':''}">
+                        <label for="first-line" class="form__label--${type}">First Line</label>
+                        <input type="text" placeholder="${type !== 'new-address'? firstLine:'First Line'}" id="first-line" class="form__input--${type} form__first-line-input--${type}" ${type === 'new-contact'? 'disabled':''}>
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+
+                    <div class="form__field--${type} form__second-line--${type} ${type === 'new-contact'? 'disabled':''}">
+                        <label for="second-line" class="form__label--${type}">Second Line</label>
+                        <input type="text" placeholder="${type !== 'new-address'? secondLine:'Second Line'}" id="second-line" class="form__input--${type} form__second-line-input--${type}" ${type === 'new-contact'? 'disabled':''}>
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+
+                    <div class="form__field--${type} form__city--${type} ${type === 'new-contact'? 'disabled':''}">
+                        <label for="city" class="form__label--${type}">City</label>
+                        <input type="text" placeholder="${type !== 'new-address'? city:'City'}" id="city" class="form__input--${type} form__city-input--${type}" ${type === 'new-contact'? 'disabled':''}>
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+
+                    <div class="form__field--${type} form__county--${type} ${type === 'new-contact'? 'disabled':''}">
+                        <label for="county" class="form__label--${type}">County</label>
+                        <input type="text" placeholder="${type !== 'new-address'? county:'County'}" id="county" class="form__input--${type} form__county-input--${type}" ${type === 'new-contact'? 'disabled':''}>
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+
+                    <div class="form__field--${type} form__postcode--${type} ${type === 'new-contact'? 'disabled':''}">
+                        <label for="postcode" class="form__label--${type}">Postcode</label>
+                        <input type="text" placeholder="${type !== 'new-address'? postcode:'Postcode'}" id="postcode" class="form__input--${type} form__postcode-input--${type}" ${type === 'new-contact'? 'disabled':''}>
+                        <i class="form__icon form__icon--success">
+                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+                        </i>
+                        <i class="form__icon form__icon--error">
+                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+                        </i>
+                        <small class="form__error-msg"></small>
+                    </div>
+
+                </div>
+                
+                <button class="form__submit--${type}">Submit</button>
+                <div class="alert-wrapper alert-wrapper--${type} alert-wrapper--hidden">
+
+            </div>
+
+        </form>
+
+            
+        </div>
+    </div>
+    `;
+    return markup;
+}
+
 const createNewCompanyModal = ({ companyNumber }) => {
     const today = new Date();
     const date = `${today.getDate()}/${today.getMonth()+1}/${+today.getFullYear()}`;
@@ -2521,7 +2703,7 @@ const createNewCompanyModal = ({ companyNumber }) => {
 
             <div class="form__content--new-company">
                 <div class="summary__column summary__column--new-company summary__column--new-company-company">
-                     <div class="summary__heading summary__heading--contacts">Company</div>
+                     <div class="summary__heading summary__heading--company">Company</div>
 
                      <div class="form__field--new-company form__company-name--new-company">
                         <label for="company-name" class="form__label--new-company">Company Name</label>
@@ -2597,7 +2779,7 @@ const createNewCompanyModal = ({ companyNumber }) => {
                 </div>
 
                 <div class="summary__column summary__column--new-company summary__column--new-company-address">
-                    <div class="summary__heading summary__heading--contacts">Address</div>
+                    <div class="summary__heading summary__heading--addresses">Address</div>
 
                     <div class="form__field--new-company form__first-line--new-company">
                         <label for="first-line" class="form__label--new-company">First Line</label>

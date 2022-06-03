@@ -34,7 +34,7 @@
             position: relative;
 
         }
-        &--new-company {
+        &--new-company, &--new-contact, &--new-address {
             grid-column: 2/3;
             grid-row: 4/5;
             margin-bottom: 1rem;
