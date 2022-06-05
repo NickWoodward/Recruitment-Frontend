@@ -157,13 +157,54 @@ const newCompanySchema = Joi.object({
             "string.empty": `Cannot be empty`,
             'string.pattern.base': `Please enter a valid postcode`
         }),
-})
+});
+
+const newContactSchema = Joi.object({
+    firstName:
+        Joi.string().trim().min(2).max(50).required().messages({
+            "string.base": `Must be text`,
+            "string.empty": `Cannot be empty`,
+            "string.min": `Must be > 2`,
+            "string.max": `Must be < than 50`,
+            "any.required": `Required`,
+        }),
+    lastName: 
+        Joi.string().trim().min(2).max(50).required().messages({
+            "string.base": `Must be text`,
+            "string.empty": `Cannot be empty`,
+            "string.min": `Must be > 2`,
+            "string.max": `Must be < than 50`,
+            "any.required": `Required`,
+        }),
+    position: 
+        Joi.string().trim().min(2).max(50).required().messages({
+            "string.base": `Must be text`,
+            "string.empty": `Cannot be empty`,
+            "string.min": `Must be > 2`,
+            "string.max": `Must be < than 50`,
+            "any.required": `Required`,
+        }),
+    phone: 
+        Joi.string().trim().replace(/\s*/g,"").pattern(new RegExp(/^0([1-6][0-9]{8,10}|7[0-9]{9})$/)).messages({
+            "string.empty": `Cannot be empty`,
+            'string.pattern.base': `Please enter a UK phone number`
+        }),
+    email: 
+        Joi.string().trim().email({tlds:{allow: false}}).messages({
+            "string.empty": `Cannot be empty`,
+            'string.domain': 'Must contain a valid domain name',
+            'string.email': 'Must be a valid email',
+        }),
+
+});
 
 export const validateJob = (data) => validate(data, newJobSchema);
 export const validateJobField = (data) => validateProperty(data, newJobSchema);
 
 export const validateCompany = (data) => validate(data, newCompanySchema);
 export const validateCompanyField = (data) => validateProperty(data, newCompanySchema);
+
+export const validateContact = (data) => validate(data, newContactSchema);
 
 // ************* Reusable validation code *************
 

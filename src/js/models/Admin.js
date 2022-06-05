@@ -96,8 +96,11 @@ export default class Admin {
     }
 
     createCompany(formData) {
-        console.log(formData);
         return JRS.post('/admin/create/company', formData);
+    }
+
+    createContact(formData) {
+        return JRS.post('/admin/create/contact', formData);
     }
 
     deleteCompany(id) {

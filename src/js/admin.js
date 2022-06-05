@@ -2819,6 +2819,7 @@ class AdminController {
     async companySummaryListener(e) {
         // Animations
         const newCompanyAlertAnimation = gsap.timeline({paused: true});
+        const newContactAlertAnimation = gsap.timeline({paused: true});
         const editCompanyAlertAnimation = gsap.timeline({paused: true});
         const deleteJobAlertAnimation = gsap.timeline({paused: true});
 
@@ -2858,8 +2859,18 @@ class AdminController {
 
         if(newBtn) {
             let alert;
+            const { 
+                id,
+                companyName,
+                addresses,
+                contacts
+            } = this.state.companies.currentCompany;
             adminView.renderCompanyModal({
-                companyNumber: this.getNextId('companies')
+                companyNumber: this.getNextId('companies'),
+                id,
+                companyName,
+                contact: contacts[this.state.companies.contactPagination.contactIndex],
+                address: addresses[this.state.companies.addressPagination.addressIndex]
             }, 'new');
 
             const alertWrapper = document.querySelector('.alert-wrapper');
@@ -2868,7 +2879,7 @@ class AdminController {
             const submitBtn = document.querySelector('.form__submit--new-company');
 
             // Get the field elements
-            const fields = adminView.getCompanyFields('new');
+            const fields = adminView.getCompanyFields('new-company');
             const { 
                 companyNameField, 
                 contactFirstNameField,
@@ -3030,7 +3041,96 @@ class AdminController {
             const closeBtn = document.querySelector('.form__close--new-contact');
             const submitBtn = document.querySelector('.form__submit--new-contact');
 
+            const fields = adminView.getCompanyFields('new-contact');
+            const { contactFirstNameField, contactSurnameField, contactPositionField, phoneField, emailField } = fields;
+
+            // Add the animation for the company alerts (paused)
+            newCompanyAlertAnimation
+            .from(alertWrapper, {
+                autoAlpha: 0
+            })
+            .to(alertWrapper, {
+                autoAlpha: 0
+            }, '+=3')
+
             closeBtn.addEventListener('click', ()=>adminView.removeCompanyModal());
+
+            companyForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                // Clear the alert wrapper
+                while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+
+                const data = adminView.getCompanyValues(fields); 
+                // Remove the changed field, and others not applicable to the new contact form
+                const { changed, companyName, firstLine, secondLine, city, county, postcode, ...values } = data;
+                const errors = validator.validateContact(values);
+
+                if(!errors) {
+                    const res = await this.Admin.createContact({id, ...values});
+
+                    if(res.status !== 201) {
+                        alert = modalView.getAlert('Contact Not Created', false);
+                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                        newContactAlertAnimation.play(0);
+                    } else {
+                        alert = modalView.getAlert('Contact Created', true);
+                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                        newContactAlertAnimation.play(0);
+
+                        this.state.companies.contactPagination.totalContacts++;
+
+                        const { totalContacts, contactIndex } = this.state.companies.contactPagination;
+                        adminView.renderPagination(totalContacts, contactIndex, document.querySelector('.pagination-wrapper--contacts'), 'contacts');
+
+                    }
+                } else {
+                    if(errors.firstName) 
+                        validator.setErrorFor(contactFirstNameField, errors.firstName); 
+                    else validator.setSuccessFor(contactFirstNameField);
+
+                    if(errors.lastName) 
+                        validator.setErrorFor(contactSurnameField, errors.lastName);
+                    else validator.setSuccessFor(contactSurnameField);
+
+                    if(errors.position) 
+                        validator.setErrorFor(contactPositionField, errors.position);
+                    else validator.setSuccessFor(contactPositionField);
+
+                    if(errors.phone) 
+                        validator.setErrorFor(phoneField, errors.phone);
+                    else validator.setSuccessFor(phoneField);
+
+                    if(errors.email) 
+                        validator.setErrorFor(emailField, errors.email);
+                    else validator.setSuccessFor(emailField);
+                
+                }
+            });
+
+            // Validate each field on lost focus
+            companyForm.addEventListener('focusout', e => {
+                if(e.target === submitBtn) return;
+                const data = adminView.getCompanyValues(fields);
+                const {name, value} = this.getCompanyDataToValidate(e, data, fields);
+                
+                const error = validator.validateCompanyField({ name,  value });
+
+                if(error) validator.setErrorFor(e.target, error);
+                else validator.setSuccessFor(e.target);
+            });
+
+            Object.values(fields).forEach(field => {
+                field.addEventListener('focus', e => {
+                    if(field.parentElement.classList.contains('success')) {
+                        field.parentElement.classList.remove('success');
+                    }
+                    if(field.parentElement.classList.contains('error')) {
+                        field.parentElement.classList.remove('error');
+                    }
+                    // Remove the success msg
+                    field.nextElementSibling.nextElementSibling.nextElementSibling.innerText = '';
+                });
+            });
 
         }
         if(newAddressBtn) {
