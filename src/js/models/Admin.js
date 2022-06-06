@@ -103,12 +103,15 @@ export default class Admin {
         return JRS.post('/admin/create/contact', formData);
     }
 
+    createAddress(formData) {
+        return JRS.post('/admin/create/address', formData);
+    }
+
     deleteCompany(id) {
         return JRS.delete(`/admin/delete/company/${id}`);
     }
 
-    editCompany(companyId, contactId, addressId, formData) {
-        for(let[key, value] of formData.entries()) console.log(key, value);
-        return JRS.post(`/admin/edit/company/${companyId}/${contactId}/${addressId}`, formData);
+    editCompany(formData) {
+        return JRS.post(`/admin/edit/company`, formData);
     }
 }

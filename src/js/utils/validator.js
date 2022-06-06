@@ -159,6 +159,46 @@ const newCompanySchema = Joi.object({
         }),
 });
 
+const newAddressSchema = Joi.object({
+    firstLine: 
+        Joi.string().trim().min(3).max(50).required().messages({
+            "string.base": `Must be text`,
+            "string.empty": `Cannot be empty`,
+            "string.min": `Must be > 3`,
+            "string.max": `Must be < than 50`,
+            "any.required": `Required`,
+        }),
+    secondLine: 
+        Joi.string().trim().min(3).max(50).required().messages({
+            "string.base": `Must be text`,
+            "string.empty": `Cannot be empty`,
+            "string.min": `Must be > 3`,
+            "string.max": `Must be < than 50`,
+            "any.required": `Required`,
+        }),
+    city: 
+        Joi.string().trim().min(3).max(50).required().messages({
+            "string.base": `Must be text`,
+            "string.empty": `Cannot be empty`,
+            "string.min": `Must be > 3`,
+            "string.max": `Must be < than 50`,
+            "any.required": `Required`,
+        }),
+    county: 
+        Joi.string().trim().min(3).max(50).required().messages({
+            "string.base": `Must be text`,
+            "string.empty": `Cannot be empty`,
+            "string.min": `Must be > 3`,
+            "string.max": `Must be < than 50`,
+            "any.required": `Required`,
+        }),
+    postcode:
+        Joi.string().trim().pattern(new RegExp(/^([a-zA-Z]{1,2}[a-zA-Z\d]{1,2})\s?(\d[a-zA-Z]{2})$/)).messages({
+            "string.empty": `Cannot be empty`,
+            'string.pattern.base': `Please enter a valid postcode`
+        })
+});
+
 const newContactSchema = Joi.object({
     firstName:
         Joi.string().trim().min(2).max(50).required().messages({
@@ -205,6 +245,7 @@ export const validateCompany = (data) => validate(data, newCompanySchema);
 export const validateCompanyField = (data) => validateProperty(data, newCompanySchema);
 
 export const validateContact = (data) => validate(data, newContactSchema);
+export const validateAddress = (data) => validate(data, newAddressSchema);
 
 // ************* Reusable validation code *************
 

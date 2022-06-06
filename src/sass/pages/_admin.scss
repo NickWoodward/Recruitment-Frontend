@@ -158,7 +158,8 @@
             }
         }
 
-        &--new-company, &--new-contact, &--new-address {
+        &--new-company, &--new-contact, &--new-address,
+        &--edit-company, &--edit-contact, &--edit-address {
             width: 100%;
             // border: 1px solid red;
             &-company {
