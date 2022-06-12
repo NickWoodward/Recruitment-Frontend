@@ -266,8 +266,9 @@ export const animateSummaryWrapperIn = () => {
 }
 
 export const switchSummary = (summary, newSummary) => {
-    const summaryWrapper = document.querySelector('.summary-wrapper');
 
+    const summaryWrapper = document.querySelector('.summary-wrapper');
+console.log('swapping:', summary, summaryWrapper);
     // Remove the old summary and insert the new one
     summary.parentElement.removeChild(summary);
     summaryWrapper.insertAdjacentHTML('afterbegin', newSummary);
@@ -2529,16 +2530,36 @@ export const generateCompanyJobsPlaceholder = () => {
     */
 const createCompanyModal = ({companyNumber, companyName, contact, address, contact: {firstName, lastName, position, phone, email}, address: {firstLine, secondLine, city, county, postcode}}, type, editMode) => {
     
+    // Potential states:
+    // Form     |   editMode   |  type                      |   Disabled sections
+
+    // company      false         type === 'new-company'        No sections disabled
+    // contact      false         type === 'new-contact'        Company && Address disabled
+    // address      false         type === 'new-address'        Company && Contact disabled
+
+    // company      true          type === 'edit-company'       No sections disabled
+    // contact      true          type === 'edit-contact'       Company && Address disabled
+    // address      true          type === 'edit-address'       Company && Contact disabled
+
+
+    const contactDisabled = type === 'new-address' || type === 'edit-address';
+    const addressDisabled = type === 'new-contact' || type === 'edit-contact';
+    const companyDisabled = type === 'new-address' || type === 'edit-address' || type==='new-contact' || type === 'edit-contact';
+
+    const edit = type === 'edit-address' || type === 'edit-contact' || type === 'edit-address' || type === 'edit-company';
+
+console.log(type, 'contactDisabled:', contactDisabled, 'addressDisabled:', addressDisabled, 'companyDisabled:', companyDisabled);
+
     const today = new Date();
     const date = `${today.getDate()}/${today.getMonth()+1}/${+today.getFullYear()}`;
 
-    const action = editMode? 'Edit':'Create';
+    const action = edit? 'Edit':'Create';
     const markup  = `
     <div class="company-summary__modal company-summary__modal--${type}">
 
         <div class="company-summary__modal-header">
             <div class="company-summary__modal-item company-summary__modal-item--id">${companyNumber}</div>
-            <div>${action} a${editMode? 'n Existing':' New'} ${type==='new-company' || type==='edit-company'? 'Company' : type === 'new-contact' || type === 'edit-contact'? 'Contact':'Address'}</div>
+            <div>${action} a${edit? 'n Existing':' New'} ${type==='new-company' || type==='edit-company'? 'Company' : type === 'new-contact' || type === 'edit-contact'? 'Contact':'Address'}</div>
             <div class="company-summary__modal-item company-summary__modal-item--date">${date}</div>
         </div>
     
@@ -2549,11 +2570,11 @@ const createCompanyModal = ({companyNumber, companyName, contact, address, conta
 
             <div class="form__content--${type}">
                 <div class="summary__column summary__column--${type} summary__column--${type}-company">
-                     <div class="summary__heading ${type !== 'new-company' && editMode !== true? 'summary__heading--disabled': ''} summary__heading--company">Company</div>
+                     <div class="summary__heading ${companyDisabled ? 'summary__heading--disabled':''} summary__heading--company">Company</div>
 
-                     <div class="form__field--${type} form__company-name--${type} ${type !== 'new-company' && editMode !== true? 'disabled': ''}">
+                     <div class="form__field--${type} form__company-name--${type} ${type === 'new-company' || type === 'edit-company' ?  '':'disabled'}">
                         <label for="company-name" class="form__label--${type}">Company Name</label>
-                        <input type="text" placeholder=${editMode? companyName : (type==='new-company'? 'Company Name':companyName)} id="company-name" class="form__input--${type} form__company-name-input--${type}" ${type !== 'new-company' && editMode !== true? 'disabled': ''}>
+                        <input type="text" placeholder=${edit || companyDisabled ? companyName : 'Company Name'} id="company-name" class="form__input--${type} form__company-name-input--${type}" ${companyDisabled ? 'disabled': ''}>
                         <i class="form__icon form__icon--success">
                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
                         </i>
@@ -2565,11 +2586,11 @@ const createCompanyModal = ({companyNumber, companyName, contact, address, conta
                 </div>
 
                 <div class="summary__column summary__column--${type} summary__column--${type}-contact">
-                    <div class="summary__heading ${type==='new-address'? 'summary__heading--disabled' : ''} summary__heading--contacts">Contact</div>
+                    <div class="summary__heading ${contactDisabled ? 'summary__heading--disabled' : ''} summary__heading--contacts">Contact</div>
 
-                    <div class="form__field--${type} form__contact-first-name--${type} ${type === 'new-address'? 'disabled':''}">
+                    <div class="form__field--${type} form__contact-first-name--${type} ${contactDisabled? 'disabled':''}">
                         <label for="contact-first-name" class="form__label--${type}">First Name</label>
-                        <input type="text" placeholder="${editMode? firstName : (type !== 'new-address'? 'First Name':firstName)}" id="contact-first-name" class="form__input--${type} form__contact-first-name-input--${type}" ${type === 'new-address'? 'disabled':''}>
+                        <input type="text" placeholder="${edit || contactDisabled ? firstName : 'First Name'}" id="contact-first-name" class="form__input--${type} form__contact-first-name-input--${type}" ${contactDisabled ? 'disabled':''}>
                         <i class="form__icon form__icon--success">
                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
                         </i>
@@ -2578,9 +2599,9 @@ const createCompanyModal = ({companyNumber, companyName, contact, address, conta
                         </i>
                         <small class="form__error-msg"></small>
                     </div>
-                    <div class="form__field--${type} form__contact-surname--${type} ${type === 'new-address'? 'disabled':''}">
+                    <div class="form__field--${type} form__contact-surname--${type} ${contactDisabled ? 'disabled':''}">
                         <label for="contact-surname" class="form__label--${type}">Surname</label>
-                        <input type="text" placeholder="${editMode? lastName : (type !== 'new-address'? 'Surname':lastName)}" id="contact-surname" class="form__input--${type} form__contact-surname-input--${type}" ${type === 'new-address'? 'disabled':''}>
+                        <input type="text" placeholder="${edit || contactDisabled ? lastName : 'Surname'}" id="contact-surname" class="form__input--${type} form__contact-surname-input--${type}" ${contactDisabled ? 'disabled':''}>
                         <i class="form__icon form__icon--success">
                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
                         </i>
@@ -2589,9 +2610,9 @@ const createCompanyModal = ({companyNumber, companyName, contact, address, conta
                         </i>
                         <small class="form__error-msg"></small>
                     </div>
-                    <div class="form__field--${type} form__position--${type} ${type === 'new-address'? 'disabled':''}">
+                    <div class="form__field--${type} form__position--${type} ${contactDisabled ? 'disabled':''}">
                         <label for="position" class="form__label--${type}">Position</label>
-                        <input type="text" placeholder="${editMode? position : (type !== 'new-address'? 'Position':position)}" class="form__input--${type} form__position-input--${type}" ${type === 'new-address'? 'disabled':''}>
+                        <input type="text" placeholder="${edit || contactDisabled ? position : 'Surname'}" class="form__input--${type} form__position-input--${type}" ${contactDisabled ? 'disabled':''}>
                         <i class="form__icon form__icon--success">
                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
                         </i>
@@ -2600,9 +2621,9 @@ const createCompanyModal = ({companyNumber, companyName, contact, address, conta
                         </i>
                         <small class="form__error-msg"></small>
                     </div>
-                    <div class="form__field--${type} form__phone--${type} ${type === 'new-address'? 'disabled':''}">
+                    <div class="form__field--${type} form__phone--${type} ${contactDisabled? 'disabled':''}">
                         <label for="phone" class="form__label--${type}">Phone</label>
-                        <input type="text" placeholder="${editMode? phone : (type !== 'new-address'? 'Phone':phone)}" id="phone" class="form__input--${type} form__phone-input--${type}" ${type === 'new-address'? 'disabled':''}>
+                        <input type="text" placeholder="${edit || contactDisabled ? phone : 'Phone'}" id="phone" class="form__input--${type} form__phone-input--${type}" ${contactDisabled? 'disabled':''}>
                         <i class="form__icon form__icon--success">
                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
                         </i>
@@ -2611,9 +2632,9 @@ const createCompanyModal = ({companyNumber, companyName, contact, address, conta
                         </i>
                         <small class="form__error-msg"></small>
                     </div>
-                    <div class="form__field--${type} form__email--${type} ${type === 'new-address'? 'disabled':''}">
+                    <div class="form__field--${type} form__email--${type} ${contactDisabled? 'disabled':''}">
                         <label for="email" class="form__label--${type}">Email</label>
-                        <input type="text" placeholder="${editMode? email : (type !== 'new-address'? 'Email':email)}" id="email" class="form__input--${type} form__email-input--${type}" ${type === 'new-address'? 'disabled':''}>
+                        <input type="text" placeholder="${edit || contactDisabled ? email : 'Email'}" id="email" class="form__input--${type} form__email-input--${type}" ${contactDisabled ? 'disabled':''}>
                         <i class="form__icon form__icon--success">
                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
                         </i>
@@ -2625,11 +2646,11 @@ const createCompanyModal = ({companyNumber, companyName, contact, address, conta
                 </div>
 
                 <div class="summary__column summary__column--${type} summary__column--${type}-address">
-                    <div class="summary__heading ${type==='new-contact'? 'summary__heading--disabled' : ''} summary__heading--addresses">Address</div>
+                    <div class="summary__heading ${addressDisabled ? 'summary__heading--disabled' : ''} summary__heading--addresses">Address</div>
 
-                    <div class="form__field--${type} form__first-line--${type} ${type === 'new-contact'? 'disabled':''}">
+                    <div class="form__field--${type} form__first-line--${type} ${addressDisabled ? 'disabled':''}">
                         <label for="first-line" class="form__label--${type}">First Line</label>
-                        <input type="text" placeholder="${editMode? firstLine : (type !== 'new-contact'? 'First Line':firstLine)}" id="first-line" class="form__input--${type} form__first-line-input--${type}" ${type === 'new-contact'? 'disabled':''}>
+                        <input type="text" placeholder="${edit || addressDisabled ? firstLine : 'First Line'}" id="first-line" class="form__input--${type} form__first-line-input--${type}" ${addressDisabled? 'disabled':''}>
                         <i class="form__icon form__icon--success">
                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
                         </i>
@@ -2639,9 +2660,9 @@ const createCompanyModal = ({companyNumber, companyName, contact, address, conta
                         <small class="form__error-msg"></small>
                     </div>
 
-                    <div class="form__field--${type} form__second-line--${type} ${type === 'new-contact'? 'disabled':''}">
+                    <div class="form__field--${type} form__second-line--${type} ${addressDisabled ? 'disabled':''}">
                         <label for="second-line" class="form__label--${type}">Second Line</label>
-                        <input type="text" placeholder="${editMode? secondLine : (type !== 'new-contact'? 'Second Line':secondLine)}" id="second-line" class="form__input--${type} form__second-line-input--${type}" ${type === 'new-contact'? 'disabled':''}>
+                        <input type="text" placeholder="${edit || addressDisabled ? secondLine : 'Second Line'}" id="second-line" class="form__input--${type} form__second-line-input--${type}" ${addressDisabled? 'disabled':''}>
                         <i class="form__icon form__icon--success">
                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
                         </i>
@@ -2651,9 +2672,9 @@ const createCompanyModal = ({companyNumber, companyName, contact, address, conta
                         <small class="form__error-msg"></small>
                     </div>
 
-                    <div class="form__field--${type} form__city--${type} ${type === 'new-contact'? 'disabled':''}">
+                    <div class="form__field--${type} form__city--${type} ${addressDisabled ? 'disabled':''}">
                         <label for="city" class="form__label--${type}">City</label>
-                        <input type="text" placeholder="${editMode? city : (type !== 'new-contact'? 'City':city)}" id="city" class="form__input--${type} form__city-input--${type}" ${type === 'new-contact'? 'disabled':''}>
+                        <input type="text" placeholder="${edit || addressDisabled ? city : 'City'}" id="city" class="form__input--${type} form__city-input--${type}" ${addressDisabled ? 'disabled':''}>
                         <i class="form__icon form__icon--success">
                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
                         </i>
@@ -2663,9 +2684,9 @@ const createCompanyModal = ({companyNumber, companyName, contact, address, conta
                         <small class="form__error-msg"></small>
                     </div>
 
-                    <div class="form__field--${type} form__county--${type} ${type === 'new-contact'? 'disabled':''}">
+                    <div class="form__field--${type} form__county--${type} ${addressDisabled ? 'disabled':''}">
                         <label for="county" class="form__label--${type}">County</label>
-                        <input type="text" placeholder="${editMode? county : type !== 'new-contact'? 'County':county}" id="county" class="form__input--${type} form__county-input--${type}" ${type === 'new-contact'? 'disabled':''}>
+                        <input type="text" placeholder="${edit || addressDisabled ? county :'County'}" id="county" class="form__input--${type} form__county-input--${type}" ${addressDisabled ? 'disabled':''}>
                         <i class="form__icon form__icon--success">
                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
                         </i>
@@ -2675,9 +2696,9 @@ const createCompanyModal = ({companyNumber, companyName, contact, address, conta
                         <small class="form__error-msg"></small>
                     </div>
 
-                    <div class="form__field--${type} form__postcode--${type} ${type === 'new-contact'? 'disabled':''}">
+                    <div class="form__field--${type} form__postcode--${type} ${addressDisabled ? 'disabled':''}">
                         <label for="postcode" class="form__label--${type}">Postcode</label>
-                        <input type="text" placeholder="${editMode? postcode : (type !== 'new-contact'? 'Postcode':postcode)}" id="postcode" class="form__input--${type} form__postcode-input--${type}" ${type === 'new-contact'? 'disabled':''}>
+                        <input type="text" placeholder="${edit || addressDisabled ? postcode:'Postcode'}" id="postcode" class="form__input--${type} form__postcode-input--${type}" ${addressDisabled ? 'disabled':''}>
                         <i class="form__icon form__icon--success">
                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
                         </i>
@@ -2690,14 +2711,9 @@ const createCompanyModal = ({companyNumber, companyName, contact, address, conta
                 </div>
                 
                 <button class="form__submit--${type}">Submit</button>
-                <div class="alert-wrapper alert-wrapper--${type} alert-wrapper--hidden">
-
+                <div class="alert-wrapper alert-wrapper--${type} alert-wrapper--hidden"></div>
             </div>
-
         </form>
-
-            
-        </div>
     </div>
     `;
     return markup;
@@ -2919,7 +2935,7 @@ export const getCompanyValues = (fields, editMode) => {
         postcodeField 
     } = fields;
 
-    const values = { changed: false };
+    const values = { changed: [] };
 
     // Fields =>
     // (field.value: empty && field.placeholder: text) = the field is empty
@@ -2930,7 +2946,7 @@ export const getCompanyValues = (fields, editMode) => {
             case companyNameField: 
                 if(editMode) {
                     values.companyName = companyNameField.value? companyNameField.value : companyNameField.placeholder;
-                    values.changed = !!companyNameField.value && companyNameField.value !== companyNameField.placeholder ? true : values.changed;
+                    if(!!companyNameField.value && companyNameField.value !== companyNameField.placeholder) values.changed.push('companyName');
                 } else {
                     values.companyName = companyNameField.value.trim();
                 }
@@ -2938,7 +2954,7 @@ export const getCompanyValues = (fields, editMode) => {
             case contactFirstNameField: 
                 if(editMode) {
                     values.firstName = contactFirstNameField.value? contactFirstNameField.value : contactFirstNameField.placeholder;
-                    values.changed = !!contactFirstNameField.value && contactFirstNameField.value !== contactFirstNameField.placeholder ? true : values.changed;
+                    if(!!contactFirstNameField.value && contactFirstNameField.value !== contactFirstNameField.placeholder) values.changed.push('firstName');
 
                 } else { 
                     values.firstName = contactFirstNameField.value.trim();
@@ -2947,63 +2963,63 @@ export const getCompanyValues = (fields, editMode) => {
             case contactSurnameField:
                 if(editMode) {
                     values.lastName = contactSurnameField.value? contactSurnameField.value : contactSurnameField.placeholder;
-                    values.changed = !!contactSurnameField.value && contactSurnameField.value !== contactSurnameField.placeholder ? true : values.changed;
+                    if(!!contactSurnameField.value && contactSurnameField.value !== contactSurnameField.placeholder) values.changed.push('surname');
                 } else 
                     values.lastName = contactSurnameField.value.trim();
                 break;
             case contactPositionField:
                 if(editMode) {
                     values.position = contactPositionField.value? contactPositionField.value : contactPositionField.placeholder;
-                    values.changed = !!contactPositionField.value && contactPositionField.value !== contactPositionField.placeholder ? true : values.changed;
+                    if(!!contactPositionField.value && contactPositionField.value !== contactPositionField.placeholder) values.changed.push('position');
                 } else 
                     values.position = contactPositionField.value.trim();
                 break;
             case phoneField:
                 if(editMode) {
                     values.phone = phoneField.value? phoneField.value : phoneField.placeholder;
-                    values.changed = !!phoneField.value && phoneField.value !== phoneField.placeholder ? true : values.changed;
+                   if(!!phoneField.value && phoneField.value !== phoneField.placeholder) values.changed.push('phone');
                 } else 
                     values.phone = phoneField.value.trim();
                 break;
             case emailField:
                 if(editMode) {
                     values.email = emailField.value? emailField.value : emailField.placeholder;
-                    values.changed = !!emailField.value && emailField.value !== emailField.placeholder ? true : values.changed;
+                    if(!!emailField.value && emailField.value !== emailField.placeholder) values.changed.push('email');
                 } else 
                     values.email = emailField.value.trim();
                 break;
             case firstLineField:
                 if(editMode) {
                     values.firstLine = firstLineField.value? firstLineField.value : firstLineField.placeholder;
-                    values.changed = !!firstLineField.value && firstLineField.value !== firstLineField.placeholder ? true : values.changed;
+                    if(!!firstLineField.value && firstLineField.value !== firstLineField.placeholder) values.changed.push('firstLine');
                 } else 
                     values.firstLine = firstLineField.value.trim();
                 break;
             case secondLineField:
                 if(editMode) {
                     values.secondLine = secondLineField.value? secondLineField.value : secondLineField.placeholder;
-                    values.changed = !!secondLineField.value && secondLineField.value !== secondLineField.placeholder ? true : values.changed;
+                    if(!!secondLineField.value && secondLineField.value !== secondLineField.placeholder) values.changed.push('secondLine');
                 } else 
                     values.secondLine = secondLineField.value.trim();
                 break;
             case cityField:
                 if(editMode) {
                     values.city = cityField.value? cityField.value : cityField.placeholder;
-                    values.changed = !!cityField.value && cityField.value !== cityField.placeholder ? true : values.changed;
+                    if(!!cityField.value && cityField.value !== cityField.placeholder) values.changed.push('city');
                 } else 
                     values.city = cityField.value.trim();
                 break;
             case countyField:
                 if(editMode) {
                     values.county = countyField.value? countyField.value : countyField.placeholder;
-                    values.changed = !!countyField.value && countyField.value !== countyField.placeholder ? true : values.changed;
+                    if(countyField.value && countyField.value !== countyField.placeholder) values.changed.push('county');
                 } else 
                     values.county = countyField.value.trim();
                 break;
             case postcodeField:
                 if(editMode) {
                     values.postcode = postcodeField.value? postcodeField.value : postcodeField.placeholder;
-                    values.changed = !!postcodeField.value && postcodeField.value !== postcodeField.placeholder ? true : values.changed;
+                    if(!!postcodeField.value && postcodeField.value !== postcodeField.placeholder) values.changed.push('postcode');
                 } else 
                     values.postcode = postcodeField.value.trim();
                 break;
@@ -3444,8 +3460,8 @@ export const calculatePagination = (current, limit, totalItems) => {
 }
 
 export const renderPagination = (pages, current, container, tableName) => {
-console.log(tableName);
-console.log(container);
+// console.log(tableName);
+// console.log(container);
     // Remove pagination if present
     const pagination = document.querySelector(`.pagination--${tableName}`);
     if(pagination) utils.removeElement(pagination);  
@@ -3517,7 +3533,7 @@ export const animateTableContentIn = (table) => {
         .fromTo(`.table--${table}`, {autoAlpha: 0},{autoAlpha: 1, duration: '.5'})
         // .from('.thead', { autoAlpha: 0, y: -20, duration: 1 }, '<')
         .from(`.row--${table}`, {
-            y: -15, 
+            x: -15, 
             autoAlpha: 0,
             stagger: {
                 each: .12
@@ -3526,13 +3542,13 @@ export const animateTableContentIn = (table) => {
         
         }, '<')
 }
-export const animateTableBodyIn = () => {
+export const animateTableBodyIn = (table) => {
     const tl = gsap.timeline()
 
     return tl
-        .fromTo('tbody', {autoAlpha: 0},{autoAlpha: 1, duration: '.5'})
-        .from('.row', {
-            y: -15, 
+        .fromTo(`.tbody--${table}`, {autoAlpha: 0},{autoAlpha: 1, duration: '.5'})
+        .from(`.row--${table}`, {
+            x: -15, 
             autoAlpha: 0,
             stagger: {
                 each: .12

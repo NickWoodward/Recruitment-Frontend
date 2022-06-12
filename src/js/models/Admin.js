@@ -114,4 +114,11 @@ export default class Admin {
     editCompany(formData) {
         return JRS.post(`/admin/edit/company`, formData);
     }
+
+    editContact(formData) {
+        return JRS.post(`/admin/edit/contact`, formData);
+    }
+    editAddress(formData) {
+        return JRS.post(`/admin/edit/address`, formData);
+    }
 }

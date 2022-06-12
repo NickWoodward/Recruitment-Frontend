@@ -59,7 +59,7 @@ export const createTableTest = (title, theads, rows, displayIndex = false) => {
                     }).join('')} 
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="tbody--${title}">
                 ${
                     rows.map(row => {
                         return `<tr class="row row--${title}">${row.map(col => {
@@ -76,7 +76,7 @@ export const createTableTest = (title, theads, rows, displayIndex = false) => {
 
 export const updateTableContent = (title, rows) => {
     const markup = `
-        <tbody>
+        <tbody class="tbody--${title}">
             ${
                 rows.map(row => {
                     return `<tr class="row row--${title}">${row.map(col => {

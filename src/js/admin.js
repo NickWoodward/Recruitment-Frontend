@@ -1932,7 +1932,7 @@ class AdminController {
                 // Re-add the company name
                 values.companyName = companyName;
 
-                if(!changed) {
+                if(!changed.length > 0) {
                     alert = modalView.getAlert(`No Fields Changed`, false);
                     alertWrapper.insertAdjacentHTML('afterbegin', alert);
 
@@ -2628,13 +2628,14 @@ class AdminController {
         // If no table visible, render both the header and content
         if(!table) { 
             tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('companies', headers, rows, false));
+            adminView.animateTableContentIn('companies')
             // Else remove the tbody and render just the content
         } else {
             utils.removeElement(document.querySelector('tbody'));
             document.querySelector('thead').insertAdjacentHTML('afterend', tableView.updateTableContent('companies', rows));
+            adminView.animateTableBodyIn('companies');
         }
     
-        adminView.animateTableContentIn('companies')
 
         // Set active row
         const companyRows = document.querySelectorAll('.row--companies');
@@ -2819,8 +2820,11 @@ class AdminController {
     async companySummaryListener(e) {
         // Animations
         const newCompanyAlertAnimation = gsap.timeline({paused: true});
-        const newContactAlertAnimation = gsap.timeline({paused: true});
         const editCompanyAlertAnimation = gsap.timeline({paused: true});
+        const newContactAlertAnimation = gsap.timeline({paused: true});
+        const editContactAlertAnimation = gsap.timeline({paused: true});
+        const newAddressAlertAnimation = gsap.timeline({paused: true});
+        const editAddressAlertAnimation = gsap.timeline({paused: true});
         const deleteJobAlertAnimation = gsap.timeline({paused: true});
 
         // Buttons
@@ -2925,29 +2929,59 @@ class AdminController {
                             alert = modalView.getAlert('Company Not Created', false);
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
                             newCompanyAlertAnimation.play(0);
-                        }else {
+                        }else {  
                             alert = modalView.getAlert('Company Created', true);
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
                             newCompanyAlertAnimation.play(0);
 
                             await this.getData('companies');
                             this.state.companies.currentCompany = res.data.company;
+                            this.resetCompanyState();
+
+                            const summary = document.querySelector('.summary');
+                            const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
+
+                            // No animation needed as it's behind the modal
+                            adminView.switchSummary(summary, newSummary);
+
+                            // Render the summary company jobs table
+                            if(this.state.companies.paginatedJobs.length > 0) {
+                                // remove any placeholders
+                                const placeholder = document.querySelector('.company-jobs-placeholder')
+
+                                if(placeholder) placeholder.parentElement.removeChild(placeholder);
+
+                                this.renderCompanyJobsTable();
+                            } else {
+                                // render a placeholder saying 'no jobs'
+                                document.querySelector('.table-wrapper--nested-jobs')
+                                    .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
+                            } 
+
+                            // Add pagination for nested contacts, addresses, and jobs elements
+                            this.addCompanyNestedPagination();
+
+                            // Add the listener to the new summary
+                            document.querySelector('.summary').addEventListener('click', (e) => this.companySummaryListener(e))
+
 
                             this.renderCompaniesTable();
                             // Update pagination
                             const { totalCompanies, searchOptions: {index: companyIndex, limit: companyLimit} } = this.state.companies;
                             adminView.renderPagination(companyIndex, companyLimit, document.querySelector('.table-wrapper'), 'companies');
                     
+                            console.log(this.state.companies.currentCompany);
                         }
                     } catch(err) {
                         console.log(err)
 
-                        if(err?.response.status === 422){
+                        if(err?.response?.data?.validationErrors.length > 0){
                             alert = modalView.getAlert(err.response.data.validationErrors[0].msg, false);
-                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                            newCompanyAlertAnimation.play(0);
+                        } else {
+                            alert = modalView.getAlert('Company Not Created', false);
                         }
-
+                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                        newCompanyAlertAnimation.play(0);
                     }
                 } else {
                     if(errors.companyName) 
@@ -2999,7 +3033,7 @@ class AdminController {
                 if(e.target === submitBtn) return;
                 const data = adminView.getCompanyValues(fields);
                 const {name, value} = this.getCompanyDataToValidate(e, data, fields);
-               
+               console.log(name, value);
                 const error = validator.validateCompanyField({ name,  value });
 
                 if(error) validator.setErrorFor(e.target, error);
@@ -3054,12 +3088,17 @@ class AdminController {
             .to(alertWrapper, {
                 autoAlpha: 0,
                 duration: .2,
-            }, '+=2')
-            .to(modal, {
-                autoAlpha: 0,
-                duration: .2,
-                onComplete: () => {
-                    modal.parentElement.removeChild(modal);
+            }, '+=1.5')
+            .add(() => {
+                if(!document.querySelector('.alert--error')) {
+                    return gsap.to(modal, {
+                        autoAlpha: 0,
+                        duration: .2,
+                        onComplete: () => {
+
+                            modal.parentElement.removeChild(modal);
+                        }
+                    })
                 }
             })
 
@@ -3095,13 +3134,15 @@ class AdminController {
 
                         }
                     } catch(err) {
-                        if(err?.response.status === 422){
-                            alert = modalView.getAlert(err.response.data.validationErrors[0].msg, false);
-                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                            newContactAlertAnimation.play(0);
-                        }
-
                         console.log(err);
+
+                        if(err?.response?.data?.validationErrors.length > 0){
+                            alert = modalView.getAlert(err.response.data.validationErrors[0].msg, false);
+                        } else {
+                            alert = modalView.getAlert('Contact Not Created', false);
+                        }
+                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                        newContactAlertAnimation.play(0);
                     } 
                     
                     
@@ -3176,9 +3217,32 @@ class AdminController {
             const companyForm = document.querySelector('.form--new-address');
             const closeBtn = document.querySelector('.form__close--new-address');
             const submitBtn = document.querySelector('.form__submit--new-address');
+            const modal = document.querySelector('.company-summary__modal');
 
             const fields = adminView.getCompanyFields('new-address');
             const { firstLineField, secondLineField, cityField, countyField, postcodeField } = fields;
+
+            // Add the animation for the company alerts (paused)
+            newAddressAlertAnimation
+            .from(alertWrapper, {
+                autoAlpha: 0
+            })
+            .to(alertWrapper, {
+                autoAlpha: 0,
+                duration: .2,
+            }, '+=1.5')
+            .add(() => {
+                if(!document.querySelector('.alert--error')) {
+                    return gsap.to(modal, {
+                        autoAlpha: 0,
+                        duration: .2,
+                        onComplete: () => {
+
+                            modal.parentElement.removeChild(modal);
+                        }
+                    })
+                }
+            })
 
             closeBtn.addEventListener('click', ()=>
                 gsap.to('.company-summary__modal', {
@@ -3203,15 +3267,14 @@ class AdminController {
                 if(!errors) {
                     try {
                         const res = await this.Admin.createAddress({id, ...values});
-
                         if(!res.status === 201) {
                             alert = modalView.getAlert('Address Not Created', false);
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                            newContactAlertAnimation.play(0);
+                            newAddressAlertAnimation.play(0);
                         } else {
                             alert = modalView.getAlert('Address Created', true);
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                            newContactAlertAnimation.play(0);
+                            newAddressAlertAnimation.play(0);
 
                             this.state.companies.addressPagination.totalAddresses++;
 
@@ -3221,11 +3284,17 @@ class AdminController {
                         }
                     } catch(err) {
                         console.log(err);
-                        if(err?.response.status === 422) {
+                        if(err?.response?.data?.validationErrors.length > 0){
                             alert = modalView.getAlert(err.response.data.validationErrors[0].msg, false);
-                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                            newContactAlertAnimation.play(0);  
+                        } else if(err.response.data.message === 'Address already exists') {
+                            console.log(err.response);
+                            alert = modalView.getAlert(err.response.data.message, false);
+                        } else {
+                            alert = modalView.getAlert('Address not created', false);
                         }
+                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                        newAddressAlertAnimation.play(0);
+
                     }
                 } else {
                     if(errors.firstLine) 
@@ -3234,7 +3303,7 @@ class AdminController {
 
                     if(errors.secondLine) 
                         validator.setErrorFor(secondLineField, errors.secondLine);
-                    else validator.setSuccessFor(secondLine);
+                    else validator.setSuccessFor(secondLineField);
 
                     if(errors.city) 
                         validator.setErrorFor(cityField, errors.city);
@@ -3294,7 +3363,6 @@ class AdminController {
             const alertWrapper = document.querySelector('.alert-wrapper');
             const companyForm = document.querySelector('.form--edit-company');
             const closeBtn = document.querySelector('.form__close--edit-company');
-            const submitBtn = document.querySelector('.form__submit--edit-company');
             const modal = document.querySelector('.company-summary__modal');
 
             const fields = adminView.getCompanyFields('edit-company');
@@ -3313,13 +3381,24 @@ class AdminController {
             } = fields;
 
             // Add the animation for the company alerts (paused)
-            newCompanyAlertAnimation
-            .from(alertWrapper, {
-                autoAlpha: 0
-            })
-            .to(alertWrapper, {
-                autoAlpha: 0
-            }, '+=3')
+            editCompanyAlertAnimation
+                .from(alertWrapper, {
+                    autoAlpha: 0
+                })
+                .to(alertWrapper, {
+                    autoAlpha: 0
+                }, '+=1')
+                .add(() => {
+                    if(!document.querySelector('.alert--error')) {
+                        return gsap.to(modal, {
+                            autoAlpha: 0,
+                            duration: .2,
+                            onComplete: () => {
+                                modal.parentElement.removeChild(modal);
+                            }
+                        })
+                    }
+                })
 
             closeBtn.addEventListener('click', adminView.removeCompanyModal);
 
@@ -3330,10 +3409,21 @@ class AdminController {
 
                 const data = adminView.getCompanyValues(fields, true); 
                 const { changed, ...values } = data;
+
                 const errors = validator.validateCompany(values);
+                
+                if(!changed.length > 0) {
+                    alert = modalView.getAlert(`No Fields Changed`, false);
+                    alertWrapper.insertAdjacentHTML('afterbegin', alert);
+
+                    editCompanyAlertAnimation.play(0);
+                    return;
+                }
+
                 const contactId = this.state.companies.currentCompany.contacts[this.state.companies.currentContactIndex].contactId;
+
                 const addressId = this.state.companies.currentCompany.addresses[this.state.companies.currentAddressIndex].id;
-            
+
                 if(!errors) {
                     try {
                         const res = await this.Admin.editCompany({ id, contactId, addressId, ...values });      
@@ -3343,24 +3433,60 @@ class AdminController {
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
                             editCompanyAlertAnimation.play(0);
                         } else {
+                            await this.getData('companies');
+                            this.state.companies.currentCompany = res.data.company;
+
+                            const summary = document.querySelector('.summary');
+                            const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
+
+                            // No animation needed as it's behind the modal
+                            adminView.switchSummary(summary, newSummary);
+                            
+                            // No need to set the companyJobs state because it's not changed
+
+                            // Render the summary company jobs table
+                            if(this.state.companies.paginatedJobs.length > 0) {
+                                // remove any placeholders
+                                const placeholder = document.querySelector('.company-jobs-placeholder')
+
+                                if(placeholder) placeholder.parentElement.removeChild(placeholder);
+
+                                this.renderCompanyJobsTable();
+                            } else {
+                                // render a placeholder saying 'no jobs'
+                                document.querySelector('.table-wrapper--nested-jobs')
+                                    .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
+                            } 
+
+                            // Add pagination for nested contacts, addresses, and jobs elements
+                            this.addCompanyNestedPagination();
+
+                            // Add the listener to the new summary
+                            document.querySelector('.summary').addEventListener('click', (e) => this.companySummaryListener(e))
+
+                            // Remove any modals
+                            adminView.removeSummaryModals();
+
                             alert = modalView.getAlert('Company Edited', true);
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
                             editCompanyAlertAnimation.play(0);
 
-                            await this.getData('companies');
-                            this.state.companies.currentCompany = res.data.company;
-                            
-                            
+                            console.log(changed);
+                            // If companyName has changed, update the table
+                            if(changed.indexOf('companyName') !== -1) this.renderCompaniesTable();
+
                         }
 
                     } catch(err) {
                         console.log(err)
 
-                        if(err?.response.status === 422){
+                        if(err?.response?.data?.validationErrors.length > 0){
                             alert = modalView.getAlert(err.response.data.validationErrors[0].msg, false);
-                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                            editCompanyAlertAnimation.play(0);
+                        } else {
+                            alert = modalView.getAlert('Company Not Edited', false);
                         }
+                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                        editCompanyAlertAnimation.play(0);
                     }
                 } else {
                     if(errors.companyName) 
@@ -3409,6 +3535,7 @@ class AdminController {
             });
         }
         if(editContactBtn) {
+            let alert;
             const { 
                 id,
                 companyName,
@@ -3423,6 +3550,41 @@ class AdminController {
                 address: addresses[this.state.companies.addressPagination.addressIndex]
             }, 'edit-contact');
 
+            const alertWrapper = document.querySelector('.alert-wrapper');
+            const companyForm = document.querySelector('.form--edit-contact');
+            const closeBtn = document.querySelector('.form__close--edit-contact');
+            const modal = document.querySelector('.company-summary__modal');
+
+            const fields = adminView.getCompanyFields('edit-contact');
+            const { 
+                contactFirstNameField,
+                contactSurnameField,
+                contactPositionField,
+                phoneField,
+                emailField,
+            } = fields;
+
+            // Add the animation for the company alerts (paused)
+            editContactAlertAnimation
+            .from(alertWrapper, {
+                autoAlpha: 0
+            })
+            .to(alertWrapper, {
+                autoAlpha: 0,
+                duration: .2,
+            }, '+=2')
+            .add(() => {
+                if(!document.querySelector('.alert--error')) {
+                    return gsap.to(modal, {
+                        autoAlpha: 0,
+                        duration: .2,
+                        onComplete: () => {
+                            modal.parentElement.removeChild(modal);
+                        }
+                    })
+                }
+            })
+
             closeBtn.addEventListener('click', ()=>
                 gsap.to('.company-summary__modal', {
                     autoAlpha: 0,
@@ -3432,8 +3594,117 @@ class AdminController {
                     }
                 })
             );
+
+            companyForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                // Clear the alert wrapper
+                while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+
+                const data = adminView.getCompanyValues(fields, true); 
+                // Remove the changed field, and others not applicable to the new contact form
+                const { changed, companyName, firstLine, secondLine, city, county, postcode, ...values } = data;
+                if(!changed.length > 0) {
+                    alert = modalView.getAlert(`No Fields Changed`, false);
+                    alertWrapper.insertAdjacentHTML('afterbegin', alert);
+
+                    editContactAlertAnimation.play(0);
+
+                    // Reset validation fields (edge case where a field is changed from and then back to the placeholder value)
+                    [
+                        contactFirstNameField, 
+                        contactSurnameField,
+                        contactPositionField,
+                        phoneField,
+                        emailField
+                    ].forEach(field => validator.setSuccessFor(field))
+                    return;
+                }
+
+                const contactId = this.state.companies.currentCompany.contacts[this.state.companies.currentContactIndex].contactId;
+
+                const errors = validator.validateContact(values);
+
+                if(!errors) {
+                    try {
+                        const res = await this.Admin.editContact({id, contactId, ...values});
+
+                        console.log(res.status);
+                        if(res.status !== 201) {
+                            alert = modalView.getAlert('Contact Not Edited', false);
+                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                            editContactAlertAnimation.play(0);
+                        } else {
+                            await this.getData('companies');
+                            // editContact returns all the contacts, not 1
+                            this.state.companies.currentCompany.contacts = res.data.contacts;
+                            
+                            const summary = document.querySelector('.summary');
+                            const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
+                            // No animation needed as it's behind the modal
+                            adminView.switchSummary(summary, newSummary);
+
+                            // No need to set the companyJobs state because it's not changed
+
+                            // Render the summary company jobs table
+                            if(this.state.companies.paginatedJobs.length > 0) {
+                                // remove any placeholders
+                                const placeholder = document.querySelector('.company-jobs-placeholder')
+
+                                if(placeholder) placeholder.parentElement.removeChild(placeholder);
+
+                                this.renderCompanyJobsTable();
+                            } else {
+                                // render a placeholder saying 'no jobs'
+                                document.querySelector('.table-wrapper--nested-jobs')
+                                    .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
+                            } 
+
+                            // Add pagination for nested contacts, addresses, and jobs elements
+                            this.addCompanyNestedPagination();
+
+                            // Add the listener to the new summary
+                            document.querySelector('.summary').addEventListener('click', (e) => this.companySummaryListener(e))
+
+                            alert = modalView.getAlert('Contact Edited', true);
+                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                            editContactAlertAnimation.play(0);
+
+                        }
+                    } catch(err) {
+                        console.log(err);
+                        if(err?.response?.data?.validationErrors.length > 0){
+                            alert = modalView.getAlert(err.response.data.validationErrors[0].msg, false);
+                        } else {
+                            alert = modalView.getAlert('Contact Not Created', false);
+                        }
+                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                        newContactAlertAnimation.play(0);
+                    }
+                } else {
+                    if(errors.firstName)  
+                        validator.setErrorFor(contactFirstNameField, errors.firstName);
+                    else validator.setSuccessFor(contactFirstNameField);
+
+                    if(errors.lastName) 
+                        validator.setErrorFor(contactSurnameField, errors.lastName);
+                    else validator.setSuccessFor(contactSurnameField);
+
+                    if(errors.position) 
+                        validator.setErrorFor(contactPositionField, errors.position);
+                    else validator.setSuccessFor(contactPositionField);
+
+                    if(errors.phone) 
+                        validator.setErrorFor(phoneField, errors.phone);
+                    else validator.setSuccessFor(phoneField);
+
+                    if(errors.email) 
+                        validator.setErrorFor(emailField, errors.email);
+                    else validator.setSuccessFor(emailField);
+                    }
+            });
         }
         if(editAddressBtn) {
+            let alert;
             const { 
                 id,
                 companyName,
@@ -3448,7 +3719,36 @@ class AdminController {
                 address: addresses[this.state.companies.addressPagination.addressIndex]
             }, 'edit-address');
 
+            const alertWrapper = document.querySelector('.alert-wrapper');
+            const companyForm = document.querySelector('.form--edit-address');
+            const closeBtn = document.querySelector('.form__close--edit-address');
+            const modal = document.querySelector('.company-summary__modal');
 
+            const fields = adminView.getCompanyFields('edit-address');
+            const { 
+                firstLineField, secondLineField, cityField, countyField, postcodeField 
+            } = fields;
+            
+            // Add the animation for the company alerts (paused)
+            editAddressAlertAnimation
+            .from(alertWrapper, {
+                autoAlpha: 0
+            })
+            .to(alertWrapper, {
+                autoAlpha: 0,
+                duration: .2,
+            }, '+=2')
+            .add(() => {
+                if(!document.querySelector('.alert--error')) {
+                    return gsap.to(modal, {
+                        autoAlpha: 0,
+                        duration: .2,
+                        onComplete: () => {
+                            modal.parentElement.removeChild(modal);
+                        }
+                    })
+                }
+            })
 
             closeBtn.addEventListener('click', ()=>
                 gsap.to('.company-summary__modal', {
@@ -3459,6 +3759,96 @@ class AdminController {
                     }
                 })
             );
+
+            companyForm.addEventListener('submit', async e => {
+                e.preventDefault();
+
+                // Clear the alert wrapper
+                while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+
+                const data = adminView.getCompanyValues(fields, true); 
+                // Remove the changed field, and others not applicable to the new address form
+                const { changed, companyName, firstName, lastName, position, email, phone, ...values } = data;
+
+                if(!changed.length > 0) {
+                    alert = modalView.getAlert(`No Fields Changed`, false);
+                    alertWrapper.insertAdjacentHTML('afterbegin', alert);
+
+                    editContactAlertAnimation.play(0);
+
+                    // Reset validation fields (edge case where a field is changed from and then back to the placeholder value)
+                    [
+                        firstLineField, 
+                        secondLineField, 
+                        cityField, 
+                        countyField, 
+                        postcodeField
+                    ].forEach(field => validator.setSuccessFor(field))
+                    return;
+                }
+                const addressId = this.state.companies.currentCompany.addresses[this.state.companies.currentAddressIndex].id;
+
+                const errors = validator.validateAddress(values);
+
+                if(!errors) {
+                    try {
+                        const res = await this.Admin.editAddress({id, addressId, ...values});
+                        console.log(res.status);
+                        if(res.status !== 201) {
+                            alert = modalView.getAlert('Address Not Edited', false);
+                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                            editAddressAlertAnimation.play(0);
+                        } else {
+                            await this.getData('companies');
+
+                            // editAddress returns all the contacts, not 1
+                            this.state.companies.currentCompany.addresses = res.data.addresses;
+
+                            const summary = document.querySelector('.summary');
+                            const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
+                            // No animation needed as it's behind the modal
+                            adminView.switchSummary(summary, newSummary);
+                            // No need to set the companyJobs state because it's not changed
+
+                            
+                            // Render the summary company jobs table
+                            if(this.state.companies.paginatedJobs.length > 0) {
+                                // remove any placeholders
+                                const placeholder = document.querySelector('.company-jobs-placeholder')
+
+                                if(placeholder) placeholder.parentElement.removeChild(placeholder);
+
+                                this.renderCompanyJobsTable();
+                            } else {
+                                // render a placeholder saying 'no jobs'
+                                document.querySelector('.table-wrapper--nested-jobs')
+                                    .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
+                            } 
+
+                            // Add pagination for nested contacts, addresses, and jobs elements
+                            this.addCompanyNestedPagination();
+
+                            // Add the listener to the new summary
+                            document.querySelector('.summary').addEventListener('click', (e) => this.companySummaryListener(e))
+
+                            alert = modalView.getAlert('Address Edited', true);
+                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                            editAddressAlertAnimation.play(0);
+                        }
+                    } catch(err) {
+                        console.log(err);
+                        if(err?.response?.data?.validationErrors.length > 0){
+                            alert = modalView.getAlert(err.response.data.validationErrors[0].msg, false);
+                        } else if(err.response.data.message === 'Address already exists') {
+                            alert = modalView.getAlert(err.response.data.message, false);
+                        } else {
+                            alert = modalView.getAlert('Address not created', false);
+                        }
+                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                        editAddressAlertAnimation.play(0);
+                    }
+                }
+            });
         }
         if(deleteBtn) {
             console.log('deleteBtn');
@@ -3710,6 +4100,19 @@ class AdminController {
     
     //     });
     // }
+
+    resetCompanyState() {
+        this.state.companies.companyJobPagination.jobIndex = 0;
+        this.state.companies.companyJobPagination.jobLimit = 0;
+        this.state.companies.companyJobPagination.totalJobs = 0;
+        this.state.companies.contactPagination.contactIndex = 0;
+        this.state.companies.contactPagination.contactLimit = 0;
+        this.state.companies.contactPagination.totalContacts = 0;
+        this.state.companies.addressPagination.addressIndex = 0;
+        this.state.companies.addressPagination.addressLimit = 0;
+        this.state.companies.addressPagination.totalAddresses = 0;
+        this.state.companies.paginatedJobs = [];
+    }
 
     // saveBtn + newBtn = currently editing
     // saveBtn + editBtn = currently creating

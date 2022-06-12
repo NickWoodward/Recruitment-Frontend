@@ -36,7 +36,7 @@ export const displayOptionModal = (message, container) => {
 
 export const getAlert = (msg, success) => {
     return `
-        <div class="alert alert--success">
+        <div class="alert alert--${success?'success':'error'}">
             <div class="alert__icon alert__icon--${success?'success':'error'}">
                 <svg class="alert__svg alert__svg--${success?'success':'error'}"><use xlink:href="svg/spritesheet.svg#${success?'tick':'cross'}"></svg>
             </div>
