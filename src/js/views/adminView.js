@@ -1838,6 +1838,103 @@ export const calculateRows = (tableName, header, pagination) => {
 //     utils.removeElement(document.querySelector(`.pagination--${tableName}`));
 //     return { headerHeight, rowHeight, paginationHeight };
 // }
+
+export const getDeleteAddressHtml = (addressId) => {
+    const firstLine = document.querySelector('.company-summary__field--first-line').innerText;
+    const secondLine = document.querySelector('.company-summary__field--second-line')?.innerText;
+    const city = document.querySelector('.company-summary__field--city').innerText;
+    const county = document.querySelector('.company-summary__field--county').innerText;
+    const postcode = document.querySelector('.company-summary__field--postcode').innerText;
+
+    return (`
+        <div class='confirmation confirmation--delete'>
+            <div class="company-summary__modal-header">
+                <div>${addressId}</div>
+            </div>
+            <div class='confirmation__header'>
+                <div class='confirmation__svg-wrapper'>
+                    <svg class='confirmation__svg confirmation__svg--delete'><use xlink:href="svg/spritesheet.svg#alert-circled"></svg>
+                </div>
+                <div class='confirmation__message'>Delete address ${addressId}?</div>
+            </div>
+            <div class='confirmation__address'>
+                <div class='confirmation__item'>
+                    <div class='confirmation__label'>First Line:</div>
+                    <div class='confirmation__field'>${firstLine}</div>
+                </div>
+                ${secondLine?
+                    `<div class='confirmation__item'>
+                        <div class='confirmation__label'>Second Line:</div>
+                        <div class='confirmation__field'>${secondLine}</div>
+                    </div>`:''
+                }
+                
+                <div class='confirmation__item'>
+                    <div class='confirmation__label'>City:</div>
+                    <div class='confirmation__field'>${city}</div>
+                </div>
+                <div class='confirmation__item'>
+                    <div class='confirmation__label'>County:</div>
+                    <div class='confirmation__field'>${county}</div>
+                </div>
+                <div class='confirmation__item'>
+                    <div class='confirmation__label'>Postcode:</div>
+                    <div class='confirmation__field'>${postcode}</div>
+                </div>
+            </div>
+            <div class='confirmation__controls'>
+                <button class='confirmation__btn confirmation__btn--confirm'>Confirm</button>
+                <button class='confirmation__btn confirmation__btn--cancel'>Cancel</button>
+            </div>
+            <div class="alert-wrapper">
+            
+            </div>
+        </div>
+    `);
+}
+export const getDeleteCompanyHtml = (companyId) => {
+    const companyDate = document.querySelector('.company-summary__field--date').innerText;
+    const companyName = document.querySelector('.company-summary__company-name').innerText;
+    const companyContact = document.querySelector('.company-summary__field--name').innerText;
+    const location = document.querySelector('.company-summary__field--city').innerText;
+    return (`
+        <div class='confirmation confirmation--delete'>
+            <div class="company-summary__modal-header">
+                <div>${companyId}</div>
+                <div>${companyDate}</div>
+            </div>
+            <div class='confirmation__header'>
+                <div class='confirmation__svg-wrapper'>
+                    <svg class='confirmation__svg confirmation__svg--delete'><use xlink:href="svg/spritesheet.svg#alert-circled"></svg>
+                </div>
+                <div class='confirmation__message'>Delete company ${companyId}?</div>
+            </div>
+            <div class='confirmation__company'>
+                <div class='confirmation__item'>
+                    <div class='confirmation__label'>Company:</div>
+                    <div class='confirmation__field'>${companyName}</div>
+                </div>
+                <div class='confirmation__item'>
+                    <div class='confirmation__label'>Main Contact:</div>
+                    <div class='confirmation__field'>${companyContact}</div>
+                </div>
+                <div class='confirmation__item'>
+                    <div class='confirmation__label'>Location:</div>
+                    <div class='confirmation__field'>${location}</div>
+                </div>
+            </div>
+            <div class='confirmation__controls'>
+                <button class='confirmation__btn confirmation__btn--confirm'>Confirm</button>
+                <button class='confirmation__btn confirmation__btn--cancel'>Cancel</button>
+            </div>
+            <div class="alert-wrapper">
+            
+            </div>
+        </div>
+    `);
+}
+
+
 export const getDeleteJobHtml = (jobId) => {
     const jobDate = document.querySelector('.job-summary__field--date').innerText;
     const positionName = document.querySelector('.job-summary__field--title').innerText;
@@ -3074,9 +3171,8 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
     // ${createAddressSummary()}
 
     // ${createContactSummary()}
-
     const markup  = `
-        <div class="company-summary summary">
+        <div class="company-summary summary" data-id="${id}">
             <div class="company-summary__details">
 
                 <div class="company-summary__section company-summary__section--header">
@@ -3147,7 +3243,7 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
                         </div>
                         <div class="pagination-wrapper pagination-wrapper--contacts"></div>
  
-                        <div class="summary__heading summary__heading--addresses">
+                        <div class="summary__heading summary__heading--addresses" data-id="${addresses[0].id}">
                             Addresses
                             <div class="company-summary__controls company-summary__controls company-summary__controls--addresses">
                                 <div class="company-summary__btn company-summary__btn--addresses company-summary__btn--new-address">
@@ -3168,21 +3264,29 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
                             </div>
                         </div>
 
-                        <div class="company-summary__section company-summary__section--addresses">
+                        <div class="company-summary__section company-summary__section--addresses" >
                             <div class="summary__column summary__column--small">    
                                 <div class="company-summary__item summary__item company-summary__item--first-line">
                                     <div class="company-summary__label company-summary__label--first-line">First Line:</div>
                                     <div class="company-summary__field company-summary__field--first-line">${addresses[0].firstLine}</div>
                                 </div>
-                                <div class="company-summary__item summary__item company-summary__item--second-line">
-                                    <div class="company-summary__label company-summary__label--second-line">Second Line:</div>
-                                    <div class="company-summary__field company-summary__field--second-line">${addresses[0].secondLine ? `${addresses[0].secondLine}`:'-'}</div>
-                                </div>
-                            </div>
-                            <div class="summary__column summary__column--large">
+                                ${addresses[0].secondLine? 
+                                    `<div class="company-summary__item summary__item company-summary__item--second-line">
+                                        <div class="company-summary__label company-summary__label--second-line">Second Line:</div>
+                                        <div class="company-summary__field company-summary__field--second-line">${addresses[0].secondLine}</div>
+                                    </div>`:''
+                                }
+                                
                                 <div class="company-summary__item summary__item company-summary__item--city">
                                     <div class="company-summary__label company-summary__label--city">City:</div>
                                     <div class="company-summary__field company-summary__field--city">${addresses[0].city}</div>
+                                </div>
+                            </div>
+                            <div class="summary__column summary__column--large">
+                                
+                                <div class="company-summary__item summary__item company-summary__item--county">
+                                    <div class="company-summary__label company-summary__label--county">County:</div>
+                                    <div class="company-summary__field company-summary__field--county">${addresses[0].county}</div>
                                 </div>
                                 <div class="company-summary__item summary__item company-summary__item--postcode">
                                     <div class="company-summary__label company-summary__label--postcode">Postcode:</div>

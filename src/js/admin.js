@@ -864,6 +864,7 @@ class AdminController {
     }
 
     async getData(sectionName, indexId) {
+        console.log('getting');
         switch(sectionName) {
             case 'applications':
                 const { data: { applications: { rows: appRows, count: appCount } } } = await this.Admin.getApplications(this.state.applications.searchOptions, indexId);
@@ -1491,12 +1492,14 @@ class AdminController {
         // If no table visible, render both the header and content
         if(!table) {
             tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('jobs', headers, rows, false));  
+            adminView.animateTableContentIn('jobs')
         } else {
             // Else remove the tbody and render just the content
             utils.removeElement(document.querySelector('tbody'));
             document.querySelector('thead').insertAdjacentHTML('afterend', tableView.updateTableContent('jobs', rows));
+            adminView.animateTableBodyIn('jobs')
+
         }
-        adminView.animateTableContentIn('jobs')
 
         const jobRows = document.querySelectorAll('.row--jobs');
 
@@ -1782,6 +1785,7 @@ class AdminController {
 
 
         if(deleteBtn) {
+            let alert;
             const jobId = document.querySelector('.job-summary__id').innerText;
             const summaryWrapper = document.querySelector('.summary-wrapper');
             const confirmationHtml = adminView.getDeleteJobHtml(jobId);
@@ -1804,65 +1808,129 @@ class AdminController {
                 })
                 .to(alertWrapper, {
                     autoAlpha: 0
-                }, '+=1.5')
-                .to(confirmation, {
-                    autoAlpha: 0,
-                    onComplete: () => {
-                        confirmation.parentElement.removeChild(confirmation);
-                        // Get a new Summary
-                        adminView.swapSummary(document.querySelector('.summary'), adminView.createJobSummary(this.jobs[0]), this.jobSummaryListener.bind(this)); 
+                }, '+=1')
+                .add(() => {
+                    if(!document.querySelector('.alert--error')) {
+                        return gsap.to(confirmation, {
+                            autoAlpha: 0,
+                            duration: .2,
+                            onComplete: () => {
+                                confirmation.parentElement.removeChild(confirmation);
+                            }
+                        })
                     }
                 })
-        
 
+        
             const confirm = document.querySelector('.confirmation__btn--confirm');
             const cancel = document.querySelector('.confirmation__btn--cancel');
 
 
             confirm.addEventListener('click', async() => {
-                // Clear the alert wrapper
+                // Clear the alert wrapper contents
                 while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
 
                 try {
                     const { status } = await this.Admin.deleteJob(jobId);
 
                     if(status === 200) {
-                        const tl = gsap.timeline();
-                        const alert = modalView.getAlert(`Job ${jobId} deleted`, true);
+                        alert = modalView.getAlert(`Job ${jobId} deleted`, true);
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
 
-                        // Deal with pagination if only 1 item left on the page
+                        // Update the jobs array
+                        await this.getData('jobs');
+                        
+                        // Rerender table
+                        this.renderJobsTable();
+
+                        // Update the current job
+                        this.state.jobs.currentJob = this.jobs[0];
+
+                        // Change the summary
+                        const summary = document.querySelector('.summary');
+                        const newSummary = adminView.createJobSummary(this.state.jobs.currentJob);
+                        // No animation needed as it's behind the modal
+                        adminView.switchSummary(summary, newSummary);
+                        this.addJobsSummaryListeners();
+
+                        // Play the alert animation
+                        deleteJobAlertAnimation.play(0);
+
+                        // Deal with pagination if only one item left on page
                         if(this.jobs.length === 1) {
-                            // 2nd arg is the 'prevBtn' argument
-                            this.setJobPaginationState(null, true, null);
-                            // Set the view
-                            adminView.updatePaginationView(this.state.jobs.currentPage -1);
 
-                            // Get the new data to display
-                            await this.getData('jobs');
 
-                            this.changeTablePageAnimation(tl, 'jobs');
+                    //         // 2nd arg is the 'prevBtn' argument
+                    //         this.setJobPaginationState(null, true, null);
+                    //         // Set the view
+                    //         adminView.updatePaginationView(this.state.jobs.currentPage -1);
 
-                            // Update the pagination items
-                            const { totalJobs, searchOptions: {index: jobIndex, limit: jobLimit} } = this.state.jobs;
-                            adminView.renderPagination(jobIndex, jobLimit, totalJobs, document.querySelector('.table-wrapper'), 'jobs');
+                    //         // Get the new data to display
+                    //         await this.getData('jobs');
+
+                    //         this.changeTablePageAnimation(tl, 'jobs');
+
+                    //         // Update the pagination items
+                    //         const { totalJobs, searchOptions: {index: jobIndex, limit: jobLimit} } = this.state.jobs;
+                    //         adminView.renderPagination(jobIndex, jobLimit, totalJobs, document.querySelector('.table-wrapper'), 'jobs');
                         
                         } else {
-                            // Update the table
-                            await this.getData('jobs');
-                            this.renderJobsTable();
 
-                            // Update pagination
-                            const { totalJobs, searchOptions: {index: jobIndex, limit: jobLimit} } = this.state.jobs;
-                            adminView.renderPagination(jobIndex, jobLimit, totalJobs, document.querySelector('.table-wrapper'), 'jobs');
-                        
-                            // After the page has potentially changed because of onComplete function
-                            deleteJobAlertAnimation.play(0);
                         }
+
+                    } else {
+                        alert = modalView.getAlert(`Error: Job ${jobId} not deleted`, false);
+                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
                     }
 
+
+
+                    // if(status === 200) {
+                    //     const tl = gsap.timeline();
+                    //     alert = modalView.getAlert(`Job ${jobId} deleted`, true);
+                    //     alertWrapper.insertAdjacentHTML('afterbegin', alert);
+
+                    //     // Deal with pagination if only 1 item left on the page
+                    //     if(this.jobs.length === 1) {
+                    //         // 2nd arg is the 'prevBtn' argument
+                    //         this.setJobPaginationState(null, true, null);
+                    //         // Set the view
+                    //         adminView.updatePaginationView(this.state.jobs.currentPage -1);
+
+                    //         // Get the new data to display
+                    //         await this.getData('jobs');
+
+                    //         this.changeTablePageAnimation(tl, 'jobs');
+
+                    //         // Update the pagination items
+                    //         const { totalJobs, searchOptions: {index: jobIndex, limit: jobLimit} } = this.state.jobs;
+                    //         adminView.renderPagination(jobIndex, jobLimit, totalJobs, document.querySelector('.table-wrapper'), 'jobs');
+                        
+                    //     } else {
+                    //         // Update the table
+                    //         await this.getData('jobs');
+                    //         this.renderJobsTable();
+
+                    //         // Update pagination
+                    //         const { totalJobs, searchOptions: {index: jobIndex, limit: jobLimit} } = this.state.jobs;
+                    //         adminView.renderPagination(jobIndex, jobLimit, totalJobs, document.querySelector('.table-wrapper'), 'jobs');
+                        
+                    //         // After the page has potentially changed because of onComplete function
+                    //         deleteJobAlertAnimation.play(0);
+                    //     }
+                    //     this.state.jobs.currentJob = jobs[0];
+                    //     const summary = document.querySelector('.summary');
+                    //     const newSummary = adminView.createCompanySummary(this.state.jobs.currentJob);
+
+                    //     // No animation needed as it's behind the modal
+                    //     adminView.switchSummary(summary, newSummary);
+
+                    // }
+
                 } catch(err) {
-                    const alert = modalView.getAlert(`Error, please contact the administrator`, false);
+                    // Clear the alert wrapper contents
+                    while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+                    alert = modalView.getAlert(`Error, please contact the administrator`, false);
                 
                     alertWrapper.insertAdjacentHTML('afterbegin', alert);
                     deleteJobAlertAnimation.play(0);
@@ -2031,7 +2099,7 @@ class AdminController {
         }
     }
 
-    addJobSummaryListeners() {
+    s() {
         const jobSummary = document.querySelector('.job-summary');
         jobSummary.addEventListener('click', e => {
             // Ignore synthetic clicks from the offscreen input element
@@ -2821,11 +2889,15 @@ class AdminController {
         // Animations
         const newCompanyAlertAnimation = gsap.timeline({paused: true});
         const editCompanyAlertAnimation = gsap.timeline({paused: true});
+        const deleteCompanyAlertAnimation = gsap.timeline({paused: true});
+
         const newContactAlertAnimation = gsap.timeline({paused: true});
         const editContactAlertAnimation = gsap.timeline({paused: true});
+        
         const newAddressAlertAnimation = gsap.timeline({paused: true});
         const editAddressAlertAnimation = gsap.timeline({paused: true});
-        const deleteJobAlertAnimation = gsap.timeline({paused: true});
+        const deleteAddressAlertAnimation = gsap.timeline({paused: true});
+
 
         // Buttons
         const newBtn = e.target.closest('.company-summary__btn--new');
@@ -3360,6 +3432,7 @@ class AdminController {
                 address: addresses[this.state.companies.addressPagination.addressIndex]
             }, 'edit');
 
+            let alert;
             const alertWrapper = document.querySelector('.alert-wrapper');
             const companyForm = document.querySelector('.form--edit-company');
             const closeBtn = document.querySelector('.form__close--edit-company');
@@ -3851,13 +3924,212 @@ class AdminController {
             });
         }
         if(deleteBtn) {
-            console.log('deleteBtn');
+            let alert;
+            const companyId = document.querySelector('.company-summary').dataset.id;
+            const summaryWrapper = document.querySelector('.summary-wrapper');
+
+            // Render confirmation modal
+            const confirmationHtml = adminView.getDeleteCompanyHtml(companyId);
+            summaryWrapper.insertAdjacentHTML('afterbegin', confirmationHtml);
+
+            // Select and animate confirmation modal
+            const confirmation = document.querySelector('.confirmation');
+            gsap.from(confirmation, {
+                autoAlpha: 0,
+                duration: .2
+            });
+
+            // Alert animation
+            const alertWrapper = document.querySelector('.alert-wrapper');
+            // Add the animation for the company alerts
+            deleteCompanyAlertAnimation
+            .from(alertWrapper, {
+                autoAlpha: 0
+            })
+            .to(alertWrapper, {
+                autoAlpha: 0
+            }, '+=1')
+            .add(() => {
+                if(!document.querySelector('.alert--error')) {
+                    return gsap.to(confirmation, {
+                        autoAlpha: 0,
+                        duration: .2,
+                        onComplete: () => {
+                            confirmation.parentElement.removeChild(confirmation);
+                        }
+                    })
+                }
+            })
+            
+            const confirm = document.querySelector('.confirmation__btn--confirm');
+            const cancel = document.querySelector('.confirmation__btn--cancel');
+
+            confirm.addEventListener('click', async() => {
+                // Clear the alert wrapper contents
+                while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+
+                try {
+                    const res = await this.Admin.deleteCompany(companyId);
+                    if(res.status === 200) {
+                        console.log('success');
+                        alert = modalView.getAlert(`Company ${companyId} deleted`, true);
+                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
+
+                        // Update the companies array
+                        await this.getData('companies');
+
+                        // Rerender table
+                        this.renderCompaniesTable();
+
+                        // Update current company
+                        this.state.companies.currentCompany = this.companies[0];
+
+                        // Change the summary
+                        const summary = document.querySelector('.summary');
+                        const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
+                        // No animation needed as it's behind the modal
+                        adminView.switchSummary(summary, newSummary);
+
+
+                        // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
+                        this.setCompanyJobsState();
+
+                        // Render the summary company jobs table
+                        if(this.state.companies.paginatedJobs.length > 0) {
+                            // remove any placeholders
+                            const placeholder = document.querySelector('.company-jobs-placeholder');
+                            if(placeholder) placeholder.parentElement.removeChild(placeholder);
+
+                            this.renderCompanyJobsTable();
+                        } else {
+                            // render a placeholder saying 'no jobs'
+                            document.querySelector('.table-wrapper--nested-jobs')
+                                .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
+                        } 
+                        // Add pagination for nested contacts, addresses, and jobs elements
+                        this.addCompanyNestedPagination();
+
+                        this.addCompanySummaryListeners();
+
+                        // Play the alert animation
+                        deleteCompanyAlertAnimation.play(0);
+                    } else { console.log('oh no!') }
+                } catch(err) {
+                    // Clear the alert wrapper contents
+                    while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+
+                }
+            });
+
+            cancel.addEventListener('click', () => {
+                gsap.to(confirmation, {
+                    autoAlpha: 0,
+                    duration: .2,
+                    onComplete: () => {
+                        confirmation.parentElement.removeChild(confirmation);
+                    }
+                })
+            });
         }
         if(deleteContactBtn) {
             console.log('deleteContact');
         }
         if(deleteAddressBtn) {
-            console.log('deleteAddress');
+            let alert;
+            const addressId = document.querySelector('.summary__heading--addresses').dataset.id;
+            const summaryWrapper = document.querySelector('.summary-wrapper');
+
+            // Render confirmation modal
+            const confirmationHtml = adminView.getDeleteAddressHtml(addressId);
+            summaryWrapper.insertAdjacentHTML('afterbegin', confirmationHtml);
+
+            // Select and animate confirmation modal
+            const confirmation = document.querySelector('.confirmation');
+            gsap.from(confirmation, {
+                autoAlpha: 0,
+                duration: .2
+            });
+
+            // Alert animation
+            const alertWrapper = document.querySelector('.alert-wrapper');
+            // Add the animation for the company alerts
+            deleteAddressAlertAnimation
+            .from(alertWrapper, {
+                autoAlpha: 0
+            })
+            .to(alertWrapper, {
+                autoAlpha: 0
+            }, '+=1')
+            .add(() => {
+                if(!document.querySelector('.alert--error')) {
+                    return gsap.to(confirmation, {
+                        autoAlpha: 0,
+                        duration: .2,
+                        onComplete: () => {
+                            confirmation.parentElement.removeChild(confirmation);
+                        }
+                    })
+                }
+            })
+
+            const confirm = document.querySelector('.confirmation__btn--confirm');
+            const cancel = document.querySelector('.confirmation__btn--cancel');
+
+            confirm.addEventListener('click', async () => {
+                // Clear the alert wrapper contents
+                while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+
+                if(this.state.companies.currentCompany.addresses.length === 1) {
+                    alert = modalView.getAlert(`Cannot delete last remaining address`, false);
+                    alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                    // Add to the animation to remove the modal (usually failed modals remain)
+                    deleteAddressAlertAnimation.to(confirmation, {
+                        autoAlpha: 0,
+                        duration: .2,
+                        onComplete: () => {
+                            // Pausing the animation prevents the onComplete running on a confirmation that isn't there
+                            confirmation.parentElement.removeChild(confirmation);
+                        }
+                    })
+                    deleteAddressAlertAnimation.play(0);
+                    // gsap.to(confirmation, {
+                    //     autoAlpha: 0,
+                    //     duration: .2,
+                    //     onComplete: () => {
+                    //         // Pausing the animation prevents the onComplete running on a confirmation that isn't there
+                    //         deleteAddressAlertAnimation.pause();
+                    //         confirmation.parentElement.removeChild(confirmation);
+                    //     }
+                    // })
+                    return;
+                }
+
+                try {
+                    const res = await this.Admin.deleteAddress(addressId);
+
+                    if(res.status === 200) {
+                        console.log('deleted');
+
+
+
+                    } 
+                } catch(err) {
+                    console.log(err);
+                }
+            }); 
+            cancel.addEventListener('click', () => {
+                gsap.to(confirmation, {
+                    autoAlpha: 0,
+                    duration: .2,
+                    onComplete: () => {
+                        // Pausing the animation prevents the onComplete running on a confirmation that isn't there
+                        deleteAddressAlertAnimation.pause();
+                        confirmation.parentElement.removeChild(confirmation);
+                    }
+                })
+            });
+
+
         }
     }
 

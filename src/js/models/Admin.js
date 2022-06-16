@@ -106,6 +106,12 @@ export default class Admin {
     createAddress(formData) {
         return JRS.post('/admin/create/address', formData);
     }
+    editAddress(formData) {
+        return JRS.post(`/admin/edit/address`, formData);
+    }
+    deleteAddress(id) {
+        return JRS.delete(`/admin/delete/address/${id}`);
+    }
 
     deleteCompany(id) {
         return JRS.delete(`/admin/delete/company/${id}`);
@@ -118,7 +124,5 @@ export default class Admin {
     editContact(formData) {
         return JRS.post(`/admin/edit/contact`, formData);
     }
-    editAddress(formData) {
-        return JRS.post(`/admin/edit/address`, formData);
-    }
+
 }
