@@ -268,7 +268,7 @@ export const animateSummaryWrapperIn = () => {
 export const switchSummary = (summary, newSummary) => {
 
     const summaryWrapper = document.querySelector('.summary-wrapper');
-console.log('swapping:', summary, summaryWrapper);
+// console.log('swapping:', summary, summaryWrapper);
     // Remove the old summary and insert the new one
     summary.parentElement.removeChild(summary);
     summaryWrapper.insertAdjacentHTML('afterbegin', newSummary);
@@ -1839,6 +1839,52 @@ export const calculateRows = (tableName, header, pagination) => {
 //     return { headerHeight, rowHeight, paginationHeight };
 // }
 
+export const getDeleteContactHtml = (contactId) => {
+    const name = document.querySelector('.company-summary__field--name').innerText;
+    const position = document.querySelector('.company-summary__field--position')?.innerText;
+    const phone = document.querySelector('.company-summary__field--contact-phone').innerText;
+    const email = document.querySelector('.company-summary__field--contact-email').innerText;
+
+    return (`
+        <div class='confirmation confirmation--delete'>
+            <div class="company-summary__modal-header">
+                <div>${contactId}</div>
+            </div>
+            <div class='confirmation__header'>
+                <div class='confirmation__svg-wrapper'>
+                    <svg class='confirmation__svg confirmation__svg--delete'><use xlink:href="svg/spritesheet.svg#alert-circled"></svg>
+                </div>
+                <div class='confirmation__message'>Delete contact ${contactId}?</div>
+            </div>
+            <div class='confirmation__contact'>
+                <div class='confirmation__item'>
+                    <div class='confirmation__label'>Name:</div>
+                    <div class='confirmation__field'>${name}</div>
+                </div>
+                <div class='confirmation__item'>
+                    <div class='confirmation__label'>Position:</div>
+                    <div class='confirmation__field'>${position}</div>
+                </div>
+                <div class='confirmation__item'>
+                    <div class='confirmation__label'>Phone:</div>
+                    <div class='confirmation__field'>${phone}</div>
+                </div>
+                <div class='confirmation__item'>
+                    <div class='confirmation__label'>Email:</div>
+                    <div class='confirmation__field'>${email}</div>
+                </div>
+            </div>
+            <div class='confirmation__controls'>
+                <button class='confirmation__btn confirmation__btn--confirm'>Confirm</button>
+                <button class='confirmation__btn confirmation__btn--cancel'>Cancel</button>
+            </div>
+            <div class="alert-wrapper">
+            
+            </div>
+        </div>
+    `);
+}
+
 export const getDeleteAddressHtml = (addressId) => {
     const firstLine = document.querySelector('.company-summary__field--first-line').innerText;
     const secondLine = document.querySelector('.company-summary__field--second-line')?.innerText;
@@ -3193,7 +3239,7 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
                     <div class="summary__column summary__column--company summary__column--company-summary">
                         
 
-                        <div class="summary__heading summary__heading--contacts">
+                        <div class="summary__heading summary__heading--contacts" data-id="${contacts[0].contactId}">
                             Contacts
                             <div class="company-summary__controls company-summary__controls--contacts">
                                 <div class="company-summary__btn company-summary__btn--new-contact company-summary__btn--contacts">

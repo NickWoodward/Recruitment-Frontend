@@ -2893,6 +2893,7 @@ class AdminController {
 
         const newContactAlertAnimation = gsap.timeline({paused: true});
         const editContactAlertAnimation = gsap.timeline({paused: true});
+        const deleteContactAlertAnimation = gsap.timeline({paused: true});
         
         const newAddressAlertAnimation = gsap.timeline({paused: true});
         const editAddressAlertAnimation = gsap.timeline({paused: true});
@@ -3348,6 +3349,7 @@ class AdminController {
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
                             newAddressAlertAnimation.play(0);
 
+                            this.state.companies.currentCompany.addresses.push(res.data.address);
                             this.state.companies.addressPagination.totalAddresses++;
 
                             const { totalAddresses, addressIndex } = this.state.companies.addressPagination;
@@ -3968,6 +3970,23 @@ class AdminController {
                 // Clear the alert wrapper contents
                 while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
 
+
+                if(this.companies.length === 1) {
+                    alert = modalView.getAlert(`Cannot delete last remaining address`, false);
+                    alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                    // Add to the animation to remove the modal (usually failed modals remain)
+                    deleteAddressAlertAnimation.to(confirmation, {
+                        autoAlpha: 0,
+                        duration: .2,
+                        onComplete: () => {
+                            confirmation.parentElement.removeChild(confirmation);
+                        }
+                    })
+                    deleteAddressAlertAnimation.play(0);
+                    
+                    return;
+                }
+
                 try {
                     const res = await this.Admin.deleteCompany(companyId);
                     if(res.status === 200) {
@@ -4013,11 +4032,17 @@ class AdminController {
 
                         // Play the alert animation
                         deleteCompanyAlertAnimation.play(0);
-                    } else { console.log('oh no!') }
+                    } else { 
+                        // Clear the alert wrapper contents
+                        while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+                        alert = modalView.getAlert(`Company not deleted`, false);
+                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                    }
                 } catch(err) {
                     // Clear the alert wrapper contents
                     while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
-
+                    alert = modalView.getAlert(`Company not deleted`, false);
+                    alertWrapper.insertAdjacentHTML('afterbegin', alert);
                 }
             });
 
@@ -4033,6 +4058,126 @@ class AdminController {
         }
         if(deleteContactBtn) {
             console.log('deleteContact');
+            
+// this needs to be changed for contacts
+
+            let alert;
+            const contactId = document.querySelector('.summary__heading--contacts').dataset.id;
+            const summaryWrapper = document.querySelector('.summary-wrapper');
+
+            // Render confirmation modal
+            const confirmationHtml = adminView.getDeleteContactHtml(contactId);
+            summaryWrapper.insertAdjacentHTML('afterbegin', confirmationHtml);
+
+            // Select and animate confirmation modal
+            const confirmation = document.querySelector('.confirmation');
+            gsap.from(confirmation, {
+                autoAlpha: 0,
+                duration: .2
+            });
+
+            // Alert animation
+            const alertWrapper = document.querySelector('.alert-wrapper');
+            // Add the animation for the company alerts
+            deleteContactAlertAnimation
+            .from(alertWrapper, {
+                autoAlpha: 0
+            })
+            .to(alertWrapper, {
+                autoAlpha: 0
+            }, '+=1')
+            .add(() => {
+                if(!document.querySelector('.alert--error')) {
+                    return gsap.to(confirmation, {
+                        autoAlpha: 0,
+                        duration: .2,
+                        onComplete: () => {
+                            confirmation.parentElement.removeChild(confirmation);
+                        }
+                    })
+                }
+            })
+
+            const confirm = document.querySelector('.confirmation__btn--confirm');
+            const cancel = document.querySelector('.confirmation__btn--cancel');
+
+            confirm.addEventListener('click', async () => {
+                // Clear the alert wrapper contents
+                while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+
+                if(this.state.companies.currentCompany.contacts.length === 1) {
+                    alert = modalView.getAlert(`Cannot delete last remaining address`, false);
+                    alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                    // Add to the animation to remove the modal (usually failed modals remain)
+                    deleteContactAlertAnimation.to(confirmation, {
+                        autoAlpha: 0,
+                        duration: .2,
+                        onComplete: () => {
+                            confirmation.parentElement.removeChild(confirmation);
+                        }
+                    })
+                    deleteContactAlertAnimation.play(0);
+                    
+                    return;
+                }
+
+                // try {
+                //     const res = await this.Admin.deleteAddress(addressId);
+
+                //     if(res.status === 200) {
+                //         console.log('deleted');
+                //         // Set the alert
+                //         alert = modalView.getAlert(`Address ${addressId} deleted`, true);
+                //         alertWrapper.insertAdjacentHTML('afterbegin', alert);
+
+                //         // No need to update the company array or the company table
+                //         // Just remove the address from the current company
+                //         const index = this.state.companies.currentCompany.addresses.findIndex(address => address.id === parseInt(addressId));
+                //         this.state.companies.currentCompany.addresses.splice(index, 1);
+
+                //         // Change summary
+                //         const summary = document.querySelector('.summary');
+                //         const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
+                //         // No animation needed as it's behind the modal
+                //         adminView.switchSummary(summary, newSummary);
+
+                //         // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
+                //         this.setCompanyJobsState();
+
+                //         // Render the summary company jobs table
+                //         if(this.state.companies.paginatedJobs.length > 0) {
+                //             // remove any placeholders
+                //             const placeholder = document.querySelector('.company-jobs-placeholder');
+                //             if(placeholder) placeholder.parentElement.removeChild(placeholder);
+
+                //             this.renderCompanyJobsTable();
+                //         } else {
+                //             // render a placeholder saying 'no jobs'
+                //             document.querySelector('.table-wrapper--nested-jobs')
+                //                 .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
+                //         } 
+                //         // Add pagination for nested contacts, addresses, and jobs elements
+                //         this.addCompanyNestedPagination();
+
+                //         this.addCompanySummaryListeners();
+
+                //         deleteAddressAlertAnimation.play(0);
+                //     } 
+                // } catch(err) {
+                //     console.log(err);
+                // }
+            }); 
+            cancel.addEventListener('click', () => {
+                gsap.to(confirmation, {
+                    autoAlpha: 0,
+                    duration: .2,
+                    onComplete: () => {
+                        // Pausing the animation prevents the onComplete running on a confirmation that isn't there
+                        deleteAddressAlertAnimation.pause();
+                        confirmation.parentElement.removeChild(confirmation);
+                    }
+                })
+            });  
         }
         if(deleteAddressBtn) {
             let alert;
@@ -4087,20 +4232,11 @@ class AdminController {
                         autoAlpha: 0,
                         duration: .2,
                         onComplete: () => {
-                            // Pausing the animation prevents the onComplete running on a confirmation that isn't there
                             confirmation.parentElement.removeChild(confirmation);
                         }
                     })
                     deleteAddressAlertAnimation.play(0);
-                    // gsap.to(confirmation, {
-                    //     autoAlpha: 0,
-                    //     duration: .2,
-                    //     onComplete: () => {
-                    //         // Pausing the animation prevents the onComplete running on a confirmation that isn't there
-                    //         deleteAddressAlertAnimation.pause();
-                    //         confirmation.parentElement.removeChild(confirmation);
-                    //     }
-                    // })
+                    
                     return;
                 }
 
@@ -4109,9 +4245,42 @@ class AdminController {
 
                     if(res.status === 200) {
                         console.log('deleted');
+                        // Set the alert
+                        alert = modalView.getAlert(`Address ${addressId} deleted`, true);
+                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
 
+                        // No need to update the company array or the company table
+                        // Just remove the address from the current company
+                        const index = this.state.companies.currentCompany.addresses.findIndex(address => address.id === parseInt(addressId));
+                        this.state.companies.currentCompany.addresses.splice(index, 1);
 
+                        // Change summary
+                        const summary = document.querySelector('.summary');
+                        const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
+                        // No animation needed as it's behind the modal
+                        adminView.switchSummary(summary, newSummary);
 
+                        // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
+                        this.setCompanyJobsState();
+
+                        // Render the summary company jobs table
+                        if(this.state.companies.paginatedJobs.length > 0) {
+                            // remove any placeholders
+                            const placeholder = document.querySelector('.company-jobs-placeholder');
+                            if(placeholder) placeholder.parentElement.removeChild(placeholder);
+
+                            this.renderCompanyJobsTable();
+                        } else {
+                            // render a placeholder saying 'no jobs'
+                            document.querySelector('.table-wrapper--nested-jobs')
+                                .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
+                        } 
+                        // Add pagination for nested contacts, addresses, and jobs elements
+                        this.addCompanyNestedPagination();
+
+                        this.addCompanySummaryListeners();
+
+                        deleteAddressAlertAnimation.play(0);
                     } 
                 } catch(err) {
                     console.log(err);
