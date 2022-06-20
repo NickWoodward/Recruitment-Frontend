@@ -17,4 +17,16 @@
 @import 'layout/section';
 
 @import 'components/summary';
+@import 'components/stats';
 @import 'components/pagination';
+@import 'components/company-table';
+
+.content {
+    display: grid;
+    // grid-template-columns: repeat(16, 1fr);
+    grid-template-columns: repeat(16, minmax(0,1fr));
+
+    column-gap: 5rem;
+    row-gap: 5rem;
+    padding: 5rem;
+}

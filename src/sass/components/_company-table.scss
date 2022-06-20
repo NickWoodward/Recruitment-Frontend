@@ -1,0 +1,70 @@
+.table-wrapper {
+    &--companies {
+        grid-column: 1/6;
+    }
+}
+
+.table {
+    border-collapse: collapse;
+
+    &__header {
+        &--companies {
+            display: flex;
+            align-items: center;
+    
+            height: var(--summary-header-height);
+            padding: 0 var(--summary-padding);
+    
+            box-shadow: 0 2px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+            border-radius: 5px 5px 0 0;
+
+            background-color: $color-primary-new;
+            font-size: 1.6rem;
+            font-weight: 400;
+            color: white;
+        }
+    }
+    &__content {
+        &--companies {
+            padding: 2rem 0 2rem 0;
+        }
+    }
+
+    &--companies {
+        width: 100%;
+        
+        box-shadow: 0 2px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+        border-radius: 5px;
+    }
+}
+
+//// Styles that could probably be generalised and moved to the table stylesheet
+
+.thead--companies {
+    & tr th {
+        font-size: var(--table-heading-font-size);
+        padding: var(--table-padding);
+        font-weight: 400;
+        text-align: left;
+
+        color: $color-secondary;
+        background-color: var(--table-heading-bg-color);
+        
+        &:last-of-type {
+            text-align: end;
+        }
+    }
+}
+
+.tbody--companies {
+    & tr td {
+        padding: var(--table-padding);
+        font-weight: 400;
+        text-align: left;
+        font-size: var(--table-content-font-size);
+
+        &:last-of-type {
+            text-align: end;
+        }
+    }
+}

@@ -78,9 +78,20 @@ textarea, input {
     // Summaries
     --summary-header-height: 6rem;
     --summary-padding: 3rem;
-    --summary-heading-font-size: 1.9rem;
+    --summary-heading-font-size: 1.7rem;
     --summary-content-font-size: 1.6rem;
     --summary-heading-bg-color: rgb(249, 250, 251);
+
+    // Stats
+    --stats-heading-font-size: 1.7rem;
+
+    // Tables
+    --table-heading-font-size: 1.7rem;
+    --table-content-font-size: 1.5rem;
+    --table-heading-height: 6rem;
+    --table-heading-bg-color: rgb(249, 250, 251);
+    --table-padding: 1.5rem 2.5rem;
+
 }
 
 html {

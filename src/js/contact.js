@@ -6,6 +6,8 @@ import '../sass/contact.scss';
 import axios from 'axios';
 
 import * as summaryView from './views/summaryView';
+import * as statsView from './views/statsView';
+import * as companyTableView from './views/companyTableView';
 import * as utils from './utils/utils';
 
 class ContactController {
@@ -17,20 +19,51 @@ class ContactController {
             id: 5, 
             companyName: 'Test', 
             companyDate: '22/04/22', 
-            contacts: [{contactId: 2, firstName: 'Nick', lastName: 'Woodward', position: 'CEO', phone: '07565234767', email: 'nick@gmail.com'}], 
+            contacts: [{contactId: 2, firstName: 'Nick', lastName: 'Woodward', position: 'CEO', phone: '07565234767', email: 'nick@gm12333.com'}], 
             addresses: [{id: 9, firstLine: '305 Haverly Drive', second: 'Earley', city:'Reading', county: 'Berkshire', postcode: 'RG6 7WE'}], 
         }
+
+        const dummyCompanies = [
+            {
+                id: 5, 
+                companyName: 'Test', 
+                companyDate: '22/04/22', 
+            },
+            {
+                id:6,
+                companyName: 'Dell',
+                companyDate: '12/03/21'
+            },
+            {
+                id: 2,
+                companyName: 'HP',
+                companyDate: '02/03/19'
+            },
+            {
+                id: 78,
+                companyName: 'JRS',
+                companyDate: '10/05/19'
+            }
+        ];
         
 
         const summary = summaryView.createCompanySummary(company);
+        const stats = statsView.createCompanyStatsSummary();
+        const table = companyTableView.createCompanyTable(dummyCompanies);
 
-        const main = document.querySelector('main');
-        main.insertAdjacentHTML('afterbegin', summary);
+        const content = document.querySelector('.content');
+        content.insertAdjacentHTML('afterbegin', stats);
+        content.insertAdjacentHTML('afterbegin', summary);
+        content.insertAdjacentHTML('afterbegin', table);
+
+
         summaryView.renderPagination(5, 3, document.querySelector('.summary__section--contacts'), 'contacts')
         summaryView.renderPagination(7, 2, document.querySelector('.summary__section--addresses'), 'addresses')
+        summaryView.renderPagination(5, 2, document.querySelector('.summary__section--jobs'), 'jobs');
 
 
     }
+
 
 
     // getUsers() {

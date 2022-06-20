@@ -10,7 +10,7 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
             <div class="summary__header-item summary__company-date">${companyDate}</div>
         </div>
     `;
-// summary wrapper added by add summary wrapper class
+// summary wrapper added by add summary wrapper class (REMOVE HERE)
     const markup = `
         <div class="summary-wrapper summary-wrapper--company">
             <div class="summary summary--company">  
@@ -28,6 +28,8 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
                         <div class="summary__table-wrapper--jobs table-wrapper--nested-jobs"></div>
                     </div>
 
+                    ${createSummaryControls('company')}
+
                 </div>
 
             </div>  
@@ -42,23 +44,7 @@ const createCompanyAddressSection = (address) => {
         <div class="summary__section summary__section--addresses">
             <div class="summary__heading summary__heading--addresses" data-id="${address.id}">
                 <p>Addresses</p>
-                <div class="summary__controls">
-                    <div class="summary__btn summary__btn--new-address">
-                        <svg class="summary__icon--new-address">
-                            <use xlink:href="svg/spritesheet.svg#add">
-                        </svg>
-                    </div>
-                    <div class="summary__btn summary__btn--edit-address">
-                        <svg class="summary__icon--edit-address">
-                            <use xlink:href="svg/spritesheet.svg#edit-np1">
-                        </svg>
-                    </div>
-                    <div class="summary__btn summary__btn--delete-address">
-                        <svg class="summary__icon--delete-address">
-                            <use xlink:href="svg/spritesheet.svg#delete-np1">
-                        </svg>
-                    </div>
-                </div>
+                ${createSummaryControls('address')}
             </div>
 
             <div class="summary__row">
@@ -106,23 +92,7 @@ const createCompanyContactSection = (contact) => {
         <div class="summary__section summary__section--contacts">
             <div class="summary__heading summary__heading--contacts" data-id="${contact.contactId}">
                 <p>Contacts</p>
-                <div class="summary__controls">
-                    <div class="summary__btn summary__btn--new-contact">
-                        <svg class="summary__icon--new-contact">
-                            <use xlink:href="svg/spritesheet.svg#add">
-                        </svg>
-                    </div>
-                    <div class="summary__btn summary__btn--edit-contact">
-                        <svg class="summary__icon--edit-contact">
-                            <use xlink:href="svg/spritesheet.svg#edit-np1">
-                        </svg>
-                    </div>
-                    <div class="summary__btn summary__btn--delete-contact">
-                        <svg class="summary__icon--delete-contact">
-                            <use xlink:href="svg/spritesheet.svg#delete-np1">
-                        </svg>
-                    </div>
-                </div>
+                ${createSummaryControls('contact')}
             </div>
 
             <div class="summary__row">
@@ -144,9 +114,10 @@ const createCompanyContactSection = (contact) => {
                     </div>
                     <div class="summary__item">
                         <div class="summary__label">Email:</div>
-                        <div class="summary__field summary__field--contact-email">
-                            <a class="summary__link--contact-email">${contact.email}</a>
-                            <svg class="summary__copy-svg"><use xlink:href="svg/spritesheet.svg#applications"></svg>    
+                        <div class="summary__field summary__field--contact-email summary__copy-wrapper">
+                            <a class="summary__link summary__link--contact-email">${contact.email}</a>  
+                            <svg class="summary__copy-svg"><use xlink:href="svg/spritesheet.svg#applications"></svg>             
+   
                         </div>
                     </div>
                 </div>
@@ -155,6 +126,35 @@ const createCompanyContactSection = (contact) => {
         </div>
     `;
     return contactSection;
+
+}
+
+const createSummaryControls = (section) => {
+    const markup = `
+        <div class="summary__controls summary__controls--${section}">
+            <div class="summary__btn summary__btn--new-${section}">
+                <svg class="summary__icon--new-${section}">
+                    <use xlink:href="svg/spritesheet.svg#add">
+                </svg>
+            </div>
+            <div class="summary__btn summary__btn--edit-${section}">
+                <svg class="summary__icon--edit-${section}">
+                    <use xlink:href="svg/spritesheet.svg#edit-np1">
+                </svg>
+            </div>
+            ${section === 'company'? `<div class="summary__btn summary__btn--hubspot-${section}">
+                <svg class="summary__icon--hubspot-${section}">
+                    <use xlink:href="svg/spritesheet.svg#hubspot">
+                </svg>
+            </div>` : ''} 
+            <div class="summary__btn summary__btn--delete-${section}">
+                <svg class="summary__icon--delete-${section}">
+                    <use xlink:href="svg/spritesheet.svg#delete-np1">
+                </svg>
+            </div>
+        </div>
+    `;
+    return markup;
 }
 
 /////////////  END COMPANY SUMMARY  /////////////
