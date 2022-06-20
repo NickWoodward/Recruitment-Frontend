@@ -1,7 +1,7 @@
 import { elementStrings } from './base';
 
 export const renderLoader = ({parent, type, position = 'afterbegin', inFlow = true}) => {
-
+console.log(parent, type);
     const loader = `
         <div class="${elementStrings.loader} ${elementStrings.loader}--${type}">
             <div class="rotate">

@@ -78,7 +78,7 @@
     &--companies, &--applications, &--jobs, &--users {
         display: grid;
         grid-template-columns: repeat(12, 1fr);
-        grid-template-rows: repeat(8, 1fr);
+        grid-template-rows: repeat(12, 1fr);
 
         grid-gap: 4rem;
     }
@@ -113,16 +113,20 @@
     // }
 
     &--applications {
-        grid-column: 1/5;
-        grid-row: 1/6;
+        grid-column: 1/6;
+        grid-row: 1/9;
     }
     &--jobs {
         grid-column: 1/5;
-        grid-row: 1/7;
+        grid-row: 1/10;
     }
     &--companies {
         grid-column: 4/13;
-        grid-row: 1/7;
+        grid-row: 1/10;
+    }
+    &--users {
+        grid-column: 4/9;
+        grid-row: 1/6;
     }
 }
 .summary {
@@ -137,10 +141,10 @@
         // border: 1px solid red;
 
         &--small {
-            width: 45%;
+            width: 50%;
         }
         &--large {
-            width: 55%;
+            width: 50%;
         }
 
         &--company {
@@ -262,7 +266,7 @@
     &__item  {
         margin-bottom: 1.4rem;
         font-size: 1.6rem;
-        padding: 0 3rem;
+        // padding: 0 3rem;
         overflow-x: hidden;
 
         &--cv {
@@ -333,14 +337,18 @@
     box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
 
     &--applications {
-        grid-column: 5/13;
-        grid-row: 1/8;
+        grid-column: 6/13;
+        grid-row: 1/6;
     }
     &--jobs {
         grid-column: 5/13;
         grid-row: 1/6;
     }
     &--companies {
+        grid-column: 1/4;
+        grid-row: 1/6;
+    }
+    &--users {
         grid-column: 1/4;
         grid-row: 1/6;
     }
@@ -422,7 +430,7 @@
 
     &__section {
         position: relative;
-
+        padding: 0 3rem;
         &--application {
             display: flex;
             justify-content: space-between;
@@ -438,6 +446,7 @@
         }
         &--job {
             height: 17rem;
+            
         }
         &--person {
             height: 15rem;

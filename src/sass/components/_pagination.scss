@@ -1,0 +1,50 @@
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-bottom: 2rem;
+
+    &__item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: .1rem .7rem;
+        font-size: 1.4rem;
+        border: 1px solid lightgray;
+
+        cursor: pointer;
+
+        &:not(:first-of-type) {
+            margin-left: .8rem;
+        }
+
+        &--active {
+            color: $color-secondary;
+            font-weight: 700;
+            border-bottom: 2px solid $color-secondary;
+        }
+    }
+
+    &__item-wrapper {
+        display: flex;
+    }
+
+    &__previous, &__next {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 8rem;
+        padding: .5rem 1rem;
+        font-size: 1.5rem;
+        cursor: pointer;
+
+        &--inactive {
+            color: lightgray;
+            cursor: default;
+        }
+    }
+   
+}

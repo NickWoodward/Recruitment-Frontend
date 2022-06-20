@@ -590,6 +590,24 @@ class AdminController {
 
                         this.addCompanySummaryListeners();
                         break;
+
+
+                    case 'users': 
+                        this.state.users.currentUser = this.users[0];
+                        // Render table
+                        this.renderUsersTable();
+
+                        // // Add pagination
+                        // const { totalJobs, searchOptions: {index: jobIndex, limit: jobLimit} } = this.state.jobs;
+                        // const { pages: numJobPages, current: currentJobPage } = adminView.calculatePagination(jobIndex, jobLimit, totalJobs);
+                        // adminView.renderPagination(numJobPages, currentJobPage, document.querySelector('.table-wrapper'), 'jobs');
+                        // Add summary
+                        const userSummary = adminView.createUserSummary(this.users[0]);
+                        document.querySelector('.summary-wrapper').insertAdjacentHTML('afterbegin', userSummary);
+
+                        // this.addJobsSummaryListeners();
+                        // // this.addJobSummaryListeners();
+                        break;
                 }
 
                 // Remove loaders
@@ -598,7 +616,6 @@ class AdminController {
 
                 // Animate summaries in for the first time (different to switching). Tables animated in the render methods
                 if(sectionName === 'applications' || sectionName === 'jobs' || sectionName === 'companies') {
-                //   adminView.animateTableContentIn()
                   adminView.animateSummaryIn();
                 }
 
@@ -2380,43 +2397,128 @@ class AdminController {
     }
 
     renderUsersTable() {
-        const { totalUsers, searchOptions: {index, limit} } = this.state.users;
-        // Offset is subtracted from the user id to get the current item
-        // const page = index / limit;
-        // const offset = page * limit;
-        // Format users/headers into html elements
+        // Format applications/headers into html elements
         const {headers, rows} = adminView.formatUsers(this.users);
-        const tableWrapper = document.querySelector('.users-table__wrapper');
 
-        // removeUserTable & pagination if it exists
+        const tableWrapper = document.querySelector('.table-wrapper');
         const table = document.querySelector('.table--users');
-        const pagination = document.querySelector('.pagination--users');
-        if(table) utils.removeElement(table);
-        if(pagination) utils.removeElement(pagination);
 
-        // elements.adminContent.insertAdjacentHTML('afterbegin', tableView.createTableTest('users', headers, rows, false))
-        tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('users', headers, rows, false));
-        // Add pagination
-        adminView.renderPagination(index, limit, totalUsers, tableWrapper, 'users');
+        // If no table visible, render both the header and content
+        if(!table) { 
+            tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('users', headers, rows, false));
+            adminView.animateTableContentIn('users')
+            // Else remove the tbody and render just the content
+        } else {
+            utils.removeElement(document.querySelector('tbody'));
+            document.querySelector('thead').insertAdjacentHTML('afterend', tableView.updateTableContent('users', rows));
+            adminView.animateTableBodyIn('users');
+        }
 
+        
+        // Set active row
         const userRows = document.querySelectorAll('.row--users');
-        const activeRow = Array.from(userRows).find(row => row.querySelector(`[data-id="${this.state.users.currentUser.applicantId}"]`)) || userRows[0];
+        const activeRow = Array.from(userRows).find(row => {
+            return row.querySelector(`[data-id="${this.state.users.currentUser.id}"]`);
+        }) || userRows[0];
+
         utils.changeActiveRow(activeRow, userRows);
 
+        // Add table row listeners
         userRows.forEach(row => {
-            row.addEventListener('click', (e) => {
+            row.addEventListener('click', e => {
                 const targetRow = e.target.closest('.row');
-                const rowId = targetRow.querySelector('.td-data--first-name').dataset.id;
-                const user = this.users.filter(user => {
-                    return parseInt(rowId) === user.applicantId;
+                const rowId = row.querySelector('.td-data--first-name').dataset.id;
+                const user = this.users.filter((user, index) => {
+                    return parseInt(rowId) === user.id;
                 });
-
                 utils.changeActiveRow(targetRow, userRows);
                 this.state.users.currentUser = user[0];
-                adminView.populateUserSummary(user[0]);
+
+
+                // Change the summary
+                const summary = document.querySelector('.summary');
+                const newSummary = adminView.createUserSummary(user[0])
+                console.log(summary, newSummary);
+
+                const tl = gsap.timeline();
+
+                // adminView.swapSummary(summary, adminView.createCompanySummary(company[0]), this.companySummaryListener.bind(this), tl);
+                tl.add(adminView.animateSummaryWrapperOut());
+                tl.add(() => {
+                    // Switch the summary
+                    adminView.switchSummary(summary, newSummary);
+
+                    // // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
+                    // this.setCompanyJobsState();
+
+                    // // Render the summary company jobs table
+                    // if(this.state.companies.paginatedJobs.length > 0) {
+                    //     // remove any placeholders
+                    //     const placeholder = document.querySelector('.company-jobs-placeholder')
+
+                    //     if(placeholder) placeholder.parentElement.removeChild(placeholder);
+
+                    //     this.renderCompanyJobsTable();
+                    // } else {
+                    //     // render a placeholder saying 'no jobs'
+                    //     document.querySelector('.table-wrapper--nested-jobs')
+                    //         .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
+                    // } 
+
+                    // // Add pagination for nested contacts, addresses, and jobs elements
+                    // this.addCompanyNestedPagination();
+
+                    // Add the listener to the new summary
+                    document.querySelector('.summary').addEventListener('click', (e) => this.userSummaryListener(e))
+
+                    // Remove any modals
+                    adminView.removeSummaryModals();
+            
+                  })
+                  tl.add(adminView.animateSummaryWrapperIn());
+
             });
         });
     }
+
+    // renderUsersTable() {
+    //     const { totalUsers, searchOptions: {index, limit} } = this.state.users;
+    //     // Offset is subtracted from the user id to get the current item
+    //     // const page = index / limit;
+    //     // const offset = page * limit;
+    //     // Format users/headers into html elements
+    //     const {headers, rows} = adminView.formatUsers(this.users);
+    //     const tableWrapper = document.querySelector('.users-table__wrapper');
+
+    //     // removeUserTable & pagination if it exists
+    //     const table = document.querySelector('.table--users');
+    //     const pagination = document.querySelector('.pagination--users');
+    //     if(table) utils.removeElement(table);
+    //     if(pagination) utils.removeElement(pagination);
+
+    //     // elements.adminContent.insertAdjacentHTML('afterbegin', tableView.createTableTest('users', headers, rows, false))
+    //     tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('users', headers, rows, false));
+    //     // Add pagination
+    //     adminView.renderPagination(index, limit, totalUsers, tableWrapper, 'users');
+
+    //     const userRows = document.querySelectorAll('.row--users');
+    //     const activeRow = Array.from(userRows).find(row => row.querySelector(`[data-id="${this.state.users.currentUser.applicantId}"]`)) || userRows[0];
+    //     utils.changeActiveRow(activeRow, userRows);
+
+    //     userRows.forEach(row => {
+    //         row.addEventListener('click', (e) => {
+    //             const targetRow = e.target.closest('.row');
+    //             const rowId = targetRow.querySelector('.td-data--first-name').dataset.id;
+    //             const user = this.users.filter(user => {
+    //                 return parseInt(rowId) === user.applicantId;
+    //             });
+
+    //             utils.changeActiveRow(targetRow, userRows);
+    //             this.state.users.currentUser = user[0];
+    //             adminView.populateUserSummary(user[0]);
+    //         });
+    //     });
+    // }
     addUserSummaryListeners() {
         const userSummary = document.querySelector('.user-summary');
 
@@ -2728,6 +2830,7 @@ class AdminController {
                 // Change the summary
                 const summary = document.querySelector('.summary');
                 const newSummary = adminView.createCompanySummary(company[0])
+                console.log(summary, newSummary);
 
                 const tl = gsap.timeline();
 
@@ -3200,6 +3303,7 @@ class AdminController {
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
                             newContactAlertAnimation.play(0);
 
+                            this.state.companies.currentCompany.contacts.push(res.data.contact);
                             this.state.companies.contactPagination.totalContacts++;
 
                             const { totalContacts, contactIndex } = this.state.companies.contactPagination;
@@ -4059,8 +4163,6 @@ class AdminController {
         if(deleteContactBtn) {
             console.log('deleteContact');
             
-// this needs to be changed for contacts
-
             let alert;
             const contactId = document.querySelector('.summary__heading--contacts').dataset.id;
             const summaryWrapper = document.querySelector('.summary-wrapper');
@@ -4106,7 +4208,7 @@ class AdminController {
                 while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
 
                 if(this.state.companies.currentCompany.contacts.length === 1) {
-                    alert = modalView.getAlert(`Cannot delete last remaining address`, false);
+                    alert = modalView.getAlert(`Cannot delete last remaining contact`, false);
                     alertWrapper.insertAdjacentHTML('afterbegin', alert);
                     // Add to the animation to remove the modal (usually failed modals remain)
                     deleteContactAlertAnimation.to(confirmation, {
@@ -4121,59 +4223,59 @@ class AdminController {
                     return;
                 }
 
-                // try {
-                //     const res = await this.Admin.deleteAddress(addressId);
+                try {
+                    const res = await this.Admin.deleteContact(contactId);
 
-                //     if(res.status === 200) {
-                //         console.log('deleted');
-                //         // Set the alert
-                //         alert = modalView.getAlert(`Address ${addressId} deleted`, true);
-                //         alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                    if(res.status === 200) {
+                        // Set the alert
+                        alert = modalView.getAlert(`Contact ${contactId} deleted`, true);
+                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
 
-                //         // No need to update the company array or the company table
-                //         // Just remove the address from the current company
-                //         const index = this.state.companies.currentCompany.addresses.findIndex(address => address.id === parseInt(addressId));
-                //         this.state.companies.currentCompany.addresses.splice(index, 1);
+                        // No need to update the company array or the company table
+                        // Just remove the contact from the current company
+                        const index = this.state.companies.currentCompany.contacts.findIndex(contact => contact.contactId === parseInt(contactId));
+                        this.state.companies.currentCompany.contacts.splice(index, 1);
 
-                //         // Change summary
-                //         const summary = document.querySelector('.summary');
-                //         const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
-                //         // No animation needed as it's behind the modal
-                //         adminView.switchSummary(summary, newSummary);
+                        // Change summary
+                        const summary = document.querySelector('.summary');
+                        const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
+                        // No animation needed as it's behind the modal
+                        adminView.switchSummary(summary, newSummary);
 
-                //         // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
-                //         this.setCompanyJobsState();
+                        // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
+                        this.setCompanyJobsState();
 
-                //         // Render the summary company jobs table
-                //         if(this.state.companies.paginatedJobs.length > 0) {
-                //             // remove any placeholders
-                //             const placeholder = document.querySelector('.company-jobs-placeholder');
-                //             if(placeholder) placeholder.parentElement.removeChild(placeholder);
+                        // Render the summary company jobs table
+                        if(this.state.companies.paginatedJobs.length > 0) {
+                            // remove any placeholders
+                            const placeholder = document.querySelector('.company-jobs-placeholder');
+                            if(placeholder) placeholder.parentElement.removeChild(placeholder);
 
-                //             this.renderCompanyJobsTable();
-                //         } else {
-                //             // render a placeholder saying 'no jobs'
-                //             document.querySelector('.table-wrapper--nested-jobs')
-                //                 .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
-                //         } 
-                //         // Add pagination for nested contacts, addresses, and jobs elements
-                //         this.addCompanyNestedPagination();
+                            this.renderCompanyJobsTable();
+                        } else {
+                            // render a placeholder saying 'no jobs'
+                            document.querySelector('.table-wrapper--nested-jobs')
+                                .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
+                        } 
+                        // Add pagination for nested contacts, addresses, and jobs elements
+                        this.addCompanyNestedPagination();
 
-                //         this.addCompanySummaryListeners();
+                        this.addCompanySummaryListeners();
 
-                //         deleteAddressAlertAnimation.play(0);
-                //     } 
-                // } catch(err) {
-                //     console.log(err);
-                // }
+                        deleteContactAlertAnimation.play(0);
+                    } 
+                } catch(err) {
+                    console.log(err);
+                }
             }); 
+
             cancel.addEventListener('click', () => {
                 gsap.to(confirmation, {
                     autoAlpha: 0,
                     duration: .2,
                     onComplete: () => {
                         // Pausing the animation prevents the onComplete running on a confirmation that isn't there
-                        deleteAddressAlertAnimation.pause();
+                        deleteContactAlertAnimation.pause();
                         confirmation.parentElement.removeChild(confirmation);
                     }
                 })
@@ -4281,9 +4383,17 @@ class AdminController {
                         this.addCompanySummaryListeners();
 
                         deleteAddressAlertAnimation.play(0);
-                    } 
+                    } else {
+                        const error = new Error();
+                        error.statusCode = res.status;
+                        throw error;
+
+                    }
                 } catch(err) {
                     console.log(err);
+                    alert = modalView.getAlert('Address Not Deleted', false);
+                    alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                    newAddressAlertAnimation.play(0);
                 }
             }); 
             cancel.addEventListener('click', () => {

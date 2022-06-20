@@ -1,16 +1,35 @@
-import * as headerView from './views/headerView'; 
 import UserModel from './models/User';
-import * as homeView from './views/homeView';
 
 // import '../sass/common.scss';
 import '../sass/index.scss';
+import '../sass/contact.scss';
 import axios from 'axios';
+
+import * as summaryView from './views/summaryView';
+import * as utils from './utils/utils';
 
 class ContactController {
     constructor() {
         this.UserModel = new UserModel();
+        utils.pageFadeIn();
 
-        console.log('contact');
+        const company = {
+            id: 5, 
+            companyName: 'Test', 
+            companyDate: '22/04/22', 
+            contacts: [{contactId: 2, firstName: 'Nick', lastName: 'Woodward', position: 'CEO', phone: '07565234767', email: 'nick@gmail.com'}], 
+            addresses: [{id: 9, firstLine: '305 Haverly Drive', second: 'Earley', city:'Reading', county: 'Berkshire', postcode: 'RG6 7WE'}], 
+        }
+        
+
+        const summary = summaryView.createCompanySummary(company);
+
+        const main = document.querySelector('main');
+        main.insertAdjacentHTML('afterbegin', summary);
+        summaryView.renderPagination(5, 3, document.querySelector('.summary__section--contacts'), 'contacts')
+        summaryView.renderPagination(7, 2, document.querySelector('.summary__section--addresses'), 'addresses')
+
+
     }
 
 
