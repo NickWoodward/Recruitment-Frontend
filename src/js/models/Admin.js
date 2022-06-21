@@ -6,12 +6,19 @@ export let cancelTokenSource;
 
 export default class Admin {    
     //////////  Applicant Methods  ///////////
-    getUsers({index, limit, orderField, orderDirection}) {
+    // getUsers({index, limit, orderField, orderDirection}) {
+    //     return JRS.get('/admin/applicants', { 
+    //         params: { index, limit, orderField, orderDirection },     
+    //         cancelToken: new axios.CancelToken(c => cancelTokenSource = c)
+    //     });
+    // }
+
+    getUsers({limit, index, orderField, orderDirection}, indexId) {
         return JRS.get('/admin/applicants', { 
-            params: { index, limit, orderField, orderDirection },     
+            params: { indexId, index, limit, orderField, orderDirection },     
             cancelToken: new axios.CancelToken(c => cancelTokenSource = c)
         });
-    }
+    };
 
     getUserNames() {
         return JRS.get('/admin/applicantnames');

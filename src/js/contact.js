@@ -7,7 +7,7 @@ import axios from 'axios';
 
 import * as summaryView from './views/summaryView';
 import * as statsView from './views/statsView';
-import * as companyTableView from './views/companyTableView';
+import * as companyListView from './views/companyListView';
 import * as utils from './utils/utils';
 
 class ContactController {
@@ -49,7 +49,7 @@ class ContactController {
 
         const summary = summaryView.createCompanySummary(company);
         const stats = statsView.createCompanyStatsSummary();
-        const table = companyTableView.createCompanyTable(dummyCompanies);
+        const table = companyListView.createCompanyTable(dummyCompanies);
 
         const content = document.querySelector('.content');
         content.insertAdjacentHTML('afterbegin', stats);
@@ -60,7 +60,7 @@ class ContactController {
         summaryView.renderPagination(5, 3, document.querySelector('.summary__section--contacts'), 'contacts')
         summaryView.renderPagination(7, 2, document.querySelector('.summary__section--addresses'), 'addresses')
         summaryView.renderPagination(5, 2, document.querySelector('.summary__section--jobs'), 'jobs');
-
+        summaryView.renderPagination(3, 1, document.querySelector('.companies-list__section'), 'companies');
 
     }
 

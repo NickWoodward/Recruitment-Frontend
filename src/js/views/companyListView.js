@@ -6,14 +6,29 @@ export const createCompanyTable = (companies) => {
     const {rows, headers} = formatCompanies(companies);
     const companyTable = tableView.createTableTest('companies', headers, rows, false);
 
+    const header = `
+        <div class="companies-list__header">Companies</div>
+    `;
+
     const markup = `
-        <div class="table-wrapper table-wrapper--companies">
-            <div class="table__header table__header--companies">Companies</div>
-            <div class="table__content table__content--companies">
-                ${companyTable}
+        <div class="companies-list-wrapper">
+            <div class="companies-list">
+                ${header}
+                <div class="companies-list__content">
+                    <div class="companies-list__section">${companyTable}</div>
+                </div>
             </div>
         </div>
     `;
+
+    // const markup = `
+    //     <div class="table-wrapper table-wrapper--companies">
+    //         <div class="table__header table__header--companies">Companies</div>
+    //         <div class="table__content table__content--companies">
+    //             ${companyTable}
+    //         </div>
+    //     </div>
+    // `;
     return markup;
 }
 

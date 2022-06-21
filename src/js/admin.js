@@ -182,8 +182,8 @@ class AdminController {
             // const jobsResponse = await this.Admin.getJobs(this.state.jobs.searchOptions);
             // this.jobs = jobsResponse.data.jobs;
 
-            const usersResponse = await this.Admin.getUsers(this.state.users.searchOptions);
-            this.users = usersResponse.data.applicants;
+            // const usersResponse = await this.Admin.getUsers(this.state.users.searchOptions);
+            // this.users = usersResponse.data.applicants;
 
             // adminView.initialiseAdminPage('jobs');
 
@@ -603,6 +603,7 @@ class AdminController {
                         // adminView.renderPagination(numJobPages, currentJobPage, document.querySelector('.table-wrapper'), 'jobs');
                         // Add summary
                         const userSummary = adminView.createUserSummary(this.users[0]);
+                        console.log(this.users[0]);
                         document.querySelector('.summary-wrapper').insertAdjacentHTML('afterbegin', userSummary);
 
                         // this.addJobsSummaryListeners();
@@ -899,6 +900,11 @@ class AdminController {
                 this.companies = companies;
                 console.log(this.companies);
                 this.state.companies.totalCompanies = companyTotal;
+                break;
+            case 'users':
+                const { data: { applicants, applicantsTotal } } = await this.Admin.getUsers(this.state.users.searchOptions, indexId);
+                this.users = applicants;
+                this.state.users.totalUsers = applicantsTotal;
                 break;
         }
     }
