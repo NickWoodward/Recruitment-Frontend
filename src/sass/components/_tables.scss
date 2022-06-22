@@ -16,6 +16,9 @@
     &--nested-jobs {
         width: 100%;
     }
+    &--nested-user-jobs {
+        width: 100%;
+    }
 }
 
 .cv-wrapper {
@@ -135,7 +138,7 @@ td:nth-of-type(8)::before {
         background-color: $color-primary-new;
     }
     .thead {
-        &--nested-jobs tr {
+        &--nested-jobs tr, &--nested-user-jobs tr {
             background-color: white;
             color: $color-secondary;
             font-size: 1.2rem;

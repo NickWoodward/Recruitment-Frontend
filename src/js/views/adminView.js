@@ -659,12 +659,12 @@ export const formatUsers = (users) => {
     });
     return { headers, rows };
 };
-const createUserElement = ({ applicantId, firstName, lastName, userDate }) => {
+const createUserElement = ({ id, firstName, lastName, userDate }) => {
     const row = [
-        `<td class="td-data--applicantId">${applicantId}</td>`,
-        `<td class="td-data--first-name" data-id=${applicantId}>${firstName}</td>`,
-        `<td class="td-data--last-name" data-id=${applicantId}>${lastName}</td>`,
-        `<td class="td-data--date" data-id=${applicantId}>${userDate}</td>`
+        `<td class="td-data--applicantId">${id}</td>`,
+        `<td class="td-data--first-name" data-id=${id}>${firstName}</td>`,
+        `<td class="td-data--last-name" data-id=${id}>${lastName}</td>`,
+        `<td class="td-data--date" data-id=${id}>${userDate}</td>`
     ];
     return row;
 }
@@ -678,7 +678,8 @@ export const createUserSummary = ({
     cvName,
     cvType,
     userDate,
-    jobs
+    jobs,
+    addresses
 }) => {
     const header = `
         <div class="summary__header">
@@ -702,13 +703,39 @@ export const createUserSummary = ({
             <div class="summary__details">
                 <div class="summary__section summary__section--user">
                     <div class="summary__heading">Applicant</div>
+                    <div class="summary__content summary__content--user">
+                        <div class="summary__column">
+                            <div class="summary__item">
+                                <div class="summary__label">Name:</div>
+                                <div class="summary__field summary__field--user-name">${firstName} ${lastName}</div>
+                            </div>
+                            <div class="summary__item">
+                                <div class="summary__label">Phone:</div>
+                                <div class="summary__field summary__field--user-phone">${phone}</div>
+                            </div>
+                        </div>
+                        <div class="summary__column">
+                            <div class="summary__item">
+                                <div class="summary__label">Email:</div>
+                                <div class="summary__field summary__field--user-email">
+                                    <a class="summary__link summary__max-width">${email}</a>
+                                    <svg class="copy-svg copy-svg--user"><use xlink:href="svg/spritesheet.svg#applications"></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="summary__section summary__section--user-addresses">
                     <div class="summary__heading">Addresses</div>
+                        ${createAddressSummary(addresses[0])}
                 </div>
 
-                <div class="summary__section summary__section--user-applications">
+                <div class="summary__section summary__section--user-jobs">
                     <div class="summary__heading">Applications</div>
+                    <div class="summary__content summary__content--user-jobs">
+
+                        <div class="summary__jobs-table-wrapper table-wrapper--nested-user-jobs"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1931,7 +1958,6 @@ export const calculateRows = (tableName, header, pagination) => {
     const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * 10;
 
     const numOfRows = Math.floor((tableWrapperHeight - parseFloat(headerHeight) - parseFloat(paginationHeight)) / parseFloat(rowHeight));
-
     return numOfRows;
 }
 
@@ -2836,7 +2862,7 @@ const createCompanyElement = ({ id, companyName, companyDate }) => {
 
 // For the nested table in the company summary
 export const formatCompanyJobs = (jobs) => {
-    const headers = ['ID','Title', 'Added'];
+    const headers = ['Id','Title', 'Added'];
     const rows = jobs.map(job => {
         return createCompanyJobElement(job);
     });
@@ -2850,6 +2876,25 @@ const createCompanyJobElement = (job) => {
     ];
     return row;
 }; 
+
+export const formatUserJobs = (jobs) => {
+    const headers = ['Id','Company','Title', 'Added'];
+    const rows = jobs.map(job => {
+        return createUserJobElement(job);
+    });
+    return { headers, rows };
+}
+const createUserJobElement = (job) => {
+    console.log(job)
+    const row = [
+        `<td class="td-data--jobId" data-id=${job.jobId}>${job.jobId}</td>`,
+        `<td class="td-data--title">${job.companyName}</td>`,
+        `<td class="td-data--title">${job.title}</td>`,
+        `<td class="td-data--location">${job.jobDate}</td>`
+    ];
+    return row;
+}; 
+
 
 export const generateCompanyJobsPlaceholder = () => {
     const markup = `
@@ -3671,31 +3716,62 @@ const getContactFormValues = () => {
     return { firstName, lastName, position, phone, email };
 };
 
-export const createAddressSummary = () => {
-    const markup  = `
-        <div class="address-summary summary">
-            <div class="address-summary__details">
-                <div class="address-summary__item address-summary__address" data-placeholder="Address" contenteditable=false></div>
+export const createAddressSummary = ({id,firstLine, secondLine, city, county, postcode}) => {
+    const markup = `
+        <div class="summary__content summary__content--user-addresses" data-id=${id}>
+            <div class="summary__column">
+                <div class="summary__item">
+                    <div class="summary__label">First Line:</div>
+                    <div class="summary__field summary__field--user-first-line">${firstLine}</div>
+                </div>
+                ${ secondLine?
+                    `<div class="summary__item">
+                        <div class="summary__label">Second Line:</div>
+                        <div class="summary__field summary__field--user-second-line">${secondLine}</div>
+                    </div>` : ''
+                }
+                <div class="summary__item">
+                    <div class="summary__label">City:</div>
+                    <div class="summary__field summary__field--user-city">${city}</div>
+                </div>
             </div>
-            <div class="address-summary__controls">
-                <div class="address-summary__btn address-summary__btn--new">
-                    <svg class="address-summary__new-icon address-summary__icon">
-                        <use xlink:href="svg/spritesheet.svg#add">
-                    </svg>
+            <div class="summary__column">
+                <div class="summary__item">
+                    <div class="summary__label">County:</div>
+                    <div class="summary__field summary__field--user-county">${county}</div>
                 </div>
-                <div class="address-summary__btn address-summary__btn--edit">
-                    <svg class="address-summary__edit-icon address-summary__icon">
-                        <use xlink:href="svg/spritesheet.svg#edit-np1">
-                    </svg>
-                </div>
-                <div class="address-summary__btn address-summary__btn--delete">
-                    <svg class="address-summary__delete-icon address-summary__icon">
-                        <use xlink:href="svg/spritesheet.svg#delete-np1">
-                    </svg>
+                <div class="summary__item">
+                    <div class="summary__label">Postcode:</div>
+                    <div class="summary__field summary__field--user-postcode">${postcode}</div>
                 </div>
             </div>
         </div>
     `;
+
+    // const markup  = `
+    //     <div class="address-summary summary">
+    //         <div class="address-summary__details">
+    //             <div class="address-summary__item address-summary__address" data-placeholder="Address" contenteditable=false></div>
+    //         </div>
+    //         <div class="address-summary__controls">
+    //             <div class="address-summary__btn address-summary__btn--new">
+    //                 <svg class="address-summary__new-icon address-summary__icon">
+    //                     <use xlink:href="svg/spritesheet.svg#add">
+    //                 </svg>
+    //             </div>
+    //             <div class="address-summary__btn address-summary__btn--edit">
+    //                 <svg class="address-summary__edit-icon address-summary__icon">
+    //                     <use xlink:href="svg/spritesheet.svg#edit-np1">
+    //                 </svg>
+    //             </div>
+    //             <div class="address-summary__btn address-summary__btn--delete">
+    //                 <svg class="address-summary__delete-icon address-summary__icon">
+    //                     <use xlink:href="svg/spritesheet.svg#delete-np1">
+    //                 </svg>
+    //             </div>
+    //         </div>
+    //     </div>
+    // `;
 
     return markup;
 };
@@ -3983,7 +4059,6 @@ export const clearAdminPage = (page) => {
     }
 }
 export const initAdminSection = (tl, sectionName) => {
-    console.log(sectionName);
     const adminMain = document.querySelector('.admin__main');
     let adminTemplate;
     let loaderContainers;
@@ -3999,16 +4074,15 @@ export const initAdminSection = (tl, sectionName) => {
     switch(sectionName) {
         case 'applications':
         case 'jobs':
-            loaderContainers = [['.table-wrapper', 'admin-table'], ['.summary-wrapper', 'summary-table']];
+            loaderContainers = [['.table-wrapper', 'admin-table'], ['.summary-wrapper', 'summary']];
             break;
         case 'companies':
-            loaderContainers = [['.table-wrapper', 'admin-table'], ['.summary-wrapper', 'summary-table']];
+            loaderContainers = [['.table-wrapper', 'admin-table'], ['.summary-wrapper', 'summary']];
             break;
         case 'users':
-            loaderContainers = [['.table-wrapper', 'admin-table'], ['.summary-wrapper', 'summary-table']];
+            loaderContainers = [['.table-wrapper', 'admin-table'], ['.summary-wrapper', 'summary']];
             break;
     }
-
     tl
     .add(() => {
         // Add the template to the main page

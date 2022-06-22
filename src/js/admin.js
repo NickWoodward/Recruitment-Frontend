@@ -125,7 +125,13 @@ class AdminController {
                     limit: 6,
                     orderField: "createdAt",
                     orderDirection: "DESC"
-                }
+                },
+                userJobsPagination: {
+                    jobLimit: 0,
+                    jobIndex: 0,
+                    totalJobs: 0
+                },
+                paginatedJobs: []
             },
             applications: {
                 totalApplications: 0,
@@ -597,17 +603,36 @@ class AdminController {
                         // Render table
                         this.renderUsersTable();
 
-                        // // Add pagination
-                        // const { totalJobs, searchOptions: {index: jobIndex, limit: jobLimit} } = this.state.jobs;
-                        // const { pages: numJobPages, current: currentJobPage } = adminView.calculatePagination(jobIndex, jobLimit, totalJobs);
-                        // adminView.renderPagination(numJobPages, currentJobPage, document.querySelector('.table-wrapper'), 'jobs');
+                        // Add pagination
+                        const { totalUsers, searchOptions: {index: userIndex, limit: userLimit} } = this.state.users;
+                        const { pages: numUserPages, current: currentUserPage } = adminView.calculatePagination(userIndex, userLimit, totalUsers);
+                        adminView.renderPagination(numUserPages, currentUserPage, document.querySelector('.table-wrapper'), 'users');
                         // Add summary
                         const userSummary = adminView.createUserSummary(this.users[0]);
-                        console.log(this.users[0]);
-                        document.querySelector('.summary-wrapper').insertAdjacentHTML('afterbegin', userSummary);
 
-                        // this.addJobsSummaryListeners();
-                        // // this.addJobSummaryListeners();
+                        document.querySelector('.summary-wrapper').insertAdjacentHTML('afterbegin', userSummary);
+                        
+                        
+                        // This paginates the results locally, much as the API call to getUsers does using limit and index
+                        this.setUserJobsState();
+
+                        // Render the summary user jobs table
+                        if(this.state.users.paginatedJobs.length > 0) {
+                            // remove any placeholders
+                            const placeholder = document.querySelector('.user-jobs-placeholder');
+                            if(placeholder) placeholder.parentElement.removeChild(placeholder);
+
+                            this.renderUserJobsTable();
+                        } else {
+                            // render a placeholder saying 'no jobs'
+                            // this shouldn't be needed, but is a safety net
+                            document.querySelector('.table-wrapper--nested-user-jobs')
+                                .insertAdjacentHTML('afterbegin', adminView.generateUserJobsPlaceholder());
+                        } 
+                        // Add pagination for nested contacts, addresses, and jobs elements
+                        this.addUserNestedPagination();
+
+                        // this.addCompanySummaryListeners();
                         break;
                 }
 
@@ -831,6 +856,8 @@ class AdminController {
         
     }
 
+
+
     addCompanyNestedPagination() {
         //// Nested Company Jobs table
 
@@ -857,7 +884,14 @@ class AdminController {
     
         // No need to calculate address pagination - displayed 1 at a time, so number of pages = address.length
         adminView.renderPagination(totalAddresses, addressIndex, document.querySelector('.pagination-wrapper--addresses'), 'addresses');
+    }
 
+    addUserNestedPagination() {
+        // Paginate userJobs array
+        const { totalJobs, jobIndex, jobLimit } = this.state.users.userJobsPagination;
+        const { pages, current } = adminView.calculatePagination(jobIndex, jobLimit, totalJobs);
+        // Render the userJobs pagination
+        adminView.renderPagination(pages, current, document.querySelector('.table-wrapper--nested-user-jobs'), 'nested-user-jobs');
 
     }
 
@@ -877,7 +911,9 @@ class AdminController {
                 break;
             case 'nested-jobs':
                 this.state.companies.companyJobPagination.jobLimit = adminView.calculateRows(sectionName, true, true);
-                // console.log('jobLimit:', adminView.calculateRows(sectionName));
+                break;
+            case 'nested-user-jobs':
+                this.state.users.userJobsPagination.jobLimit = adminView.calculateRows(sectionName, true, true);
         }
     }
 
@@ -902,9 +938,9 @@ class AdminController {
                 this.state.companies.totalCompanies = companyTotal;
                 break;
             case 'users':
-                const { data: { applicants, applicantsTotal } } = await this.Admin.getUsers(this.state.users.searchOptions, indexId);
+                const { data: { applicants, applicantTotal } } = await this.Admin.getUsers(this.state.users.searchOptions, indexId);
                 this.users = applicants;
-                this.state.users.totalUsers = applicantsTotal;
+                this.state.users.totalUsers = applicantTotal;
                 break;
         }
     }
@@ -2444,13 +2480,13 @@ class AdminController {
                 // Change the summary
                 const summary = document.querySelector('.summary');
                 const newSummary = adminView.createUserSummary(user[0])
-                console.log(summary, newSummary);
 
                 const tl = gsap.timeline();
 
                 // adminView.swapSummary(summary, adminView.createCompanySummary(company[0]), this.companySummaryListener.bind(this), tl);
                 tl.add(adminView.animateSummaryWrapperOut());
                 tl.add(() => {
+                    console.log('CHANGING');
                     // Switch the summary
                     adminView.switchSummary(summary, newSummary);
 
@@ -2764,6 +2800,35 @@ class AdminController {
         });
     }
 
+    setUserJobsState() {
+        // Set the state for the summary's nested table
+        this.getNumOfRows('nested-user-jobs');
+        this.state.users.userJobsPagination.totalJobs = this.state.users.currentUser.jobs.length;
+        const { jobIndex, jobLimit } = this.state.users.userJobsPagination;
+
+        // Paginate the company jobs
+        this.state.users.paginatedJobs = this.state.users.currentUser.jobs.slice(jobIndex, jobIndex + jobLimit);
+
+    }
+
+    renderUserJobsTable() {
+        // Format the paginated jobs into html elements
+        const {headers, rows} = adminView.formatUserJobs(this.state.users.paginatedJobs);
+
+        const tableWrapper = document.querySelector('.table-wrapper--nested-user-jobs');
+        const table = document.querySelector('.table--nested-user-jobs');
+        // If no table visible, render both the header and content
+        if(!table) { 
+            tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('nested-user-jobs', headers, rows, false));
+            // Else remove the tbody and render just the content
+        } else {
+            utils.removeElement(document.querySelector('tbody'));
+            document.querySelector('thead').insertAdjacentHTML('afterend', tableView.updateTableContent('nested-user-jobs', rows));
+        }
+
+        adminView.animateTableContentIn('nested-user-jobs')
+    }
+
     setCompanyJobsState() {
         // Set the state for the summary's nested table
         this.getNumOfRows('nested-jobs');
@@ -2772,7 +2837,6 @@ class AdminController {
 
         // Paginate the company jobs
         this.state.companies.paginatedJobs = this.state.companies.currentCompany.jobs.slice(jobIndex, jobIndex + jobLimit);
-
     }
 
     renderCompanyJobsTable() {
@@ -2784,6 +2848,7 @@ class AdminController {
 
         // If no table visible, render both the header and content
         if(!table) { 
+            console.log('nestedTableWrapper', tableWrapper);
             tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('nested-jobs', headers, rows, false));
             // Else remove the tbody and render just the content
         } else {
