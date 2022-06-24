@@ -89,3 +89,10 @@ export const updateTableContent = (title, rows) => {
     `;
     return markup;
 }
+
+export const createTableHeader = (page, title) => {
+    const markup = `
+        <div class="table__header table__header--${page}">${title}</div>
+    `;
+    return markup;
+};

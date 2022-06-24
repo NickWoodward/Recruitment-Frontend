@@ -131,6 +131,11 @@ class AdminController {
                     jobIndex: 0,
                     totalJobs: 0
                 },
+                addressPagination: {
+                    addressIndex: 0,
+                    addressLimit: 0,
+                    totalAddresses: 0
+                },
                 paginatedJobs: []
             },
             applications: {
@@ -519,7 +524,7 @@ class AdminController {
                         // Add pagination
                         const { totalApplications, searchOptions: {index: appIndex, limit: appLimit} } = this.state.applications;
                         const { pages: numAppPages, current: currentAppPage } = adminView.calculatePagination(appIndex, appLimit, totalApplications);
-                        adminView.renderPagination(numAppPages, currentAppPage, document.querySelector('.table-wrapper'), 'applications');
+                        adminView.renderPagination(numAppPages, currentAppPage, document.querySelector('.table__content'), 'applications');
 
                         // Create and add a summary element
                         const applicationSummary = adminView.createApplicationSummary(this.applications[0]);
@@ -893,6 +898,13 @@ class AdminController {
         // Render the userJobs pagination
         adminView.renderPagination(pages, current, document.querySelector('.table-wrapper--nested-user-jobs'), 'nested-user-jobs');
 
+        //// Nested Addresses pagination
+        // Displayed 1 at a time
+        this.state.users.addressPagination.totalAddresses = this.state.users.currentUser.addresses.length;
+        const { totalAddresses, addressIndex } = this.state.users.addressPagination;
+
+        // No need to calculate contact pagination - displayed 1 at a time, so number of pages = contacts.length
+        adminView.renderPagination(totalAddresses, addressIndex, document.querySelector('.pagination-wrapper--addresses'), 'addresses');
     }
 
     getNumOfRows(sectionName) {
@@ -1197,12 +1209,21 @@ class AdminController {
         // Format applications/headers into html elements
         const {headers, rows} = adminView.formatApplications(this.applications);
         const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
+        
         const tableWrapper = document.querySelector('.table-wrapper');
+        // Add a header to the table 
+
         const table = document.querySelector('.table--applications');
 
        // If no table visible, render both the header and content
         if(!table) { 
-            tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('applications', headers, rows, false));
+            const newTable = tableView.createTableTest('applications', headers, rows, false);
+            const tableHeader = tableView.createTableHeader('applications', 'Applications');
+            const tableContent = `<div class="table__content table__content--applications">${newTable}</div>`;
+            tableWrapper.insertAdjacentHTML('afterbegin', tableContent);
+            tableWrapper.insertAdjacentHTML('afterbegin', tableHeader);
+
+            
             // Else remove the tbody and render just the content
         } else {
             utils.removeElement(document.querySelector('tbody'));
@@ -1251,11 +1272,11 @@ class AdminController {
         this.renderApplicationTable();
         // Update pagination
         const { totalApplications, searchOptions: {index: appIndex, limit: appLimit} } = this.state.applications;
-        adminView.renderPagination(appIndex, appLimit, totalApplications, document.querySelector('.table-wrapper'), 'applications');
+        adminView.renderPagination(appIndex, appLimit, totalApplications, document.querySelector('.table__content'), 'applications');
     }
 
     addApplicationSummaryListeners() {
-        const applicationSummary = document.querySelector('.application-summary');
+        const applicationSummary = document.querySelector('.summary--applications-page');
 
         applicationSummary.addEventListener(
             'click', 
@@ -1388,7 +1409,7 @@ class AdminController {
                         this.renderApplicationTable();
                         // Update pagination
                         const { totalApplications, searchOptions: {index: appIndex, limit: appLimit} } = this.state.applications;
-                        adminView.renderPagination(appIndex, appLimit, totalApplications, document.querySelector('.table-wrapper'), 'applications');
+                        adminView.renderPagination(appIndex, appLimit, totalApplications, document.querySelector('.table__content'), 'applications');
                     
                     }
                 } catch (err) {
@@ -1467,7 +1488,7 @@ class AdminController {
 
                             // Update pagination
                             const { totalApplications, searchOptions: {index: appIndex, limit: appLimit} } = this.state.applications;
-                            adminView.renderPagination(appIndex, appLimit, totalApplications, document.querySelector('.table-wrapper'), 'applications');
+                            adminView.renderPagination(appIndex, appLimit, totalApplications, document.querySelector('.table__content'), 'applications');
                             
                         } else {
                             // Update table
@@ -1477,7 +1498,7 @@ class AdminController {
 
                             // Update pagination
                             const { totalApplications, searchOptions: {index: appIndex, limit: appLimit} } = this.state.applications;
-                            adminView.renderPagination(appIndex, appLimit, totalApplications, document.querySelector('.table-wrapper'), 'applications');
+                            adminView.renderPagination(appIndex, appLimit, totalApplications, document.querySelector('.table__content'), 'applications');
                         
                             // After the page has potentially changed because of onComplete function
                             deleteApplicationAlertAnimation.play(0);
@@ -2486,30 +2507,28 @@ class AdminController {
                 // adminView.swapSummary(summary, adminView.createCompanySummary(company[0]), this.companySummaryListener.bind(this), tl);
                 tl.add(adminView.animateSummaryWrapperOut());
                 tl.add(() => {
-                    console.log('CHANGING');
                     // Switch the summary
                     adminView.switchSummary(summary, newSummary);
 
                     // // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
-                    // this.setCompanyJobsState();
+                    this.setUserJobsState();
 
-                    // // Render the summary company jobs table
-                    // if(this.state.companies.paginatedJobs.length > 0) {
-                    //     // remove any placeholders
-                    //     const placeholder = document.querySelector('.company-jobs-placeholder')
+                    // Render the summary user jobs table
+                    if(this.state.users.paginatedJobs.length > 0) {
+                        // remove any placeholders
+                        const placeholder = document.querySelector('.user-jobs-placeholder');
+                        if(placeholder) placeholder.parentElement.removeChild(placeholder);
 
-                    //     if(placeholder) placeholder.parentElement.removeChild(placeholder);
-
-                    //     this.renderCompanyJobsTable();
-                    // } else {
-                    //     // render a placeholder saying 'no jobs'
-                    //     document.querySelector('.table-wrapper--nested-jobs')
-                    //         .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
-                    // } 
-
-                    // // Add pagination for nested contacts, addresses, and jobs elements
-                    // this.addCompanyNestedPagination();
-
+                        this.renderUserJobsTable();
+                    } else {
+                        // render a placeholder saying 'no jobs'
+                        // this shouldn't be needed, but is a safety net
+                        document.querySelector('.table-wrapper--nested-user-jobs')
+                            .insertAdjacentHTML('afterbegin', adminView.generateUserJobsPlaceholder());
+                    } 
+                    // Add pagination for nested contacts, addresses, and jobs elements
+                    this.addUserNestedPagination();
+                    
                     // Add the listener to the new summary
                     document.querySelector('.summary').addEventListener('click', (e) => this.userSummaryListener(e))
 

@@ -381,107 +381,122 @@ export const createApplicationSummary = ({
     if(cvUrl) {
         cvType = cvUrl.indexOf('.doc') !== -1 ? 'doc':'pdf';
     } 
+
+    const header = `
+        <div class="summary__header">
+            <div class="summary__item summary__item--header">
+                <div class="summary__id">${applicationId}</div>
+            </div>
+            <div class="summary__item summary__item--header">
+                <div class="summary__date">${applicationDate}</div>
+            </div>
+        </div>
+    `;
+
+    const applicationSection = `
+        <div class="summary__section summary__section--application-job">
+            <div class="summary__heading summary__heading--applications-page">Position</div>
+            <div class="summary__content summary__content--application-job">
+
+                <div class="summary__column summary__column--applications-page">
+                    <div class="summary__item summary__item--applications-page">
+                        <div class="summary__label summary__label">Title:</div>
+                        <div class="summary__field summary__field--title" data-id="${jobId}">
+                            <a class="summary__link summary__link--job">${jobTitle}</a>
+                        </div>
+                    </div>
+                    <div class="summary__item summary__item--applications-page">
+                        <div class="summary__label">Company:</div>
+                        <div class="summary__field summary__field--company" data-id="${companyId}">
+                            <a class="summary__link summary__link--company">${companyName}</a>
+                        </div>
+                    </div>
+                    <div class="summary__item--applications-page summary__item">
+                        <div class="summary__label">Contact:</div>
+                        <div class="summary__field summary__field--contact">${contactFirstName} ${contactLastName}</div>
+                    </div>
+                </div>
+
+                <div class="summary__column summary__column--applications-page">
+                    <div class="summary__item summary__item--applications-page">
+                        <div class="summary__label">Contact Position:</div>
+                        <div class="summary__field summary__field--contact-position">${contactPosition}</div>
+                    </div>
+                    <div class="summary__item summary__item--applications-page">
+                        <div class="summary__label">Contact Phone:</div>
+                        <div class="summary__field summary__field--contact-phone">${contactPhone}</div>
+                    </div>
+                    <div class="summary__item summary__item--applications-page">
+                        <div class="summary__label">Contact Email:</div>
+                        <div class="summary__field summary__field--contact-email">
+                            <a class="summary__field-text--contact-email">${contactEmail}</a>
+                            <svg class="summary__copy-svg copy-svg--application"><use xlink:href="svg/spritesheet.svg#applications"></svg>    
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    `;
+
     const markup  = `
-            <div class="application-summary summary">
-                <div class="application-summary__details">
+            <div class="summary summary--applications-page">
+                <div class="summary__details summary__details--applications-page">
 
-                    <div class="application-summary__section application-summary__section--application">
-                        <div class="application-summary__id">${applicationId}</div>
+                    ${header}
 
-                        <div class="application-summary__item summary__item">
-                            <div class="application-summary__field application-summary__field--date">${applicationDate}</div>
+                    ${applicationSection}
+
+                    <div class="summary__section summary__section--application-person">
+
+                        <div class="summary__heading summary__heading--applications-page">Applicant</div>
+                        <div class="summary__content summary__content--application-applicant">
+                            <div class="summary__column summary__column--applications-page">
+                                <div class="summary__item summary__item--applications-page">
+                                    <div class="summary__label">Applicant Name:</div>
+                                    <a class="summary__link summary__link--applicant">
+                                        <div class="summary__field summary__field--applicant" data-id="${applicantId}">${personFirstName} ${personLastName}</div>
+                                    </a>
+                                </div>
+                                <div class="summary__item summary__item--applications-page">
+                                    <div class="summary__label">Phone:</div>
+                                    <div class="summary__field summary__field--phone">${personPhone}</div>
+                                </div>
+                            </div>
+
+                            <div class="summary__column summary__column--applications-page">
+                                <div class="summary__item summary__item--applications-page">
+                                    <div class="summary__label">Email:</div>
+                                    <div class="summary__field summary__field--email">${personEmail}</div>
+                                </div>
+
+                                <div class="summary__item summary__item--applications-page summary__item--cv">
+                                    <div class="summary__label summary__label--cv">Applicant CV:</div>
+                                    <div class="summary__field summary__field--cv">${cvType? 'Yes':'No'}</div>
+                                </div>
+                            </div>
+
+                            
                         </div>
                     </div>
 
-                    <div class="summary__heading">Position</div>
-
-                        <div class="application-summary__section application-summary__section--job">
-                            <div class="summary__column summary__column--small">
-                                <div class="application-summary__item application-summary__item--job summary__item">
-                                    <div class="application-summary__label application-summary__label--title">Title:</div>
-                                    <div class="application-summary__field application-summary__field--title" data-id="${jobId}">
-                                        <a class="summary__link summary__link--job">${jobTitle}</a>
-                                    </div>
-                                </div>
-                                <div class="application-summary__item application-summary__item--job summary__item">
-                                    <div class="application-summary__label application-summary__label--company">Company:</div>
-                                    <div class="application-summary__field application-summary__field--company" data-id="${companyId}">
-                                        <a class="summary__link summary__link--company">${companyName}</a>
-                                    </div>
-                                </div>
-                                <div class="application-summary__item application-summary__item--job summary__item">
-                                    <div class="application-summary__label application-summary__label--contact-name">Contact:</div>
-                                    <div class="application-summary__field application-summary__field--contact">${contactFirstName} ${contactLastName}</div>
-                                </div>
-                            </div>
-
-                            <div class="summary__column summary__column--large">
-                                <div class="application-summary__item application-summary__item--job summary__item">
-                                    <div class="application-summary__label application-summary__label--contact-position">Contact Position:</div>
-                                    <div class="application-summary__field application-summary__field--contact-position">${contactPosition}</div>
-                                </div>
-                                <div class="application-summary__item application-summary__item--job summary__item">
-                                    <div class="application-summary__label application-summary__label--contact-phone">Contact Phone:</div>
-                                    <div class="application-summary__field application-summary__field--contact-phone">${contactPhone}</div>
-                                </div>
-                                <div class="application-summary__item application-summary__item--job summary__item">
-                                    <div class="application-summary__label application-summary__label--contact-email">Contact Email:</div>
-                                    <div class="application-summary__field application-summary__field--contact-email">
-                                        <a class="application-summary__field-text--contact-email">${contactEmail}</a>
-                                        <svg class="application-summary__copy-svg copy-svg--application"><use xlink:href="svg/spritesheet.svg#applications"></svg>    
-                                    </div>
-                                </div>
-                            </div>
-                    </div>
-
-                    <div class="summary__heading">Applicant</div>
-
-                    <div class="application-summary__section application-summary__section--person">
-                        <div class="summary__column summary__column--small">
-                            <div class="application-summary__item summary__item">
-                                <div class="application-summary__label application-summary__label--applicant-name">Applicant Name:</div>
-                                <a class="summary__link summary__link--applicant">
-                                    <div class="application-summary__field application-summary__field--applicant" data-id="${applicantId}">${personFirstName} ${personLastName}</div>
-                                </a>
-                            </div>
-                            <div class="application-summary__item summary__item">
-                                <div class="application-summary__label application-summary__label--phone">Phone:</div>
-                                <div class="application-summary__field application-summary__field--phone">${personPhone}</div>
-                            </div>
-
+                    <div class="summary__controls summary__application-controls--applications-page">
+                        <div class="summary__btn summary__new-application-btn--applications">
+                            <svg class="summary__new-application-icon summary__icon">
+                                <use xlink:href="svg/spritesheet.svg#add">
+                            </svg>
                         </div>
-
-                        <div class="summary__column summary__column--large">
-                            <div class="application-summary__item summary__item">
-                                <div class="application-summary__label application-summary__label--email">Email:</div>
-                                <div class="application-summary__field application-summary__field--email">${personEmail}</div>
-                            </div>
-
-                            <div class="application-summary__item summary__item application-summary__item--cv">
-                                <div class="application-summary__label application-summary__label--cv">Applicant CV:</div>
-                                <div class="application-summary__field application-summary__field--cv">${cvType? 'Yes':'No'}</div>
-                            </div>
+    
+                        <div class="summary__btn summary__cv-btn--applications" data-id='${personId}'>
+                            ${cvType?`<svg class="summary__cv-svg--applications"><use xlink:href="svg/spritesheet.svg#${cvType}"></svg>`:'None'}
                         </div>
-
-                        <div class="summary__controls summary__controls--application">
-                            <div class="application-summary__btn application-summary__btn--new">
-                                <svg class="application-summary__new-icon application-summary__icon">
-                                    <use xlink:href="svg/spritesheet.svg#add">
-                                </svg>
-                            </div>
-        
-                            <div class="application-summary__cv-wrapper summary__cv-wrapper" data-id='${personId}'>
-                                ${cvType?`<svg class="application-summary__cv-svg"><use xlink:href="svg/spritesheet.svg#${cvType}"></svg>`:'None'}
-                            </div>
-        
-                            <div class="application-summary__btn application-summary__btn--delete">
-                                <svg class="application-summary__delete-icon application-summary__icon">
-                                    <use xlink:href="svg/spritesheet.svg#delete-np1">
-                                </svg>
-                            </div>
+    
+                        <div class="summary__btn summary__delete-application-btn--applications">
+                            <svg class="summary__delete-application-icon summary__icon">
+                                <use xlink:href="svg/spritesheet.svg#delete-np1">
+                            </svg>
                         </div>
                     </div>
-                    
                 </div>
             </div>
     `;
@@ -692,17 +707,71 @@ export const createUserSummary = ({
                 </div>
             </div>
             <div class="summary__item summary__item--header">
-                <div class="summary__field summary__date">${userDate}</div>
+                <div class="summary__item summary__date">${userDate}</div>
             </div>
         </div>
     `;
 
+    const userControls = `
+        <div class="summary__controls summary__user-controls--users summary__section--user-controls">
+            <div class="summary__btn summary__new-user-btn--users">
+                <svg class="summary__new-user-icon--users summary__icon">
+                    <use xlink:href="svg/spritesheet.svg#add">
+                </svg>
+            </div>
+            <div class="summary__btn summary__edit-user-btn--users">
+                <svg class="summary__edit-user-icon--users summary__icon">
+                    <use xlink:href="svg/spritesheet.svg#edit-np1">
+                </svg>
+            </div>
+            <div class="summary__btn summary__delete-user-btn--users">
+                <svg class="summary__delete-user-icon--users summary__icon">
+                    <use xlink:href="svg/spritesheet.svg#delete-np1">
+                </svg>
+            </div>
+        </div>
+    `;
+
+    const applicantControls = `
+        <div class="summary__controls summary__applicant-controls--users">
+            <div class="summary__btn summary__edit-applicant-btn--users">
+                <svg class="summary__edit-applicant-icon--users summary__icon">
+                    <use xlink:href="svg/spritesheet.svg#edit-np1">
+                </svg>
+            </div>
+        </div>
+    `;
+
+    const addressControls = `
+    <div class="summary__controls summary__address-controls--users">
+        <div class="summary__btn summary__new-address-btn--users">
+            <svg class="summary__new-address-icon--users summary__icon">
+                <use xlink:href="svg/spritesheet.svg#add">
+            </svg>
+        </div>
+        <div class="summary__btn summary__edit-address-btn--users">
+            <svg class="summary__edit-address-icon--users summary__icon">
+                <use xlink:href="svg/spritesheet.svg#edit-np1">
+            </svg>
+        </div>
+        <div class="summary__btn summary__delete-address-btn--users ">
+            <svg class="summary__delete-address-icon--users summary__icon">
+                <use xlink:href="svg/spritesheet.svg#delete-np1">
+            </svg>
+        </div>
+    </div>
+`;
+
+
     const markup  = `
         <div class="summary" data-id="${id}">
             ${header}
-            <div class="summary__details">
+            <div class="summary__details summary__details--users">
                 <div class="summary__section summary__section--user">
-                    <div class="summary__heading">Applicant</div>
+                    <div class="summary__heading summary__heading--user">
+                        Applicant
+                        ${applicantControls}
+                    </div>
                     <div class="summary__content summary__content--user">
                         <div class="summary__column">
                             <div class="summary__item">
@@ -726,21 +795,25 @@ export const createUserSummary = ({
                     </div>
                 </div>
                 <div class="summary__section summary__section--user-addresses">
-                    <div class="summary__heading">Addresses</div>
-                        ${createAddressSummary(addresses[0])}
+                    <div class="summary__heading summary__heading--users">
+                        Addresses
+                        ${addressControls}
+                    </div>
+                    ${createAddressSummary(addresses[0])}
+                    <div class="pagination-wrapper pagination-wrapper--addresses"></div>
                 </div>
 
+
                 <div class="summary__section summary__section--user-jobs">
-                    <div class="summary__heading">Applications</div>
+                    <div class="summary__heading summary__heading--users">Applications</div>
                     <div class="summary__content summary__content--user-jobs">
 
                         <div class="summary__jobs-table-wrapper table-wrapper--nested-user-jobs"></div>
                     </div>
                 </div>
+                ${userControls}
             </div>
-        </div>
-
-                    
+        </div>          
     `;
     return markup;
 
@@ -2905,6 +2978,15 @@ export const generateCompanyJobsPlaceholder = () => {
     `;
     return(markup);
 }
+export const generateUserJobsPlaceholder = () => {
+    const markup = `
+        <div class="company-jobs-placeholder">
+            <div class="company-jobs-placeholder__message">No Current Jobs</div>
+            <div class="company-jobs-placeholder__add-link"><a>Add Job</a></div>
+        </div>
+    `;
+    return(markup);
+}
 
     /**
      * Create the markup for the new/edit company modal
@@ -3716,7 +3798,7 @@ const getContactFormValues = () => {
     return { firstName, lastName, position, phone, email };
 };
 
-export const createAddressSummary = ({id,firstLine, secondLine, city, county, postcode}) => {
+export const createAddressSummary = ({id,firstLine, secondLine, city, county, postcode} = { id: 'None', firstLine: 'None', secondLine: 'None', city: 'None', county: 'None', postcode: 'None' }) => {
     const markup = `
         <div class="summary__content summary__content--user-addresses" data-id=${id}>
             <div class="summary__column">
@@ -4111,10 +4193,15 @@ export const createAdminTemplate = (page) => {
     adminContent.setAttribute('class', `admin__content admin__content--${page}`);
 
     // Create conditional here for different page types/structure 
-    if(page === 'applications' || page === 'jobs' || page === 'users') {
+    if(page === 'users' || page === 'jobs') {
         addTableWrapper(adminContent, page);
         addSummaryWrapper(adminContent, page);
     } else if(page === 'companies') {
+        addTableWrapper(adminContent, page);
+        addSummaryWrapper(adminContent, page);
+
+    } else if(page === 'applications') {
+        // addTableHeader(adminContent, page);
         addTableWrapper(adminContent, page);
         addSummaryWrapper(adminContent, page);
 
@@ -4122,6 +4209,13 @@ export const createAdminTemplate = (page) => {
 
     return adminContent;
 }
+
+// const addTableHeader = (adminContent, page) => {
+//     const summary = document.createElement('div');
+//     summary.setAttribute('class', `table__header table__header--${page}`);
+
+//     adminContent.appendChild(summary);
+// }
 
 const addSummaryWrapper = (adminContent, page) => {
     const summary = document.createElement('div');
@@ -4136,6 +4230,13 @@ const addTableWrapper = (adminContent, page) => {
     adminContent.appendChild(markup);
 }
 
+export const createTableHeader = (page, heading) => {
+    return `
+        <div class="table__header table__header--${page}">
+            <div class="table__heading">${heading}</div>
+        </div>
+    `;
+}
 
 
 export const initialiseAdminPage = (page) => {

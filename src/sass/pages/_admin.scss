@@ -77,7 +77,7 @@
 
     &--companies, &--applications, &--jobs, &--users {
         display: grid;
-        grid-template-columns: repeat(12, 1fr);
+        grid-template-columns: repeat(16, 1fr);
         grid-template-rows: repeat(12, 1fr);
 
         grid-gap: 4rem;
@@ -93,7 +93,14 @@
         fill: firebrick;
     }
 }
+.pagination-wrapper {
+    &--addresses {
+        // flex-grow: 1;
+        margin-top: auto;
+        grid-column: 1/7;
 
+    }
+}
 .summary-wrapper {
     position: relative;
 
@@ -102,8 +109,8 @@
     justify-content: flex-start;
 
     border-radius: 5px;
-    overflow: hidden;
-    box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+    // overflow: hidden;
+    // box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
 
     // &--applications {
     //     min-height: 50rem;
@@ -113,8 +120,8 @@
     // }
 
     &--applications {
-        grid-column: 1/6;
-        grid-row: 1/9;
+        grid-column: 1/7;
+        grid-row: 1/11;
     }
     &--jobs {
         grid-column: 1/5;
@@ -130,6 +137,9 @@
     }
 }
 .summary {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     background-color: white;
     border: none;
     // box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
@@ -139,6 +149,8 @@
         justify-content: space-between;
         align-items: center;
         height: 6rem;
+        box-shadow: 0 2px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+        border-radius: 5px 5px 0 0;
         background-color: $color-primary-new;
         font-size: 1.6rem;
         font-weight: 400;
@@ -146,29 +158,87 @@
     }
 
     &__details {
-        display: grid;
-        grid-template-columns: repeat(12, 1fr);
-        column-gap: 4rem;
-        padding: 2rem 4rem 2rem 4rem;
+
+        &--users {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: repeat(12, 1fr);
+            column-gap: 4rem;
+            row-gap: .5rem;
+            flex-grow: 1;
+            padding: 2rem 4rem 2rem 4rem;
+        }
+
+        &--applications-page {
+            display: flex;
+            flex-direction: column;
+        }
+
+        
     }
     &__section {
+        //// Application Page
+        &--application-job,
+        &--application-person {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+            border-radius: 5px;
+            overflow: hidden;
+
+        }
+        &--application-job {
+            margin-top: 2rem;
+        }
+        &--application-person {
+            margin-top: 2.5rem;
+
+        }
+         
+        //// End Application Page
+
+
+        //// Users Page
         &--user {
             grid-column: 1/7;
-            grid-row: 1/2;
+            grid-row: 1/6;
         }
         &--user-addresses {
+            display: flex;
+            flex-direction: column;
             grid-column: 1/7;
-            grid-row: 2/3;
+            grid-row: 6/13;
+            // border: 1px solid red;
         }
         &--user-jobs {
+            display: flex;
+            flex-direction: column;
             grid-column: 7/13;
-            grid-row: 1/3;
+            grid-row: 1/11;
         }
+        &--user-controls {
+            grid-column: 8/13;
+            grid-row: 12/13;
+        }
+        //// End Users Page
     }
 
     &__content {
         display: flex;
-        height: 100%;
+        &--user-jobs {
+            flex-grow: 1;
+
+        }
+
+        //// Application Page
+        &--application-job,
+        &--application-applicant {
+            position: relative;
+            display: flex;
+        }
+
+        //// End Application Page
     }
 
     &__label {
@@ -192,6 +262,14 @@
         width: 50%;
         flex-direction: column;
         // border: 1px solid red;
+        padding-left: 2.5rem;
+
+        &--applications-page {
+            padding: 2.5rem 3rem;
+            &:first-of-type{
+                padding-left: 5rem;
+            }
+        }
 
         &--small {
             width: 50%;
@@ -264,6 +342,9 @@
     }
     &__heading {
         position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         color: $color-secondary;
         font-size: 1.9rem;
         font-weight: 400;
@@ -271,13 +352,25 @@
         padding: .8rem 2.5rem;
         background-color: rgb(249, 250, 251);
     
-        margin: 1rem 0 1rem 0;
+        margin: 1rem 0 2rem 0;
+
+        &--applications-page {
+            margin: 0;
+            padding-left: 3rem;
+            height: 5.5rem;
+
+        }
 
         &--contacts, &--addresses {
             grid-column: 1/3;
             display:flex;
             justify-content: space-between;
         }
+
+        &--application {
+            margin-top: 1.5rem;
+        }
+
 
         &--disabled {
             color: lightgrey;
@@ -317,19 +410,23 @@
     }
 
     &__item  {
-        &:not(.company-summary__item--header):not(.summary__item--header) {
-            margin-bottom: 1.8rem;
+        // &:not(.company-summary__item--header):not(.summary__item--header) {
+        //     margin-bottom: 1.8rem;
+        // }
+
+        &--applications-page {
+            margin-bottom: 2rem;
         }
 
         font-size: 1.7rem;
         // padding: 0 3rem;
         overflow-x: hidden;
 
-        &--cv {
-            display: flex;
-            align-items: flex-start;
-            width: 100%;
-        }
+        // &--cv {
+        //     display: flex;
+        //     align-items: flex-start;
+        //     width: 100%;
+        // }
         
         &--header {
             padding: 0 3rem;
@@ -340,23 +437,50 @@
         }
     }
 
-    &__controls {
-        position: absolute;
-        top: 0;
-        right: .5rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-end;
-        width: 5rem;
-        margin-top: auto;
-        padding: 0 1rem;
-
-        &--application {
-            
+    &__address-controls,
+    &__applicant-controls,
+    &__user-controls {
+        &--users {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            // border: 1px solid red;
         }
+    }
+    &__user-controls {
+        &--users {
+            height: 3.5rem;
+            padding-right: 2rem;
+        }
+    }
+    
+    &__application-controls {
+        &--applications-page {
+            align-self: flex-end;
+            display: flex;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+            border-radius: 5px;
+            margin-top: 2.5rem;
+        }
+    }
+
+
+
+    &__controls {
+        display: flex;
         
-        &--job {
+        &--job, &--application {
+            position: absolute;
+
+            top: 0;
+            right: .5rem;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            width: 5rem;
+            margin-top: auto;
+            padding: 0 1rem;
             transform: translateY(-5px);
         }
 
@@ -365,13 +489,113 @@
         }
     }
 
-    &__cv-wrapper {
-        display: flex;
-        width: 2.9rem;
-        height: 2.9rem;
-        margin-bottom: 1.2rem;
-        cursor: pointer;
-    
+
+    // new-address/edit-applicant btns etc can happen in multiple views
+    &__edit-applicant-btn,
+    &__new-address-btn,
+    &__edit-address-btn,
+    &__delete-address-btn,
+    &__new-user-btn,
+    &__edit-user-btn,
+    &__delete-user-btn {
+        &--users {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 1.5rem;
+            cursor:pointer;
+        }
+
+    }
+
+    &__new-address-btn {
+        &--users {
+            height: 2.5rem;
+            width: 2.5rem;
+            fill: $color-logo;
+        }
+    }
+    &__new-user-btn {
+        &--users {
+            height: 3.2rem;
+            width: 3.2rem;
+            fill: $color-logo;
+            transform: translateY(1px); 
+
+        }
+    }
+    &__edit-applicant-btn, 
+    &__edit-address-btn {
+        &--users {
+            height: 2.6rem;
+            width: 2.6rem;
+            fill: $color-logo;
+            transform: translateY(1px); 
+        }
+    }
+    &__edit-user-btn {
+        &--users {
+            height: 2.9rem;
+            width: 2.9rem;
+            fill: $color-logo;
+            transform: translateY(2px); 
+        }
+    }
+
+    &__delete-address-btn {
+        &--users {
+            height: 2.6rem;
+            width: 2.6rem;
+            fill: firebrick;
+        }
+    }
+    &__delete-user-btn {
+        &--users {
+            height: 2.9rem;
+            width: 2.9rem;
+            fill: firebrick;
+        }
+    }
+
+    &__new-application-btn,
+    &__delete-application-btn {
+        &--applications {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor:pointer;
+
+            height: 2.5rem;
+            width: 2.5rem;
+            fill: $color-logo;
+        }
+    }
+    &__new-application-btn{
+        &--applications {
+            transform: translateY(1px);
+        }
+    }
+    &__cv-btn {
+        &--applications {
+            display: flex;
+            width: 2.5rem;
+            height: 2.5rem;
+            margin-left: 1.5rem;
+
+            cursor: pointer;
+        }
+    }
+    &__delete-application-btn {
+        &--applications {
+            margin-left: 1.5rem;
+            fill: $color-secondary;
+        }
+    }
+
+
+
+    &__icon {
+        height: 100%;
     }
 
     &__btn--disabled {
@@ -387,17 +611,20 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    &:not(&--applications) {
+
+        justify-content: space-between;
+    }
 
 
     border-radius: 5px;
-    overflow: hidden;    
+    // overflow: hidden;    
     border: none;
-    box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+    // box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
 
     &--applications {
-        grid-column: 6/13;
-        grid-row: 1/6;
+        grid-column: 7/17;
+        grid-row: 1/9;
     }
     &--jobs {
         grid-column: 5/13;
@@ -417,9 +644,39 @@
         justify-content: space-between;
         width: 100%;
     }
+    &--nested-user-jobs {
+        width: 100%;
+        margin: .5rem 0;
+        border: 3px solid #f9fafb;
+    }
 
 }
 
+.table {
+    &__header {
+        grid-column: 6/13;
+        grid-row: 1/2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 6rem;
+        padding-left: 3rem;
+        box-shadow: 0 2px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+        border-radius: 5px 5px 0 0;
+        background-color: $color-primary-new;
+        font-size: 1.8rem;
+        font-weight: 400;
+        color: white;
+    }
+    &__content {
+        margin-top: 2rem;
+        box-shadow: 0 2px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+        border-radius: 5px;
+        overflow: hidden;
+
+
+    }
+}
 
 // ********** APPLICATION CONTENT STYLING ***********
 .application-summary {
@@ -430,138 +687,104 @@
     width: 100%;
     min-height: 18rem;
     
-    &__details {
-        width: 100%;
-        // padding: 0 2.5rem 0 2.5rem;
-    }
+    // &__details {
+    //     width: 100%;
+    //     // padding: 0 2.5rem 0 2.5rem;
+    // }
 
-    &__id {
-        display: flex;
-        align-items: center;
-        padding: 0 3rem;
+    // &__id {
+    //     display: flex;
+    //     align-items: center;
+    //     padding: 0 3rem;
 
-        flex-basis: 50%;
-        padding: 0 2rem;
+    //     flex-basis: 50%;
+    //     padding: 0 2rem;
 
-        // wrapper for the field--date element
-        & + .application-summary__item {
-            display: flex;
-            justify-content: flex-end;
-            padding: 0;
-            padding: 0 3rem;
-            height: 100%;
-            width: 50%;
-            align-items: center;
-            margin-bottom: 0;
-            border-radius: 5px;
+    //     // wrapper for the field--date element
+    //     & + .application-summary__item {
+    //         display: flex;
+    //         justify-content: flex-end;
+    //         padding: 0;
+    //         padding: 0 3rem;
+    //         height: 100%;
+    //         width: 50%;
+    //         align-items: center;
+    //         margin-bottom: 0;
+    //         border-radius: 5px;
 
-        }
-    }
-    &__field--date {
-        display: flex;
-        justify-content: flex-end;
-    }
-    &__field--applicant-firstname {
-        display: inline-block;
-        text-decoration: underline;
-    }
-    &__field {
-        &--contact-email {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
+    //     }
+    // }
+    // &__field--date {
+    //     display: flex;
+    //     justify-content: flex-end;
+    // }
+    // &__field--applicant-firstname {
+    //     display: inline-block;
+    //     text-decoration: underline;
+    // }
+    // &__field {
+    //     margin-top: .8rem;
 
-        }
-        &-text {
-            &--contact-email {
-                max-width: 20rem;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-                text-decoration: underline;
-                color: firebrick;
-            }
+    //     &--contact-email {
+    //         display: flex;
+    //         align-items: center;
+    //         cursor: pointer;
 
-        }
-    }
+    //     }
+    //     &-text {
+    //         &--contact-email {
+    //             max-width: 20rem;
+    //             overflow: hidden;
+    //             white-space: nowrap;
+    //             text-overflow: ellipsis;
+    //             text-decoration: underline;
+    //             color: firebrick;
+    //         }
+
+    //     }
+    // }
 
 
 
   
 
-    &__section {
-        position: relative;
-        padding: 0 3rem;
-        &--application {
-            display: flex;
-            justify-content: space-between;
-            height: 6rem;
-            background-color: $color-primary-new;
-            font-size: 1.6rem;
-            font-weight: 400;
-            color: white;
-        }
-        &--job, &--person {
-            display: flex;
-            flex-flow: column wrap;
-        }
-        &--job {
-            height: 17rem;
-            
-        }
-        &--person {
-            height: 15rem;
-
-        }
-    }
-
-
-    &__label {
-        margin-bottom: .1rem;
-        font-weight: 600;
-    }
-    &__item {
-        overflow: hidden;
-
-    }
-    // &__item  {
-    //     margin-bottom: 1.4rem;
-    //     font-size: 1.6rem;
+    // &__section {
+    //     position: relative;
     //     padding: 0 3rem;
-
-    //     &--cv {
+    //     &--application {
     //         display: flex;
-    //         align-items: flex-start;
-    //         width: 100%;
-            
-    //         // border: 1px solid lightgrey;
+    //         justify-content: space-between;
+    //         height: 6rem;
+    //         background-color: $color-primary-new;
+    //         font-size: 1.6rem;
+    //         font-weight: 400;
+    //         color: white;
     //     }
-        
+    //     &--job, &--person {
+    //         display: flex;
+    //         flex-flow: column wrap;
+    //     }
     //     &--job {
-    //         width: 50%;
+    //         height: 24rem;
+            
+    //     }
+    //     &--person {
+    //         height: 15rem;
+
     //     }
     // }
- 
-    &__item--editable {
-        -moz-appearance: textfield;
-        -webkit-appearance: textfield;
-        background-color: white;
-        background-color: -moz-field;
-        border: 1px solid darkgray;
-        box-shadow: 1px 1px 1px 0 lightgray inset;  
-        &:hover {
-            cursor: auto;
-        }
-    }
 
-    // &__controls {
-    //     display: flex;
-    //     align-items: center;
-    //     justify-content: flex-end;
-    //     width: 100%;
-    //     margin-top: auto;
-    //     padding: 1.5rem;
+
+    // &__label {
+    //     margin-bottom: .1rem;
+    //     font-weight: 600;
     // }
+    // &__item {
+    //     overflow: hidden;
+
+    // }
+
+
     &__btn {
         display: flex;
         align-items: flex-end;
@@ -629,7 +852,7 @@
             height: 6rem;
             background-color: $color-primary-new;
 
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             color: white;
 
             &>div {
@@ -1655,12 +1878,19 @@
     padding-left: 2rem;
     padding-right: 2rem;
     padding-bottom: 2rem;
+
+
     
     &--nested-jobs {
         margin-top: auto;
     }
     &--contacts, &--addresses {
         margin-top: 1rem;
+    }
+    &--addresses {
+        margin: 0;
+        padding-bottom: 1rem;
+        padding-top: 0;
     }
 
     &__item {
