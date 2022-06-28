@@ -518,19 +518,26 @@ class AdminController {
 
                 switch(sectionName) {
                     case 'applications': 
-                        // Render table
-                        this.renderApplicationTable();
+
 
                         // Add pagination
                         const { totalApplications, searchOptions: {index: appIndex, limit: appLimit} } = this.state.applications;
                         const { pages: numAppPages, current: currentAppPage } = adminView.calculatePagination(appIndex, appLimit, totalApplications);
-                        adminView.renderPagination(numAppPages, currentAppPage, document.querySelector('.table__content'), 'applications');
+                        adminView.renderPagination(numAppPages, currentAppPage, 'applications');
 
-                        // Create and add a summary element
-                        const applicationSummary = adminView.createApplicationSummary(this.applications[0]);
-                        document.querySelector('.summary-wrapper').insertAdjacentHTML('afterbegin', applicationSummary);
+                        // Render table
+                        this.renderApplicationTable();
 
-                        this.addApplicationSummaryListeners();
+                        // The elements are created when the admin page is initialised, this is content
+                        const { headerContent, applicantContent, positionContent, controlContent } = adminView.createApplicationSummaryContent(this.applications[0]);
+                        document.querySelector('.summary__header').insertAdjacentHTML('afterbegin', headerContent);
+                        document.querySelector('.summary__section--application-person').insertAdjacentHTML('beforeend', applicantContent);
+                        document.querySelector('.summary__section--application-job').insertAdjacentHTML('beforeend', positionContent);
+                        document.querySelector('.summary__controls').insertAdjacentHTML('beforeend', controlContent);
+                    
+
+    
+                        // this.addApplicationSummaryListeners();
 
                         break;
 
@@ -646,8 +653,10 @@ class AdminController {
                 nestedTl.to('.loader', {autoAlpha: 0, duration: .2, onComplete: () => loader.clearLoaders()});
 
                 // Animate summaries in for the first time (different to switching). Tables animated in the render methods
-                if(sectionName === 'applications' || sectionName === 'jobs' || sectionName === 'companies') {
+                if(sectionName === 'jobs' || sectionName === 'companies') {
                   adminView.animateSummaryIn();
+                } else if(sectionName === 'applications') {
+                    adminView.animateApplicationSummaryIn();
                 }
 
                 // Animate the pagination in
@@ -910,7 +919,7 @@ class AdminController {
     getNumOfRows(sectionName) {
         switch(sectionName) {
             case 'applications': 
-                this.state.applications.searchOptions.limit = adminView.calculateRows(sectionName, true, true);
+                this.state.applications.searchOptions.limit = adminView.calculateRows(sectionName, true,false);
                 break;
             case 'jobs': 
                 this.state.jobs.searchOptions.limit = adminView.calculateRows(sectionName, true, true);
@@ -1209,21 +1218,18 @@ class AdminController {
         // Format applications/headers into html elements
         const {headers, rows} = adminView.formatApplications(this.applications);
         const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
-        
-        const tableWrapper = document.querySelector('.table-wrapper');
-        // Add a header to the table 
 
         const table = document.querySelector('.table--applications');
+        const tableContent = document.querySelector('.table__content--applications');
 
        // If no table visible, render both the header and content
         if(!table) { 
+            // Heading content added here to animate at the same time as the data comes in
+            const headerContent = `<div class="table__heading">Applications</div>`;
+            document.querySelector('.table__header').insertAdjacentHTML('afterbegin', headerContent);
             const newTable = tableView.createTableTest('applications', headers, rows, false);
-            const tableHeader = tableView.createTableHeader('applications', 'Applications');
-            const tableContent = `<div class="table__content table__content--applications">${newTable}</div>`;
-            tableWrapper.insertAdjacentHTML('afterbegin', tableContent);
-            tableWrapper.insertAdjacentHTML('afterbegin', tableHeader);
+            tableContent.insertAdjacentHTML('afterbegin',newTable);
 
-            
             // Else remove the tbody and render just the content
         } else {
             utils.removeElement(document.querySelector('tbody'));
@@ -1248,21 +1254,25 @@ class AdminController {
                 this.state.applications.currentApplication = application[0];
 
                 // Change summary
-                const summary = document.querySelector('.summary');
-                const newSummary = adminView.createApplicationSummary(application[0]);
+                // const summary = document.querySelector('.summary');
+                // const newSummary = adminView.createApplicationSummary(application[0]);
                 // adminView.swapSummary(summary, adminView.createApplicationSummary(application[0]), this.applicationSummaryListener.bind(this)); 
             
-                const tl = gsap.timeline();
+                // const { headerContent, positionContent, applicantContent, controlContent } = adminView.createApplicationSummaryContent(application[0])
 
-                tl.add(adminView.animateSummaryWrapperOut());
-                tl.add(() => {
-                    // Switch the summary
-                    adminView.switchSummary(summary, newSummary);
+                adminView.switchApplicationSummary(application[0]);
+
+                // const tl = gsap.timeline();
+
+                // tl.add(adminView.animateSummaryWrapperOut());
+                // tl.add(() => {
+                //     // Switch the summary
+                //     adminView.switchSummary(summary, newSummary);
                                 
-                    // Add the listener to the new summary
-                    this.addApplicationSummaryListeners();
-                });
-                tl.add(adminView.animateSummaryWrapperIn());
+                //     // Add the listener to the new summary
+                //     this.addApplicationSummaryListeners();
+                // });
+                // tl.add(adminView.animateSummaryWrapperIn());
             
             });
         });

@@ -155,6 +155,12 @@
         font-size: 1.6rem;
         font-weight: 400;
         color: white;
+
+        &-content {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
     }
 
     &__details {
@@ -180,6 +186,7 @@
         //// Application Page
         &--application-job,
         &--application-person {
+            position:relative;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -190,10 +197,11 @@
         }
         &--application-job {
             margin-top: 2rem;
+            height: 31.6rem;
         }
         &--application-person {
             margin-top: 2.5rem;
-
+            height: 24.5rem;
         }
          
         //// End Application Page
@@ -458,7 +466,10 @@
         &--applications-page {
             align-self: flex-end;
             display: flex;
-            padding: 1.5rem;
+            justify-content: center;
+            align-items: center;
+            width: 13.5rem;
+            height: 5.5rem;
             box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
             border-radius: 5px;
             margin-top: 2.5rem;
@@ -469,6 +480,10 @@
 
     &__controls {
         display: flex;
+
+        &-content {
+            display: flex;
+        }
         
         &--job, &--application {
             position: absolute;
@@ -669,6 +684,10 @@
         color: white;
     }
     &__content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        flex-grow: 1;
         margin-top: 2rem;
         box-shadow: 0 2px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
         border-radius: 5px;
@@ -1868,7 +1887,22 @@
     }
 }
 
+.pagination-wrapper {
+ 
+    box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+    border-radius: 5px;
+    
+    &--applications {
+        display: flex;
+        align-items: center;
+        height: 6rem;
+        width: 40%;
+        margin-top: 2.5rem;
+        margin-left: auto;
 
+    }
+
+}
 
 .pagination {
     display: flex;
@@ -1879,6 +1913,11 @@
     padding-right: 2rem;
     padding-bottom: 2rem;
 
+    &__content {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    } 
 
     
     &--nested-jobs {

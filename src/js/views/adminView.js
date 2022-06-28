@@ -344,7 +344,8 @@ export const swapSummary = (oldSummary, newSummary, cb) => {
 //     })
 // }
 
-export const createApplicationSummary = ({
+
+export const createApplicationSummaryContent = ({
     id: applicationId,
     applicationDate,
     applicant: {
@@ -382,8 +383,8 @@ export const createApplicationSummary = ({
         cvType = cvUrl.indexOf('.doc') !== -1 ? 'doc':'pdf';
     } 
 
-    const header = `
-        <div class="summary__header">
+    const headerContent = `
+        <div class="summary__header-content">
             <div class="summary__item summary__item--header">
                 <div class="summary__id">${applicationId}</div>
             </div>
@@ -393,116 +394,119 @@ export const createApplicationSummary = ({
         </div>
     `;
 
-    const applicationSection = `
-        <div class="summary__section summary__section--application-job">
-            <div class="summary__heading summary__heading--applications-page">Position</div>
-            <div class="summary__content summary__content--application-job">
-
-                <div class="summary__column summary__column--applications-page">
-                    <div class="summary__item summary__item--applications-page">
-                        <div class="summary__label summary__label">Title:</div>
-                        <div class="summary__field summary__field--title" data-id="${jobId}">
-                            <a class="summary__link summary__link--job">${jobTitle}</a>
-                        </div>
-                    </div>
-                    <div class="summary__item summary__item--applications-page">
-                        <div class="summary__label">Company:</div>
-                        <div class="summary__field summary__field--company" data-id="${companyId}">
-                            <a class="summary__link summary__link--company">${companyName}</a>
-                        </div>
-                    </div>
-                    <div class="summary__item--applications-page summary__item">
-                        <div class="summary__label">Contact:</div>
-                        <div class="summary__field summary__field--contact">${contactFirstName} ${contactLastName}</div>
+    const positionContent = `
+        <div class="summary__content summary__content--application-job">
+            <div class="summary__column summary__column--applications-page">
+                <div class="summary__item summary__item--applications-page">
+                    <div class="summary__label summary__label">Title:</div>
+                    <div class="summary__field summary__field--title" data-id="${jobId}">
+                        <a class="summary__link summary__link--job">${jobTitle}</a>
                     </div>
                 </div>
-
-                <div class="summary__column summary__column--applications-page">
-                    <div class="summary__item summary__item--applications-page">
-                        <div class="summary__label">Contact Position:</div>
-                        <div class="summary__field summary__field--contact-position">${contactPosition}</div>
-                    </div>
-                    <div class="summary__item summary__item--applications-page">
-                        <div class="summary__label">Contact Phone:</div>
-                        <div class="summary__field summary__field--contact-phone">${contactPhone}</div>
-                    </div>
-                    <div class="summary__item summary__item--applications-page">
-                        <div class="summary__label">Contact Email:</div>
-                        <div class="summary__field summary__field--contact-email">
-                            <a class="summary__field-text--contact-email">${contactEmail}</a>
-                            <svg class="summary__copy-svg copy-svg--application"><use xlink:href="svg/spritesheet.svg#applications"></svg>    
-                        </div>
+                <div class="summary__item summary__item--applications-page">
+                    <div class="summary__label">Company:</div>
+                    <div class="summary__field summary__field--company" data-id="${companyId}">
+                        <a class="summary__link summary__link--company">${companyName}</a>
                     </div>
                 </div>
+                <div class="summary__item--applications-page summary__item">
+                    <div class="summary__label">Contact:</div>
+                    <div class="summary__field summary__field--contact">${contactFirstName} ${contactLastName}</div>
+                </div>
+            </div>
 
+            <div class="summary__column summary__column--applications-page">
+                <div class="summary__item summary__item--applications-page">
+                    <div class="summary__label">Contact Position:</div>
+                    <div class="summary__field summary__field--contact-position">${contactPosition}</div>
+                </div>
+                <div class="summary__item summary__item--applications-page">
+                    <div class="summary__label">Contact Phone:</div>
+                    <div class="summary__field summary__field--contact-phone">${contactPhone}</div>
+                </div>
+                <div class="summary__item summary__item--applications-page">
+                    <div class="summary__label">Contact Email:</div>
+                    <div class="summary__field summary__field--contact-email">
+                        <a class="summary__field-text--contact-email">${contactEmail}</a>
+                        <svg class="summary__copy-svg copy-svg--application"><use xlink:href="svg/spritesheet.svg#applications"></svg>    
+                    </div>
+                </div>
             </div>
         </div>
     `;
 
-    const markup  = `
-            <div class="summary summary--applications-page">
-                <div class="summary__details summary__details--applications-page">
-
-                    ${header}
-
-                    ${applicationSection}
-
-                    <div class="summary__section summary__section--application-person">
-
-                        <div class="summary__heading summary__heading--applications-page">Applicant</div>
-                        <div class="summary__content summary__content--application-applicant">
-                            <div class="summary__column summary__column--applications-page">
-                                <div class="summary__item summary__item--applications-page">
-                                    <div class="summary__label">Applicant Name:</div>
-                                    <a class="summary__link summary__link--applicant">
-                                        <div class="summary__field summary__field--applicant" data-id="${applicantId}">${personFirstName} ${personLastName}</div>
-                                    </a>
-                                </div>
-                                <div class="summary__item summary__item--applications-page">
-                                    <div class="summary__label">Phone:</div>
-                                    <div class="summary__field summary__field--phone">${personPhone}</div>
-                                </div>
-                            </div>
-
-                            <div class="summary__column summary__column--applications-page">
-                                <div class="summary__item summary__item--applications-page">
-                                    <div class="summary__label">Email:</div>
-                                    <div class="summary__field summary__field--email">${personEmail}</div>
-                                </div>
-
-                                <div class="summary__item summary__item--applications-page summary__item--cv">
-                                    <div class="summary__label summary__label--cv">Applicant CV:</div>
-                                    <div class="summary__field summary__field--cv">${cvType? 'Yes':'No'}</div>
-                                </div>
-                            </div>
-
-                            
-                        </div>
-                    </div>
-
-                    <div class="summary__controls summary__application-controls--applications-page">
-                        <div class="summary__btn summary__new-application-btn--applications">
-                            <svg class="summary__new-application-icon summary__icon">
-                                <use xlink:href="svg/spritesheet.svg#add">
-                            </svg>
-                        </div>
-    
-                        <div class="summary__btn summary__cv-btn--applications" data-id='${personId}'>
-                            ${cvType?`<svg class="summary__cv-svg--applications"><use xlink:href="svg/spritesheet.svg#${cvType}"></svg>`:'None'}
-                        </div>
-    
-                        <div class="summary__btn summary__delete-application-btn--applications">
-                            <svg class="summary__delete-application-icon summary__icon">
-                                <use xlink:href="svg/spritesheet.svg#delete-np1">
-                            </svg>
-                        </div>
-                    </div>
+    const applicantContent  = `
+        <div class="summary__content summary__content--application-applicant">
+            <div class="summary__column summary__column--applications-page">
+                <div class="summary__item summary__item--applications-page">
+                    <div class="summary__label">Applicant Name:</div>
+                    <a class="summary__link summary__link--applicant">
+                        <div class="summary__field summary__field--applicant" data-id="${applicantId}">${personFirstName} ${personLastName}</div>
+                    </a>
+                </div>
+                <div class="summary__item summary__item--applications-page">
+                    <div class="summary__label">Phone:</div>
+                    <div class="summary__field summary__field--phone">${personPhone}</div>
                 </div>
             </div>
-    `;
 
-    return markup;
+            <div class="summary__column summary__column--applications-page">
+                <div class="summary__item summary__item--applications-page">
+                    <div class="summary__label">Email:</div>
+                    <div class="summary__field summary__field--email">${personEmail}</div>
+                </div>
+
+                <div class="summary__item summary__item--applications-page summary__item--cv">
+                    <div class="summary__label summary__label--cv">Applicant CV:</div>
+                    <div class="summary__field summary__field--cv">${cvType? 'Yes':'No'}</div>
+                </div>
+            </div>
+
+        </div>
+    `;            
+
+    const controlContent = `
+        <div class="summary__controls-content summary__controls-content--applications">
+            <div class="summary__btn summary__btn--applications summary__btn--applications summary__new-application-btn--applications">
+                <svg class="summary__new-application-icon summary__icon">
+                    <use xlink:href="svg/spritesheet.svg#add">
+                </svg>
+            </div>
+
+            <div class="summary__btn summary__btn--applications summary__cv-btn--applications" data-id='${personId}'>
+                ${cvType?`<svg class="summary__cv-svg--applications"><use xlink:href="svg/spritesheet.svg#${cvType}"></svg>`:'None'}
+            </div>
+
+            <div class="summary__btn summary__btn--applications summary__delete-application-btn--applications">
+                <svg class="summary__delete-application-icon summary__icon">
+                    <use xlink:href="svg/spritesheet.svg#delete-np1">
+                </svg>
+            </div>
+        </div>
+    `;
+    
+
+    return {headerContent, applicantContent, positionContent, controlContent};
 };
+
+export const switchApplicationSummary = (application) => {
+    const tl = gsap.timeline();
+    
+    // Create new content
+    const { headerContent, applicantContent, positionContent, controlContent } = createApplicationSummaryContent(application);
+
+    // Animate out the current content
+    tl.add(animateApplicationSummaryOut());
+    
+    // document.querySelector('.summary__header').insertAdjacentHTML('afterbegin', headerContent);
+    // document.querySelector('.summary__section--application-person').insertAdjacentHTML('beforeend', applicantContent);
+    // document.querySelector('.summary__section--application-job').insertAdjacentHTML('beforeend', positionContent);
+    // document.querySelector('.summary__controls').insertAdjacentHTML('beforeend', controlContent);
+
+    // tl.add(animateApplicationSummaryIn())
+
+}
+
 
 export const renderNewApplicationModal = (data) => {
     const summary = document.querySelector('.summary-wrapper');
@@ -2009,131 +2013,24 @@ const getUserFormValues = () => {
     return { firstName, lastName, phone, email, cv };
 };
 
-// export const calculateRows = (tableName) => {
-//     // 1: Set a test table to be the full height of the container
-//     const markup = `<div class="table-wrapper table-wrapper--${tableName}"></div>`;
-//     const adminContent = document.querySelector('.admin__content');
-//     adminContent.insertAdjacentHTML('afterbegin', markup);
-//     const tableWrapperHeight = document.querySelector('.table-wrapper').offsetHeight;
 
-//     const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--table-header-height')) * 10;
-//     const paginationHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pagination-height')) * 10;
-//     const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * 10;
-
-//     const numOfRows = Math.floor((tableWrapperHeight - parseFloat(headerHeight) - parseFloat(paginationHeight)) / parseFloat(rowHeight));
-
-//     return numOfRows;
-// }
 export const calculateRows = (tableName, header, pagination) => {
-    const tableWrapperHeight = document.querySelector(`.table-wrapper--${tableName}`).offsetHeight;
+    // const tableWrapperHeight = document.querySelector(`.table-wrapper--${tableName}`).offsetHeight;
+
+    const tableContentHeight = document.querySelector(`.table__content--${tableName}`).offsetHeight;
     const headerHeight = header? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--table-header-height')) * 10 : 0;
     const paginationHeight = pagination? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pagination-height')) * 10 : 0;
     const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * 10;
 
-    const numOfRows = Math.floor((tableWrapperHeight - parseFloat(headerHeight) - parseFloat(paginationHeight)) / parseFloat(rowHeight));
+    const numOfRows = Math.floor((tableContentHeight - parseFloat(headerHeight) - parseFloat(paginationHeight)) / parseFloat(rowHeight));
+    console.log('\ntableContentHeight',tableContentHeight);
+    console.log('headerHeight', headerHeight);
+    console.log('paginationHeigh', paginationHeight);
+    console.log('rowHeight',rowHeight);
+    console.log('numRows', numOfRows);
     return numOfRows;
 }
 
-// export const calculateRows = (tableName) => {
-//     // 1: Set a test table to be the full height of the container
-//     const markup = `<div class="table-wrapper table-wrapper--${tableName}"></div>`;
-//     const adminContent = document.querySelector('.admin__content');
-//     adminContent.insertAdjacentHTML('afterbegin', markup);
-//     const tableWrapper = document.querySelector('.table-wrapper');
-
-//     const testTable = `
-//         <table class="table--test">
-//             <thead class="thead thead--${tableName}"><tr><th>Test</th></tr></thead>
-//             <tbody>
-//                 <tr class="row row--${tableName}">
-//                     <td>test</td>
-//                    <!-- ${
-//                         tableName === 'applications' ? 
-//                         '<td><div class="cv-btn--table"><svg class="cv-icon"><use xlink:href="svg/spritesheet.svg#doc"></svg></div></td>' : 
-//                         ''
-//                     } -->
-//                 </tr>
-//             </tbody>
-//         </table>
-//         <div class="pagination pagination--${tableName}">
-//             <div class="pagination__previous">Previous</div>
-//                 <div class="pagination__item pagination__item--active">
-//                     1
-//                 </div>
-//             <div class="pagination__next">Next</div>
-//         </div>
-//     `;
-
-//     tableWrapper.insertAdjacentHTML('afterbegin', testTable);
-
-//     // 2: Get the table header height and pagination heights, take them away from the wrapper height
-//     const headerHeight = document.querySelector(`.thead--${tableName}`).offsetHeight;
-//     const paginationHeight = document.querySelector(`.pagination--${tableName}`).offsetHeight;
-//     const wrapperHeight = tableWrapper.offsetHeight;
-
-//     const availableHeight = wrapperHeight - headerHeight - paginationHeight;
-//     console.log(headerHeight, paginationHeight, wrapperHeight, availableHeight);
-
-//     // 3: Take availble height and divide by the row height
-//     const rowHeight = document.querySelector(`.row--${tableName}`).offsetHeight;
-//     const numOfRows = Math.floor(availableHeight / rowHeight);
-
-//     return numOfRows;
-// }
-
-// // table name, function to get row height
-// export const calculateRows = (tableName) => {
-//     // Add a table wrapper to the DOM to find its styled height
-//     const markup = `<div class="${tableName}-table__wrapper"></div>`;
-//     const adminMain = document.querySelector('.admin__main');
-//     adminMain.insertAdjacentHTML('afterbegin', markup);
-
-//     const { headerHeight, rowHeight, paginationHeight } = getRowHeight(tableName);
-//     const tableHeight = document.querySelector(`.${tableName}-table__wrapper`).offsetHeight;
-//     const numOfRows = Math.floor((tableHeight - headerHeight - paginationHeight)/rowHeight);
-//     // Remove test table wrapper
-//     utils.removeElement(document.querySelector(`.${tableName}-table__wrapper`));
-
-//     return numOfRows-1;
-// }
-// const getRowHeight = (tableName) => {
-//     // Create dummy table to get row height
-//     const table = `
-//             <table class="table--test">
-//                 <thead class="thead thead--${tableName}"><tr><th>Test</th></tr></thead>
-//                 <tbody>
-//                     <tr class="row row--${tableName}">
-//                         <td>test</td>
-//                         ${
-//                             tableName === 'applications' ? 
-//                             '<td><div class="cv-btn--table"><svg class="cv-icon"><use xlink:href="svg/spritesheet.svg#doc"></svg></div></td>' : 
-//                             ''
-//                         }
-//                     </tr>
-//                 </tbody>
-//             </table>
-//             <div class="pagination pagination--${tableName}">
-//                 <div class="pagination__previous">Previous</div>
-//                     <div class="pagination__item pagination__item--active">
-//                         1
-//                     </div>
-//                 <div class="pagination__next">Next</div>
-//             </div>
-//     `;
-
-//     // Add table to DOM
-//     document.querySelector(`.admin__content`).insertAdjacentHTML('afterbegin', table);
-//     const rowHeight = document.querySelector(`.row--${tableName}`).offsetHeight;
-//     const headerHeight = document.querySelector(`.thead--${tableName}`).offsetHeight;
-//     const paginationHeight = document.querySelector(`.pagination--${tableName}`).offsetHeight;
-
-//     console.log(`TestTable -- row: ${rowHeight}, header: ${headerHeight}, pagination: ${paginationHeight}`)
-
-//     // Remove table
-//     utils.removeElement(document.querySelector('.table--test'));
-//     utils.removeElement(document.querySelector(`.pagination--${tableName}`));
-//     return { headerHeight, rowHeight, paginationHeight };
-// }
 
 export const getDeleteContactHtml = (contactId) => {
     const name = document.querySelector('.company-summary__field--name').innerText;
@@ -3965,24 +3862,27 @@ export const calculatePagination = (current, limit, totalItems) => {
         return { pages, current };
 }
 
-export const renderPagination = (pages, current, container, tableName) => {
+// export const renderPagination = (pages, current, container, tableName) => {
+export const renderPagination = (pages, current, tableName) => {
+
 // console.log(tableName);
 // console.log(container);
+    const paginationWrapper = document.querySelector(`.pagination-wrapper--${tableName}`);
     // Remove pagination if present
-    const pagination = document.querySelector(`.pagination--${tableName}`);
-    if(pagination) utils.removeElement(pagination);  
+    const paginationContent = document.querySelector(`.pagination__content--${tableName}`);
+    if(paginationContent) utils.removeElement(paginationContent);  
 
     // Generate the individual pagination numbers
     const itemMarkup = generatePaginationMarkup(pages, current, tableName);
 
     const markup = `
-        <div class="pagination pagination--${tableName}">
+        <div class="pagination__content pagination__content--${tableName}">
             <div class="pagination__previous pagination__previous--${tableName} ${current === 0? 'pagination__previous--inactive':''}">Previous</div>
             <div class="pagination__item-wrapper">${itemMarkup}</div>
             <div class="pagination__next pagination__next--${tableName} ${current === pages-1 || pages === 0? 'pagination__next--inactive':''}">Next</div>
         </div>
     `;
-    container.insertAdjacentHTML('beforeend', markup);
+    paginationWrapper.insertAdjacentHTML('beforeend', markup);
 }
 
 // export const renderPagination = (current, limit, totalItems, container, table) => {
@@ -4033,10 +3933,11 @@ export const updatePaginationView = (index) => {
 // }
 
 export const animateTableContentIn = (table) => {
-    const tl = gsap.timeline()
+    const tl = gsap.timeline();
 
     return tl
-        .fromTo(`.table--${table}`, {autoAlpha: 0},{autoAlpha: 1, duration: '.5'})
+        .fromTo('.table__heading', {autoAlpha: 0, y: -15}, {autoAlpha: 1, y: 0,  duration: .3})
+        .fromTo(`.table--${table}`, {autoAlpha: 0},{autoAlpha: 1, duration: .5}, '<')
         // .from('.thead', { autoAlpha: 0, y: -20, duration: 1 }, '<')
         .from(`.row--${table}`, {
             x: -15, 
@@ -4047,6 +3948,12 @@ export const animateTableContentIn = (table) => {
             ease: 'power2.out',
         
         }, '<')
+        .fromTo(`.pagination__content--${table}`, {autoAlpha: 0},{autoAlpha: 1, duration: .3}, '<')
+        .fromTo(`.pagination__item--${table}`, {autoAlpha: 0},{autoAlpha: 1, stagger: .3}, '<')
+        .fromTo(`.pagination__previous--${table}`, {autoAlpha: 0, x:-20},{autoAlpha:1, x:0}, '<')
+        .fromTo(`.pagination__next--${table}`, {autoAlpha: 0, x:20},{autoAlpha:1, x:0}, '<');
+
+        
 }
 export const animateTableBodyIn = (table) => {
     const tl = gsap.timeline()
@@ -4062,6 +3969,42 @@ export const animateTableBodyIn = (table) => {
             ease: 'power2.out',
         
         }, '<')
+}
+export const animateApplicationSummaryIn = () => {
+    const tl = gsap.timeline();
+    tl
+    .fromTo('.summary__item--header', { autoAlpha: 0, y: -10 },{ autoAlpha: 1, y: 0 })
+    .fromTo('.summary__content', { autoAlpha: 0, x: 10 },{ autoAlpha: 1, x: 0, stagger: 0.2 }, '<')
+    .fromTo('.summary__btn--applications', { autoAlpha: 0, y: 10 },{ autoAlpha: 1, y: 0, stagger: { from: 'end', each: .1 } }, '<')    
+    
+    return tl;
+}
+const animateApplicationSummaryOut = () => {
+    // Select the old content
+    const oldHeaderContent = document.querySelector('.summary__header-content');
+    const oldApplicantContent = document.querySelector('.summary__content--application-applicant');
+    const oldPositionContent = document.querySelector('.summary__content--application-job');
+    const oldControlsContent = document.querySelector('.summary__controls-content--applications');
+console.log(oldHeaderContent, oldApplicantContent, oldPositionContent, oldControlsContent);
+    const tl = gsap.timeline();
+    tl.to(oldHeaderContent, {
+        autoAlpha: 0, 
+        onComplete: () => oldHeaderContent.parentElement.removeChild(oldHeaderContent)
+    })
+    .to(oldApplicantContent, {
+        autoAlpha: 0, 
+        onComplete: () => oldApplicantContent.parentElement.removeChild(oldApplicantContent)
+    }, '<')
+    .to(oldPositionContent, {
+        autoAlpha: 0, 
+        onComplete: () => oldPositionContent.parentElement.removeChild(oldPositionContent)
+    }, '<')
+    .to(oldControlsContent, {
+        autoAlpha: 0, 
+        onComplete: () => oldControlsContent.parentElement.removeChild(oldControlsContent)
+    }, '<');
+
+    return tl;
 }
 
 export const animateSummaryIn = () => {
@@ -4155,6 +4098,8 @@ export const initAdminSection = (tl, sectionName) => {
     // List the elements that will contain a loader, and the css selector
     switch(sectionName) {
         case 'applications':
+            loaderContainers = [['.table-wrapper', 'admin-table'], ['.summary__section--application-person', 'person-summary'], ['.summary__section--application-job', 'job-summary']];
+            break;
         case 'jobs':
             loaderContainers = [['.table-wrapper', 'admin-table'], ['.summary-wrapper', 'summary']];
             break;
@@ -4203,7 +4148,8 @@ export const createAdminTemplate = (page) => {
     } else if(page === 'applications') {
         // addTableHeader(adminContent, page);
         addTableWrapper(adminContent, page);
-        addSummaryWrapper(adminContent, page);
+        addApplicationSummaryWrapper(adminContent);
+        // addSummaryWrapper(adminContent, page);
 
     }
 
@@ -4216,7 +4162,35 @@ export const createAdminTemplate = (page) => {
 
 //     adminContent.appendChild(summary);
 // }
+const addApplicationSummaryWrapper = (adminContent) => {
+    // addSummaryWrapper(adminContent, 'applications');
 
+    // Create the summary, minus the content divs that'll be animated in after the axios request
+    const summaryWrapper = createSummaryElement('summary-wrapper summary-wrapper--applications');
+    const summary = createSummaryElement('summary summary--applications-page');
+    const details = createSummaryElement('summary__details summary__details--applications-page');
+    const header = createSummaryElement('summary__header');
+    const positionSection = createSummaryElement('summary__section summary__section--application-job');
+    const positionHeading = createSummaryElement('summary__heading summary__heading--applications-page');
+    const applicantSection = createSummaryElement('summary__section summary__section--application-person');
+    const applicantHeading = createSummaryElement('summary__heading summary__heading--applications-page');
+    const controls = createSummaryElement('summary__controls summary__application-controls--applications-page');
+    positionHeading.innerText = 'Position';
+    applicantHeading.innerText = 'Applicant';
+
+
+    positionSection.appendChild(positionHeading);
+    applicantSection.appendChild(applicantHeading);
+    details.append(header, applicantSection, positionSection, controls);
+    summary.appendChild(details);
+    summaryWrapper.append(summary);
+    adminContent.append(summaryWrapper);
+}
+const createSummaryElement = (classes) => {
+    const summary = document.createElement('div');
+    summary.setAttribute('class', classes);
+    return summary;
+}
 const addSummaryWrapper = (adminContent, page) => {
     const summary = document.createElement('div');
     summary.setAttribute('class', `summary-wrapper summary-wrapper--${page}`);
@@ -4224,19 +4198,36 @@ const addSummaryWrapper = (adminContent, page) => {
     adminContent.appendChild(summary);
 }
 const addTableWrapper = (adminContent, page) => {
-    const markup = document.createElement('div');
-    markup.setAttribute('class', `table-wrapper table-wrapper--${page}`);
+    // Create a table wrapper
+    const tableWrapper = document.createElement('div');
+    tableWrapper.setAttribute('class', `table-wrapper table-wrapper--${page}`);
 
-    adminContent.appendChild(markup);
+    // Create a table header and a content wrapper
+    const tableHeader = createTableHeader(page, `${page[0].toUpperCase()}${page.substring(1)}`);
+    const tableContent = createTableContent(page);
+    const tablePagination = createTablePagination(page);
+
+    tableWrapper.append(tableHeader, tableContent, tablePagination);
+
+    adminContent.appendChild(tableWrapper);
 }
 
-export const createTableHeader = (page, heading) => {
-    return `
-        <div class="table__header table__header--${page}">
-            <div class="table__heading">${heading}</div>
-        </div>
-    `;
+export const createTableHeader = (page, title) => {
+    const header = document.createElement('div');
+    header.setAttribute('class', `table__header table__header--${page}`);
+
+    return header;
 }
+const createTableContent = (page) => {
+    const content = document.createElement('div');
+    content.setAttribute('class', `table__content table__content--${page}`);
+    return content;
+};
+const createTablePagination = (page) => {
+    const pagination = document.createElement('div');
+    pagination.setAttribute('class', `pagination-wrapper pagination-wrapper--${page}`);
+    return pagination;
+};
 
 
 export const initialiseAdminPage = (page) => {
