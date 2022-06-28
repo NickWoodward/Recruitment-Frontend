@@ -164,7 +164,7 @@
     }
 
     &__details {
-
+        position: relative;
         &--users {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
@@ -620,6 +620,41 @@
     &__icon--disabled {
         fill: rgb(197, 197, 197) !important;
     }
+
+    &__modal {
+        position: absolute;
+        left: 0;
+        top: 0;
+
+        display: flex;
+        flex-direction: column;
+        // justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        background-color: white;
+        z-index: 100;
+
+        box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+        border-radius: 5px;
+
+        &-header {
+            flex-grow: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            height: 6rem;
+            background-color: $color-primary-new;
+            border-radius: 5px 5px 0 0;
+            font-size: 1.7rem;
+            color: white;
+
+            &>div {
+                padding: 0 3rem;
+            }
+        }
+    }
 }
 
 .table-wrapper {
@@ -688,7 +723,7 @@
         flex-direction: column;
         justify-content: space-between;
         flex-grow: 1;
-        margin-top: 2rem;
+        margin-top: 2.5rem;
         box-shadow: 0 2px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
         border-radius: 5px;
         overflow: hidden;
@@ -848,37 +883,7 @@
         fill: red;
     }
 
-    &__modal {
-        position: absolute;
-        left: 0;
-        top: 0;
 
-        display: flex;
-        flex-direction: column;
-        // justify-content: center;
-        align-items: center;
-        width: 100%;
-        height: 100%;
-        background-color: white;
-        z-index: 100;
-
-        &-header {
-            flex-grow: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            height: 6rem;
-            background-color: $color-primary-new;
-
-            font-size: 1.8rem;
-            color: white;
-
-            &>div {
-                padding: 0 3rem;
-            }
-        }
-    }
 }
 
 .new-application {
@@ -888,7 +893,7 @@
     justify-content: flex-start;
     align-items: center;
     width: 100%;
-    margin-top: 3rem;
+    margin-top: 6rem;
 
     font-size: 1.8rem;
     color: $color-secondary;
@@ -948,6 +953,8 @@
     left: 0;
     width: 100%;
     height: 100%;
+    box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+    border-radius: 5px;
 
 
     display: flex;
@@ -972,7 +979,8 @@
         font-weight: bold;
         width: 25rem;
 
-        margin-top: 3rem;
+        margin-top: 5rem;
+        margin-bottom: 1.5rem;
     }
     &__svg-wrapper {
         display: flex;
@@ -1000,12 +1008,15 @@
     &__label {
         font-weight: bold;
     }
+    &__field {
+        margin-top: .8rem;
+    }
 
     &__controls {
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
-        margin-top: 2rem;
+        margin-top: 2.5rem;
     }
 
     &__btn--confirm, &__btn--cancel {

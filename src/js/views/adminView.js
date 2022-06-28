@@ -7,9 +7,9 @@ import * as tableView from './tableView';
 import * as loader from './loader';
 import Select from './customSelect';
 
-
 import gsap from 'gsap';
 
+let summaryAnimationInProgress = false;
 
 export const renderContent = (content, container) => {
     content.forEach(item => {
@@ -345,267 +345,37 @@ export const swapSummary = (oldSummary, newSummary, cb) => {
 // }
 
 
-export const createApplicationSummaryContent = ({
-    id: applicationId,
-    applicationDate,
-    applicant: {
-        id: applicantId,
-        person: {
-            id: personId,
-            firstName: personFirstName,
-            lastName: personLastName,
-            email: personEmail,
-            phone: personPhone,
+
+
+export const animateApplicationSummaryOut = () => {
+    const tl = gsap.timeline({
+        defaults: { 
+            duration: .2,
+            immediateRender: false 
         },
-        cvUrl: cvUrl
-    },
-    job: {
-        id: jobId,
-        title: jobTitle,
-        company: {
-            id: companyId, 
-            name: companyName,
-            contacts: [{
-                person: { 
-                    firstName: contactFirstName,  
-                    lastName: contactLastName,
-                    phone: contactPhone,
-                    email: contactEmail
-                },
-                person,
-                position: contactPosition,
-            }]
-        }
-    }
-}) => {
-    let cvType;
-    if(cvUrl) {
-        cvType = cvUrl.indexOf('.doc') !== -1 ? 'doc':'pdf';
-    } 
+    });
 
-    const headerContent = `
-        <div class="summary__header-content">
-            <div class="summary__item summary__item--header">
-                <div class="summary__id">${applicationId}</div>
-            </div>
-            <div class="summary__item summary__item--header">
-                <div class="summary__date">${applicationDate}</div>
-            </div>
-        </div>
-    `;
+    tl
+    .fromTo('.summary__header-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -10 })
+    .fromTo('.summary__content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y:-10, stagger: 0.1 }, '<0.1')
+    .fromTo('.summary__btn--applications', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y:10, stagger: { from: 'end', each: .1 } }, '<');
 
-    const positionContent = `
-        <div class="summary__content summary__content--application-job">
-            <div class="summary__column summary__column--applications-page">
-                <div class="summary__item summary__item--applications-page">
-                    <div class="summary__label summary__label">Title:</div>
-                    <div class="summary__field summary__field--title" data-id="${jobId}">
-                        <a class="summary__link summary__link--job">${jobTitle}</a>
-                    </div>
-                </div>
-                <div class="summary__item summary__item--applications-page">
-                    <div class="summary__label">Company:</div>
-                    <div class="summary__field summary__field--company" data-id="${companyId}">
-                        <a class="summary__link summary__link--company">${companyName}</a>
-                    </div>
-                </div>
-                <div class="summary__item--applications-page summary__item">
-                    <div class="summary__label">Contact:</div>
-                    <div class="summary__field summary__field--contact">${contactFirstName} ${contactLastName}</div>
-                </div>
-            </div>
-
-            <div class="summary__column summary__column--applications-page">
-                <div class="summary__item summary__item--applications-page">
-                    <div class="summary__label">Contact Position:</div>
-                    <div class="summary__field summary__field--contact-position">${contactPosition}</div>
-                </div>
-                <div class="summary__item summary__item--applications-page">
-                    <div class="summary__label">Contact Phone:</div>
-                    <div class="summary__field summary__field--contact-phone">${contactPhone}</div>
-                </div>
-                <div class="summary__item summary__item--applications-page">
-                    <div class="summary__label">Contact Email:</div>
-                    <div class="summary__field summary__field--contact-email">
-                        <a class="summary__field-text--contact-email">${contactEmail}</a>
-                        <svg class="summary__copy-svg copy-svg--application"><use xlink:href="svg/spritesheet.svg#applications"></svg>    
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    const applicantContent  = `
-        <div class="summary__content summary__content--application-applicant">
-            <div class="summary__column summary__column--applications-page">
-                <div class="summary__item summary__item--applications-page">
-                    <div class="summary__label">Applicant Name:</div>
-                    <a class="summary__link summary__link--applicant">
-                        <div class="summary__field summary__field--applicant" data-id="${applicantId}">${personFirstName} ${personLastName}</div>
-                    </a>
-                </div>
-                <div class="summary__item summary__item--applications-page">
-                    <div class="summary__label">Phone:</div>
-                    <div class="summary__field summary__field--phone">${personPhone}</div>
-                </div>
-            </div>
-
-            <div class="summary__column summary__column--applications-page">
-                <div class="summary__item summary__item--applications-page">
-                    <div class="summary__label">Email:</div>
-                    <div class="summary__field summary__field--email">${personEmail}</div>
-                </div>
-
-                <div class="summary__item summary__item--applications-page summary__item--cv">
-                    <div class="summary__label summary__label--cv">Applicant CV:</div>
-                    <div class="summary__field summary__field--cv">${cvType? 'Yes':'No'}</div>
-                </div>
-            </div>
-
-        </div>
-    `;            
-
-    const controlContent = `
-        <div class="summary__controls-content summary__controls-content--applications">
-            <div class="summary__btn summary__btn--applications summary__btn--applications summary__new-application-btn--applications">
-                <svg class="summary__new-application-icon summary__icon">
-                    <use xlink:href="svg/spritesheet.svg#add">
-                </svg>
-            </div>
-
-            <div class="summary__btn summary__btn--applications summary__cv-btn--applications" data-id='${personId}'>
-                ${cvType?`<svg class="summary__cv-svg--applications"><use xlink:href="svg/spritesheet.svg#${cvType}"></svg>`:'None'}
-            </div>
-
-            <div class="summary__btn summary__btn--applications summary__delete-application-btn--applications">
-                <svg class="summary__delete-application-icon summary__icon">
-                    <use xlink:href="svg/spritesheet.svg#delete-np1">
-                </svg>
-            </div>
-        </div>
-    `;
-    
-
-    return {headerContent, applicantContent, positionContent, controlContent};
-};
-
-export const switchApplicationSummary = (application) => {
+    return tl;
+}
+export const animateApplicationSummaryIn = (firstAnimation) => {
     const tl = gsap.timeline();
+
+    // Slower animations on first render
+    const duration = firstAnimation? 0.2:0.1;
+
+    tl
+    .fromTo('.summary__item--header', { autoAlpha: 0, y: 10 },{ autoAlpha: 1, y: 0 })
+    .fromTo('.summary__content', { autoAlpha: 0, y: 10 },{ autoAlpha: 1, y: 0, stagger: duration }, `<${duration}`)
+    .fromTo('.summary__btn--applications', { autoAlpha: 0, y: 10 },{ autoAlpha: 1, y: 0, stagger: { from: 'end', each: .1 } }, '<')    
     
-    // Create new content
-    const { headerContent, applicantContent, positionContent, controlContent } = createApplicationSummaryContent(application);
-
-    // Animate out the current content
-    tl.add(animateApplicationSummaryOut());
-    
-    // document.querySelector('.summary__header').insertAdjacentHTML('afterbegin', headerContent);
-    // document.querySelector('.summary__section--application-person').insertAdjacentHTML('beforeend', applicantContent);
-    // document.querySelector('.summary__section--application-job').insertAdjacentHTML('beforeend', positionContent);
-    // document.querySelector('.summary__controls').insertAdjacentHTML('beforeend', controlContent);
-
-    // tl.add(animateApplicationSummaryIn())
-
+    return tl;
 }
 
-
-export const renderNewApplicationModal = (data) => {
-    const summary = document.querySelector('.summary-wrapper');
-    const modal = createNewApplicationModal(data);
-
-    summary.insertAdjacentHTML('afterbegin', modal);
-
-    gsap.fromTo('.application-summary__modal', 
-        { autoAlpha: 0 }, 
-        { autoAlpha: 1, duration: .2 }
-    );
-
-    populateApplicationModal(data);
-
-    // Has to be after the application modal is created
-
-    // const submitNewBtn = document.querySelector('.new-application__submit');
-    // submitNewBtn.addEventListener('click',  async (e) => {
-    //     e.preventDefault();
-    //     // Get the job id from the select
-    //     const jobId = document.querySelector('.new-application__input--job').value;
-    //     const personId = document.querySelector('.new-application__input--applicant').value;
-
-    //     if(!jobId || !personId) {
-    //         console.log(`job: ${jobId}, person: ${personId}`);
-    //         const msg = !jobId? 'No Job Selected':'No Applicant Selected';
-    //         alertModal.displayAlert(
-    //             msg,
-    //             false,
-    //             document.querySelector('.application-summary__modal')
-    //         );
-    //         return
-    //     };
-
-    //     try {
-    //         const res = await data.api.createApplication(jobId, personId);
-    //         if(res.status === 200) {
-    //             console.log('success');
-    //             alertModal.displayAlert(
-    //                 'New Application Created',
-    //                 true,
-    //                 document.querySelector('.application-summary__modal')
-    //             ); 
-    //         }
-    //     } catch (err) {
-    //         if(err.response.data.message === 'Application already made') {
-    //             alertModal.displayAlert(
-    //                 err.response.data.message,
-    //                 false,
-    //                 document.querySelector('.application-summary__modal')
-    //             );
-    //         }
-    //     }
-    // });
-};
-
-const createNewApplicationModal = ({jobs, users, appNumber}) => {
-
-    const today = new Date();
-    const date = `${today.getDate()}/${today.getMonth()+1}/${+today.getFullYear()}`;
-    const modal = `
-        <div class="application-summary__modal application-summary__modal--new summary__modal">
-
-            <div class="application-summary__modal-header">
-                <div>${appNumber}</div>
-                <div>${date}</div>
-            </div>
-            <div class="new-application__close">
-                <svg class="new-application__close-svg"><use xlink:href="svg/spritesheet.svg#cross"></svg>
-            </div>
-            <div class="new-application__form-wrapper">
-
-                <form class="new-application">
-                    <div class="new-application__field">
-                        <div class="new-application__label">Job:</div>
-                        <select name="job" id="job" class="new-application__input new-application__input--job">
-                            <!-- options added in js -->
-                        </select>
-                    </div>
-                    
-                    <div class="new-application__field">
-                        <div class="new-application__label">Applicant:</div>
-                        <select name="applicant" id="applicant" class="new-application__input new-application__input--applicant">
-                            <!-- options added in js -->
-                        </select>
-                    </div>
-
-                    <button class="new-application__submit">Submit</button>
-
-                </form>
-            </div>
-            <div class="alert-wrapper">
-                
-            </div>
-        </div>
-    `;
-
-    return modal;
-};
 
 export const animateApplicationAnimation = (success, msg) => {
     const markup = `
@@ -628,44 +398,6 @@ export const animateApplicationAnimation = (success, msg) => {
 
 }
 
-const populateApplicationModal = ({ jobs, users }) => {
-    const jobsInput = document.querySelector('.new-application__input--job');
-    const userInput = document.querySelector('.new-application__input--applicant');
-
-    // Order the jobs by the company name
-    jobs.sort((a, b) => a.companyName > b.companyName? 1:-1);
-
-    const jobPlaceholder = new Option('Jobs');
-    jobPlaceholder.setAttribute('disabled', 'disabled');
-    jobPlaceholder.setAttribute('selected', 'selected');
-    jobsInput.append(jobPlaceholder)
-
-    const userPlaceholder = new Option('Applicants');
-    userPlaceholder.setAttribute('disabled', 'disabled');
-    userPlaceholder.setAttribute('selected', 'selected');
-    userInput.append(userPlaceholder)
-
-    jobs.forEach(job => {
-        let group = jobsInput.querySelector(`optgroup[label="${job.companyName}"]`);
-        if(!group) {
-            group = document.createElement("optgroup");
-            group.label = job.companyName;
-        }
-        const option = new Option(`${job.title}`, job.id);
-        option.setAttribute('data-group', group.label.toLowerCase());
-        group.append(option);
-
-        jobsInput.appendChild(group);
-    });
-
-    users.forEach(applicant => {
-        const option = new Option(`${applicant.applicantId}: ${applicant.firstName} ${applicant.lastName}`, applicant.applicantId);
-        option.className = 'job-option';
-        userInput.add(option, undefined);
-    });
-
-    [jobsInput, userInput].forEach(input => new Select(input));
-}
 
 
 //////////  USER PAGE  //////////
@@ -2023,11 +1755,11 @@ export const calculateRows = (tableName, header, pagination) => {
     const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * 10;
 
     const numOfRows = Math.floor((tableContentHeight - parseFloat(headerHeight) - parseFloat(paginationHeight)) / parseFloat(rowHeight));
-    console.log('\ntableContentHeight',tableContentHeight);
-    console.log('headerHeight', headerHeight);
-    console.log('paginationHeigh', paginationHeight);
-    console.log('rowHeight',rowHeight);
-    console.log('numRows', numOfRows);
+    // console.log('\ntableContentHeight',tableContentHeight);
+    // console.log('headerHeight', headerHeight);
+    // console.log('paginationHeigh', paginationHeight);
+    // console.log('rowHeight',rowHeight);
+    // console.log('numRows', numOfRows);
     return numOfRows;
 }
 
@@ -2217,14 +1949,14 @@ export const getDeleteJobHtml = (jobId) => {
     `);
 }
 export const getDeleteApplicationHtml = (applicationId) => {
-    const applicationDate = document.querySelector('.application-summary__field--date').innerText;
-    const positionName = document.querySelector('.application-summary__field--title').innerText;
-    const positionCompany = document.querySelector('.application-summary__field--company').innerText;
-    const applicantName = `${document.querySelector('.application-summary__field--applicant').innerText}`;
+    const applicationDate = document.querySelector('.summary__date').innerText;
+    const positionName = document.querySelector('.summary__field--title').innerText;
+    const positionCompany = document.querySelector('.summary__field--company').innerText;
+    const applicantName = `${document.querySelector('.summary__field--applicant').innerText}`;
     
     return (`
             <div class='confirmation confirmation--delete'>
-                <div class="application-summary__modal-header">
+                <div class="summary__modal-header">
                     <div>${applicationId}</div>
                     <div>${applicationDate}</div>
                 </div>
@@ -3853,56 +3585,7 @@ const renderCompany = (company) => {
         `
 };
 
-export const calculatePagination = (current, limit, totalItems) => {
-        // Work out how many pages
-        const pages = Math.ceil(totalItems / limit);
-        // Current is the first (zero indexed) item on the page. current/limit = zero index page number
-        current = current/limit;
 
-        return { pages, current };
-}
-
-// export const renderPagination = (pages, current, container, tableName) => {
-export const renderPagination = (pages, current, tableName) => {
-
-// console.log(tableName);
-// console.log(container);
-    const paginationWrapper = document.querySelector(`.pagination-wrapper--${tableName}`);
-    // Remove pagination if present
-    const paginationContent = document.querySelector(`.pagination__content--${tableName}`);
-    if(paginationContent) utils.removeElement(paginationContent);  
-
-    // Generate the individual pagination numbers
-    const itemMarkup = generatePaginationMarkup(pages, current, tableName);
-
-    const markup = `
-        <div class="pagination__content pagination__content--${tableName}">
-            <div class="pagination__previous pagination__previous--${tableName} ${current === 0? 'pagination__previous--inactive':''}">Previous</div>
-            <div class="pagination__item-wrapper">${itemMarkup}</div>
-            <div class="pagination__next pagination__next--${tableName} ${current === pages-1 || pages === 0? 'pagination__next--inactive':''}">Next</div>
-        </div>
-    `;
-    paginationWrapper.insertAdjacentHTML('beforeend', markup);
-}
-
-// export const renderPagination = (current, limit, totalItems, container, table) => {
-//     const pagination = document.querySelector(`.pagination--${table}`);
-//     if(pagination) utils.removeElement(pagination);   
-//     // Work out how many pages
-//     const pages = Math.ceil(totalItems / limit);
-//     // Current is the first (zero indexed) item on the page. current/limit = zero index page number
-//     current = current/limit;
-//     const itemMarkup = generatePaginationMarkup(pages, current, table);
-    
-//     const markup = `
-//         <div class="pagination pagination--${table}">
-//             <div class="pagination__previous pagination__previous--${table} ${current === 0? 'pagination__previous--inactive':''}">Previous</div>
-//             <div class="pagination__item-wrapper">${itemMarkup}</div>
-//             <div class="pagination__next pagination__next--${table} ${current === pages-1? 'pagination__next--inactive':''}">Next</div>
-//         </div>
-//     `;
-//     container.insertAdjacentHTML('beforeend', markup);
-// };
 export const updatePaginationView = (index) => {
     // Get the pagination items
     const items = document.querySelectorAll('.pagination__item');
@@ -3970,42 +3653,7 @@ export const animateTableBodyIn = (table) => {
         
         }, '<')
 }
-export const animateApplicationSummaryIn = () => {
-    const tl = gsap.timeline();
-    tl
-    .fromTo('.summary__item--header', { autoAlpha: 0, y: -10 },{ autoAlpha: 1, y: 0 })
-    .fromTo('.summary__content', { autoAlpha: 0, x: 10 },{ autoAlpha: 1, x: 0, stagger: 0.2 }, '<')
-    .fromTo('.summary__btn--applications', { autoAlpha: 0, y: 10 },{ autoAlpha: 1, y: 0, stagger: { from: 'end', each: .1 } }, '<')    
-    
-    return tl;
-}
-const animateApplicationSummaryOut = () => {
-    // Select the old content
-    const oldHeaderContent = document.querySelector('.summary__header-content');
-    const oldApplicantContent = document.querySelector('.summary__content--application-applicant');
-    const oldPositionContent = document.querySelector('.summary__content--application-job');
-    const oldControlsContent = document.querySelector('.summary__controls-content--applications');
-console.log(oldHeaderContent, oldApplicantContent, oldPositionContent, oldControlsContent);
-    const tl = gsap.timeline();
-    tl.to(oldHeaderContent, {
-        autoAlpha: 0, 
-        onComplete: () => oldHeaderContent.parentElement.removeChild(oldHeaderContent)
-    })
-    .to(oldApplicantContent, {
-        autoAlpha: 0, 
-        onComplete: () => oldApplicantContent.parentElement.removeChild(oldApplicantContent)
-    }, '<')
-    .to(oldPositionContent, {
-        autoAlpha: 0, 
-        onComplete: () => oldPositionContent.parentElement.removeChild(oldPositionContent)
-    }, '<')
-    .to(oldControlsContent, {
-        autoAlpha: 0, 
-        onComplete: () => oldControlsContent.parentElement.removeChild(oldControlsContent)
-    }, '<');
 
-    return tl;
-}
 
 export const animateSummaryIn = () => {
     return gsap.fromTo('.summary', { autoAlpha:0 }, {autoAlpha: 1 });
@@ -4063,17 +3711,6 @@ export const renderAdminLoaders = () => {
     // });
 }
 
-const generatePaginationMarkup = (pages, current, table) => {
-    let markup = '';
-    for(let x = 0; x < pages; x++) {
-        const temp = `
-            <div class="pagination__item pagination__item--${table} pagination__item--${x+1} ${x === current? 'pagination__item--active':''}" data-id=${x}>
-                ${x+1}
-            </div>`;
-        markup += temp;
-    }
-    return markup;
-};
 
 
 export const clearAdminPage = (page) => {

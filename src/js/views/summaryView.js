@@ -1,194 +1,173 @@
+//// APPLICATION SUMMARY VIEW ////
 
+export const createApplicationSummaryContent = ({
+    id: applicationId,
+    applicationDate,
+    applicant: {
+        id: applicantId,
+        person: {
+            id: personId,
+            firstName: personFirstName,
+            lastName: personLastName,
+            email: personEmail,
+            phone: personPhone,
+        },
+        cvUrl: cvUrl
+    },
+    job: {
+        id: jobId,
+        title: jobTitle,
+        company: {
+            id: companyId, 
+            name: companyName,
+            contacts: [{
+                person: { 
+                    firstName: contactFirstName,  
+                    lastName: contactLastName,
+                    phone: contactPhone,
+                    email: contactEmail
+                },
+                position: contactPosition,
+            }]
+        }
+    }
+}) => {
+    let cvType;
+    if(cvUrl) {
+        cvType = cvUrl.indexOf('.doc') !== -1 ? 'doc':'pdf';
+    } 
 
-///////////////  COMPANY SUMMARY  ///////////////
-
-export const createCompanySummary = ({id, companyName, companyDate, contacts, addresses, jobs}) => {
-    const header = `
-        <div class="summary__header summary__header--company">
-            <div class="summary__header-item summary__company-id">${id}</div>
-            <div class="summary__header-item summary__company-name">${companyName}</div>
-            <div class="summary__header-item summary__company-date">${companyDate}</div>
-        </div>
-    `;
-// summary wrapper added by add summary wrapper class (REMOVE HERE)
-    const markup = `
-        <div class="summary-wrapper summary-wrapper--company">
-            <div class="summary summary--company">  
-    
-                ${header}
-      
-                <div class="summary__content summary__content--company">
-
-                    ${createCompanyContactSection(contacts[0])}
-
-                    ${createCompanyAddressSection(addresses[0])}
-
-                    <div class="summary__section summary__section--jobs">
-                        <div class="summary__heading">Jobs</div>
-                        <div class="summary__table-wrapper--jobs table-wrapper--nested-jobs"></div>
-                    </div>
-
-                    ${createSummaryControls('company')}
-
-                </div>
-
-            </div>  
-        </div>
-    `;
-
-    return markup;
-};
-
-const createCompanyAddressSection = (address) => {
-    const addressSection = `
-        <div class="summary__section summary__section--addresses">
-            <div class="summary__heading summary__heading--addresses" data-id="${address.id}">
-                <p>Addresses</p>
-                ${createSummaryControls('address')}
+    const headerContent = `
+        <div class="summary__header-content">
+            <div class="summary__item summary__item--header">
+                <div class="summary__id">${applicationId}</div>
             </div>
-
-            <div class="summary__row">
-
-                <div class="summary__column">    
-                    <div class="summary__item">
-                        <div class="summary__label">First Line:</div>
-                        <div class="summary__field summary__field--first-line">${address.firstLine}</div>
-                    </div>
-
-                    ${address.secondLine? 
-                        `<div class="summary__item">
-                            <div class="summary__label">Second Line:</div>
-                            <div class="summary__field summary__field--second-line">${address.secondLine}</div>
-                        </div>`:''
-                    }
-                    
-                    <div class="summary__item">
-                        <div class="summary__label">City:</div>
-                        <div class="summary__field summary__field--city">${address.city}</div>
-                    </div>
-                </div>
-
-                <div class="summary__column">
-                    <div class="summary__item">
-                        <div class="summary__label">County:</div>
-                        <div class="summary__field summary__field--county">${address.county}</div>
-                    </div>
-                    <div class="summary__item">
-                        <div class="summary__label">Postcode:</div>
-                        <div class="summary__field summary__field--postcode">${address.postcode}</div>
-                    </div>
-                </div>
+            <div class="summary__item summary__item--header">
+                <div class="summary__date">${applicationDate}</div>
             </div>
-
-            <div class="pagination-wrapper pagination-wrapper--addresses"></div>
         </div>
     `;
 
-    return addressSection;
-}
-
-const createCompanyContactSection = (contact) => {
-    const contactSection = `
-        <div class="summary__section summary__section--contacts">
-            <div class="summary__heading summary__heading--contacts" data-id="${contact.contactId}">
-                <p>Contacts</p>
-                ${createSummaryControls('contact')}
-            </div>
-
-            <div class="summary__row">
-                <div class="summary__column">
-                    <div class="summary__item">
-                        <div class="summary__label">Name:</div>
-                        <div class="summary__field summary__field--name">${contact.firstName} ${contact.lastName}</div>
-                    </div>
-                    <div class="summary__item">
-                        <div class="summary__label">Position:</div>
-                        <div class="summary__field summary__field--position">${contact.position}</div>
+    const positionContent = `
+        <div class="summary__content summary__content--application-job">
+            <div class="summary__column summary__column--applications-page">
+                <div class="summary__item summary__item--applications-page">
+                    <div class="summary__label summary__label">Title:</div>
+                    <div class="summary__field summary__field--title" data-id="${jobId}">
+                        <a class="summary__link summary__link--job">${jobTitle}</a>
                     </div>
                 </div>
-
-                <div class="summary__column">
-                    <div class="summary__item">
-                        <div class="summary__label">Phone:</div>
-                        <div class="summary__field summary__field--contact-phone">${contact.phone}</div>
+                <div class="summary__item summary__item--applications-page">
+                    <div class="summary__label">Company:</div>
+                    <div class="summary__field summary__field--company" data-id="${companyId}">
+                        <a class="summary__link summary__link--company">${companyName}</a>
                     </div>
-                    <div class="summary__item">
-                        <div class="summary__label">Email:</div>
-                        <div class="summary__field summary__field--contact-email summary__copy-wrapper">
-                            <a class="summary__link summary__link--contact-email">${contact.email}</a>  
-                            <svg class="summary__copy-svg"><use xlink:href="svg/spritesheet.svg#applications"></svg>             
-   
-                        </div>
+                </div>
+                <div class="summary__item--applications-page summary__item">
+                    <div class="summary__label">Contact:</div>
+                    <div class="summary__field summary__field--contact">${contactFirstName} ${contactLastName}</div>
+                </div>
+            </div>
+
+            <div class="summary__column summary__column--applications-page">
+                <div class="summary__item summary__item--applications-page">
+                    <div class="summary__label">Contact Position:</div>
+                    <div class="summary__field summary__field--contact-position">${contactPosition}</div>
+                </div>
+                <div class="summary__item summary__item--applications-page">
+                    <div class="summary__label">Contact Phone:</div>
+                    <div class="summary__field summary__field--contact-phone">${contactPhone}</div>
+                </div>
+                <div class="summary__item summary__item--applications-page">
+                    <div class="summary__label">Contact Email:</div>
+                    <div class="summary__field summary__field--contact-email">
+                        <a class="summary__field-text--contact-email">${contactEmail}</a>
+                        <svg class="summary__copy-svg copy-svg--application"><use xlink:href="svg/spritesheet.svg#applications"></svg>    
                     </div>
                 </div>
             </div>
-            <div class="pagination-wrapper pagination-wrapper--contacts"></div>
         </div>
     `;
-    return contactSection;
 
-}
+    const applicantContent  = `
+        <div class="summary__content summary__content--application-applicant">
+            <div class="summary__column summary__column--applications-page">
+                <div class="summary__item summary__item--applications-page">
+                    <div class="summary__label">Applicant Name:</div>
+                    <a class="summary__link summary__link--applicant">
+                        <div class="summary__field summary__field--applicant" data-id="${applicantId}">${personFirstName} ${personLastName}</div>
+                    </a>
+                </div>
+                <div class="summary__item summary__item--applications-page">
+                    <div class="summary__label">Phone:</div>
+                    <div class="summary__field summary__field--phone">${personPhone}</div>
+                </div>
+            </div>
 
-const createSummaryControls = (section) => {
-    const markup = `
-        <div class="summary__controls summary__controls--${section}">
-            <div class="summary__btn summary__btn--new-${section}">
-                <svg class="summary__icon--new-${section}">
+            <div class="summary__column summary__column--applications-page">
+                <div class="summary__item summary__item--applications-page">
+                    <div class="summary__label">Email:</div>
+                    <div class="summary__field summary__field--email">${personEmail}</div>
+                </div>
+
+                <div class="summary__item summary__item--applications-page summary__item--cv">
+                    <div class="summary__label summary__label--cv">Applicant CV:</div>
+                    <div class="summary__field summary__field--cv">${cvType? 'Yes':'No'}</div>
+                </div>
+            </div>
+
+        </div>
+    `;            
+
+    const controlContent = `
+        <div class="summary__controls-content summary__controls-content--applications">
+            <div class="summary__btn summary__btn--applications summary__new-application-btn--applications">
+                <svg class="summary__new-application-icon summary__icon">
                     <use xlink:href="svg/spritesheet.svg#add">
                 </svg>
             </div>
-            <div class="summary__btn summary__btn--edit-${section}">
-                <svg class="summary__icon--edit-${section}">
-                    <use xlink:href="svg/spritesheet.svg#edit-np1">
-                </svg>
+
+            <div class="summary__btn summary__btn--applications summary__cv-btn--applications" data-id='${personId}'>
+                ${cvType?`<svg class="summary__cv-svg--applications"><use xlink:href="svg/spritesheet.svg#${cvType}"></svg>`:'None'}
             </div>
-            ${section === 'company'? `<div class="summary__btn summary__btn--hubspot-${section}">
-                <svg class="summary__icon--hubspot-${section}">
-                    <use xlink:href="svg/spritesheet.svg#hubspot">
-                </svg>
-            </div>` : ''} 
-            <div class="summary__btn summary__btn--delete-${section}">
-                <svg class="summary__icon--delete-${section}">
+
+            <div class="summary__btn summary__btn--applications summary__delete-application-btn--applications">
+                <svg class="summary__delete-application-icon summary__icon">
                     <use xlink:href="svg/spritesheet.svg#delete-np1">
                 </svg>
             </div>
         </div>
     `;
-    return markup;
-}
-
-/////////////  END COMPANY SUMMARY  /////////////
-
-
-
-/////////// TESTING:
-
-export const renderPagination = (pages, current, container, tableName) => {
-    // Remove pagination if present
-    const pagination = document.querySelector(`.pagination--${tableName}`);
-    if(pagination) utils.removeElement(pagination);  
-
-    // Generate the individual pagination numbers
-    const itemMarkup = generatePaginationMarkup(pages, current, tableName);
-
-    const markup = `
-        <div class="pagination pagination--${tableName}">
-            <div class="pagination__previous pagination__previous--${tableName} ${current === 0? 'pagination__previous--inactive':''}">Previous</div>
-            <div class="pagination__item-wrapper">${itemMarkup}</div>
-            <div class="pagination__next pagination__next--${tableName} ${current === pages-1 || pages === 0? 'pagination__next--inactive':''}">Next</div>
-        </div>
-    `;
-    container.insertAdjacentHTML('beforeend', markup);
-}
-
-const generatePaginationMarkup = (pages, current, table) => {
-    let markup = '';
-    for(let x = 0; x < pages; x++) {
-        const temp = `
-            <div class="pagination__item pagination__item--${table} pagination__item--${x+1} ${x === current? 'pagination__item--active':''}" data-id=${x}>
-                ${x+1}
-            </div>`;
-        markup += temp;
-    }
-    return markup;
+    
+    return {headerContent, applicantContent, positionContent, controlContent};
 };
+
+export const switchApplicationSummary = (application) => {
+    removeOldApplicationSummary();
+    insertNewApplicationSummary(application);
+}
+
+const removeOldApplicationSummary = () => {
+    // Select old content
+    const oldHeaderContent = document.querySelector('.summary__header-content');
+    const oldApplicantContent = document.querySelector('.summary__content--application-applicant');
+    const oldPositionContent = document.querySelector('.summary__content--application-job');
+    const oldControlsContent = document.querySelector('.summary__controls-content--applications');
+    const items = [oldHeaderContent, oldApplicantContent, oldPositionContent, oldControlsContent];
+    
+    // Remove old content
+    items.forEach(item => item.parentElement.removeChild(item));
+}
+
+export const insertNewApplicationSummary = (application) => {
+    // Create new content
+    const { headerContent, applicantContent, positionContent, controlContent } = createApplicationSummaryContent(application);
+    
+    // Add new content
+    document.querySelector('.summary__header').insertAdjacentHTML('afterbegin', headerContent);
+    document.querySelector('.summary__section--application-person').insertAdjacentHTML('beforeend', applicantContent);
+    document.querySelector('.summary__section--application-job').insertAdjacentHTML('beforeend', positionContent);
+    document.querySelector('.summary__controls').insertAdjacentHTML('beforeend', controlContent);
+}
+
+//// END APPLICATION SUMMARY VIEW ////

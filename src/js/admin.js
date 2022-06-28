@@ -29,6 +29,8 @@ import gsap from 'gsap';
 import * as headerView from './views/headerView';
 import * as adminView from './views/adminView';
 import * as tableView from './views/tableView';
+import * as summaryView from './views/summaryView';
+import * as paginationView from './views/paginationView';
 import * as userForm from './views/userForm';
 import * as jobForm from './views/jobForm';
 import * as jobView from './views/jobView';
@@ -518,26 +520,28 @@ class AdminController {
 
                 switch(sectionName) {
                     case 'applications': 
-
+                        // Set current application
+                        this.state.applications.currentApplication = this.applications[0];
 
                         // Add pagination
                         const { totalApplications, searchOptions: {index: appIndex, limit: appLimit} } = this.state.applications;
-                        const { pages: numAppPages, current: currentAppPage } = adminView.calculatePagination(appIndex, appLimit, totalApplications);
-                        adminView.renderPagination(numAppPages, currentAppPage, 'applications');
+                        const { pages: numAppPages, current: currentAppPage } = paginationView.calculatePagination(appIndex, appLimit, totalApplications);
+                        paginationView.renderPagination(numAppPages, currentAppPage, 'applications');
 
                         // Render table
                         this.renderApplicationTable();
 
-                        // The elements are created when the admin page is initialised, this is content
-                        const { headerContent, applicantContent, positionContent, controlContent } = adminView.createApplicationSummaryContent(this.applications[0]);
-                        document.querySelector('.summary__header').insertAdjacentHTML('afterbegin', headerContent);
-                        document.querySelector('.summary__section--application-person').insertAdjacentHTML('beforeend', applicantContent);
-                        document.querySelector('.summary__section--application-job').insertAdjacentHTML('beforeend', positionContent);
-                        document.querySelector('.summary__controls').insertAdjacentHTML('beforeend', controlContent);
-                    
+                        // Render summary
+                        summaryView.insertNewApplicationSummary(this.applications[0]);
 
-    
-                        // this.addApplicationSummaryListeners();
+                        // // The elements are created when the admin page is initialised, this is content
+                        // const { headerContent, applicantContent, positionContent, controlContent } = summaryView.createApplicationSummaryContent(this.applications[0]);
+                        // document.querySelector('.summary__header').insertAdjacentHTML('afterbegin', headerContent);
+                        // document.querySelector('.summary__section--application-person').insertAdjacentHTML('beforeend', applicantContent);
+                        // document.querySelector('.summary__section--application-job').insertAdjacentHTML('beforeend', positionContent);
+                        // document.querySelector('.summary__controls').insertAdjacentHTML('beforeend', controlContent);
+            
+                        this.addApplicationSummaryListeners();
 
                         break;
 
@@ -656,7 +660,7 @@ class AdminController {
                 if(sectionName === 'jobs' || sectionName === 'companies') {
                   adminView.animateSummaryIn();
                 } else if(sectionName === 'applications') {
-                    adminView.animateApplicationSummaryIn();
+                    adminView.animateApplicationSummaryIn(true);
                 }
 
                 // Animate the pagination in
@@ -1245,13 +1249,30 @@ class AdminController {
 
         applicationRows.forEach(row => {
             row.addEventListener('click', (e) => {
-                const targetRow = e.target.closest('.row');
-                const rowId = targetRow.querySelector('.td-data--applicationId').dataset.application;
-                const application = this.applications.filter(application => {
-                    return parseInt(rowId) === application.id;
+
+                const tl = gsap.timeline({ paused: true });
+
+                tl.add(adminView.animateApplicationSummaryOut());
+                tl.add(() => {
+                    // Putting the row selection and switching logic inside the timeline
+                    // should prevent issues with fast successive clicks
+
+                    // Set the new row
+                    const targetRow = e.target.closest('.row');
+                    const rowId = targetRow.querySelector('.td-data--applicationId').dataset.application;
+                    const application = this.applications.filter(application => {
+                        return parseInt(rowId) === application.id;
+                    });
+                    utils.changeActiveRow(targetRow, applicationRows);
+                    this.state.applications.currentApplication = application[0];
+
+                    // Remove old summary items, add new ones
+                    summaryView.switchApplicationSummary(application[0]);
+
+                    // Animate the summary back in
+                    adminView.animateApplicationSummaryIn();
                 });
-                utils.changeActiveRow(targetRow, applicationRows);
-                this.state.applications.currentApplication = application[0];
+                tl.play(0);
 
                 // Change summary
                 // const summary = document.querySelector('.summary');
@@ -1260,7 +1281,7 @@ class AdminController {
             
                 // const { headerContent, positionContent, applicantContent, controlContent } = adminView.createApplicationSummaryContent(application[0])
 
-                adminView.switchApplicationSummary(application[0]);
+                // adminView.switchApplicationSummary(application[0]);
 
                 // const tl = gsap.timeline();
 
@@ -1300,9 +1321,9 @@ class AdminController {
         const deleteApplicationAlertAnimation = gsap.timeline({paused: true});
 
         // Buttons
-        const newBtn = e.target.closest('.application-summary__btn--new');
-        const deleteBtn = e.target.closest('.application-summary__btn--delete');
-        const cvBtn = e.target.closest('.application-summary__cv-wrapper');
+        const newBtn = e.target.closest('.summary__new-application-btn--applications');
+        const deleteBtn = e.target.closest('.summary__delete-application-btn--applications');
+        const cvBtn = e.target.closest('.summary__cv-btn--applications');
 
         // Applicant/Job/Company links
         const jobLink = e.target.closest('.summary__link--job');
@@ -1310,16 +1331,13 @@ class AdminController {
         const applicantLink = e.target.closest('.summary__link--applicant');
 
         // Copy links
-        const emailCopy = e.target.closest('.application-summary__field--contact-email');
+        const emailCopy = e.target.closest('.summary__field--contact-email');
 
         if(emailCopy){
             const text = emailCopy.firstElementChild.text;
 
             this.copyLink(emailCopy, text);
         }
-
-
-
 
         if(jobLink) {
             const jobId = jobLink.parentElement.dataset.id;
@@ -1338,13 +1356,14 @@ class AdminController {
             const applicantId = applicantLink.firstElementChild.dataset.id;
         }
         if(cvBtn) {
-            this.Admin.getCv(cvBtn.dataset.id)
-            .then(res => {
+            try {
+                const res = await this.Admin.getCv(cvBtn.dataset.id);
                 const contentDisposition = res.headers['content-disposition'];
                 let fileName = contentDisposition.split(';')[1].split('=')[1].toString();
                 adminView.forceDownload(res, fileName);
-             })
-             .catch(err => console.log(err));
+            } catch(err) {
+                console.log(err);
+            }
         }
 
         if(newBtn) {
@@ -1356,9 +1375,9 @@ class AdminController {
             const { data: { applicants: applicantNames } } =  await this.Admin.getUserNames();
             this.state.users.applicantNames = applicantNames;
 
-            adminView.renderNewApplicationModal({jobs: this.state.jobs.jobNames, users: this.state.users.applicantNames, applications: this.applications, appNumber: this.getNextId('applications')});
+            modalView.renderNewApplicationModal({jobs: this.state.jobs.jobNames, users: this.state.users.applicantNames, applications: this.applications, appNumber: this.getNextId('applications')});
         
-            const applicationSummaryModal = document.querySelector('.application-summary__modal');
+            const applicationSummaryModal = document.querySelector('.summary__modal--new-application');
             const submitNewBtn = document.querySelector('.new-application__submit');
             const closeBtn = document.querySelector('.new-application__close');
 
@@ -1374,6 +1393,7 @@ class AdminController {
                 }, '+=3')
 
             closeBtn.addEventListener('click', () => {
+                console.log('clicked');
                 gsap.to(applicationSummaryModal, {
                     autoAlpha: 0,
                     duration: .2,
@@ -1398,32 +1418,38 @@ class AdminController {
                     msg = !jobId? 'No Job Selected':'No Applicant Selected';
 
                     const alert = modalView.getAlert(msg, false);
-                
                     alertWrapper.insertAdjacentHTML('afterbegin', alert);
-
                     newApplicationAlertAnimation.play(0);
                     return;
                 }
 
                 try {
                     const res = await this.Admin.createApplication(jobId, personId);
-                    if(res.status === 200) {                                       
+                    if(res.status === 200) {                                 
+                        // Display successful alert      
                         const alert = modalView.getAlert('Application Created', true);
-                    
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
-
                         newApplicationAlertAnimation.play(0);
 
+                        // Get data (Updates the total applications)
                         await this.getData('applications');
-                        // this.updateApplicationTable();
+                        // Update the current application
+                        this.state.applications.currentApplication = this.applications[0];
+                        
+                        // Render table
                         this.renderApplicationTable();
+
+                        // Switch summary (No animation needed as behind the modal)
+                        summaryView.switchApplicationSummary(this.applications[0]);
+
                         // Update pagination
-                        const { totalApplications, searchOptions: {index: appIndex, limit: appLimit} } = this.state.applications;
-                        adminView.renderPagination(appIndex, appLimit, totalApplications, document.querySelector('.table__content'), 'applications');
-                    
+                        const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
+                        const { pages, current } = paginationView.calculatePagination(index, limit, totalApplications);
+                        paginationView.renderPagination(pages, current, 'applications');
                     }
                 } catch (err) {
-                    if(err.response.data.message === 'Application already made') {
+                    console.log(err);
+                    if(err.response?.data?.message === 'Application already made') {
                         const alert = modalView.getAlert(`Application Exists, ID: ${err.response.data.data.applicationId}`, false);
                     
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
@@ -1434,8 +1460,8 @@ class AdminController {
 
         }
         if(deleteBtn) {
-            const applicationId = document.querySelector('.application-summary__id').innerText;
-            const summaryWrapper = document.querySelector('.summary-wrapper');
+            const applicationId = document.querySelector('.summary__id').innerText;
+            const summaryWrapper = document.querySelector('.summary__details');
             const confirmationHtml = adminView.getDeleteApplicationHtml(applicationId);
 
             summaryWrapper.insertAdjacentHTML('afterbegin', confirmationHtml);
@@ -1461,8 +1487,6 @@ class AdminController {
                     autoAlpha: 0,
                     onComplete: () => {
                         confirmation.parentElement.removeChild(confirmation);
-                        // Get a new Summary
-                        adminView.swapSummary(document.querySelector('.summary'), adminView.createApplicationSummary(this.applications[0]), this.applicationSummaryListener.bind(this)); 
                     }
                 })
         
@@ -1470,6 +1494,7 @@ class AdminController {
             const confirm = document.querySelector('.confirmation__btn--confirm');
             const cancel = document.querySelector('.confirmation__btn--cancel');
 
+            console.log(this.state.applications.totalApplications, ' applications');
 
             confirm.addEventListener('click', async() => {
                 while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
@@ -1481,6 +1506,7 @@ class AdminController {
                         const tl = gsap.timeline();
                         const alert = modalView.getAlert(`Application ${applicationId} deleted`, true);
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
+
                         if(this.applications.length === 1) {
                             // Set the pagination state (second param simulates pressing the previous button)
                             this.setApplicationPagination(null, true, null);
@@ -1490,31 +1516,35 @@ class AdminController {
                             // Get the data
                             await this.getData('applications');
 
-                            // tl
-                            // .add(adminView.animateTableContentOut())
-                            // .add(adminView.animateAdminLoadersIn(), '<')
 
                             this.changeTablePageAnimation(tl, 'applications');
 
-                            // Update pagination
-                            const { totalApplications, searchOptions: {index: appIndex, limit: appLimit} } = this.state.applications;
-                            adminView.renderPagination(appIndex, appLimit, totalApplications, document.querySelector('.table__content'), 'applications');
+                            const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
+                            const { pages, current } = paginationView.calculatePagination(index, limit, totalApplications);
                             
+                            paginationView.renderPagination(pages, current, 'applications');
                         } else {
-                            // Update table
+                            // Update the data
                             await this.getData('applications');
-                            // this.updateApplicationTable();
-                            this.renderApplicationTable();                            
 
-                            // Update pagination
-                            const { totalApplications, searchOptions: {index: appIndex, limit: appLimit} } = this.state.applications;
-                            adminView.renderPagination(appIndex, appLimit, totalApplications, document.querySelector('.table__content'), 'applications');
+                            // Rerender the table
+                            this.renderApplicationTable();       
+                            
+                            // Switch the summary (No animation needed)
+                            summaryView.switchApplicationSummary(this.applications[0]);
+
+                            // // Update pagination
+                            // const { totalApplications, searchOptions: {index: appIndex, limit: appLimit} } = this.state.applications;
+                            // adminView.renderPagination(appIndex, appLimit, totalApplications, document.querySelector('.table__content'), 'applications');
                         
+                            const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
+                            const { pages, current } = paginationView.calculatePagination(index, limit, totalApplications);
+                            paginationView.renderPagination(pages, current, 'applications');
+
                             // After the page has potentially changed because of onComplete function
                             deleteApplicationAlertAnimation.play(0);
                         }
 
-                        // Confirmation modal removed and summary swapped in the animation `onComplete()` above
                     } else {
                         throw new Error();
                     }

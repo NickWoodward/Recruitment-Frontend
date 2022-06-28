@@ -5,7 +5,7 @@ import '../sass/index.scss';
 import '../sass/contact.scss';
 import axios from 'axios';
 
-import * as summaryView from './views/summaryView';
+import * as summaryView from './views/summaryViewTest';
 import * as statsView from './views/statsView';
 import * as companyListView from './views/companyListView';
 import * as utils from './utils/utils';
