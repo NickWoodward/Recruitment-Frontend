@@ -285,6 +285,16 @@ export const removeSummaryModals = () => {
     };
 }
 
+export const animateSummaryModalOut = (modal) => {
+    return gsap.to(modal, {
+        autoAlpha: 0,
+        duration: .2,
+        onComplete: () => {
+            modal.parentElement.removeChild(modal);
+        }
+    })
+} 
+
 export const swapSummary = (oldSummary, newSummary, cb) => {
 
     const summaryWrapper = document.querySelector('.summary-wrapper');
@@ -3586,42 +3596,21 @@ const renderCompany = (company) => {
 };
 
 
-export const updatePaginationView = (index) => {
-    // Get the pagination items
-    const items = document.querySelectorAll('.pagination__item');
 
-    items.forEach(item => {
-        if(item.classList.contains('pagination__item--active')) {
-            item.classList.remove('pagination__item--active');
-        }
-    })
-
-    items[index].classList.add('pagination__item--active');
-
-    if(index === 0) {
-        document.querySelector('.pagination__previous').classList.add('pagination__previous--inactive');
-    }  else {
-        document.querySelector('.pagination__previous').classList.remove('pagination__previous--inactive');
-    }
-    if(index === items.length -1) {
-        document.querySelector('.pagination__next').classList.add('pagination__next--inactive');
-    } else {
-        document.querySelector('.pagination__next').classList.remove('pagination__next--inactive');
-    }
-}
 // export const removeLastPaginationItem = () => {
 //     const items = document.querySelectorAll('.pagination__item');
 //     console.log(items, items[items.length - 1]);
 //     // items[items.length - 1].parentElement.removeChild(items[items.length - 1]);
 // }
 
+
+
 export const animateTableContentIn = (table) => {
     const tl = gsap.timeline();
 
     return tl
         .fromTo('.table__heading', {autoAlpha: 0, y: -15}, {autoAlpha: 1, y: 0,  duration: .3})
-        .fromTo(`.table--${table}`, {autoAlpha: 0},{autoAlpha: 1, duration: .5}, '<')
-        // .from('.thead', { autoAlpha: 0, y: -20, duration: 1 }, '<')
+        .fromTo(`.table--${table}`, {autoAlpha: 0},{autoAlpha: 1, duration: .8}, '<')
         .from(`.row--${table}`, {
             x: -15, 
             autoAlpha: 0,
@@ -3631,18 +3620,12 @@ export const animateTableContentIn = (table) => {
             ease: 'power2.out',
         
         }, '<')
-        .fromTo(`.pagination__content--${table}`, {autoAlpha: 0},{autoAlpha: 1, duration: .3}, '<')
-        .fromTo(`.pagination__item--${table}`, {autoAlpha: 0},{autoAlpha: 1, stagger: .3}, '<')
-        .fromTo(`.pagination__previous--${table}`, {autoAlpha: 0, x:-20},{autoAlpha:1, x:0}, '<')
-        .fromTo(`.pagination__next--${table}`, {autoAlpha: 0, x:20},{autoAlpha:1, x:0}, '<');
-
-        
 }
 export const animateTableBodyIn = (table) => {
     const tl = gsap.timeline()
 
     return tl
-        .fromTo(`.tbody--${table}`, {autoAlpha: 0},{autoAlpha: 1, duration: '.5'})
+        .fromTo(`.tbody--${table}`, {autoAlpha: 0},{autoAlpha: 1, duration: '4'})
         .from(`.row--${table}`, {
             x: -15, 
             autoAlpha: 0,
@@ -3688,7 +3671,7 @@ export const animateTableContentOut = () => {
     const tableContent = document.querySelector('tbody');
 
     return (
-      gsap.fromTo(tableContent, { autoAlpha: 1 }, {autoAlpha: 0, duration: .2})
+      gsap.fromTo(tableContent, { autoAlpha: 1 }, {autoAlpha: 0, duration: 3})
     );
 }
 export const renderAdminLoaders = () => {
