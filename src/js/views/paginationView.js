@@ -1,7 +1,7 @@
 import gsap from 'gsap';
 
 export const calculatePagination = (index, limit, totalItems) => {
-    console.log({index}, {limit}, {totalItems});
+    // console.log({index}, {limit}, {totalItems});
     // Work out how many pages
     const pages = Math.ceil(totalItems / limit);
     // Current is the first (zero indexed) item on the page. index/limit = zero index page number
@@ -11,7 +11,7 @@ export const calculatePagination = (index, limit, totalItems) => {
 }
 
 export const renderPagination = (pages, current, tableName) => {
-    console.log(pages, current, tableName)
+    // console.log(pages, current, tableName)
     const paginationWrapper = document.querySelector(`.pagination-wrapper--${tableName}`);
     // Remove pagination if present
     const paginationContent = document.querySelector(`.pagination__content--${tableName}`);
@@ -66,7 +66,6 @@ export const updatePaginationView = (index) => {
 }
 
 export const animatePaginationContentIn = (table) => {
-    console.log('Animating')
     return (
         gsap.timeline()
             .fromTo(`.pagination__content--${table}`, {autoAlpha: 0},{autoAlpha: 1, duration: .3}, '<')

@@ -7,10 +7,12 @@ export const getAlert = (msg, success) => {
     return `
         <div class="alert alert--${success?'success':'error'}">
             <div class="alert__icon alert__icon--${success?'success':'error'}">
-                <svg class="alert__svg alert__svg--${success?'success':'error'}"><use xlink:href="svg/spritesheet.svg#${success?'tick':'cross'}"></svg>
+                <svg class="alert__svg alert__svg--${success?'success':'error'}"><use xlink:href="svg/spritesheet.svg#${success?'tick':'alert-circled'}"></svg>
             </div>
-            <div class="alert__status">${ success? 'Success':'Error' }</div>
-            <div class="alert__message">${msg}</div>
+            <div class="alert__content alert__content--${success? 'success':'error'}">
+                <div class="alert__status">${ success? 'Success':'Error' }</div>
+                <div class="alert__message">${msg}</div>
+            </div>
         </div>
     `;
 }

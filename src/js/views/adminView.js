@@ -97,62 +97,62 @@ const formatProperties = (object, skip) => {
     return object;
 };
 
-export const populateApplicationSummary = ({ 
-    id, 
-    applicationDate, 
-    jobId, 
-    job: { 
-        title, 
-        position, 
-        jobType, 
-        pqe, 
-        location, 
-        company: { 
-            id: 
-            companyId, 
-            name,
-            people: [ 
-                {
-                    contact: { position: contactPosition },
-                    firstName: contactFirstName,
-                    lastName: contactLastName,
-                    phone: contactPhone,
-                    email: contactEmail
-                } 
-            ]
-        } 
-    }, 
-    applicant: { 
-        person: { 
-            firstName, 
-            lastName, 
-            id: personId, 
-            email, 
-            phone 
-        } 
-    } 
-}) => {
-    const applicationSummary = document.querySelector('.application-summary');
-    console.log('valled?');
-    // applicationSummary.setAttribute('data-id', application.applicantId);
-    document.querySelector('.application-summary__id').innerText = `ID: ${id}`;
-    document.querySelector('.application-summary__field--date').innerText = applicationDate;
+// export const populateApplicationSummary = ({ 
+//     id, 
+//     applicationDate, 
+//     jobId, 
+//     job: { 
+//         title, 
+//         position, 
+//         jobType, 
+//         pqe, 
+//         location, 
+//         company: { 
+//             id: 
+//             companyId, 
+//             name,
+//             people: [ 
+//                 {
+//                     contact: { position: contactPosition },
+//                     firstName: contactFirstName,
+//                     lastName: contactLastName,
+//                     phone: contactPhone,
+//                     email: contactEmail
+//                 } 
+//             ]
+//         } 
+//     }, 
+//     applicant: { 
+//         person: { 
+//             firstName, 
+//             lastName, 
+//             id: personId, 
+//             email, 
+//             phone 
+//         } 
+//     } 
+// }) => {
+//     const applicationSummary = document.querySelector('.application-summary');
+//     console.log('valled?');
+//     // applicationSummary.setAttribute('data-id', application.applicantId);
+//     document.querySelector('.application-summary__id').innerText = `ID: ${id}`;
+//     document.querySelector('.application-summary__field--date').innerText = applicationDate;
 
-    document.querySelector('.application-summary__field--title').innerText = title;
-    document.querySelector('.application-summary__field--company').innerText = name;
-    document.querySelector('.application-summary__field--contact-firstname').innerText = contactFirstName;
-    document.querySelector('.application-summary__field--contact-surname').innerText = contactLastName;
-    document.querySelector('.application-summary__field--contact-position').innerText = contactPosition;
-    document.querySelector('.application-summary__field--contact-phone').innerText = contactPhone;
-    document.querySelector('.application-summary__field--contact-email').innerText = contactEmail;
+//     document.querySelector('.application-summary__field--title').innerText = title;
+//     document.querySelector('.application-summary__field--company').innerText = name;
+//     document.querySelector('.application-summary__field--contact-firstname').innerText = contactFirstName;
+//     document.querySelector('.application-summary__field--contact-surname').innerText = contactLastName;
+//     document.querySelector('.application-summary__field--contact-position').innerText = contactPosition;
+//     document.querySelector('.application-summary__field--contact-phone').innerText = contactPhone;
+//     document.querySelector('.application-summary__field--contact-email').innerText = contactEmail;
 
-    document.querySelector('.application-summary__field--applicant-firstname').innerText = firstName;
-    document.querySelector('.application-summary__field--applicant-surname').innerText = lastName;
-    document.querySelector('.application-summary__field--email').innerText = email;
-    document.querySelector('.application-summary__field--phone').innerText = phone;
+//     document.querySelector('.application-summary__field--applicant-firstname').innerText = firstName;
+//     document.querySelector('.application-summary__field--applicant-surname').innerText = lastName;
+//     document.querySelector('.application-summary__field--email').innerText = email;
+//     document.querySelector('.application-summary__field--phone').innerText = phone;
     
-    // addCvElement(user);
-}
+//     // addCvElement(user);
+// }
 
 // const createApplicationSummary = (application) => {
 //     const markup  = `
@@ -338,26 +338,33 @@ export const swapSummary = (oldSummary, newSummary, cb) => {
         )
 }
 
-// export const getApplicationSummaryListener = (data) => {
-//     console.log(data);
-//     return ((e) => {
-//         const newBtn = e.target.closest('.application-summary__btn--new');
-//         const deleteBtn = e.target.closest('.application-summary__btn--delete');
+export const animateJobSummaryIn = (firstAnimation) => {
+    const tl = gsap.timeline();
 
-//         if(newBtn) {
-//             console.log(data);
-//             renderNewApplicationModal(data);
-//         }
-//         if(deleteBtn) {
-//             console.log(data);
-//         }
-//     })
-// }
+    // Slower animations on first render
+    const duration = firstAnimation? 0.2:0.1;
+
+    tl
+    .fromTo('.summary__item--header', { autoAlpha: 0, y: 10 },{ autoAlpha: 1, y: 0 })
+    .fromTo('.summary__content', { autoAlpha: 0, y: 10 },{ autoAlpha: 1, y: 0, stagger: duration }, `<${duration}`)
+    .fromTo('.summary__btn--jobs', 
+        { autoAlpha: 0, y: 10 },
+        { 
+            autoAlpha: 1, 
+            y: function(index, target, targets) {
+                if(index === 0) return 1;
+                if(index === 1) return 2;
+                return 0;
+            }, 
+            stagger: { from: 'end', each: .1 } 
+        }, '<')    
+    
+    return tl;
+}
 
 
 
-
-export const animateApplicationSummaryOut = () => {
+export const animateSummaryOut = () => {
     const tl = gsap.timeline({
         defaults: { 
             duration: .2,
@@ -368,11 +375,11 @@ export const animateApplicationSummaryOut = () => {
     tl
     .fromTo('.summary__header-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -10 })
     .fromTo('.summary__content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y:-10, stagger: 0.1 }, '<0.1')
-    .fromTo('.summary__btn--applications', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y:10, stagger: { from: 'end', each: .1 } }, '<');
+    .fromTo('.summary__btn', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y:10, stagger: { from: 'end', each: .1 } }, '<');
 
     return tl;
 }
-export const animateApplicationSummaryIn = (firstAnimation) => {
+export const animateSummaryIn = (firstAnimation) => {
     const tl = gsap.timeline();
 
     // Slower animations on first render
@@ -381,7 +388,16 @@ export const animateApplicationSummaryIn = (firstAnimation) => {
     tl
     .fromTo('.summary__item--header', { autoAlpha: 0, y: 10 },{ autoAlpha: 1, y: 0 })
     .fromTo('.summary__content', { autoAlpha: 0, y: 10 },{ autoAlpha: 1, y: 0, stagger: duration }, `<${duration}`)
-    .fromTo('.summary__btn--applications', { autoAlpha: 0, y: 10 },{ autoAlpha: 1, y: 0, stagger: { from: 'end', each: .1 } }, '<')    
+    .fromTo('.summary__btn', 
+        { autoAlpha: 0, y: 10 },
+        { 
+            autoAlpha: 1, 
+            y: function(index, target, targets) {
+                if(index === 0) return 1;
+                return 0;
+            }, 
+            stagger: { from: 'end', each: .1 } 
+        }, '<')    
     
     return tl;
 }
@@ -2036,160 +2052,127 @@ export const togglePlaceholders = (elements, toggle, values) => {
 //     elements.adminContent.insertAdjacentHTML('beforeend', `<div class="jobs-table__wrapper"></div>`);
 // };
 
-export const createJobSummary = ({companyId, companyName, title, featured, id, jobDate, jobType, description, location, position, pqe, wage}) => {
-    // const markup = `
-    //     <div class="job-summary summary">
+
+
+    // const markup1 = `
+    //     <div class="summary">
     //         <div class="job-summary__details">
-    //             <div class="job-summary__item job-summary__company" data-placeholder="company" contenteditable=false></div>
-    //             <div class="job-summary__item job-summary__title" data-placeholder="title" contenteditable=false></div>
-    //             <div class="job-summary__item job-summary__location" data-placeholder="location" contenteditable=false></div>
-    //             <div class="job-summary__item job-summary__wage" data-placeholder="wage" contenteditable=false></div>
-    //             <label class="job-summary__item job-summary__featured" for="job-summary__featured-checkbox"></label>
-    //             <div class="job-summary__item job-summary__description job-summary__text-area" data-placeholder="description" contenteditable=false></div>
-    //         </div>
-    //         <div class="job-summary__controls">
-    //             <div class="job-summary__btn job-summary__btn--new">
-    //                 <svg class="job-summary__new-icon job-summary__icon">
-    //                     <use xlink:href="svg/spritesheet.svg#add">
-    //                 </svg>
-    //             </div>
-    //             <div class="job-summary__btn job-summary__btn--hubspot">
-    //                 <svg class="job-summary__hubspot-icon job-summary__icon">
-    //                     <use xlink:href="svg/spritesheet.svg#hubspot">
-    //                 </svg>
-    //             </div>
-    //             <div class="job-summary__btn job-summary__btn--edit">
-    //                 <svg class="job-summary__edit-icon job-summary__icon">
-    //                     <use xlink:href="svg/spritesheet.svg#edit-np1">
-    //                 </svg>
-    //             </div>
-    //             <div class="job-summary__btn job-summary__btn--delete">
-    //                 <svg class="job-summary__delete-icon job-summary__icon">
-    //                     <use xlink:href="svg/spritesheet.svg#delete-np1">
-    //                 </svg>
-    //             </div>
-    //         </div>
-    //     </div>
-    // `;
-    // return markup;
-    const markup = `
-        <div class="job-summary summary">
-            <div class="job-summary__details">
 
-                <div class="job-summary__section job-summary__section--header">
-                    <div class="job-summary__item job-summary__item--header">
-                        <div class="job-summary__id">${id}</div>
-                    </div>
+    //             <div class="job-summary__section job-summary__section--header">
+    //                 <div class="job-summary__item job-summary__item--header">
+    //                     <div class="job-summary__id">${id}</div>
+    //                 </div>
 
-                    <div class="job-summary__item job-summary__item--header">
-                        <div class="job-summary__field job-summary__field--date">${jobDate}</div>
-                    </div>
-                </div>
+    //                 <div class="job-summary__item job-summary__item--header">
+    //                     <div class="job-summary__field job-summary__field--date">${jobDate}</div>
+    //                 </div>
+    //             </div>
 
-                <div class="summary__heading">Role</div>
+
+
+    //             <div class="summary__heading">Role</div>
                
-                <div class="job-summary__section job-summary__section--job">
-                    <div class="job-summary__item job-summary__item--job">
-                        <div class="job-summary__label job-summary__label--title">Title:</div>
-                        <div class="job-summary__field job-summary__field--title">${title}</div>
-                    </div>
+    //             <div class="job-summary__section job-summary__section--job">
+    //                 <div class="job-summary__item job-summary__item--job">
+    //                     <div class="job-summary__label job-summary__label--title">Title:</div>
+    //                     <div class="job-summary__field job-summary__field--title">${title}</div>
+    //                 </div>
 
-                    <div class="job-summary__item job-summary__item--job">
-                        <div class="job-summary__label job-summary__label--company">Company:</div>
-                        <div class="job-summary__field job-summary__field--company" data-id=${companyId}>
-                            <a class="summary__link summary__link--company">${companyName}</a>
-                        </div>
-                    </div>
+    //                 <div class="job-summary__item job-summary__item--job">
+    //                     <div class="job-summary__label job-summary__label--company">Company:</div>
+    //                     <div class="job-summary__field job-summary__field--company" data-id=${companyId}>
+    //                         <a class="summary__link summary__link--company">${companyName}</a>
+    //                     </div>
+    //                 </div>
 
-                </div>
+    //             </div>
 
-                <div class="summary__heading">Details</div>
+    //             <div class="summary__heading">Details</div>
 
-                <div class="job-summary__section job-summary__section--info">
+    //             <div class="job-summary__section job-summary__section--info">
 
-                    <div class="summary__column">
-                        <div class="job-summary__item job-summary__item--info">
-                            <div class="job-summary__label job-summary__label--location">Location:</div>
-                            <div class="job-summary__field job-summary__field--location">
-                                ${location}
-                            </div>
-                        </div>
+    //                 <div class="summary__column">
+    //                     <div class="job-summary__item job-summary__item--info">
+    //                         <div class="job-summary__label job-summary__label--location">Location:</div>
+    //                         <div class="job-summary__field job-summary__field--location">
+    //                             ${location}
+    //                         </div>
+    //                     </div>
 
-                        <div class="job-summary__item job-summary__item--info">
-                            <div class="job-summary__label job-summary__label--wage">Wage:</div>
-                            <div class="job-summary__field job-summary__field--wage">
-                                ${utils.formatSalary(wage)}
-                            </div>
-                        </div>
+    //                     <div class="job-summary__item job-summary__item--info">
+    //                         <div class="job-summary__label job-summary__label--wage">Wage:</div>
+    //                         <div class="job-summary__field job-summary__field--wage">
+    //                             ${utils.formatSalary(wage)}
+    //                         </div>
+    //                     </div>
 
-                        <div class="job-summary__item job-summary__item--info">
-                            <div class="job-summary__label job-summary__label--type">Type:</div>
-                            <div class="job-summary__field job-summary__field--type">
-                                ${jobType}
-                            </div>
-                        </div>
-                    </div>
+    //                     <div class="job-summary__item job-summary__item--info">
+    //                         <div class="job-summary__label job-summary__label--type">Type:</div>
+    //                         <div class="job-summary__field job-summary__field--type">
+    //                             ${jobType}
+    //                         </div>
+    //                     </div>
+    //                 </div>
 
-                    <div class="summary__column">
+    //                 <div class="summary__column">
                         
-                        <div class="job-summary__item job-summary__item--info">
-                            <div class="job-summary__label job-summary__label--position">Position:</div>
-                            <div class="job-summary__field job-summary__field--position">
-                                ${position}
-                            </div>
-                        </div>
-                        <div class="job-summary__item job-summary__item--info">
-                            <div class="job-summary__label job-summary__label--pqe">PQE:</div>
-                            <div class="job-summary__field job-summary__field--pqe">
-                                ${pqe}
-                            </div>
-                        </div>
+    //                     <div class="job-summary__item job-summary__item--info">
+    //                         <div class="job-summary__label job-summary__label--position">Position:</div>
+    //                         <div class="job-summary__field job-summary__field--position">
+    //                             ${position}
+    //                         </div>
+    //                     </div>
+    //                     <div class="job-summary__item job-summary__item--info">
+    //                         <div class="job-summary__label job-summary__label--pqe">PQE:</div>
+    //                         <div class="job-summary__field job-summary__field--pqe">
+    //                             ${pqe}
+    //                         </div>
+    //                     </div>
 
-                        <div class="job-summary__item job-summary__item--info">
-                            <div class="job-summary__label job-summary__label--featured">Featured:</div>
-                            <div class="job-summary__field job-summary__field--featured">
-                                ${featured? 'Yes':'No'}
-                            </div>
-                        </div>
+    //                     <div class="job-summary__item job-summary__item--info">
+    //                         <div class="job-summary__label job-summary__label--featured">Featured:</div>
+    //                         <div class="job-summary__field job-summary__field--featured">
+    //                             ${featured? 'Yes':'No'}
+    //                         </div>
+    //                     </div>
     
-                    </div>
-                </div>    
+    //                 </div>
+    //             </div>    
 
-                <div class="summary__heading">Description</div>
+    //             <div class="summary__heading">Description</div>
 
-                <div class="job-summary__section job-summary__section--description">
-                    <div class="job-summary__description job-summary__field scrollable" style="overflow:hidden">${description}</div>
+    //             <div class="job-summary__section job-summary__section--description">
+    //                 <div class="job-summary__description job-summary__field scrollable" style="overflow:hidden">${description}</div>
 
-                    <div class="summary__controls summary__controls--job">
-                        <div class="job-summary__btn job-summary__btn--new">
-                            <svg class="job-summary__new-icon job-summary__icon">
-                                <use xlink:href="svg/spritesheet.svg#add">
-                            </svg>
-                        </div>
-                        <div class="job-summary__btn job-summary__btn--hubspot">
-                            <svg class="job-summary__hubspot-icon job-summary__icon">
-                                <use xlink:href="svg/spritesheet.svg#hubspot">
-                            </svg>
-                        </div>
-                        <div class="job-summary__btn job-summary__btn--edit">
-                            <svg class="job-summary__edit-icon job-summary__icon">
-                                <use xlink:href="svg/spritesheet.svg#edit-np1">
-                            </svg>
-                        </div>
-                        <div class="job-summary__btn job-summary__btn--delete">
-                            <svg class="job-summary__delete-icon job-summary__icon">
-                                <use xlink:href="svg/spritesheet.svg#delete-np1">
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    //                 <div class="summary__controls summary__controls--job">
+    //                     <div class="job-summary__btn job-summary__btn--new">
+    //                         <svg class="job-summary__new-icon job-summary__icon">
+    //                             <use xlink:href="svg/spritesheet.svg#add">
+    //                         </svg>
+    //                     </div>
+    //                     <div class="job-summary__btn job-summary__btn--hubspot">
+    //                         <svg class="job-summary__hubspot-icon job-summary__icon">
+    //                             <use xlink:href="svg/spritesheet.svg#hubspot">
+    //                         </svg>
+    //                     </div>
+    //                     <div class="job-summary__btn job-summary__btn--edit">
+    //                         <svg class="job-summary__edit-icon job-summary__icon">
+    //                             <use xlink:href="svg/spritesheet.svg#edit-np1">
+    //                         </svg>
+    //                     </div>
+    //                     <div class="job-summary__btn job-summary__btn--delete">
+    //                         <svg class="job-summary__delete-icon job-summary__icon">
+    //                             <use xlink:href="svg/spritesheet.svg#delete-np1">
+    //                         </svg>
+    //                     </div>
+    //                 </div>
+    //             </div>
+    //         </div>
 
-        </div>                 
-    `;
+    //     </div>                 
+    // `;
 
- return markup;
-};
+
 
 
 
@@ -3597,19 +3580,38 @@ const renderCompany = (company) => {
 
 
 
-// export const removeLastPaginationItem = () => {
-//     const items = document.querySelectorAll('.pagination__item');
-//     console.log(items, items[items.length - 1]);
-//     // items[items.length - 1].parentElement.removeChild(items[items.length - 1]);
+
+
+// export const animateSummaryIn = () => {
+//     return gsap.fromTo('.summary', { autoAlpha:0 }, {autoAlpha: 1 });
+// }
+// export const animateSummaryOut = () => {
+//     return gsap.fromTo('.summary', { autoAlpha: 1 }, {autoAlpha: 0, duration: .2}, '<')
 // }
 
-
+export const animateAdminLoadersIn = () => {
+    return gsap.fromTo('.loader', {autoAlpha:0}, {autoAlpha:1, duration: .2});
+}
+export const animateAdminLoadersOut = () => {
+    return gsap.fromTo(
+        '.loader', 
+        { autoAlpha: 1 }, 
+        { 
+            autoAlpha: 0, 
+            duration: .2,
+            immediateRender: false,
+            onComplete: () => {
+                loader.clearLoaders()
+            }
+        }
+    );
+}
 
 export const animateTableContentIn = (table) => {
     const tl = gsap.timeline();
 
     return tl
-        .fromTo('.table__heading', {autoAlpha: 0, y: -15}, {autoAlpha: 1, y: 0,  duration: .3})
+        .fromTo('.table__heading', {autoAlpha: 0, y: -15}, {autoAlpha: 1, y: 0,  duration: .4})
         .fromTo(`.table--${table}`, {autoAlpha: 0},{autoAlpha: 1, duration: .8}, '<')
         .from(`.row--${table}`, {
             x: -15, 
@@ -3625,7 +3627,7 @@ export const animateTableBodyIn = (table) => {
     const tl = gsap.timeline()
 
     return tl
-        .fromTo(`.tbody--${table}`, {autoAlpha: 0},{autoAlpha: 1, duration: '4'})
+        .fromTo(`.tbody--${table}`, {autoAlpha: 0},{autoAlpha: 1, duration: .4})
         .from(`.row--${table}`, {
             x: -15, 
             autoAlpha: 0,
@@ -3636,51 +3638,20 @@ export const animateTableBodyIn = (table) => {
         
         }, '<')
 }
-
-
-export const animateSummaryIn = () => {
-    return gsap.fromTo('.summary', { autoAlpha:0 }, {autoAlpha: 1 });
-}
-// export const animateSummaryOut = () => {
-//     return gsap.fromTo('.summary', { autoAlpha: 1 }, {autoAlpha: 0, duration: .2}, '<')
-// }
-
-export const animateAdminLoadersOut = () => {
-    return gsap.fromTo(
-        '.loader', 
-        { autoAlpha: 1 }, 
-        { 
-            autoAlpha: 0, 
-            duration: .4,
-            immediateRender: false,
-            onComplete: () => {
-                loader.clearLoaders()
-            }
-        }
-    );
-
-}
-
-
-
-export const animateAdminLoadersIn = () => {
-    return gsap.fromTo('.loader', {autoAlpha:0}, {autoAlpha:1, duration: '.2'});
-}
-
 export const animateTableContentOut = () => {
     const tableContent = document.querySelector('tbody');
 
     return (
-      gsap.fromTo(tableContent, { autoAlpha: 1 }, {autoAlpha: 0, duration: 3})
+      gsap.fromTo(tableContent, { autoAlpha: 1 }, {autoAlpha: 0, duration: .4})
     );
 }
 export const renderAdminLoaders = () => {
-    const tableWrapper = document.querySelector('.table-wrapper');
-    const summaryWrapper = document.querySelector('.summary-wrapper');
+    const tableContent = document.querySelector('.table__content');
+    // const summaryWrapper = document.querySelector('.summary-wrapper');
 
     // Add a loader to the table wrapper
     loader.renderLoader({
-        parent: tableWrapper,
+        parent: tableContent,
         type: 'admin-table',
         position: 'afterbegin',
         inFlow: false
@@ -3721,7 +3692,11 @@ export const initAdminSection = (tl, sectionName) => {
             loaderContainers = [['.table-wrapper', 'admin-table'], ['.summary__section--application-person', 'person-summary'], ['.summary__section--application-job', 'job-summary']];
             break;
         case 'jobs':
-            loaderContainers = [['.table-wrapper', 'admin-table'], ['.summary-wrapper', 'summary']];
+            loaderContainers = [
+                ['.table-wrapper', 'admin-table'], 
+                ['.summary__section--details', 'details-summary'],
+                ['.summary__section--description', 'description-summary']
+            ];
             break;
         case 'companies':
             loaderContainers = [['.table-wrapper', 'admin-table'], ['.summary-wrapper', 'summary']];
@@ -3758,7 +3733,7 @@ export const createAdminTemplate = (page) => {
     adminContent.setAttribute('class', `admin__content admin__content--${page}`);
 
     // Create conditional here for different page types/structure 
-    if(page === 'users' || page === 'jobs') {
+    if(page === 'users') {
         addTableWrapper(adminContent, page);
         addSummaryWrapper(adminContent, page);
     } else if(page === 'companies') {
@@ -3766,25 +3741,43 @@ export const createAdminTemplate = (page) => {
         addSummaryWrapper(adminContent, page);
 
     } else if(page === 'applications') {
-        // addTableHeader(adminContent, page);
         addTableWrapper(adminContent, page);
-        addApplicationSummaryWrapper(adminContent);
-        // addSummaryWrapper(adminContent, page);
-
+        addApplicationSummaryTemplate(adminContent);
+    } else if(page === 'jobs') {
+        addTableWrapper(adminContent, page);
+        addJobSummaryTemplate(adminContent);
     }
 
     return adminContent;
 }
 
-// const addTableHeader = (adminContent, page) => {
-//     const summary = document.createElement('div');
-//     summary.setAttribute('class', `table__header table__header--${page}`);
 
-//     adminContent.appendChild(summary);
-// }
-const addApplicationSummaryWrapper = (adminContent) => {
-    // addSummaryWrapper(adminContent, 'applications');
+const addJobSummaryTemplate = (adminContent) => {
+    // Create the summary, minus the content divs that'll be animated in after the axios request
+    const summaryWrapper = createSummaryElement('summary-wrapper summary-wrapper--jobs');
+    const summary = createSummaryElement('summary summary--jobs-page');
+    const details = createSummaryElement('summary__details summary__details--jobs-page');
+    const header = createSummaryElement('summary__header');
 
+    // Sections
+    const detailsSection = createSummaryElement('summary__section summary__section--details');
+    const detailsHeading = createSummaryElement('summary__heading summary__heading--jobs-page');
+    const descriptionSection = createSummaryElement('summary__section summary__section--description');
+    const descriptionHeading = createSummaryElement('summary__heading summary__heading--jobs-page');
+
+    const controls = createSummaryElement('summary__controls summary__job-controls--jobs-page');
+    detailsHeading.innerText = 'Details';
+    descriptionHeading.innerText = 'Description';
+
+    detailsSection.appendChild(detailsHeading);
+    descriptionSection.appendChild(descriptionHeading);
+    details.append(header, detailsSection, descriptionSection, controls);
+    summary.appendChild(details);
+    summaryWrapper.append(summary);
+    adminContent.append(summaryWrapper);
+}
+
+const addApplicationSummaryTemplate = (adminContent) => {
     // Create the summary, minus the content divs that'll be animated in after the axios request
     const summaryWrapper = createSummaryElement('summary-wrapper summary-wrapper--applications');
     const summary = createSummaryElement('summary summary--applications-page');
