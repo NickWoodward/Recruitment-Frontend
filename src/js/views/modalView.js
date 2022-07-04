@@ -23,7 +23,7 @@ export const renderNewApplicationModal = (data) => {
     const summaryHeader = document.querySelector('.summary__header');
     const summary = document.querySelector('.summary__content');
 
-    const headerModal = createHeaderModal(data);
+    const headerModal = createHeaderModal(data, 'applications');
     const modal = createNewApplicationModal(data);
 
     summaryHeader.insertAdjacentHTML('afterbegin', headerModal);
@@ -87,13 +87,8 @@ const createNewApplicationModal = ({jobs, users, appNumber}) => {
 
 const populateApplicationModal = ({ jobs, users }) => {
     const jobsInput = document.querySelector('.new-application__input--job');
-    console.log("🚀 ----------------------------------------------------------------------------------🚀")
-    console.log("🚀 ~ file: modalView.js ~ line 92 ~ populateApplicationModal ~ jobsInput", jobsInput)
-    console.log("🚀 ----------------------------------------------------------------------------------🚀")
+
     const userInput = document.querySelector('.new-application__input--applicant');
-    console.log("🚀 ----------------------------------------------------------------------------------🚀")
-    console.log("🚀 ~ file: modalView.js ~ line 96 ~ populateApplicationModal ~ userInput", userInput)
-    console.log("🚀 ----------------------------------------------------------------------------------🚀")
 
     // Order the jobs by the company name
     jobs.sort((a, b) => a.companyName > b.companyName? 1:-1);
@@ -141,12 +136,12 @@ export const renderJobModal = (data, type) => {
 
     switch(type) {
         case 'new': 
-            summaryHeader.insertAdjacentHTML('afterbegin', createHeaderModal(data));
+            summaryHeader.insertAdjacentHTML('afterbegin', createHeaderModal(data, 'jobs'));
             summary.insertAdjacentHTML('afterbegin', createNewJobModal());
             populateNewJobModal(data);
             break;
         case 'edit':
-            summaryHeader.insertAdjacentHTML('afterbegin', createHeaderModal(data, true));
+            summaryHeader.insertAdjacentHTML('afterbegin', createHeaderModal(data, 'jobs', true));
             summary.insertAdjacentHTML('afterbegin', createEditJobModal(data));
             populateEditJobModal(data);
             break;
@@ -166,16 +161,28 @@ export const renderJobModal = (data, type) => {
         );
 };
 
-const createHeaderModal = ({jobNumber, job}, editMode) => {
+const createHeaderModal = (data, type, editMode) => {
     const today = new Date();
     const day = `${today.getDate()}`.padStart(2, '0');;
     const month = `${today.getMonth()+1}`.padStart(2, '0');
     const year = `${today.getFullYear()}`.substring(2);
-    const date = `${day}/${month}/${year}`;
+    let date = `${day}/${month}/${year}`;
+
+    let id;
+    console.log(data);
+    switch(type) {
+        case 'applications':
+            id = data.appNumber;
+            break;
+        case 'jobs':
+            id = editMode? data.job.id : data.jobNumber;
+            date = editMode? data.job.jobDate : date; 
+            break
+    }
 
     const header = `
-        <div class="summary__modal-header summary__modal-header--jobs">
-            <div>${editMode? job.id : jobNumber}</div>
+        <div class="summary__modal-header summary__modal-header--${type}">
+            <div>${id}</div>
             <div>${date}</div>
         </div>
     `;
@@ -467,25 +474,19 @@ const createEditJobModal = ({companies, job, jobNumber}) => {
     return modal;
 };
 
-export const removeJobModal = () => {
-    const jobSummary = document.querySelector('.summary__modal');
-    const jobHeader = document.querySelector('.summary__modal-header');
-    gsap.timeline()
-        .to(jobSummary, {
-            autoAlpha: 0,
-            duration: 0.2,
-            onComplete: () => {
-                jobSummary.parentElement.removeChild(jobSummary)
-            }
-        }).to(jobHeader, {
-            autoAlpha: 0,
-            duration: 0.2,
-            onComplete: () => {
-                jobHeader.parentElement.removeChild(jobHeader)
-            }
-        }, '<')
-}
+export const removeAdminModal = (type) => {
+    const elements = [];
+    switch(type) {
+        case 'applications':
+        case 'jobs':
+            elements.push(document.querySelector('.summary__modal'));
+            elements.push(document.querySelector('.summary__modal-header'));
+            break;
+    }
 
+    const tl = gsap.timeline({defaults: { duration: .2 }});
+    elements.forEach(element => tl.to(element, { autoAlpha: 0, onComplete: () => element.parentElement.removeChild(element) }, '<'))
+}
 
 const populateNewJobModal = ({companies, jobTypes, jobPositions, jobPqes}) => {
     // Populate select elements

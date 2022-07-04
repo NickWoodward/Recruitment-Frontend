@@ -135,6 +135,11 @@
 
     &__description-input--new-job, &__description-input--edit-job {
         min-height: 10rem;
+        line-height: 2.3rem;
+
+    }
+    &__description-input--edit-job {
+        padding: 1rem 1.5rem;
     }
 
     &__icon {

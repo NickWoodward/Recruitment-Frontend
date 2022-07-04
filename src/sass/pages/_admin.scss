@@ -298,6 +298,9 @@
             white-space: nowrap;
             text-overflow: ellipsis;
         }
+        &--description {
+            line-height: 2.3rem;
+        }
 
     }
     &__max-width {

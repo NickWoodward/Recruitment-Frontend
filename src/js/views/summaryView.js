@@ -317,7 +317,7 @@ const removeOldJobSummary = () => {
     const oldDescriptionContent = document.querySelector('.summary__section-content--description');
     const oldControlsContent = document.querySelector('.summary__controls-content--jobs');
     const items = [oldHeaderContent, oldDetailsContent, oldDescriptionContent, oldControlsContent];
-    console.log(items);
+
     // Remove old content
     items.forEach(item => item.parentElement.removeChild(item));
 }

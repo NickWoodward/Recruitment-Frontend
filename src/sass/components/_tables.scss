@@ -1,21 +1,10 @@
 .table {
-    &--jobs {
-        width: 100%;
-    }
-    &--users {
-        width: 100%;
-    }
-    &--companies {
-        width: 100%;
-        
-    }
-    &--applications {
-        width: 100%;
-        // font-size: 1.5rem;
-    }
-    &--nested-jobs {
-        width: 100%;
-    }
+
+    &--jobs,
+    &--users,
+    &--companies,
+    &--applications,
+    &--nested-jobs,
     &--nested-user-jobs {
         width: 100%;
     }
@@ -26,49 +15,115 @@
     height: 3.6rem;
     width: 4rem;
 }
-
-.td-data {
-    &--jobId {
-        max-width: 2rem;
-    }
-    &--company {
-        max-width: 10rem;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-    }
-    &--title {
-        max-width: 18rem;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-    }
-    &--location {
-        max-width: 10rem;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-    }
-
-    // Applications
-    // &--position {
-    //     max-width: 12rem;
-    //     overflow: hidden;
-    //     white-space: nowrap;
-    //     text-overflow: ellipsis;
-    // }
+thead, tbody {
+    display: table-row-group;
+}
+th, td {
+    display: table-cell;
+    text-align: left;
+    text-transform:initial;
 }
 
-// caption {
-//     text-align: left;
-//     padding: 2rem 1rem;
-//     font-size: 2.2rem;
-//     color: $color-secondary;
+// TABLE HEADS
+// Widths of THs have to match max-widths of tds for ellipsis overflow to work
+
+th {
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+td {
+    padding: 0 var(--thead-padding);
+}
+
+.thead--jobs, .thead--applications {
+    & th {
+        padding: var(--thead-padding);
+    }
+}
+
+//// JOBS TABLE
+.thead--jobs {
+
+
+    & .th--id {
+        width: 10rem;
+        padding: 0 3rem;
+    }
+    & .th--company {
+        width: 20rem;
+    }
+    & .th--title {
+        width: 22rem;
+    }
+}
+
+.table--jobs {
+    & .td-data {
+        &--jobId {
+            width: 2.5rem;
+            padding: 0 3rem;
+
+        }
+        &--company {
+            max-width: 20rem;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        &--title {
+            max-width: 25rem;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        &--location {
+            max-width: 10rem;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+    }
+}
+
+// Set max cell widths
+.table--applications {
+    & .td-data--first-name {
+        max-width:12rem;
+        width:12rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    & .td-data--last-name {
+        max-width:15rem;
+        width:15rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    & .td-data--position {
+        max-width:18rem;
+        width: 18rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    & .td-data--company {
+        max-width:18rem;
+        width: 18rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    & .td-data--cv {
+        position: relative;
+    }
+}
+
+
+// table, thead, tbody, th, td, tr {
+//     display: block;
 // }
-
-table, thead, tbody, th, td, tr {
-    display: block;
-}
 
 thead tr {
     position: absolute;
@@ -81,10 +136,6 @@ table {
 }
 
 
-
-tr {
-    // padding: 2rem;
-}
 
 tbody tr:nth-child(odd) {
     background-color: rgb(249, 250, 251);
@@ -146,61 +197,12 @@ td:nth-of-type(8)::before {
         }
         
     }
-    thead, tbody {
-        display: table-row-group;
-    }
-    th, td {
-        display: table-cell;
-        text-align: left;
-        // padding: 2rem 2.5rem;
-        text-transform:initial;
-    }
-    td {
-        padding: 0 2rem;
-    }
+
     // .table--applications .td-data--applicationId {
     //     padding: 2rem 1rem 2rem 2.5rem;
     // }
-    // Set max cell widths
-    .table--applications {
-        & .td-data--first-name {
-            max-width:12rem;
-            width:12rem;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-        }
-        & .td-data--last-name {
-            max-width:15rem;
-            width:15rem;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-        }
-        & .td-data--position {
-            max-width:18rem;
-            width: 18rem;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-        }
-        & .td-data--company {
-            max-width:18rem;
-            width: 18rem;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-        }
-        & .td-data--cv {
-            position: relative;
-        }
-    }
-    th {
-        font-size: 1.5rem;
-        font-weight: 400;
-        // padding: 2rem 2.5rem 2rem 2.5rem;
-        padding: 2.1rem 2.4rem;
-    }
+
+
     .table--applications .th--id {
         width: 8.5rem;
     }

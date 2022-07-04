@@ -1328,11 +1328,11 @@ export const calculateRows = (tableName, header, pagination) => {
     const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * 10;
 
     const numOfRows = Math.floor((tableContentHeight - parseFloat(headerHeight) - parseFloat(paginationHeight)) / parseFloat(rowHeight));
-    // console.log('\ntableContentHeight',tableContentHeight);
-    // console.log('headerHeight', headerHeight);
-    // console.log('paginationHeigh', paginationHeight);
-    // console.log('rowHeight',rowHeight);
-    // console.log('numRows', numOfRows);
+    console.log('\ntableContentHeight',tableContentHeight);
+    console.log('headerHeight', headerHeight);
+    console.log('paginationHeigh', paginationHeight);
+    console.log('rowHeight',rowHeight);
+    console.log('numRows', numOfRows);
     return numOfRows;
 }
 
@@ -1480,17 +1480,14 @@ export const getDeleteCompanyHtml = (companyId) => {
 
 
 export const getDeleteJobHtml = (jobId) => {
-    const jobDate = document.querySelector('.job-summary__field--date').innerText;
-    const positionName = document.querySelector('.job-summary__field--title').innerText;
-    const positionCompany = document.querySelector('.job-summary__field--company').innerText;
-    const location = document.querySelector('.job-summary__field--location').innerText;
+    const jobDate = document.querySelector('.summary__date').innerText;
+    const jobTitle = document.querySelector('.summary__field--title').innerText;
+    const companyName = document.querySelector('.summary__field--company').innerText;
+    const location = document.querySelector('.summary__field--location').innerText;
     
     return (`
             <div class='confirmation confirmation--delete'>
-                <div class="job-summary__modal-header">
-                    <div>${jobId}</div>
-                    <div>${jobDate}</div>
-                </div>
+
                 <div class='confirmation__header'>
                     <div class='confirmation__svg-wrapper'>
                         <svg class='confirmation__svg confirmation__svg--delete'><use xlink:href="svg/spritesheet.svg#alert-circled"></svg>
@@ -1500,11 +1497,11 @@ export const getDeleteJobHtml = (jobId) => {
                 <div class='confirmation__job'>
                     <div class='confirmation__item'>
                         <div class='confirmation__label'>Title:</div>
-                        <div class='confirmation__field'>${positionName}</div>
+                        <div class='confirmation__field'>${jobTitle}</div>
                     </div>
                     <div class='confirmation__item'>
                         <div class='confirmation__label'>Company:</div>
-                        <div class='confirmation__field'>${positionCompany}</div>
+                        <div class='confirmation__field'>${companyName}</div>
                     </div>
                     <div class='confirmation__item'>
                         <div class='confirmation__label'>Location:</div>
@@ -1933,7 +1930,7 @@ const getJobFormValues = () => {
 
 export const formatJobs = (jobs) => {
     // Headers should match the returned divs in createJobsElement
-    const headers = ['ID', 'Company','Title','Location', 'Added'];
+    const headers = ['ID', 'Company','Title','Location', 'Featured', 'Added'];
     const rows = jobs.map(job => {
         return createJobElement(job);
     });
@@ -1945,6 +1942,7 @@ const createJobElement = (job) => {
         `<td class="td-data--company" data-id=${job.id}>${job.companyName}</td>`,
         `<td class="td-data--title">${job.title}</td>`,
         `<td class="td-data--location">${job.location}</td>`,
+        `<td class="td-data--featured">${job.featured? 'Yes':'No'}</td>`,
         `<td class="td-data--location">${job.jobDate}</td>`
 
     ];
