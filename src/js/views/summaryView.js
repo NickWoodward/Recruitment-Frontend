@@ -51,7 +51,7 @@ export const createApplicationSummaryContent = ({
     `;
 
     const positionContent = `
-        <div class="summary__content summary__content--application-job">
+        <div class="summary__section-content summary__section-content--application-job">
             <div class="summary__column summary__column--applications-page">
                 <div class="summary__item summary__item--applications-page">
                     <div class="summary__label summary__label">Title:</div>
@@ -92,7 +92,7 @@ export const createApplicationSummaryContent = ({
     `;
 
     const applicantContent  = `
-        <div class="summary__content summary__content--application-applicant">
+        <div class="summary__section-content summary__section-content--application-applicant">
             <div class="summary__column summary__column--applications-page">
                 <div class="summary__item summary__item--applications-page">
                     <div class="summary__label">Applicant Name:</div>
@@ -152,8 +152,8 @@ export const switchApplicationSummary = (application) => {
 const removeOldApplicationSummary = () => {
     // Select old content
     const oldHeaderContent = document.querySelector('.summary__header-content');
-    const oldApplicantContent = document.querySelector('.summary__content--application-applicant');
-    const oldPositionContent = document.querySelector('.summary__content--application-job');
+    const oldApplicantContent = document.querySelector('.summary__section-content--application-applicant');
+    const oldPositionContent = document.querySelector('.summary__section-content--application-job');
     const oldControlsContent = document.querySelector('.summary__controls-content--applications');
     const items = [oldHeaderContent, oldApplicantContent, oldPositionContent, oldControlsContent];
     
@@ -179,7 +179,7 @@ export const insertNewApplicationSummary = (application) => {
 export const createJobSummaryContent = ({companyId, companyName, title, featured, id, jobDate, jobType, description, location, position, pqe, wage}) => {
     
     const headerContent = `
-        <div class="summary__header-content">
+        <div class="summary__header-content" data-id=${id}>
             <div class="summary__item summary__item--header summary__item--header-title">
                 <div class="summary__id">${title}</div>
             </div>
@@ -191,7 +191,7 @@ export const createJobSummaryContent = ({companyId, companyName, title, featured
     // Section wrappers and headers are created/inserted in the initAdmin function
 
     const detailsContent = `
-        <div class="summary__content summary__content--details">
+        <div class="summary__section-content summary__section-content--details">
 
             <div class="summary__column summary__column--jobs-page">
 
@@ -262,7 +262,7 @@ export const createJobSummaryContent = ({companyId, companyName, title, featured
     `;
 
     const descriptionContent = `
-        <div class="summary__content summary__content--description scrollable">
+        <div class="summary__section-content summary__section-content--description scrollable">
 
             <div class="summary__column summary__column--description summary__column--jobs-page">
                 <div class="summary__item summary__item--description summary__item--jobs-page">
@@ -313,8 +313,8 @@ export const switchJobSummary = (job) => {
 const removeOldJobSummary = () => {
     // Select old content
     const oldHeaderContent = document.querySelector('.summary__header-content');
-    const oldDetailsContent = document.querySelector('.summary__content--details');
-    const oldDescriptionContent = document.querySelector('.summary__content--description');
+    const oldDetailsContent = document.querySelector('.summary__section-content--details');
+    const oldDescriptionContent = document.querySelector('.summary__section-content--description');
     const oldControlsContent = document.querySelector('.summary__controls-content--jobs');
     const items = [oldHeaderContent, oldDetailsContent, oldDescriptionContent, oldControlsContent];
     console.log(items);

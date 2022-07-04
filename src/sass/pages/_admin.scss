@@ -169,6 +169,7 @@
         }
     }
 
+
     &__details {
         position: relative;
         &--users {
@@ -203,16 +204,15 @@
 
         }
 
+        &-wrapper {
+            // margin-top: 2.5rem;
+        }
+
         // Heights fixed as they exist before the template is populated
         &--application-job, &--details{
-            margin-top: 2rem;
             height: 31.6rem;
         }
-        // &--details {
-        //     margin-top: 2rem;
-        //     height: 15rem;
-        // }
-        &--application-person, 
+      
         &--description {
             margin-top: 2.5rem;
         }
@@ -220,8 +220,12 @@
         &--application-person {
             height: 24.5rem;
         }
+        &--application-job {
+            margin-top: 2.5rem;
+        }
+
         &--description {
-            height: 21rem;
+            height: 26rem;
         }
          
 
@@ -252,6 +256,13 @@
     }
 
     &__content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        margin-top: 2.5rem;
+    }
+
+    &__section-content {
         display: flex;
         padding: 2.5rem 2rem 2.5rem 5rem;
 
@@ -266,6 +277,7 @@
             position: relative;
             display: flex;
         }
+        
 
         //// End Application Page
         &--description {
@@ -724,6 +736,7 @@
         border-radius: 5px;
 
         &-header {
+            position: absolute;
             flex-grow: 0;
             display: flex;
             justify-content: space-between;
@@ -734,7 +747,7 @@
             border-radius: 5px 5px 0 0;
             font-size: 1.7rem;
             color: white;
-
+            z-index: 100;
             &>div {
                 padding: 0 3rem;
             }

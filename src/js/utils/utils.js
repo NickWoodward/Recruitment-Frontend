@@ -1,5 +1,7 @@
 import { gsap } from 'gsap';
 
+import Select from '../views/customSelect';
+
 export const displayLoaderMessage = (container, type, msg) => {
 
     const markup = `
@@ -172,3 +174,5 @@ export const getInnerDimensions = (element) => {
 
     return { elementWidth, elementHeight };
 }
+
+export const createSelect = (select) => new Select(select);
