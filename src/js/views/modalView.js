@@ -29,19 +29,12 @@ export const renderNewApplicationModal = (data) => {
     summaryHeader.insertAdjacentHTML('afterbegin', headerModal);
     summary.insertAdjacentHTML('afterbegin', modal);
 
-    gsap.fromTo('.summary__modal--new-application', 
-        { autoAlpha: 0,  }, 
-        { autoAlpha: 1, duration: .2 }
-    );
-
     populateApplicationModal(data);
 };
 
 
-{/* <div class="summary__modal-header summary__modal-header--applications">
-<div>${appNumber}</div>
-<div>${date}</div>
-</div> */}
+
+
 const createNewApplicationModal = ({jobs, users, appNumber}) => {
 
     const today = new Date();
@@ -169,7 +162,6 @@ const createHeaderModal = (data, type, editMode) => {
     let date = `${day}/${month}/${year}`;
 
     let id;
-    console.log(data);
     switch(type) {
         case 'applications':
             id = data.appNumber;

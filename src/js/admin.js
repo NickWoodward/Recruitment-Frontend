@@ -24,7 +24,7 @@ import '../assets/icons/applications.svg';
 
 
 import axios from 'axios';
-import gsap from 'gsap';
+import { gsap } from 'gsap';
 
 import * as headerView from './views/headerView';
 import * as adminView from './views/adminView';
@@ -39,6 +39,7 @@ import * as validator from './utils/validator';
 import * as dummyData from './utils/dummyData';
 import * as loader from './views/loader';
 import * as modalView from './views/modalView';
+import * as animation from './animations/adminAnimation';
 
 
 import JobList from './models/JobList';
@@ -534,6 +535,9 @@ class AdminController {
                         // Render summary
                         summaryView.insertNewApplicationSummary(this.applications[0]);
 
+                        // Table and Summary animated in for the first time below this switch statement
+
+                        // Add summary listeners
                         this.addApplicationSummaryListeners();
 
                         break;
@@ -553,6 +557,9 @@ class AdminController {
                         // Render summary
                         summaryView.insertNewJobSummary(this.jobs[0]);
 
+                        // Table and Summary animated in for the first time below this switch statement
+
+                        // Add summary listeners
                         this.addJobsSummaryListeners();
                         break;
                     }
@@ -647,15 +654,17 @@ class AdminController {
 
                 // Remove loaders
                 const nestedTl = gsap.timeline();
-                nestedTl.to('.loader', {autoAlpha: 0, duration: .2, onComplete: () => loader.clearLoaders()});
+                // nestedTl.to('.loader', {autoAlpha: 0, duration: .2, onComplete: () => loader.clearLoaders()});
+                nestedTl.add(animation.animateAdminLoadersOut());
 
-                // Animate summaries in for the first time (different to switching). Tables animated in the render methods
+                // Animate summaries and tables in for the first time (different to switching)
                 if(sectionName === 'companies') {
-                  adminView.animateSummaryIn();
+                  animation.animateSummaryIn();
                 } else if(sectionName === 'applications') {
-                    adminView.animateSummaryIn(true);
+                    nestedTl.add(animation.animateSummaryIn(true), '<');
+                    nestedTl.add(animation.animateTableContentIn('applications'), '<');
                 } else if(sectionName === 'jobs') {
-                    adminView.animateSummaryIn(true)
+                    animation.animateSummaryIn(true)
                 }
 
                 // Animate the pagination in
@@ -1213,11 +1222,9 @@ class AdminController {
     // }
 
     renderApplicationTable(timeline) {
-        const tl = timeline? timeline : gsap.timeline();
   
         // Format applications/headers into html elements
         const {headers, rows} = adminView.formatApplications(this.applications);
-        const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
 
         const table = document.querySelector('.table--applications');
         const tableContent = document.querySelector('.table__content--applications');
@@ -1231,23 +1238,23 @@ class AdminController {
             const newTable = tableView.createTableTest('applications', headers, rows, false);
             tableContent.insertAdjacentHTML('afterbegin',newTable);
 
-            adminView.animateTableContentIn('applications');
+            // adminView.animateTableContentIn('applications');
             // Else remove the tbody and render just the content
         } else {
             console.log('update table');
             utils.removeElement(document.querySelector('tbody'));
             document.querySelector('thead').insertAdjacentHTML('afterend', tableView.updateTableContent('applications', rows));
             
-            tl
-              .add(adminView.animateAdminLoadersOut())
-              .add(adminView.animateTableBodyIn('applications'));
+            // tl
+            //   .add(adminView.animateAdminLoadersOut())
+            //   .add(adminView.animateTableBodyIn('applications'));
 
         }
 
-        //@TODO: why is this animated here?
-        if(!document.querySelector('.pagination__content')){
-            paginationView.animatePaginationContentIn('applications');
-        }
+        // //@TODO: why is this animated here?
+        // if(!document.querySelector('.pagination__content')){
+        //     paginationView.animatePaginationContentIn('applications');
+        // }
 
         const applicationRows = document.querySelectorAll('.row--applications');
        
@@ -1257,14 +1264,14 @@ class AdminController {
 
         applicationRows.forEach(row => {
             row.addEventListener('click', (e) => {
-
+                console.log('Adding row listeners');                   
                 const tl = gsap.timeline({ paused: true });
 
-                // Remove any modals if present
-                if(document.querySelector('.summary__modal')) tl.add(gsap.to('.summary__modal', { autoAlpha: 0, onComplete: () => adminView.removeSummaryModals() }), '<')
-                if(document.querySelector('.confirmation')) tl.add(gsap.to('.confirmation', { autoAlpha: 0, onComplete: () => adminView.removeSummaryModals() }), '<');
+                // // Remove any modals if present
+                // if(document.querySelector('.summary__modal')) tl.add(gsap.to('.summary__modal', { autoAlpha: 0, onComplete: () => adminView.removeSummaryModals() }), '<')
+                // if(document.querySelector('.confirmation')) tl.add(gsap.to('.confirmation', { autoAlpha: 0, onComplete: () => adminView.removeSummaryModals() }), '<');
         
-                tl.add(adminView.animateSummaryOut());
+                tl.add(animation.animateSummaryOut());
                 tl.add(() => {
                     // Putting the row selection and switching logic inside the timeline
                     // should minimise issues with fast successive clicks
@@ -1282,7 +1289,7 @@ class AdminController {
                     summaryView.switchApplicationSummary(application[0]);
 
                     // Animate the summary back in
-                    adminView.animateSummaryIn();
+                    animation.animateSummaryIn();
                 });
                 tl.play(0); 
             });
@@ -1307,8 +1314,6 @@ class AdminController {
     }
 
     async applicationSummaryListener (e) {
-        const newApplicationAlertAnimation = gsap.timeline({paused: true});
-        const deleteApplicationAlertAnimation = gsap.timeline({paused: true});
 
         // Buttons
         const newBtn = e.target.closest('.summary__new-application-btn--applications');
@@ -1357,6 +1362,9 @@ class AdminController {
         }
 
         if(newBtn) {
+            let errorAnimation;
+            let successAnimation;
+
             // Get Job names for the job select
             const { data: { names } } =  await this.Admin.getJobNames();
             this.state.jobs.jobNames = names;
@@ -1366,36 +1374,25 @@ class AdminController {
             this.state.users.applicantNames = applicantNames;
 
             modalView.renderNewApplicationModal({jobs: this.state.jobs.jobNames, users: this.state.users.applicantNames, applications: this.applications, appNumber: this.getNextId('applications')});
-        
+            animation.animateSummaryModalIn(document.querySelector('.summary__modal--new-application'))
+
             const applicationSummaryModal = document.querySelector('.summary__modal--new-application');
             const submitNewBtn = document.querySelector('.new-application__submit');
             const closeBtn = document.querySelector('.new-application__close');
 
             const alertWrapper = document.querySelector('.alert-wrapper');
 
-            // Add the animation for the application alerts (paused)
-            newApplicationAlertAnimation
-                .from(alertWrapper, {
-                    autoAlpha: 0
-                })
-                .to(alertWrapper, {
-                    autoAlpha: 0,
-                    onComplete: () => {
-                        if(document.querySelector('.alert--success')) {
-                            gsap.to(applicationSummaryModal, {autoAlpha:0, onComplete: () => applicationSummaryModal.parentElement.removeChild(applicationSummaryModal)});
-                        }
-                        
-                    }
-                }, '+=1')
+            // Get the animation for the application alerts (paused)
+            errorAnimation = animation.animateAlert(alertWrapper, true);
+            // Success animation is the same, but appended later (paused)
+            successAnimation = animation.animateAlert(alertWrapper, true);
                 
-
             closeBtn.addEventListener('click', () => {
                 modalView.removeAdminModal('applications');
             });
         
             submitNewBtn.addEventListener('click',  async (e) => {
                 e.preventDefault();
-
                 // Clear the alert wrapper
                 while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
 
@@ -1410,7 +1407,7 @@ class AdminController {
 
                     const alert = modalView.getAlert(msg, false);
                     alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                    newApplicationAlertAnimation.play(0);
+                    errorAnimation.play(0);
                     return;
                 }
 
@@ -1420,14 +1417,14 @@ class AdminController {
                         // Display successful alert      
                         const alert = modalView.getAlert('Application Created', true);
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                        newApplicationAlertAnimation.play(0);
+                        successAnimation.play(0);
 
                         // set up animation timeline (before data updated)
                         const tl = gsap.timeline();
                         adminView.renderAdminLoaders();
                         tl
-                        .add(adminView.animateAdminLoadersIn())
-                        .add(adminView.animateTableContentOut(), '<')
+                        .add(animation.animateAdminLoadersIn())
+                        .add(animation.animateTableContentOut('applications'), '<')
                         .add(async () => {
 
                             // Get data (Updates the total applications)
@@ -1436,35 +1433,59 @@ class AdminController {
                             // Update the current application
                             this.state.applications.currentApplication = this.applications[0];
                             
-                            // Render table (Pass the tl so table loading in happens after loaders)
-                            this.renderApplicationTable(tl);
 
-                            // Switch summary (No animation needed as behind the modal)
+                        // TABLE RENDERING/ANIMATION
+                            this.renderApplicationTable();
+                            // Animate table body in (body, not content, because the table will already be present
+                            // if adding an applicant), and the loaders out
+                            gsap
+                            .timeline()
+                            .add(animation.animateTableBodyIn('applications'))
+                            .add(animation.animateAdminLoadersOut(), '<')
+                            
+                        // SUMMARY RENDERING/ANIMATION
+                            // Switch summary (No animation needed as behind the modal, should happen prior to animation of modal itself)
                             summaryView.switchApplicationSummary(this.applications[0]);
+
+                            // Add to the successAnimation once the getData() call has now completed
+                            // NB: animating the modal out, not the summary out (which would also animate the modal)
+                            successAnimation.add(animation.animateSummaryModalOut(applicationSummaryModal));
+                            // console.log('Added to the success animation', successAnimation.getChildren());
+
+                        // PAGINATION RENDERING
                             // Update pagination
                             const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
                             const { pages, index: current } = paginationView.calculatePagination(index, limit, totalApplications);
                             paginationView.renderPagination(pages, current, 'applications');
+                            // console.log('\n ///////////////////////////////////////////////////// ');
+
                         })
 
                     }
+
                 } catch (err) {
                     console.log(err);
                     if(err.response?.data?.message === 'Application already made') {
                         const alert = modalView.getAlert(`Application Exists, ID: ${err.response.data.data.applicationId}`, false);
                     
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                        newApplicationAlertAnimation.play(0);
+                        console.log('🚀🚀🚀 Playing alert animation from New catch block');
+                        errorAnimation.play(0);
                     }
                 }
             });
 
         }
         if(deleteBtn) {
+            let errorAnimation;
+            let successAnimation;
+
             const applicationId = document.querySelector('.summary__id').innerText;
+
+
+            // Create, insert and animate the confirmation modal into the DOM
             const summaryWrapper = document.querySelector('.summary__content');
             const confirmationHtml = adminView.getDeleteApplicationHtml(applicationId);
-
             summaryWrapper.insertAdjacentHTML('afterbegin', confirmationHtml);
             const confirmation = document.querySelector('.confirmation');
             // Confirmation animation 
@@ -1473,106 +1494,84 @@ class AdminController {
                 duration: .2
             });
 
-            // Alert animation
             const alertWrapper = document.querySelector('.alert-wrapper');
 
-            // Add the animation for the application alerts
-            deleteApplicationAlertAnimation
-                .from(alertWrapper, {
-                    autoAlpha: 0
-                })
-                .to(alertWrapper, {
-                    autoAlpha: 0
-                }, '+=5')
-                .to(confirmation, {
-                    autoAlpha: 0,
-                    onComplete: () => {
-                        confirmation.parentElement.removeChild(confirmation);
-                    }
-                })
-        
+            // Get the animation for the application alerts
+            errorAnimation = animation.animateAlert(alertWrapper, true);
+            // Success animation is the same, but is added to after async call to get data
+            successAnimation = animation.animateAlert(alertWrapper, true);
 
             const confirm = document.querySelector('.confirmation__btn--confirm');
             const cancel = document.querySelector('.confirmation__btn--cancel');
 
-            confirm.addEventListener('click', async() => {
+            confirm.addEventListener('click', async(e) => {
+                e.preventDefault();
+                // console.clear();
                 while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
 
                 try {
                     const res = await this.Admin.deleteApplication(applicationId);
 
                     if(res.status === 200) {
-                        const tl = gsap.timeline();
-
+                        console.log('DELETING', 'Applications left: ', this.applications.length)
+                        // Display successful alert
                         const alert = modalView.getAlert(`Application ${applicationId} deleted`, true);
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                        successAnimation.play(0);
 
                         // If it's the last item on the page
                         if(this.applications.length === 1) {
-
-                            // Set the pagination state (second param simulates pressing the previous button)
-                            this.setApplicationPagination(null, true, null);
-                            // // Set the pagination view
-                            paginationView.updatePaginationView(this.state.applications.currentPage -1);
-
-                            adminView.renderAdminLoaders();
-
-                            // set up animation timeline (before data updated)
-                            tl.add(adminView.animateTableContentOut())
-                              .add(adminView.animateAdminLoadersIn(), '<')
-                              .add(deleteApplicationAlertAnimation, '<')
-                              .add(async() => {
-                                    // Get the data
-                                    await this.getData('applications');
-        
-                                    // this.handleApplicationPagination(null, true, null)
-                                    this.changeTablePageAnimation(tl, 'applications');
-        
-                                    const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
-                                    const { pages, index: current } = paginationView.calculatePagination(index, limit, totalApplications);
-                                    paginationView.renderPagination(pages, current, 'applications');                            
-                                    
-                                })
+                            this.handleApplicationPagination(null, true, null)
                         } else {
 
                             adminView.renderAdminLoaders();
 
-                            tl.add(adminView.animateAdminLoadersIn())
-                            .add(adminView.animateTableContentOut(), '<')
+                            const tl = gsap.timeline();
+                            tl.add(animation.animateAdminLoadersIn())
+                            .add(animation.animateTableContentOut('applications'), '<')
                             .add(async() => {
                                 // Update the data
                                 await this.getData('applications');
 
-                                // Rerender the table
-                                this.renderApplicationTable();       
-                                
+                                // Update the current application 
+                                this.state.applications.currentApplication = this.applications[0];
+
+                            // TABLE RENDERING/ANIMATION
+                                this.renderApplicationTable();
+                                // Animate table body in (body, not content, because the table will already be present
+                                // if adding an applicant), and the loaders out
+                                gsap
+                                .timeline()
+                                .add(animation.animateTableBodyIn('applications'))
+                                .add(animation.animateAdminLoadersOut(), '<')    
+                                    
+                            // SUMMARY RENDERING
                                 // Switch the summary (No animation needed)
                                 summaryView.switchApplicationSummary(this.applications[0]);
-
+                                
+                                // Add to the successAnimation once the getData() call has now completed
+                                // NB: animating the modal out, not the summary out (which would also animate the modal)
+                                successAnimation.add(animation.animateSummaryModalOut(confirmation));
+                                // console.log('Added to the success animation', successAnimation.getChildren());
 
                                 const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
                                 const { pages, index: current } = paginationView.calculatePagination(index, limit, totalApplications);
                                 paginationView.renderPagination(pages, current, 'applications');
                             
-                                deleteApplicationAlertAnimation.play(0);
-
-                            })
-                            
-                            // After the page has potentially changed because of onComplete function
+                            })   
                         }
-
-
 
                     } else {
                         throw new Error();
                     }
 
-                
                 } catch (err) {
                     const alert = modalView.getAlert(`Please contact the administrator`, false);
-                
                     alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                    deleteApplicationAlertAnimation.play(0);
+
+                    errorAnimation.play(0);
+                    // console.log('🔥🔥🔥 Playing alert animation from "Delete" catch block');
+
                     console.log(err)
                 }
             });
@@ -5305,28 +5304,109 @@ class AdminController {
     }
 
     async handleApplicationPagination(applicationBtn, applicationPrevious, applicationNext) {
-        // Render loaders
-        adminView.renderAdminLoaders();
-
         const tl = gsap.timeline();
-        // set up animation timeline (before data updated)
-        tl.add(adminView.animateTableContentOut())
-          .add(adminView.animateAdminLoadersIn(), '<')
 
         // Set the pagination state
         this.setApplicationPagination(applicationBtn, applicationPrevious, applicationNext);
-        // Set the pagination view
-        paginationView.updatePaginationView(this.state.applications.currentPage -1);
+        
+        // ANIMATION ORDER/LOGIC
+        // 1: Place the loaders in the DOM
+        // 2: Animate the loaders in, while animating the table body out
+        // 3: The following functions have to be called in a function added to the main timeline
+        //    which will execute in order (& wait for the async call)
+        //    4: Update the data/state
 
-        await this.getData('applications');
-        // Update the current application state
-        this.state.applications.currentApplication = this.applications[0];
-        console.log('current: ',this.state.applications.currentApplication);
-        this.state.isActiveRequest = false;
+        // SUMMARY (NESTED TL)
+        //    5: Animate the summary out
+        //    6: Switch summary in a function nested in the new timeline
+        //    7: Animate the summary back in
 
-        this.changeTablePageAnimation(tl, 'applications');
+        // TABLE (NESTED TL)
+        //    8: Render the table
+        //    9: Animate the new table body in / and the loaders out in a new nested timeline
 
+        
+        // 1: Render loaders
+        adminView.renderAdminLoaders();
+
+        // 2: Animate the loaders in / table body out
+        tl.add(animation.animateTableContentOut('applications'))
+          .add(animation.animateAdminLoadersIn(), '<')
+          // 3: Nest subsequent functions so they execute after the above animations
+          .add(async () => {
+              // 4: Update the data and state (getData fn also updates the total count)
+              await this.getData('applications');
+              this.state.applications.currentApplication = this.applications[0];
+              this.state.isActiveRequest = false;
+
+            // SUMMARY (NESTED TL)
+              // 5: Animate the Summary out (modal animation handled in animateSummaryOut)
+              gsap
+                .timeline().add(animation.animateSummaryOut())
+                // 6: Switch the summary *after* the out animation has occurred
+                .add(() => {
+                    summaryView.switchApplicationSummary(this.applications[0]);
+                    // 7: Animate the summary back in
+                    animation.animateSummaryIn();
+                })  
+
+            // TABLE (NESTED TL) 
+              // 8: Change table
+              this.renderApplicationTable();
+              // 9: Animate table body in (body, not content, because the table will already be present)
+              //    and the loaders out
+              gsap
+                .timeline()
+                .add(animation.animateTableBodyIn('applications'))
+                .add(animation.animateAdminLoadersOut(), '<')
+
+            // CALCULATE/RENDER PAGINATION
+            const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
+            const { pages, index: current } = paginationView.calculatePagination(index, limit, totalApplications);
+            paginationView.renderPagination(pages, current, 'applications');  
+
+          })
+
+
+
+
+
+        // await this.getData('applications');
+        // // Update the current application state
+        // this.state.applications.currentApplication = this.applications[0];
+
+        // this.state.isActiveRequest = false;
+
+        // // this.changeTablePageAnimation(tl, 'applications');
+
+        // // Change table
+        // this.renderApplicationTable()
+        // // Animate table content (body, not content, because the table will already be present)
+        // tl.add(adminView.animateTableBodyIn('applications'))
+        // tl.add(adminView.animateAdminLoadersOut(), '<')
+
+        // // Switch Summary
+        // tl.add(adminView.animateSummaryOut())
+        // .add(() => {
+        //     summaryView.switchApplicationSummary(this.applications[0]);
+        // })
+        // .add(adminView.animateSummaryIn())
     }
+
+    // changeTablePageAnimationTest(timeline, table) {
+    //     let table;
+    //     // Update the table
+    //     switch(table) {
+    //         case 'applications': 
+    //             this.renderApplicationTable();
+                
+
+    //             break;
+    //         case 'jobs':
+    //             this.renderJobsTable();
+    //             break;
+    //     }
+    // } 
 
     changeTablePageAnimation(timeline, table) {
         let switchSummary;

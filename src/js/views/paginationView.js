@@ -4,7 +4,7 @@ export const calculatePagination = (index, limit, totalItems) => {
     // console.log({index}, {limit}, {totalItems});
     // Work out how many pages
     const pages = Math.ceil(totalItems / limit);
-    // Current is the first (zero indexed) item on the page. index/limit = zero index page number
+    // index/limit = zero index page number
     index = index/limit;
 
     return { pages, index };

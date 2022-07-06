@@ -285,15 +285,7 @@ export const removeSummaryModals = () => {
     };
 }
 
-export const animateSummaryModalOut = (modal) => {
-    return gsap.to(modal, {
-        autoAlpha: 0,
-        duration: .2,
-        onComplete: () => {
-            modal.parentElement.removeChild(modal);
-        }
-    })
-} 
+
 
 export const swapSummary = (oldSummary, newSummary, cb) => {
 
@@ -364,43 +356,6 @@ export const animateJobSummaryIn = (firstAnimation) => {
 
 
 
-export const animateSummaryOut = () => {
-    const tl = gsap.timeline({
-        defaults: { 
-            duration: .2,
-            immediateRender: false 
-        },
-    });
-
-    tl
-    .fromTo('.summary__header-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -10 })
-    .fromTo('.summary__section-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y:-10, stagger: 0.1 }, '<0.1')
-    .fromTo('.summary__btn', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y:10, stagger: { from: 'end', each: .1 } }, '<');
-
-    return tl;
-}
-export const animateSummaryIn = (firstAnimation) => {
-    const tl = gsap.timeline();
-
-    // Slower animations on first render
-    const duration = firstAnimation? 0.2:0.1;
-
-    tl
-    .fromTo('.summary__item--header', { autoAlpha: 0, y: 10 },{ autoAlpha: 1, y: 0 })
-    .fromTo('.summary__section-content', { autoAlpha: 0, y: 10 },{ autoAlpha: 1, y: 0, stagger: duration }, `<${duration}`)
-    .fromTo('.summary__btn', 
-        { autoAlpha: 0, y: 10 },
-        { 
-            autoAlpha: 1, 
-            y: function(index, target, targets) {
-                if(index === 0) return 1;
-                return 0;
-            }, 
-            stagger: { from: 'end', each: .1 } 
-        }, '<')    
-    
-    return tl;
-}
 
 
 export const animateApplicationAnimation = (success, msg) => {
@@ -1328,11 +1283,11 @@ export const calculateRows = (tableName, header, pagination) => {
     const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * 10;
 
     const numOfRows = Math.floor((tableContentHeight - parseFloat(headerHeight) - parseFloat(paginationHeight)) / parseFloat(rowHeight));
-    console.log('\ntableContentHeight',tableContentHeight);
-    console.log('headerHeight', headerHeight);
-    console.log('paginationHeigh', paginationHeight);
-    console.log('rowHeight',rowHeight);
-    console.log('numRows', numOfRows);
+    // console.log('\ntableContentHeight',tableContentHeight);
+    // console.log('headerHeight', headerHeight);
+    // console.log('paginationHeigh', paginationHeight);
+    // console.log('rowHeight',rowHeight);
+    // console.log('numRows', numOfRows);
     return numOfRows;
 }
 
@@ -2127,7 +2082,6 @@ export const formatUserJobs = (jobs) => {
     return { headers, rows };
 }
 const createUserJobElement = (job) => {
-    console.log(job)
     const row = [
         `<td class="td-data--jobId" data-id=${job.jobId}>${job.jobId}</td>`,
         `<td class="td-data--title">${job.companyName}</td>`,
@@ -3137,7 +3091,7 @@ const renderCompany = (company) => {
 // }
 
 export const animateAdminLoadersIn = () => {
-    return gsap.fromTo('.loader', {autoAlpha:0}, {autoAlpha:1, duration: .2});
+    return gsap.fromTo('.loader', {autoAlpha:0}, {autoAlpha:1, duration: 2});
 }
 export const animateAdminLoadersOut = () => {
     return gsap.fromTo(
@@ -3185,13 +3139,7 @@ export const animateTableBodyIn = (table) => {
         
         }, '<')
 }
-export const animateTableContentOut = () => {
-    const tableContent = document.querySelector('tbody');
 
-    return (
-      gsap.fromTo(tableContent, { autoAlpha: 1 }, {autoAlpha: 0, duration: .4})
-    );
-}
 export const renderAdminLoaders = () => {
     const tableContent = document.querySelector('.table__content');
     // const summaryWrapper = document.querySelector('.summary-wrapper');
