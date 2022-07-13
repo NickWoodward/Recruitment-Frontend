@@ -93,14 +93,7 @@
         fill: firebrick;
     }
 }
-.pagination-wrapper {
-    &--addresses {
-        // flex-grow: 1;
-        margin-top: auto;
-        grid-column: 1/7;
 
-    }
-}
 .summary-wrapper {
     position: relative;
 
@@ -128,7 +121,7 @@
         grid-row: 1/11;
     }
     &--companies {
-        grid-column: 4/13;
+        grid-column: 5/17;
         grid-row: 1/11;
     }
     &--users {
@@ -164,7 +157,7 @@
 
             & .summary__item {
                 display: flex; 
-                flex-basis: 33.3%;
+                flex-basis: 50%;
             }
         }
     }
@@ -193,7 +186,10 @@
         &--application-job,
         &--application-person,
         &--details,
-        &--description {
+        &--description,
+        &--contacts,
+        &--addresses,
+        &--company-jobs {
             position:relative;
             display: flex;
             flex-direction: column;
@@ -226,6 +222,22 @@
 
         &--description {
             height: 26rem;
+        }
+        &--contacts, &--addresses{
+            // height: 25rem;
+        }
+        &--contacts {
+            grid-column: 1/8;
+            height: 24.5rem;
+        }
+        &--addresses {
+            // margin-top: 2.5rem;
+            grid-column: 1/8;
+            height: 31.5rem;
+        }
+        &--company-jobs {
+            grid-column: 8/17;
+            grid-row: 1/4;
         }
          
 
@@ -260,6 +272,12 @@
         display: flex;
         flex-direction: column;
         margin-top: 2.5rem;
+
+        &--companies {
+            display: grid;
+            grid-template-columns: repeat(16, minmax(0, 1fr));
+            grid-gap: 2rem;
+        }
     }
 
     &__section-content {
@@ -316,10 +334,9 @@
         flex-direction: column;
         padding-right: 1.8rem;
  
-        &--applications-page {
+        &--applications-page, &--companies-page {
             flex-basis: 50%;
         }
-
 
         &--jobs-page  {
             flex-basis: 33%;
@@ -409,7 +426,8 @@
         margin: 1rem 0 2rem 0;
 
         &--applications-page,
-        &--jobs-page {
+        &--jobs-page,
+        &--companies-page {
             margin: 0;
             padding-left: 3rem;
             height: 5.5rem;
@@ -466,7 +484,7 @@
 
     &__item  {
 
-        &--applications-page, &--jobs-page {
+        &--applications-page, &--jobs-page, &--companies-page {
             &:not(.summary__item--description) {
                 margin-bottom: 2rem;
             }
@@ -509,7 +527,7 @@
             justify-content: center;
             align-items: center;
             width: 13.5rem;
-            height: 5.5rem;
+            height: 6rem;
             box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
             border-radius: 5px;
             margin-top: 2.5rem;
@@ -520,7 +538,7 @@
             align-self: flex-end;
             display: flex;
             width: 20rem;
-            height: 5.5rem;
+            height: 6rem;
             box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
             border-radius: 5px;
             margin-top: 2.5rem;
@@ -528,6 +546,28 @@
         }
     }
 
+    &__contact-controls, &__address-controls {
+
+        &-wrapper {
+            &--companies-page {
+                grid-column: 1/8;
+                display: flex;
+                justify-content: space-between;
+            }
+        }
+
+        &--companies-page {
+            // grid-column-end: 8;
+            // justify-self: end;
+            display: flex;
+            width: 15rem;
+            height: 6rem;
+            box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+            border-radius: 5px;
+            padding: 0 1rem 0 .5rem;
+
+        }
+    }
 
 
     &__controls {
@@ -536,7 +576,7 @@
         &-content {
             display: flex;
 
-            &--jobs, &--applications {
+            &--jobs, &--applications, &--contacts, &--addresses {
                 display: flex;
                 justify-content: space-evenly;
                 align-items: center;
@@ -550,74 +590,113 @@
         }
     }
 
+    // // new-address/edit-applicant btns etc can happen in multiple views
+    // &__edit-applicant-btn,
+    // &__new-address-btn,
+    // &__edit-address-btn,
+    // &__delete-address-btn,
+    // &__new-user-btn,
+    // &__edit-user-btn,
+    // &__delete-user-btn {
+    //     &--users {
+    //         display: flex;
+    //         align-items: center;
+    //         justify-content: center;
+    //         margin-left: 1.5rem;
+    //         cursor:pointer;
+    //     }
 
-    // new-address/edit-applicant btns etc can happen in multiple views
-    &__edit-applicant-btn,
+    // }
+
+    // &__new-address-btn {
+    //     &--users {
+    //         height: 2.5rem;
+    //         width: 2.5rem;
+    //         fill: $color-logo;
+    //     }
+    // }
+    // &__new-user-btn {
+    //     &--users {
+    //         height: 3.2rem;
+    //         width: 3.2rem;
+    //         fill: $color-logo;
+    //         transform: translateY(1px); 
+
+    //     }
+    // }
+
+    // &__edit-applicant-btn, 
+    // &__edit-address-btn {
+    //     &--users {
+    //         height: 2.6rem;
+    //         width: 2.6rem;
+    //         fill: $color-logo;
+    //         transform: translateY(1px); 
+    //     }
+    // }
+    // &__edit-user-btn {
+    //     &--users {
+    //         height: 2.9rem;
+    //         width: 2.9rem;
+    //         fill: $color-logo;
+    //         transform: translateY(2px); 
+    //     }
+    // }
+
+    // &__delete-address-btn {
+    //     &--users {
+    //         height: 2.6rem;
+    //         width: 2.6rem;
+    //         fill: firebrick;
+    //     }
+    // }
+    // &__delete-user-btn {
+    //     &--users {
+    //         height: 2.9rem;
+    //         width: 2.9rem;
+    //         fill: firebrick;
+    //     }
+    // }
+
+    &__new-contact-btn,
     &__new-address-btn,
+    &__edit-contact-btn,
     &__edit-address-btn,
-    &__delete-address-btn,
-    &__new-user-btn,
-    &__edit-user-btn,
-    &__delete-user-btn {
-        &--users {
+    &__delete-contact-btn,
+    &__delete-address-btn {
+        &--companies {
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-left: 1.5rem;
             cursor:pointer;
         }
-
     }
 
+    &__new-contact-btn,
     &__new-address-btn {
-        &--users {
-            height: 2.5rem;
-            width: 2.5rem;
+        &--companies {
+            height: 2.9rem;
+            width: 2.9rem;
             fill: $color-logo;
         }
     }
-    &__new-user-btn {
-        &--users {
-            height: 3.2rem;
-            width: 3.2rem;
-            fill: $color-logo;
-            transform: translateY(1px); 
 
-        }
-    }
-    &__edit-applicant-btn, 
+    &__edit-contact-btn,
     &__edit-address-btn {
-        &--users {
-            height: 2.6rem;
-            width: 2.6rem;
-            fill: $color-logo;
-            transform: translateY(1px); 
-        }
-    }
-    &__edit-user-btn {
-        &--users {
+        &--companies {
             height: 2.9rem;
             width: 2.9rem;
             fill: $color-logo;
-            transform: translateY(2px); 
         }
     }
-
+    &__delete-contact-btn,
     &__delete-address-btn {
-        &--users {
-            height: 2.6rem;
-            width: 2.6rem;
-            fill: firebrick;
-        }
-    }
-    &__delete-user-btn {
-        &--users {
+        &--companies {
             height: 2.9rem;
             width: 2.9rem;
-            fill: firebrick;
+            fill: $color-secondary;
         }
     }
-
 
 
     &__new-application-btn,
@@ -686,7 +765,6 @@
         &--jobs {
             height: 2.9rem;
             width: 2.9rem;
-
         }
     }
 
@@ -782,8 +860,8 @@
         grid-row: 1/9;
     }
     &--companies {
-        grid-column: 1/4;
-        grid-row: 1/6;
+        grid-column: 1/5;
+        grid-row: 1/10;
     }
     &--users {
         grid-column: 1/4;
@@ -820,14 +898,22 @@
         color: white;
     }
     &__content {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        flex-grow: 1;
-        margin-top: 2.5rem;
-        box-shadow: 0 2px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
-        border-radius: 5px;
-        overflow: hidden;
+        &--companies, &--jobs, &--applications {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-grow: 1;
+            margin-top: 2.5rem;
+            box-shadow: 0 2px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+            border-radius: 5px;
+            overflow: hidden
+        };
+
+        &--company-jobs {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
 
 
     }
@@ -1602,13 +1688,14 @@
 
 //////////  COMPANY SUMMARY STYLING  ///////////
 .company-jobs-placeholder {
+
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100%;
     width: 100%;
-    background-color: #f9fafb;
+    flex-grow: 1;
+    background-color: white;
 
     font-size: 1.5rem;
 
@@ -2004,14 +2091,29 @@
     box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
     border-radius: 5px;
     
-    &--applications, &--jobs {
+    &--applications, &--jobs, &--companies {
         display: flex;
         align-items: center;
         height: 6rem;
-        width: 40%;
+        width: auto;
+        min-width: 40%;
         margin-top: 2.5rem;
         margin-left: auto;
-
+    }
+    &--company-contacts, &--company-addresses {
+        display: flex;
+        align-items: center;
+        height: 6rem;
+        // flex-grow: 1;
+        margin-right: 2rem;
+        min-width: 40%;    
+    }
+    &--company-jobs {
+        display: flex;
+        align-items: center;
+        width: 20.3rem;
+        grid-column-end: 17;
+        justify-self: end;
     }
 
 }

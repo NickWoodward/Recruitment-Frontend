@@ -70,6 +70,11 @@ export const animateAdminLoadersOut = () => {
     );
 }
 
+//// PLACEHOLDERS ////
+export const animateTablePlaceholderIn = (placeholder) => {
+    return gsap.fromTo(placeholder, { autoAlpha: 0 }, { autoAlpha: 1, duration: SPEED_MEDIUM });
+};
+
 //// TABLES ////
 
 export const animateTableContentIn = (table) => {

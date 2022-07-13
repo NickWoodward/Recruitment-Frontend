@@ -1,9 +1,9 @@
 import gsap from 'gsap';
 
 export const calculatePagination = (index, limit, totalItems) => {
-    // console.log({index}, {limit}, {totalItems});
-    // Work out how many pages
-    const pages = Math.ceil(totalItems / limit);
+    console.log({index}, {limit}, {totalItems});
+    // Work out how many pages (if there are no items default to 1)
+    const pages = totalItems === 0? 1 : Math.ceil(totalItems / limit);
     // index/limit = zero index page number
     index = index/limit;
 
@@ -11,7 +11,7 @@ export const calculatePagination = (index, limit, totalItems) => {
 }
 
 export const renderPagination = (pages, current, tableName) => {
-    // console.log(pages, current, tableName)
+    console.log(pages, current, tableName)
     const paginationWrapper = document.querySelector(`.pagination-wrapper--${tableName}`);
     // Remove pagination if present
     const paginationContent = document.querySelector(`.pagination__content--${tableName}`);

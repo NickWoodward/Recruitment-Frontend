@@ -4,7 +4,7 @@
     &--users,
     &--companies,
     &--applications,
-    &--nested-jobs,
+    &--company-jobs,
     &--nested-user-jobs {
         width: 100%;
     }
@@ -35,7 +35,7 @@ td {
     padding: 0 var(--thead-padding);
 }
 
-.thead--jobs, .thead--applications {
+.thead--jobs, .thead--applications, .thead--companies, .thead--company-jobs {
     & th {
         padding: var(--thead-padding);
     }
@@ -189,8 +189,8 @@ td:nth-of-type(8)::before {
         background-color: $color-primary-new;
     }
     .thead {
-        &--applications tr, &--nested-jobs tr, &--nested-user-jobs tr,
-        &--jobs tr {
+        &--applications tr, &--company-jobs tr, &--nested-user-jobs tr,
+        &--jobs tr, &--companies tr {
             background-color: white;
             color: $color-secondary;
             font-size: 1.2rem;

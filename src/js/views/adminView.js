@@ -10,6 +10,7 @@ import Select from './customSelect';
 import gsap from 'gsap';
 
 let summaryAnimationInProgress = false;
+const REM_TO_PX = 10;
 
 export const renderContent = (content, container) => {
     content.forEach(item => {
@@ -806,7 +807,7 @@ export const getJobValues = (fields, selects, editMode) => {
     const {titleField, locationField, wageField, descriptionField } = fields;
     const { companyField, typeField, positionField, pqeField, featuredField } = selects;
 
-    const values = { changed: false };
+    const values = { changed: [] };
 
     // Fields =>
     // (field.value: empty && field.placeholder: text) = the field is empty
@@ -820,7 +821,7 @@ export const getJobValues = (fields, selects, editMode) => {
             case titleField: 
                 if(editMode) {
                     values.title = titleField.value? titleField.value : titleField.placeholder;
-                    values.changed = !!titleField.value && titleField.value !== titleField.placeholder ? true : values.changed;
+                    if(!!titleField.value && titleField.value !== titleField.placeholder) values.changed.push('title');
                 } else {
                     values.title = titleField.value.trim();
                 }
@@ -828,7 +829,7 @@ export const getJobValues = (fields, selects, editMode) => {
             case locationField: 
                 if(editMode) {
                     values.location = locationField.value? locationField.value : locationField.placeholder;
-                    values.changed = !!locationField.value && locationField.value !== locationField.placeholder ? true : values.changed;
+                    if(!!locationField.value && locationField.value !== locationField.placeholder) values.changed.push('location');
 
                 } else { 
                     values.location = locationField.value.trim();
@@ -837,13 +838,13 @@ export const getJobValues = (fields, selects, editMode) => {
             case wageField:
                 if(editMode) {
                     values.wage = wageField.value? wageField.value : wageField.placeholder;
-                    values.changed = !!wageField.value && wageField.value !== wageField.placeholder ? true : values.changed;
+                    if(!!wageField.value && wageField.value !== wageField.placeholder) values.changed.push('wage');
                 } else 
                     values.wage = wageField.value.trim();
                 break;
             case descriptionField:
                 values.description = descriptionField.value;
-                values.changed = descriptionField.placeholder !== descriptionField.value.trim() ? true : values.changed;
+                if(descriptionField.placeholder !== descriptionField.value.trim()) values.changed.push('description');
                 break;
         }
     });
@@ -856,31 +857,31 @@ export const getJobValues = (fields, selects, editMode) => {
                 values.companyName = select.options[select.selectedIndex].innerText;
 
                 if(editMode){
-                    values.changed = companyField.value !== companyField.dataset.placeholder? true : values.changed;
+                    if(companyField.value !== companyField.dataset.placeholder) values.changed.push('company');
                 }
                 break;
             case typeField:
                 values.type = typeField.value === 'Type'? '' : typeField.value;
                 if(editMode){
-                    values.changed = typeField.value !== typeField.dataset.placeholder? true : values.changed;
+                    if(typeField.value !== typeField.dataset.placeholder) values.changed.push('type');
                 }
                 break;
             case positionField:
                 values.position = positionField.value === 'Position'? '' : positionField.value;
                 if(editMode){
-                    values.changed = positionField.value.trim() !== positionField.dataset.placeholder? true : values.changed;
+                    if(positionField.value.trim() !== positionField.dataset.placeholder) values.changed.push('position');
                 }
                 break
             case pqeField:
                 values.pqe = pqe.value === 'Experience'? '' : pqeField.value;
                 if(editMode){
-                    values.changed = pqeField.value !== pqeField.dataset.placeholder? true : values.changed;
+                    if(pqeField.value !== pqeField.dataset.placeholder) values.changed.push('pqe');
                 }
                 break;
             case featuredField:
                 values.featured = featured.value === 'Featured?'? '' : featuredField.value
                 if(editMode) {
-                     values.changed = Boolean(Number(featuredField.value)) != Boolean(Number(featuredField.dataset.placeholder))? true : values.changed;
+                    if(Boolean(Number(featuredField.value)) != Boolean(Number(featuredField.dataset.placeholder))) values.changed.push('featured');
                 }
         }
     });
@@ -1278,9 +1279,9 @@ export const calculateRows = (tableName, header, pagination) => {
     // const tableWrapperHeight = document.querySelector(`.table-wrapper--${tableName}`).offsetHeight;
 
     const tableContentHeight = document.querySelector(`.table__content--${tableName}`).offsetHeight;
-    const headerHeight = header? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--table-header-height')) * 10 : 0;
-    const paginationHeight = pagination? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pagination-height')) * 10 : 0;
-    const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * 10;
+    const headerHeight = header? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--table-header-height')) * REM_TO_PX : 0;
+    const paginationHeight = pagination? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pagination-height')) * REM_TO_PX : 0;
+    const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * REM_TO_PX;
 
     const numOfRows = Math.floor((tableContentHeight - parseFloat(headerHeight) - parseFloat(paginationHeight)) / parseFloat(rowHeight));
     // console.log('\ntableContentHeight',tableContentHeight);
@@ -1291,6 +1292,19 @@ export const calculateRows = (tableName, header, pagination) => {
     return numOfRows;
 }
 
+const getRemainingTableSpace = (table) => {
+    const numRows = table.querySelectorAll('tr').length;
+    const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * REM_TO_PX;
+    const tableHeight = table.getBoundingClientRect().height;
+    const spaceRemaining = tableHeight - (numRows * rowHeight);
+    return spaceRemaining;
+}
+export const jobBtnFits = () => {
+    const space = getRemainingTableSpace(document.querySelector('.table__content--company-jobs'));
+    // Allow 3 rows worth of space for the button
+    const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * REM_TO_PX;
+    return rowHeight * 3 <= space;
+};
 
 export const getDeleteContactHtml = (contactId) => {
     const name = document.querySelector('.company-summary__field--name').innerText;
@@ -2091,8 +2105,13 @@ const createUserJobElement = (job) => {
     return row;
 }; 
 
+export const createAddJobsLink = () => {
+    return `<div class="company-jobs-placeholder">
+        <div class="company-jobs-placeholder__add-link"><a>Add Job</a></div>
+    </div>`;
+}
 
-export const generateCompanyJobsPlaceholder = () => {
+export const createNoJobsPlaceholder = () => {
     const markup = `
         <div class="company-jobs-placeholder">
             <div class="company-jobs-placeholder__message">No Current Jobs</div>
@@ -2101,7 +2120,7 @@ export const generateCompanyJobsPlaceholder = () => {
     `;
     return(markup);
 }
-export const generateUserJobsPlaceholder = () => {
+export const createUserJobsPlaceholder = () => {
     const markup = `
         <div class="company-jobs-placeholder">
             <div class="company-jobs-placeholder__message">No Current Jobs</div>
@@ -2630,63 +2649,124 @@ export const removeCompanyModal = () => {
 }
 
 
-export const createCompanySummary = ({id, companyName, companyDate, contacts, addresses, jobs}) => {
-    // const markup  = `
-    //         <div class="company-summary summary">
-    //             <div class="company-summary__details">
+//     <div class="company-summary__header">
+//     <div class="company-summary__item summary__item company-summary__item--header">
+//         <div class="company-summary__id">${id}</div>
+//     </div>
+//     <div class="company-summary__item summary__item company-summary__item--header">
+//         <div class="company-summary__company-name">
+//             ${companyName}
+//         </div>
+//     </div>
+//     <div class="company-summary__item summary__item company-summary__item--header">
+//         <div class="company-summary__field company-summary__field--date">${companyDate}</div>
+//     </div>
+// </div>
 
-    //                 <div class="company-summary__item company-summary__company" data-placeholder="Company" contenteditable=false></div>
-    //             </div>
-    //             <div class="company-summary__controls">
-    //                 <div class="company-summary__btn company-summary__btn--new">
-    //                     <svg class="company-summary__new-icon company-summary__icon">
-    //                         <use xlink:href="svg/spritesheet.svg#add">
-    //                     </svg>
-    //                 </div>
-    //                 <div class="company-summary__btn company-summary__btn--hubspot">
-    //                     <svg class="company-summary__hubspot-icon company-summary__icon">
-    //                         <use xlink:href="svg/spritesheet.svg#hubspot">
-    //                     </svg>
-    //                 </div>
-    //                 <div class="company-summary__btn company-summary__btn--edit">
-    //                     <svg class="company-summary__edit-icon company-summary__icon">
-    //                         <use xlink:href="svg/spritesheet.svg#edit-np1">
-    //                     </svg>
-    //                 </div>
-    //                 <div class="company-summary__btn company-summary__btn--delete">
-    //                     <svg class="company-summary__delete-icon company-summary__icon">
-    //                         <use xlink:href="svg/spritesheet.svg#delete-np1">
-    //                     </svg>
-    //                 </div>
-    //             </div>
-    //         </div>         
-    // `;
+export const createCompanySummaryContent = ({id, companyName, companyDate, contacts, addresses, jobs}) => {
 
-    // ${createAddressSummary()}
+    const headerContent = `
+        <div class="summary__header-content" data-id=${id}>
+            <div class="summary__item summary__item--header summary__item--header-title">
+                <div class="summary__title">${companyName}</div>
+            </div>
+            <div class="summary__item summary__item--header summary__item--header-date">
+                <div class="summary__date">${companyDate}</div>
+            </div>
+        </div>
+    `;
 
-    // ${createContactSummary()}
+    // Section wrappers and headers are created/inserted in the initAdmin function
+
+    const contactsContent = `
+        <div class="summary__section-content summary__section-content--contacts">
+            <div class="summary__column summary__column--companies-page">
+
+                <div class="summary__item summary__item--companies-page">
+                    <div class="summary__label summary__label">Name:</div>
+                    <div class="summary__field summary__field--name" data-id="${contacts[0].contactId}" title="${contacts[0].firstName} ${contacts[0].lastName}">
+                        <a class="summary__link summary__link--name">${contacts[0].firstName} ${contacts[0].lastName}</a>
+                    </div>
+                </div>
+
+                <div class="summary__item summary__item--companies-page">
+                    <div class="summary__label summary__label">Position:</div>
+                    <div class="summary__field summary__field--position">
+                        ${contacts[0].position}
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary__column summary__column--companies-page">
+
+                <div class="summary__item summary__item--companies-page">
+                    <div class="summary__label summary__label">Email:</div>
+                    <div class="summary__field summary__field--email" title="${contacts[0].email}">
+                        <a class="summary__link summary__link--email">${contacts[0].email}</a>
+                    </div>
+                </div>
+
+                <div class="summary__item summary__item--companies-page">
+                    <div class="summary__label summary__label">Phone:</div>
+                    <div class="summary__field summary__field--phone">${contacts[0].phone}</div>
+                </div>
+
+            </div> 
+        </div>
+    `; 
+
+    const addressesContent = `
+        <div class="summary__section-content summary__section-content--addresses">
+            <div class="summary__column summary__column--companies-page">
+
+                <div class="summary__item summary__item--companies-page">
+                    <div class="summary__label summary__label">First Line:</div>
+                    <div class="summary__field summary__field--first-line">${addresses[0].firstLine}</div>
+                </div>
+
+                ${addresses[0].secondLine? `
+                    <div class="summary__item summary__item--companies-page">
+                        <div class="summary__label summary__label">SecondLine:</div>
+                        <div class="summary__field summary__field--second-line">
+                            ${addresses[0].secondLine}
+                        </div>
+                    </div>
+                `:''}    
+
+                <div class="summary__item summary__item--companies-page">
+                    <div class="summary__label summary__label">City:</div>
+                    <div class="summary__field summary__field--city">${addresses[0].city}</div>
+                </div>
+
+            </div>
+
+            <div class="summary__column summary__column--companies-page">
+
+                <div class="summary__item summary__item--companies-page">
+                    <div class="summary__label summary__label">County:</div>
+                    <div class="summary__field summary__field--county">
+                        <a class="summary__link summary__link--county">${addresses[0].county}</a>
+                    </div>
+                </div>
+
+                <div class="summary__item summary__item--companies-page">
+                    <div class="summary__label summary__label">Postcode:</div>
+                    <div class="summary__field summary__field--postcode">${addresses[0].postcode}</div>
+                </div>
+
+            </div> 
+        </div>
+    `;
+
+    const companyJobsTable = ``;
+
     const markup  = `
         <div class="company-summary summary" data-id="${id}">
             <div class="company-summary__details">
 
-                <div class="company-summary__header">
-                    <div class="company-summary__item summary__item company-summary__item--header">
-                        <div class="company-summary__id">${id}</div>
-                    </div>
-                    <div class="company-summary__item summary__item company-summary__item--header">
-                        <div class="company-summary__company-name">
-                            ${companyName}
-                        </div>
-                    </div>
-                    <div class="company-summary__item summary__item company-summary__item--header">
-                        <div class="company-summary__field company-summary__field--date">${companyDate}</div>
-                    </div>
-                </div>
-
                 <div class="summary__column-wrapper summary__column-wrapper--company">
                     <div class="summary__column summary__column--company summary__column--company-summary">
                         
-
                         <div class="summary__heading summary__heading--contacts" data-id="${contacts[0].contactId}">
                             Contacts
                             <div class="company-summary__controls company-summary__controls--contacts">
@@ -2829,7 +2909,7 @@ export const createCompanySummary = ({id, companyName, companyDate, contacts, ad
             
         </div>         
     `;
-    return markup;
+    return { headerContent, contactsContent, addressesContent };
 };
 
 export const populateCompanySummary = ({ id, name }) => {
@@ -3108,22 +3188,7 @@ export const animateAdminLoadersOut = () => {
     );
 }
 
-export const animateTableContentIn = (table) => {
-    const tl = gsap.timeline();
 
-    return tl
-        .fromTo('.table__heading', {autoAlpha: 0, y: -15}, {autoAlpha: 1, y: 0,  duration: .4})
-        .fromTo(`.table--${table}`, {autoAlpha: 0},{autoAlpha: 1, duration: .8}, '<')
-        .from(`.row--${table}`, {
-            x: -15, 
-            autoAlpha: 0,
-            stagger: {
-                each: .12
-            },
-            ease: 'power2.out',
-        
-        }, '<')
-}
 export const animateTableBodyIn = (table) => {
     const tl = gsap.timeline()
 
@@ -3194,7 +3259,13 @@ export const initAdminSection = (tl, sectionName) => {
             ];
             break;
         case 'companies':
-            loaderContainers = [['.table-wrapper', 'admin-table'], ['.summary-wrapper', 'summary']];
+            loaderContainers = [
+                ['.table__content', 'admin-table'], 
+                ['.summary__section--contacts', 'summary-contacts'],
+                ['.summary__section--addresses', 'summary-addresses'],
+                ['.summary__section--company-jobs', 'summary-company-jobs']
+
+            ];
             break;
         case 'users':
             loaderContainers = [['.table-wrapper', 'admin-table'], ['.summary-wrapper', 'summary']];
@@ -3217,12 +3288,6 @@ export const initAdminSection = (tl, sectionName) => {
 
 } 
 
-// export const createContentTemplate = (page) => {
-//     const adminContent = document.createElement('div');
-//     adminContent.setAttribute('class', `admin__content admin__content--${page}`);
-
-//     return adminContent;
-// }
 export const createAdminTemplate = (page) => {
     const adminContent = document.createElement('div');
     adminContent.setAttribute('class', `admin__content admin__content--${page}`);
@@ -3233,7 +3298,7 @@ export const createAdminTemplate = (page) => {
         addSummaryWrapper(adminContent, page);
     } else if(page === 'companies') {
         addTableWrapper(adminContent, page);
-        addSummaryWrapper(adminContent, page);
+        addCompanySummaryTemplate(adminContent);
 
     } else if(page === 'applications') {
         addTableWrapper(adminContent, page);
@@ -3246,6 +3311,60 @@ export const createAdminTemplate = (page) => {
     return adminContent;
 }
 
+const addCompanySummaryTemplate = (adminContent) => {
+    // Create the summary, minus the content divs that'll be animated in after the axios request
+    const summaryWrapper = createSummaryElement('summary-wrapper summary-wrapper--companies');
+    const summary = createSummaryElement('summary summary--companies-page');
+    const details = createSummaryElement('summary__details summary__details--companies-page');
+    const header = createSummaryElement('summary__header');
+    const mainContent = createSummaryElement('summary__content summary__content--companies');
+
+    // Sections => Heading/Controls/Pagination
+    const contactsSection = createSummaryElement('summary__section summary__section--contacts');
+    const contactsHeading = createSummaryElement('summary__heading summary__heading--companies-page');
+    const contactControlsWrapper = createSummaryElement('summary__contact-controls-wrapper--companies-page');
+    const contactControls = createSummaryElement('summary__controls summary__contact-controls--companies-page');
+    const contactPagination = createPagination('company-contacts');
+
+    const addressesSection = createSummaryElement('summary__section summary__section--addresses');
+    const addressesHeading = createSummaryElement('summary__heading summary__heading--companies-page');
+    const addressControlsWrapper = createSummaryElement('summary__address-controls-wrapper--companies-page');
+    const addressControls = createSummaryElement('summary__controls summary__address-controls--companies-page');
+    const addressPagination = createPagination('company-addresses');
+
+    const jobsSection = createSummaryElement('summary__section summary__section--company-jobs');
+    const jobsTable = createTableContent('company-jobs');
+    const jobsHeading = createSummaryElement('summary__heading summary__heading--companies-page');
+    const jobsPagination = createPagination('company-jobs');
+
+    // Adding Heading Text
+    contactsHeading.innerText = 'Contacts';
+    addressesHeading.innerText = 'Addresses';
+    jobsHeading.innerText = 'Jobs';
+
+    mainContent.append(
+        contactsSection, 
+        contactControlsWrapper, 
+        addressesSection, 
+        addressControlsWrapper,
+        addressPagination, 
+        jobsSection,
+        jobsPagination
+    );
+    contactControlsWrapper.append(contactPagination, contactControls);
+    addressControlsWrapper.append(addressPagination, addressControls);
+
+    contactsSection.appendChild(contactsHeading);
+    addressesSection.appendChild(addressesHeading);
+    jobsSection.appendChild(jobsHeading);
+
+    jobsSection.appendChild(jobsTable);
+
+    details.append(header, mainContent);
+    summary.appendChild(details);
+    summaryWrapper.append(summary);
+    adminContent.append(summaryWrapper);
+}; 
 
 const addJobSummaryTemplate = (adminContent) => {
     // Create the summary, minus the content divs that'll be animated in after the axios request
@@ -3311,7 +3430,7 @@ const addSummaryWrapper = (adminContent, page) => {
 
     adminContent.appendChild(summary);
 }
-const addTableWrapper = (adminContent, page) => {
+const addTableWrapper = (container, page) => {
     // Create a table wrapper
     const tableWrapper = document.createElement('div');
     tableWrapper.setAttribute('class', `table-wrapper table-wrapper--${page}`);
@@ -3319,12 +3438,16 @@ const addTableWrapper = (adminContent, page) => {
     // Create a table header and a content wrapper
     const tableHeader = createTableHeader(page, `${page[0].toUpperCase()}${page.substring(1)}`);
     const tableContent = createTableContent(page);
-    const tablePagination = createTablePagination(page);
+    const tablePagination = createPagination(page);
 
     tableWrapper.append(tableHeader, tableContent, tablePagination);
 
-    adminContent.appendChild(tableWrapper);
+    container.appendChild(tableWrapper);
 }
+// const addNestedTable = (container, type) => {
+//     const tableContent = createTableContent(page);
+
+// } 
 
 export const createTableHeader = (page, title) => {
     const header = document.createElement('div');
@@ -3337,7 +3460,7 @@ const createTableContent = (page) => {
     content.setAttribute('class', `table__content table__content--${page}`);
     return content;
 };
-const createTablePagination = (page) => {
+const createPagination = (page) => {
     const pagination = document.createElement('div');
     pagination.setAttribute('class', `pagination-wrapper pagination-wrapper--${page}`);
     return pagination;
