@@ -1292,19 +1292,19 @@ export const calculateRows = (tableName, header, pagination) => {
     return numOfRows;
 }
 
-const getRemainingTableSpace = (table) => {
-    const numRows = table.querySelectorAll('tr').length;
-    const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * REM_TO_PX;
-    const tableHeight = table.getBoundingClientRect().height;
-    const spaceRemaining = tableHeight - (numRows * rowHeight);
-    return spaceRemaining;
-}
-export const jobBtnFits = () => {
-    const space = getRemainingTableSpace(document.querySelector('.table__content--company-jobs'));
-    // Allow 3 rows worth of space for the button
-    const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * REM_TO_PX;
-    return rowHeight * 3 <= space;
-};
+// const getRemainingTableSpace = (table) => {
+//     const numRows = table.querySelectorAll('tr').length;
+//     const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * REM_TO_PX;
+//     const tableHeight = table.getBoundingClientRect().height;
+//     const spaceRemaining = tableHeight - (numRows * rowHeight);
+//     return spaceRemaining;
+// }
+// export const jobBtnFits = () => {
+//     const space = getRemainingTableSpace(document.querySelector('.table__content--company-jobs'));
+//     // Allow 3 rows worth of space for the button
+//     const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * REM_TO_PX;
+//     return rowHeight * 3 <= space;
+// };
 
 export const getDeleteContactHtml = (contactId) => {
     const name = document.querySelector('.company-summary__field--name').innerText;
@@ -2073,7 +2073,7 @@ const createCompanyElement = ({ id, companyName, companyDate }) => {
 
 // For the nested table in the company summary
 export const formatCompanyJobs = (jobs) => {
-    const headers = ['Id','Title', 'Added'];
+    const headers = ['Id','Title', 'Location', 'Wage', 'Added'];
     const rows = jobs.map(job => {
         return createCompanyJobElement(job);
     });
@@ -2083,6 +2083,8 @@ const createCompanyJobElement = (job) => {
     const row = [
         `<td class="td-data--jobId" data-id=${job.jobId}>${job.jobId}</td>`,
         `<td class="td-data--title">${job.title}</td>`,
+        `<td class="td-data--location">${job.location}</td>`,
+        `<td class="td-data--wage">${job.wage}</td>`,
         `<td class="td-data--location">${job.jobDate}</td>`
     ];
     return row;
@@ -2118,7 +2120,7 @@ export const createNoJobsPlaceholder = () => {
             <div class="company-jobs-placeholder__add-link"><a>Add Job</a></div>
         </div>
     `;
-    return(markup);
+    return markup;
 }
 export const createUserJobsPlaceholder = () => {
     const markup = `
@@ -3335,7 +3337,10 @@ const addCompanySummaryTemplate = (adminContent) => {
     const jobsSection = createSummaryElement('summary__section summary__section--company-jobs');
     const jobsTable = createTableContent('company-jobs');
     const jobsHeading = createSummaryElement('summary__heading summary__heading--companies-page');
+    const jobsControlsWrapper = createSummaryElement('summary__jobs-controls-wrapper--companies-page');
     const jobsPagination = createPagination('company-jobs');
+    
+    const companyControls = createSummaryElement('summary__controls summary__company-controls--companies-page');
 
     // Adding Heading Text
     contactsHeading.innerText = 'Contacts';
@@ -3349,10 +3354,14 @@ const addCompanySummaryTemplate = (adminContent) => {
         addressControlsWrapper,
         addressPagination, 
         jobsSection,
-        jobsPagination
+        jobsControlsWrapper
     );
     contactControlsWrapper.append(contactPagination, contactControls);
-    addressControlsWrapper.append(addressPagination, addressControls);
+    addressControlsWrapper.append(addressControls);
+    // The jobs control wrapper contains the jobs pagination and the overall company controls
+    jobsControlsWrapper.append(jobsPagination, companyControls);
+
+        jobsHeading.append(addressPagination)
 
     contactsSection.appendChild(contactsHeading);
     addressesSection.appendChild(addressesHeading);

@@ -74,6 +74,9 @@ export const animateAdminLoadersOut = () => {
 export const animateTablePlaceholderIn = (placeholder) => {
     return gsap.fromTo(placeholder, { autoAlpha: 0 }, { autoAlpha: 1, duration: SPEED_MEDIUM });
 };
+export const animateTablePlaceholderOut = (placeholder) => {
+    return gsap.to(placeholder, { autoAlpha: 0, duration: SPEED_MEDIUM });
+}
 
 //// TABLES ////
 
@@ -112,7 +115,7 @@ export const animateTableBodyIn = (table) => {
 // @TODO: RENAME TO animatTableBodyOut & check that the tbody selector can be changed to a template string
 export const animateTableContentOut = (table) => {
     // const tableContent = document.querySelector(`.tbody--${table}`);
-    const tableContent = document.querySelector('tbody');
+    const tableContent = document.querySelector(`.tbody--${table}`);
     
     return (
       gsap.fromTo(tableContent, { autoAlpha: 1 }, {autoAlpha: 0, duration: SPEED_SLOW, immediateRender:false})

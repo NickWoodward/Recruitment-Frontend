@@ -339,7 +339,7 @@ export const insertNewJobSummary = (job) => {
 
 export const insertNewCompanySummary = (company) => {
     // Create new content
-    const { headerContent, contactsContent, addressesContent, contactsControls, addressesControls } = createCompanySummaryContent(company);
+    const { headerContent, contactsContent, addressesContent, contactsControls, addressesControls, companyControls } = createCompanySummaryContent(company);
     
     // Add new content
     document.querySelector('.summary__header').insertAdjacentHTML('afterbegin', headerContent);
@@ -347,8 +347,7 @@ export const insertNewCompanySummary = (company) => {
     document.querySelector('.summary__section--addresses').insertAdjacentHTML('beforeend', addressesContent);
     document.querySelector('.summary__contact-controls--companies-page').insertAdjacentHTML('beforeend', contactsControls);
     document.querySelector('.summary__address-controls--companies-page').insertAdjacentHTML('beforeend', addressesControls);
-
-    
+    document.querySelector('.summary__company-controls--companies-page').insertAdjacentHTML('beforeend', companyControls);
 }
 
 export const switchCompanySummary = (company) => {
@@ -360,10 +359,12 @@ const removeOldCompanySummary = () => {
     const oldHeaderContent = document.querySelector('.summary__header-content');
     const oldContactsContent = document.querySelector('.summary__section-content--contacts');
     const oldAddressesContent = document.querySelector('.summary__section-content--addresses');
-    const oldCompanyJobsTable = document.querySelector('.table__content--company-jobs');
 
     const oldContactControls = document.querySelector('.summary__controls-content--contacts');
     const oldAddressControls = document.querySelector('.summary__controls-content--addresses');
+    const oldCompanyControls = document.querySelector('.summary__controls-content--companies');
+
+    // The company-jobs element is handled as a table
 
     const items = [
         oldHeaderContent, 
@@ -371,7 +372,7 @@ const removeOldCompanySummary = () => {
         oldAddressesContent, 
         oldContactControls, 
         oldAddressControls,
-        oldCompanyJobsTable
+        oldCompanyControls
     ];
 
     // Remove old content
@@ -513,8 +514,34 @@ export const createCompanySummaryContent = ({id, companyName, companyDate, conta
         </div>
     `;
 
+    const companyControls = `
+       <div class="summary__controls-content summary__controls-content--companies">
+            <div class="summary__btn summary__new-company-btn--companies">
+                <svg class="summary__icon summary__new-company-icon--companies">
+                    <use xlink:href="svg/spritesheet.svg#add">
+                </svg>
+            </div>
+            <div class="summary__btn summary__edit-company-btn--companies">
+                <svg class="summary__icon summary__edit-company-icon--companies">
+                    <use xlink:href="svg/spritesheet.svg#edit-np1">
+                </svg>
+            </div>
+            <div class="summary__btn summary__hubspot-btn--companies">
+                <svg class="summary__icon summary__hubspot-icon--companies">
+                    <use xlink:href="svg/spritesheet.svg#hubspot">
+                </svg>
+            </div>
+            <div class="summary__btn summary__delete-company-btn--companies">
+                <svg class="summary__icon summary__delete-company-icon--companies">
+                    <use xlink:href="svg/spritesheet.svg#delete-np1">
+                </svg>
+            </div>
+        </div>
+    `;
+    
 
-    return { headerContent, contactsContent, addressesContent, contactsControls, addressesControls };
+
+    return { headerContent, contactsContent, addressesContent, contactsControls, addressesControls, companyControls };
 };
 
 //// END COMPANY SUMMARY VIEW ////

@@ -1,7 +1,8 @@
 import gsap from 'gsap';
+import Select from './customSelect';
 
 export const calculatePagination = (index, limit, totalItems) => {
-    console.log({index}, {limit}, {totalItems});
+    // console.log({index}, {limit}, {totalItems});
     // Work out how many pages (if there are no items default to 1)
     const pages = totalItems === 0? 1 : Math.ceil(totalItems / limit);
     // index/limit = zero index page number
@@ -11,7 +12,7 @@ export const calculatePagination = (index, limit, totalItems) => {
 }
 
 export const renderPagination = (pages, current, tableName) => {
-    console.log(pages, current, tableName)
+    // console.log(pages, current, tableName)
     const paginationWrapper = document.querySelector(`.pagination-wrapper--${tableName}`);
     // Remove pagination if present
     const paginationContent = document.querySelector(`.pagination__content--${tableName}`);
@@ -29,13 +30,25 @@ export const renderPagination = (pages, current, tableName) => {
     paginationWrapper.insertAdjacentHTML('beforeend', markup);
 }
 
+// const generatePaginationMarkup = (pages, current, table) => {
+//     let markup = '';
+//     for(let x = 0; x < pages; x++) {
+//         const temp = `
+//             <div class="pagination__item pagination__item--${table} pagination__item--${x+1} ${x === current? 'pagination__item--active':''}" data-id=${x}>
+//                 ${x+1}
+//             </div>`;
+//         markup += temp;
+//     }
+//     return markup;
+// };
+
 const generatePaginationMarkup = (pages, current, table) => {
     let markup = '';
     for(let x = 0; x < pages; x++) {
         const temp = `
-            <div class="pagination__item pagination__item--${table} pagination__item--${x+1} ${x === current? 'pagination__item--active':''}" data-id=${x}>
+            <select class="pagination__item pagination__item--${table} pagination__item--${x+1} ${x === current? 'pagination__item--active':''}" data-id=${x}>
                 ${x+1}
-            </div>`;
+            </select>`;
         markup += temp;
     }
     return markup;

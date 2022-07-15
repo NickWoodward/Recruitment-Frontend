@@ -594,32 +594,20 @@ class AdminController {
                         // // Add pagination for nested contacts, addresses, and jobs elements
                         this.addCompanyNestedPagination();
 
-                        // remove any companyJobs placeholders
-                        const placeholder = document.querySelector('.company-jobs-placeholder');
-                        if(placeholder) placeholder.parentElement.removeChild(placeholder);
+                        // // remove any companyJobs placeholders
+                        // const placeholder = document.querySelector('.company-jobs-placeholder');
+                        // if(placeholder) placeholder.parentElement.removeChild(placeholder);
 
                         // Render the summary company jobs table
-                        if(this.state.companies.paginatedJobs.length > 0) {
-                            this.renderCompanyJobsTable();
-
-                            // See if the add jobs element fits below the jobs list
-                            const addJobBtnFits = adminView.jobBtnFits();
-
-                            if(addJobBtnFits) {
-                                document.querySelector('.table__content--company-jobs')
-                                  .insertAdjacentHTML('afterbegin', adminView.createAddJobsLink());
-                            } else {
-                                document.querySelector('.table__content--company-jobs')
-                                .insertAdjacentHTML('afterbegin', adminView.createNoJobsPlaceholder());
-                            }
-                        } else {
+                        if(this.state.companies.paginatedJobs.length === 0) {
+                            this.renderCompanyJobsTable();  
                             // render a placeholder saying 'no jobs'
                             document.querySelector('.table__content--company-jobs')
-                                .insertAdjacentHTML('afterbegin', adminView.createNoJobsPlaceholder());
+                            .insertAdjacentHTML('beforeend', adminView.createNoJobsPlaceholder());
+                            // Animate the placeholder in
+                            animation.animateTablePlaceholderIn(document.querySelector('.company-jobs-placeholder'));   
+
                         } 
-                        // Animate the placeholder in
-                        animation.animateTablePlaceholderIn(document.querySelector('.company-jobs-placeholder'));
-                        
 
                         // this.addCompanySummaryListeners();
                         break;
@@ -896,7 +884,6 @@ class AdminController {
 
         // Paginate companyJobs array
         const { totalJobs: totalCompanyJobs, jobIndex: companyJobsIndex, jobLimit: companyJobsLimit } = this.state.companies.companyJobPagination;
-        console.log(totalCompanyJobs, companyJobsIndex, companyJobsLimit)
         const { 
             pages: numCompanyJobPages, 
             index: currentCompanyJobPage 
@@ -2859,26 +2846,24 @@ class AdminController {
     }
 
     renderCompanyJobsTable() {
-        console.log('renderCompanyJobsTable');
         // Format the paginated jobs into html elements
         const {headers, rows} = adminView.formatCompanyJobs(this.state.companies.paginatedJobs);
 
         const tableWrapper = document.querySelector('.table__content--company-jobs');
         const table = document.querySelector('.table--company-jobs');
+        const tbody = document.querySelector('.tbody--company-jobs');
 
         // If no table visible, render both the header and content
         if(!table) { 
             console.log('no table');
-            console.log('nestedTableWrapper', tableWrapper);
             tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('company-jobs', headers, rows, false));
             // Else remove the tbody and render just the content
         } else {
             console.log('table');
-            utils.removeElement(document.querySelector('tbody'));
-            document.querySelector('thead').insertAdjacentHTML('afterend', tableView.updateTableContent('company-jobs', rows));
+            if(tbody) tbody.parentElement.removeChild(tbody);
+            document.querySelector('.thead--company-jobs').insertAdjacentHTML('afterend', tableView.updateTableContent('company-jobs', rows));
         }
 
-        animation.animateTableContentIn('company-jobs')
     };
 
     renderCompaniesTable() {
@@ -2917,9 +2902,25 @@ class AdminController {
             row.addEventListener('click', e => {
                 const tl = gsap.timeline({ paused: true });
 
-                tl
-                  .add(animation.animateSummaryOut())
-                  .add(() => {
+                tl.add(animation.animateSummaryOut());
+
+                  // If there's a company-jobs tbody, animate its content out
+                  const tbody = document.querySelector('.tbody--company-jobs')
+                  if(tbody) {
+                      tl.add(animation.animateTableContentOut('company-jobs'), '<')
+                      tl.add(() => {
+                        tbody.parentElement.removeChild(tbody);
+                      });  
+                  }
+
+                  // Remove any companyJobs placeholders
+                  const placeholder = document.querySelector('.company-jobs-placeholder');
+                  if(placeholder) {
+                    tl.add(animation.animateTablePlaceholderOut(placeholder), '<');
+                    tl.add(() => placeholder.parentElement.removeChild(placeholder))
+                  }
+                  
+                  tl.add(() => {
                     // Putting the row selection and switching logic inside the timeline
                     // should minimise issues with fast successive clicks
                     const targetRow = e.target.closest('.row');
@@ -2939,35 +2940,34 @@ class AdminController {
                     // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
                     this.setCompanyJobsState();
                     
-                    // Add pagination for nested contacts, addresses, and jobs elements
-                    this.addCompanyNestedPagination();
+                    // // Add pagination for nested contacts, addresses, and jobs elements
+                    // this.addCompanyNestedPagination();
 
-                    // remove any companyJobs placeholders
-                    const placeholder = document.querySelector('.company-jobs-placeholder');
-                    if(placeholder) placeholder.parentElement.removeChild(placeholder);
 
-                    // Render the summary company jobs table
+                    // // Render the summary company jobs table
                     if(this.state.companies.paginatedJobs.length > 0) {
                         this.renderCompanyJobsTable();
+                        animation.animateTableBodyIn('company-jobs')
 
-                        // See if the add jobs element fits below the jobs list
-                        const addJobBtnFits = adminView.jobBtnFits();
+                        // // See if the add jobs element fits below the jobs list
+                        // const addJobBtnFits = adminView.jobBtnFits();
 
-                        if(addJobBtnFits) {
-                            document.querySelector('.table__content--company-jobs')
-                                .insertAdjacentHTML('beforeend', adminView.createAddJobsLink());
-                        } else {
-                            document.querySelector('.table__content--company-jobs')
-                            .insertAdjacentHTML('beforeend', adminView.createNoJobsPlaceholder());
-                        }
+                        // if(addJobBtnFits) {
+                        //     document.querySelector('.table__content--company-jobs')
+                        //         .insertAdjacentHTML('beforeend', adminView.createAddJobsLink());
+                        // } else {
+                        //     document.querySelector('.table__content--company-jobs')
+                        //     .insertAdjacentHTML('beforeend', adminView.createNoJobsPlaceholder());
+                        // }
                     } else {
                         // render a placeholder saying 'no jobs'
                         document.querySelector('.table__content--company-jobs')
                             .insertAdjacentHTML('beforeend', adminView.createNoJobsPlaceholder());
+                        // Animate the placeholder in
+                        animation.animateTablePlaceholderIn(document.querySelector('.company-jobs-placeholder'));
+                
                     } 
-                    // Animate the placeholder in
-                    animation.animateTablePlaceholderIn(document.querySelector('.company-jobs-placeholder'));
-                    
+
                     // Animate the summary back in
                     animation.animateSummaryIn();
                   });

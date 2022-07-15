@@ -4,8 +4,7 @@
     &--users,
     &--companies,
     &--applications,
-    &--company-jobs,
-    &--nested-user-jobs {
+    &--company-jobs {
         width: 100%;
     }
 }
@@ -35,9 +34,51 @@ td {
     padding: 0 var(--thead-padding);
 }
 
-.thead--jobs, .thead--applications, .thead--companies, .thead--company-jobs {
+.thead--jobs, .thead--applications, .thead--company-jobs {
     & th {
         padding: var(--thead-padding);
+    }
+}
+
+//// COMPANIES TABLE
+
+// Headers
+.thead--companies {
+    & .th--id {
+        width: 10rem;
+        padding: 2rem 3rem 2rem 3rem;
+        // border: 1px solid green;
+
+    }
+
+    & .th--name {
+        width: 100%;
+        padding: 0 2rem;
+        // border: 1px solid red;
+    }
+
+    & .th--added {
+        width: 10rem;
+        padding: 0 2rem 0 3rem;
+        text-align: end;
+        // border: 1px solid blue;
+
+    }
+}
+// Cells
+.table--companies {
+    & .td-data {
+        &--company-id {
+            width: 10rem;
+            padding: 0 2rem 0 3rem;
+        }
+        &--company-name {
+            // border: 1px solid red;
+            max-width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
     }
 }
 

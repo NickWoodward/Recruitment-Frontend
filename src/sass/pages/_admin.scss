@@ -231,7 +231,7 @@
             height: 24.5rem;
         }
         &--addresses {
-            // margin-top: 2.5rem;
+            margin-top: 2rem;
             grid-column: 1/8;
             height: 31.5rem;
         }
@@ -276,7 +276,8 @@
         &--companies {
             display: grid;
             grid-template-columns: repeat(16, minmax(0, 1fr));
-            grid-gap: 2rem;
+            grid-column-gap: 4rem;
+            grid-row-gap: 1.5rem;
         }
     }
 
@@ -557,11 +558,29 @@
         }
 
         &--companies-page {
-            // grid-column-end: 8;
-            // justify-self: end;
             display: flex;
             width: 15rem;
-            height: 6rem;
+            height: 5.5rem;
+            box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+            border-radius: 5px;
+            padding: 0 1rem 0 .5rem;
+
+        }
+    }
+    &__jobs-controls {
+        &-wrapper {
+            &--companies-page {
+                grid-column: 8/17;
+                display: flex;
+                justify-content: space-between;
+            }
+        }
+    }
+    &__company-controls {
+        &--companies-page {
+            display: flex;
+            width: 20rem;
+            height: 5.5rem;
             box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
             border-radius: 5px;
             padding: 0 1rem 0 .5rem;
@@ -576,7 +595,7 @@
         &-content {
             display: flex;
 
-            &--jobs, &--applications, &--contacts, &--addresses {
+            &--jobs, &--applications, &--contacts, &--addresses, &--companies {
                 display: flex;
                 justify-content: space-evenly;
                 align-items: center;
@@ -660,10 +679,14 @@
 
     &__new-contact-btn,
     &__new-address-btn,
+    &__new-company-btn,
     &__edit-contact-btn,
     &__edit-address-btn,
+    &__edit-company-btn,
+    &__hubspot-btn,
     &__delete-contact-btn,
-    &__delete-address-btn {
+    &__delete-address-btn,
+    &__delete-company-btn {
         &--companies {
             display: flex;
             align-items: center;
@@ -673,7 +696,8 @@
     }
 
     &__new-contact-btn,
-    &__new-address-btn {
+    &__new-address-btn,
+    &__new-company-btn {
         &--companies {
             height: 2.9rem;
             width: 2.9rem;
@@ -682,7 +706,8 @@
     }
 
     &__edit-contact-btn,
-    &__edit-address-btn {
+    &__edit-address-btn,
+    &__edit-company-btn {
         &--companies {
             height: 2.9rem;
             width: 2.9rem;
@@ -690,7 +715,8 @@
         }
     }
     &__delete-contact-btn,
-    &__delete-address-btn {
+    &__delete-address-btn,
+    &__delete-company-btn {
         &--companies {
             height: 2.9rem;
             width: 2.9rem;
@@ -769,12 +795,13 @@
     }
 
     &__hubspot-btn {
-        &--jobs {
+        &--jobs, &--companies {
             height: 2.6rem;
             width: 2.6rem;
             fill: #f8761f;
 
         }
+        
     }
     &__delete-job-btn {
         &--jobs {
@@ -2088,25 +2115,31 @@
 
 .pagination-wrapper {
  
-    box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
-    border-radius: 5px;
+    // box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+    // border-radius: 5px;
     
     &--applications, &--jobs, &--companies {
         display: flex;
         align-items: center;
-        height: 6rem;
+        height: 5.5rem;
         width: auto;
         min-width: 40%;
         margin-top: 2.5rem;
+    }
+    &--applications, &--jobs {
         margin-left: auto;
+    }
+    &--companies {
+        margin-right: auto;
     }
     &--company-contacts, &--company-addresses {
         display: flex;
         align-items: center;
-        height: 6rem;
+        height: 5.5rem;
         // flex-grow: 1;
         margin-right: 2rem;
         min-width: 40%;    
+        // visibility: hidden;
     }
     &--company-jobs {
         display: flex;
@@ -2150,8 +2183,10 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: .5rem 1rem;
-        font-size: 1.5rem;
+        // padding: .5rem 1rem;
+        // font-size: 1.5rem;
+        padding: .2rem .8rem;
+        font-size: 1.3rem;
         border: 1px solid lightgray;
 
         cursor: pointer;
@@ -2161,9 +2196,9 @@
         }
 
         &--active {
-            color: $color-secondary;
-            font-weight: 700;
-            border-bottom: 2px solid $color-secondary;
+            // color: $color-secondary;
+            // font-weight: 700;
+            // border-bottom: 2px solid $color-secondary;
         }
     }
 
