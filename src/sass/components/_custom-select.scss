@@ -1,4 +1,6 @@
 
+
+//// GENERIC STYLES ////
 .custom-select-container,
 .custom-select-value,
 .custom-select-options,
@@ -11,10 +13,12 @@
     display: inline-block;
     position: relative;
     font-family: inherit;
-    width: 100%;
+    // width: 100%;
+    z-index: 200;
 }
 
 .custom-select-value {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -26,6 +30,7 @@
 
     cursor: pointer;
     user-select: none;
+    z-index: 200;
 }
 .custom-select-value.placeholder {
     color: grey;
@@ -47,7 +52,7 @@
 }
 
 .custom-select-options {
-    display: none;
+    // display: none;
     position: absolute;
     padding: 1rem 0;
     margin:0;
@@ -60,7 +65,7 @@
     z-index: 102;
 } 
 .custom-select-options.show {
-    display: block;
+    // display: block;
 }
 
 .custom-select-group {
@@ -85,7 +90,6 @@
     height: 100%;
     padding: .3rem 1rem;
 }
-
 
 .custom-select-svg-wrapper {
     display: flex;
@@ -125,3 +129,105 @@
 }
 
 
+//// SPECIFIC STYLES THAT CAN BE DELETED FOR NEW PROJECTS ////
+.custom-select-container {
+    &--companies {
+        min-width: 2rem;
+        margin-right: 1.2rem;
+    }
+    &--companies.custom-select-container--companies-disabled {
+        margin-right: 0;
+    }
+
+    &--company-contacts, &--company-addresses, &--company-jobs {
+        min-width: 2rem;
+        margin-right: 1.2rem;
+    }
+    &--company-contacts.custom-select-container--company-contacts-disabled {
+        margin-right: 0;
+    } 
+    &--company-addresses.custom-select-container--company-addresses-disabled {
+        margin-right: 0;
+    } 
+    &--company-jobs.custom-select-container--company-jobs-disabled {
+        margin-right: 0;
+    } 
+}
+
+
+.custom-select-value {
+    &--companies {
+        font-size: 1.3rem;
+        // padding: .6rem .6rem;
+        border: none;
+        border-bottom: 1px solid #7293a5;
+    }
+    &--company-contacts, &--company-addresses, &--company-jobs {
+        font-size: 1.3rem;
+        // padding: .6rem .6rem;
+        border: none;
+        border-bottom: 1px solid firebrick;
+    }
+    &--company-contacts.placeholder, &--company-addresses.placeholder, &--company-jobs.placeholder{
+        color: black;
+    }
+
+    &--companies::after {
+        position:absolute;
+        right: -1rem;
+        margin-top: 6px;
+        border-top-color: #7293a5;
+    }
+    &--companies-disabled {
+        color: #7293a5 !important; // important because the placeholder class in the custom select is more specific
+        cursor: default;
+        pointer-events: none;
+        border: none;
+    }
+
+    &--companies.custom-select-value--companies-disabled::after {
+        visibility: hidden;
+    }
+    &--company-contacts.custom-select-value--company-contacts-disabled::after {
+        visibility: hidden;
+    }
+    &--company-addresses.custom-select-value--company-addresses-disabled::after {
+        visibility: hidden;
+    }
+    &--company-jobs.custom-select-value--company-jobs-disabled::after {
+        visibility: hidden;
+    }
+    
+
+    &--company-contacts, &--company-addresses, &--company-jobs {
+        &::after {
+            position:absolute;
+            right: -1rem;
+            margin-top: 6px;
+            border-top-color: black;
+        }
+        &-disabled {
+            color: lightgray!important;
+            cursor: default;
+            pointer-events: none;
+            border: none;
+        }
+    }
+    
+}
+
+.custom-select-options {
+    &--companies, &--company-contacts, &--company-addresses, &--company-jobs {
+        font-size: 1.3rem;
+        padding: .1rem 0;
+        // margin-top: .5rem;
+    }
+}
+
+.custom-select-option {
+    &--companies, &--company-contacts, &--company-addresses, &--company-jobs {
+        padding: .6rem 0;
+        justify-content: center;
+        color: black;
+    }
+}

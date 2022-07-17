@@ -3356,12 +3356,14 @@ const addCompanySummaryTemplate = (adminContent) => {
         jobsSection,
         jobsControlsWrapper
     );
-    contactControlsWrapper.append(contactPagination, contactControls);
+    contactControlsWrapper.append(contactControls);
     addressControlsWrapper.append(addressControls);
     // The jobs control wrapper contains the jobs pagination and the overall company controls
-    jobsControlsWrapper.append(jobsPagination, companyControls);
+    jobsControlsWrapper.append(companyControls);
 
-        jobsHeading.append(addressPagination)
+    addressesHeading.append(addressPagination);
+    contactsHeading.append(contactPagination);
+    jobsHeading.append(jobsPagination);
 
     contactsSection.appendChild(contactsHeading);
     addressesSection.appendChild(addressesHeading);
@@ -3449,7 +3451,17 @@ const addTableWrapper = (container, page) => {
     const tableContent = createTableContent(page);
     const tablePagination = createPagination(page);
 
-    tableWrapper.append(tableHeader, tableContent, tablePagination);
+    switch(page) {
+        case 'companies': {
+            tableHeader.append(tablePagination);
+            tableWrapper.append(tableHeader, tableContent);
+            console.log('HAHAHAHA');
+            break;
+        }
+        default: {
+            tableWrapper.append(tableHeader, tableContent, tablePagination);
+        }
+    }
 
     container.appendChild(tableWrapper);
 }

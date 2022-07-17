@@ -2941,7 +2941,7 @@ class AdminController {
                     this.setCompanyJobsState();
                     
                     // // Add pagination for nested contacts, addresses, and jobs elements
-                    // this.addCompanyNestedPagination();
+                    this.addCompanyNestedPagination();
 
 
                     // // Render the summary company jobs table

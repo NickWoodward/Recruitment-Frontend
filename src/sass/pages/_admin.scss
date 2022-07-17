@@ -2118,7 +2118,7 @@
     // box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
     // border-radius: 5px;
     
-    &--applications, &--jobs, &--companies {
+    &--applications, &--jobs {
         display: flex;
         align-items: center;
         height: 5.5rem;
@@ -2126,27 +2126,28 @@
         min-width: 40%;
         margin-top: 2.5rem;
     }
+    &--companies {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+        margin-right: 2rem;
+    }
     &--applications, &--jobs {
         margin-left: auto;
     }
-    &--companies {
-        margin-right: auto;
-    }
+
     &--company-contacts, &--company-addresses {
         display: flex;
         align-items: center;
         height: 5.5rem;
-        // flex-grow: 1;
-        margin-right: 2rem;
-        min-width: 40%;    
-        // visibility: hidden;
+
     }
     &--company-jobs {
         display: flex;
         align-items: center;
-        width: 20.3rem;
-        grid-column-end: 17;
-        justify-self: end;
+        // width: 20.3rem;
+        // grid-column-end: 17;
+        // justify-self: end;
     }
 
 }
@@ -2210,14 +2211,16 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 8rem;
+        // width: 8rem;
         padding: .5rem 1rem;
         font-size: 1.5rem;
         cursor: pointer;
 
         &--inactive {
+            // color: lightgray;
             color: lightgray;
             cursor: default;
+            pointer-events: none;
         }
     }
    

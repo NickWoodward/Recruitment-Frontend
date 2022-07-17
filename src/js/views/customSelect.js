@@ -1,11 +1,15 @@
+import gsap from 'gsap';
+
 export default class Select {
-    constructor(select) {
+    constructor(select, modifiers = [], selectIcon = true) {
       this.sourceSelect = select
       this.placeholder = this.sourceSelect.querySelector(`[disabled="disabled"]`)?.value
       this.selectOptions = getFormattedOptions(select.querySelectorAll("option"))
       this.customSelect = document.createElement("div")
       this.customLabel = document.createElement("span")
       this.customOptions = document.createElement("ul")
+      this.customClassModifiers = modifiers;
+      this.customIcon = selectIcon;
 
       setupCustomElement(this)
 
@@ -63,9 +67,16 @@ export default class Select {
   
   function setupCustomElement(select) {
     select.customSelect.classList.add("custom-select-container")
+    if(select.customClassModifiers.length > 0) {
+      select.customClassModifiers.forEach(modifier => select.customSelect.classList.add(`custom-select-container--${modifier}`))
+    }
     select.customSelect.tabIndex = 0
   
     select.customLabel.classList.add("custom-select-value")
+    if(select.customClassModifiers.length > 0) {
+      select.customClassModifiers.forEach(modifier => select.customLabel.classList.add(`custom-select-value--${modifier}`))
+    }
+
     // Placeholder removed when any option selected
     select.customLabel.classList.add("placeholder")
 
@@ -73,6 +84,10 @@ export default class Select {
     select.customSelect.append(select.customLabel)
   
     select.customOptions.classList.add("custom-select-options")
+    if(select.customClassModifiers.length > 0) {
+      select.customClassModifiers.forEach(modifier => select.customOptions.classList.add(`custom-select-options--${modifier}`))
+    }
+
 
     let group
 
@@ -81,6 +96,10 @@ export default class Select {
 
       const optionElement = document.createElement("li")
       optionElement.classList.add("custom-select-option")
+      if(select.customClassModifiers.length > 0) {
+        select.customClassModifiers.forEach(modifier => optionElement.classList.add(`custom-select-option--${modifier}`))
+      }
+
       optionElement.classList.toggle("selected", option.selected)
       optionElement.dataset.value = option.value
       optionElement.dataset.group = option.group
@@ -89,31 +108,38 @@ export default class Select {
       titleElement.classList.add('custom-select-title')
       titleElement.innerText = option.label
 
-      const svgWrapper = document.createElement('div')
-      svgWrapper.className = 'custom-select-svg-wrapper'
-      const selectedSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-      const path1 = document.createElementNS("http://www.w3.org/2000/svg", 'path')
-      selectedSvg.setAttribute("aria-hidden","true")
-      selectedSvg.setAttribute('viewBox', '0 0 512 512')
+      let svgWrapper;
+
+      if(select.customIcon) {
+        svgWrapper = document.createElement('div')
+        svgWrapper.className = 'custom-select-svg-wrapper'
+
+        const selectedSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+        const path1 = document.createElementNS("http://www.w3.org/2000/svg", 'path')
+        selectedSvg.setAttribute("aria-hidden","true")
+        selectedSvg.setAttribute('viewBox', '0 0 512 512')
 
 
-      selectedSvg.setAttribute('class', 'custom-select-svg');
-      selectedSvg.classList.toggle("selected", option.selected)
+        selectedSvg.setAttribute('class', 'custom-select-svg');
+        selectedSvg.classList.toggle("selected", option.selected)
 
-      path1.setAttribute('d', `M461.6,109.6l-54.9-43.3c-1.7-1.4-3.8-2.4-6.2-2.4c-2.4,0-4.6,1-6.3,2.5L194.5,323c0,0-78.5-75.5-80.7-77.7
-      c-2.2-2.2-5.1-5.9-9.5-5.9c-4.4,0-6.4,3.1-8.7,5.4c-1.7,1.8-29.7,31.2-43.5,45.8c-0.8,0.9-1.3,1.4-2,2.1c-1.2,1.7-2,3.6-2,5.7
-      c0,2.2,0.8,4,2,5.7l2.8,2.6c0,0,139.3,133.8,141.6,136.1c2.3,2.3,5.1,5.2,9.2,5.2c4,0,7.3-4.3,9.2-6.2L462,121.8
-      c1.2-1.7,2-3.6,2-5.8C464,113.5,463,111.4,461.6,109.6z`);
-      path1.setAttribute('fill', '#000000');
+        path1.setAttribute('d', `M461.6,109.6l-54.9-43.3c-1.7-1.4-3.8-2.4-6.2-2.4c-2.4,0-4.6,1-6.3,2.5L194.5,323c0,0-78.5-75.5-80.7-77.7
+        c-2.2-2.2-5.1-5.9-9.5-5.9c-4.4,0-6.4,3.1-8.7,5.4c-1.7,1.8-29.7,31.2-43.5,45.8c-0.8,0.9-1.3,1.4-2,2.1c-1.2,1.7-2,3.6-2,5.7
+        c0,2.2,0.8,4,2,5.7l2.8,2.6c0,0,139.3,133.8,141.6,136.1c2.3,2.3,5.1,5.2,9.2,5.2c4,0,7.3-4.3,9.2-6.2L462,121.8
+        c1.2-1.7,2-3.6,2-5.8C464,113.5,463,111.4,461.6,109.6z`);
+        path1.setAttribute('fill', '#000000');
 
-      selectedSvg.appendChild(path1);
-      svgWrapper.appendChild(selectedSvg);
+        selectedSvg.appendChild(path1);
+        svgWrapper.appendChild(selectedSvg);
+      }
 
       optionElement.addEventListener("click", () => {
         
         select.selectValue(option.value, option.group)
         select.customOptions.classList.remove("show")
         select.customSelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+        gsap.fromTo('.custom-select-options', {autoAlpha:0},{autoAlpha:1});
       })
 
       // Add option groups if present
@@ -134,7 +160,9 @@ export default class Select {
         }
       }
 
-      optionElement.append(svgWrapper)
+      if(select.customIcon) {
+        optionElement.append(svgWrapper)
+      }
 
       optionElement.append(titleElement);
       select.customOptions.append(optionElement)
@@ -142,9 +170,20 @@ export default class Select {
 
     })
     select.customSelect.append(select.customOptions)
+
+    // Set the customOptions to autoAlpha 0
+    gsap.set(select.customOptions, { autoAlpha:0 })
   
     select.customLabel.addEventListener("click", () => {
       select.customOptions.classList.toggle("show")
+      const visible = select.customOptions.classList.contains("show");
+      console.log(visible);
+      if(visible) {
+        gsap.fromTo(select.customOptions, { autoAlpha:0, y: -20 }, { autoAlpha:1, y:0, ease: 'ease-out' })
+      } else {
+        gsap.fromTo(select.customOptions, { autoAlpha:1, y: 0 }, { autoAlpha:0, y:-20, ease: 'ease-in' })
+
+      }
 
     })
   
