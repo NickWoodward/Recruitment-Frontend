@@ -3352,7 +3352,7 @@ const addCompanySummaryTemplate = (adminContent) => {
         contactControlsWrapper, 
         addressesSection, 
         addressControlsWrapper,
-        addressPagination, 
+        // addressPagination, 
         jobsSection,
         jobsControlsWrapper
     );
@@ -3452,10 +3452,10 @@ const addTableWrapper = (container, page) => {
     const tablePagination = createPagination(page);
 
     switch(page) {
+        case 'jobs':
         case 'companies': {
             tableHeader.append(tablePagination);
             tableWrapper.append(tableHeader, tableContent);
-            console.log('HAHAHAHA');
             break;
         }
         default: {

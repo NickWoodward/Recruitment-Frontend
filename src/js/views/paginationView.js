@@ -1,5 +1,6 @@
 import gsap from 'gsap';
 import Select from './customSelect';
+import { getPaginationSelectAnimations } from '../animations/adminAnimation';
 
 export const calculatePagination = (index, limit, totalItems) => {
     // console.log({index}, {limit}, {totalItems});
@@ -72,7 +73,8 @@ export const renderPagination = (pages, current, tableName) => {
     const select = paginationWrapper.querySelector('select');
     const selectClassNames = [tableName];
     if(pages === 1) selectClassNames.push(`${tableName}-disabled`);
-    new Select(select, selectClassNames, false);
+    const animations = getPaginationSelectAnimations();
+    new Select({select, modifiers: selectClassNames, selectIcon:false, animations});
 
     // const markup = `
     //     <div class="pagination__content pagination__content--${tableName}">

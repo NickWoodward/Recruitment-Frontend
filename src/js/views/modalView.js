@@ -1,5 +1,6 @@
 import {gsap} from 'gsap';
 
+import { getSelectAnimations } from '../animations/adminAnimation';
 import Select from './customSelect';
 
 export const getAlert = (msg, success) => {
@@ -115,7 +116,7 @@ const populateApplicationModal = ({ jobs, users }) => {
         userInput.add(option, undefined);
     });
 
-    [jobsInput, userInput].forEach(select => {return new Select(select)});
+    [jobsInput, userInput].forEach(select => {return new Select({select, animations: getSelectAnimations()})});
 }
 
 
@@ -540,7 +541,7 @@ const populateNewJobModal = ({companies, jobTypes, jobPositions, jobPqes}) => {
         featuredSelect.add(option); 
     });
     // Create Custom Selects
-    selects.forEach(select => new Select(select[0]));
+    selects.forEach(select => new Select({select: select[0], animations: getSelectAnimations()}));
 };
 
 const populateEditJobModal = ({companies, job, jobTypes, jobPositions, jobPqes}) => {
@@ -592,7 +593,7 @@ const populateEditJobModal = ({companies, job, jobTypes, jobPositions, jobPqes})
         featuredSelect.add(option); 
     });
 
-    selects.forEach(select => new Select(select));
+    selects.forEach(select => new Select({select, animations: getSelectAnimations()}));
 };
 
 

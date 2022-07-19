@@ -2902,7 +2902,9 @@ class AdminController {
             row.addEventListener('click', e => {
                 const tl = gsap.timeline({ paused: true });
 
-                tl.add(animation.animateSummaryOut());
+                // Table pagination animates out separately to pagination in summary headings
+                tl.add(animation.animateSummaryOut())
+                  .add(animation.animateTablePaginationOut(document.querySelector('.pagination__content--companies')), '<')
 
                   // If there's a company-jobs tbody, animate its content out
                   const tbody = document.querySelector('.tbody--company-jobs')

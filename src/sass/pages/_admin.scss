@@ -2118,7 +2118,7 @@
     // box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
     // border-radius: 5px;
     
-    &--applications, &--jobs {
+    &--applications {
         display: flex;
         align-items: center;
         height: 5.5rem;
@@ -2126,7 +2126,7 @@
         min-width: 40%;
         margin-top: 2.5rem;
     }
-    &--companies {
+    &--companies, &--jobs {
         display: flex;
         align-items: center;
         margin-left: auto;
@@ -2165,6 +2165,8 @@
         display: flex;
         justify-content: space-between;
         width: 100%;
+
+
     } 
 
     
@@ -2218,7 +2220,7 @@
 
         &--inactive {
             // color: lightgray;
-            color: lightgray;
+            color: lighten(grey, 10%);
             cursor: default;
             pointer-events: none;
         }

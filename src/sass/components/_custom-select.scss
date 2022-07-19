@@ -14,7 +14,6 @@
     position: relative;
     font-family: inherit;
     // width: 100%;
-    z-index: 200;
 }
 
 .custom-select-value {
@@ -30,7 +29,6 @@
 
     cursor: pointer;
     user-select: none;
-    z-index: 200;
 }
 .custom-select-value.placeholder {
     color: grey;
@@ -62,7 +60,7 @@
     max-height: 20rem;
     overflow-y: auto;
     background-color: white;
-    z-index: 102;
+    z-index: 202;
 } 
 .custom-select-options.show {
     // display: block;
@@ -99,12 +97,12 @@
 }
 
 .custom-select-svg {
-    display: none;
+    // display: none;
     width: 12px;
     height: 12px;
 }
 .custom-select-svg.selected {
-    display: block;
+    // display: block;
 }
 
 .custom-select-option {
@@ -131,11 +129,15 @@
 
 //// SPECIFIC STYLES THAT CAN BE DELETED FOR NEW PROJECTS ////
 .custom-select-container {
-    &--companies {
+    // These 2 are in a table head
+    &--companies, &--jobs {
         min-width: 2rem;
         margin-right: 1.2rem;
     }
     &--companies.custom-select-container--companies-disabled {
+        margin-right: 0;
+    }
+    &--jobs.custom-select-container--jobs-disabled {
         margin-right: 0;
     }
 
@@ -156,7 +158,7 @@
 
 
 .custom-select-value {
-    &--companies {
+    &--companies, &--jobs {
         font-size: 1.3rem;
         // padding: .6rem .6rem;
         border: none;
@@ -172,19 +174,20 @@
         color: black;
     }
 
-    &--companies::after {
+    &--companies::after, &--jobs::after {
         position:absolute;
         right: -1rem;
         margin-top: 6px;
         border-top-color: #7293a5;
     }
-    &--companies-disabled {
-        color: #7293a5 !important; // important because the placeholder class in the custom select is more specific
+    &--companies-disabled, &--jobs-disabled {
+        color: lighten(grey, 10%) !important; // important because the placeholder class in the custom select is more specific
         cursor: default;
         pointer-events: none;
         border: none;
     }
 
+    &--jobs.custom-select-value--jobs-disabled::after,
     &--companies.custom-select-value--companies-disabled::after {
         visibility: hidden;
     }
@@ -207,7 +210,7 @@
             border-top-color: black;
         }
         &-disabled {
-            color: lightgray!important;
+            color: lighten(grey, 10%)!important;
             cursor: default;
             pointer-events: none;
             border: none;

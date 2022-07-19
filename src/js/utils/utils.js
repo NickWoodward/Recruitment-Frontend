@@ -175,4 +175,4 @@ export const getInnerDimensions = (element) => {
     return { elementWidth, elementHeight };
 }
 
-export const createSelect = (select) => new Select(select);
+export const createSelect = (select) => new Select({select});

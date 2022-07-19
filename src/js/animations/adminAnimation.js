@@ -78,6 +78,40 @@ export const animateTablePlaceholderOut = (placeholder) => {
     return gsap.to(placeholder, { autoAlpha: 0, duration: SPEED_MEDIUM });
 }
 
+//// PAGINATION ////
+export const animateTablePaginationOut = (element) => {
+    console.log(element.children);
+    return gsap.to(element.children, { 
+        autoAlpha: 0, 
+        y: -10, 
+        stagger: SPEED_FASTEST, 
+        onStart: () => console.log('TablePaginationOut')
+    });
+}
+
+export const getPaginationSelectAnimations = () => {
+    return [ animatePaginationSelectOut, animatePaginationSelectIn ];
+}
+
+const animatePaginationSelectOut = (element) => {
+    return gsap.fromTo(element, { autoAlpha:1, y: 0 }, { autoAlpha:0, y:-10, duration: SPEED_FASTER, ease: 'ease-in' })
+}
+const animatePaginationSelectIn = (element) => {
+    return gsap.fromTo(element, { autoAlpha:0, y: -10 }, { autoAlpha:1, y:0, duration: SPEED_FASTER, ease: 'ease-out' })
+} 
+
+//// SELECT ////
+export const getSelectAnimations = () => {
+    return [ animateSelectOut, animateSelectIn ];
+}
+
+const animateSelectOut = (element) => {
+    return gsap.fromTo(element, { autoAlpha:1 }, { autoAlpha:0, duration: SPEED_FASTER, ease: 'ease-in', immediateRender:false  })
+}
+const animateSelectIn = (element) => {
+    return gsap.fromTo(element, { autoAlpha:0 }, { autoAlpha:1, duration: SPEED_FASTER, ease: 'ease-out'})
+}
+
 //// TABLES ////
 
 export const animateTableContentIn = (table) => {
@@ -165,7 +199,7 @@ export const animateSummaryOut = () => {
     if(element) tl.add(animateSummaryModalOut(element));
 
     tl
-    .fromTo('.summary__header-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -10 })
+    .fromTo('.summary__header-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -10, onStart: () => console.log('TableSummaryOut')})
     .fromTo('.summary__section-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y:-10, stagger: SPEED_FASTEST }, '<0.1')
     .fromTo('.summary__btn', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y:10, stagger: { from: 'end', each: SPEED_FASTEST } }, '<');
 
