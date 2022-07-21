@@ -7,6 +7,10 @@
     &--company-jobs {
         width: 100%;
     }
+
+    &--company-jobs {
+        table-layout: fixed;
+    }
 }
 
 .cv-wrapper {
@@ -79,6 +83,17 @@ td {
             white-space: nowrap;
             text-overflow: ellipsis;
         }
+    }
+    
+}
+
+//// COMPANY-JOBS TABLE 
+.thead--company-jobs {
+    & .th--id {
+        width: 3rem;
+    }
+    & .th--added {
+        // width: 2rem;
     }
 }
 

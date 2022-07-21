@@ -3,10 +3,7 @@ import * as loader from '../views/loader';
 
 const SPEED_TEST = 2;
 const SPEED_SLOW = 1;
-const SPEED_MEDIUM = .8;
-const SPEED_FAST = .4;
-const SPEED_FASTER = .2;
-const SPEED_FASTEST = .1;
+
 
 //// ALERTS ////
 
@@ -35,14 +32,14 @@ export const animateAlert = (alertWrapper, paused) => {
 export const animateSummaryModalIn = (modal) => {
     gsap.fromTo(modal, 
     { autoAlpha: 0,  }, 
-    { autoAlpha: 1, duration: SPEED_FASTER }
+    { autoAlpha: 1, duration: .2 }
 );
 }
 
 export const animateSummaryModalOut = (modal) => {
     return gsap.to(modal, {
         autoAlpha: 0,
-        duration: SPEED_FASTER,
+        duration: .2,
         onComplete: () => {
             modal.parentElement.removeChild(modal);
         }
@@ -61,7 +58,7 @@ export const animateAdminLoadersOut = () => {
         { autoAlpha: 1 }, 
         { 
             autoAlpha: 0, 
-            duration: SPEED_FASTER,
+            duration:.2,
             immediateRender: false,
             onComplete: () => {
                 loader.clearLoaders()
@@ -72,10 +69,14 @@ export const animateAdminLoadersOut = () => {
 
 //// PLACEHOLDERS ////
 export const animateTablePlaceholderIn = (placeholder) => {
-    return gsap.fromTo(placeholder, { autoAlpha: 0 }, { autoAlpha: 1, duration: SPEED_MEDIUM });
+    return gsap.fromTo(placeholder, { autoAlpha: 0 }, { autoAlpha: 1, duration: .4 });
 };
 export const animateTablePlaceholderOut = (placeholder) => {
-    return gsap.to(placeholder, { autoAlpha: 0, duration: SPEED_MEDIUM });
+    return gsap.to(placeholder, { 
+        autoAlpha: 0, 
+        duration: .4, 
+        onComplete: () => placeholder.parentElement.removeChild(placeholder) 
+    });
 }
 
 //// PAGINATION ////
@@ -84,8 +85,7 @@ export const animateTablePaginationOut = (element) => {
     return gsap.to(element.children, { 
         autoAlpha: 0, 
         y: -10, 
-        stagger: SPEED_FASTEST, 
-        onStart: () => console.log('TablePaginationOut')
+        stagger: .1, 
     });
 }
 
@@ -94,10 +94,10 @@ export const getPaginationSelectAnimations = () => {
 }
 
 const animatePaginationSelectOut = (element) => {
-    return gsap.fromTo(element, { autoAlpha:1, y: 0 }, { autoAlpha:0, y:-10, duration: SPEED_FASTER, ease: 'ease-in' })
+    return gsap.fromTo(element, { autoAlpha:1, y: 0 }, { autoAlpha:0, y:-10, duration:.2, ease: 'ease-in' })
 }
 const animatePaginationSelectIn = (element) => {
-    return gsap.fromTo(element, { autoAlpha:0, y: -10 }, { autoAlpha:1, y:0, duration: SPEED_FASTER, ease: 'ease-out' })
+    return gsap.fromTo(element, { autoAlpha:0, y: -10 }, { autoAlpha:1, y:0, duration:.2, ease: 'ease-out' })
 } 
 
 //// SELECT ////
@@ -106,10 +106,10 @@ export const getSelectAnimations = () => {
 }
 
 const animateSelectOut = (element) => {
-    return gsap.fromTo(element, { autoAlpha:1 }, { autoAlpha:0, duration: SPEED_FASTER, ease: 'ease-in', immediateRender:false  })
+    return gsap.fromTo(element, { autoAlpha:1 }, { autoAlpha:0, duration:.2, ease: 'ease-in', immediateRender:false  })
 }
 const animateSelectIn = (element) => {
-    return gsap.fromTo(element, { autoAlpha:0 }, { autoAlpha:1, duration: SPEED_FASTER, ease: 'ease-out'})
+    return gsap.fromTo(element, { autoAlpha:0 }, { autoAlpha:1, duration:.2, ease: 'ease-out'})
 }
 
 //// TABLES ////
@@ -135,7 +135,7 @@ export const animateTableBodyIn = (table) => {
     const tl = gsap.timeline()
 
     return tl
-        .fromTo(`.tbody--${table}`, {autoAlpha: 0},{autoAlpha: 1, duration: SPEED_FAST})
+        .fromTo(`.tbody--${table}`, {autoAlpha: 0},{autoAlpha: 1, duration: .2})
         .from(`.row--${table}`, {
             x: -15, 
             autoAlpha: 0,
@@ -161,47 +161,221 @@ export const animateTableContentOut = (table) => {
 
 export const animateSummaryIn = (firstAnimation) => {
     const tl = gsap.timeline();
+    console.log('SUMMARY IN');
 
     // Slower animations on first render
-    const duration = firstAnimation? SPEED_FASTER:SPEED_FASTEST;
+    const duration = firstAnimation? .4:.3;
 
-    tl
-    .fromTo('.summary__item--header', { autoAlpha: 0, y: 10 },{ autoAlpha: 1, y: 0 })
-    .fromTo('.summary__section-content', { autoAlpha: 0, y: 10 },{ autoAlpha: 1, y: 0, stagger: duration }, `<${duration}`)
-    .fromTo('.summary__btn', 
-        { autoAlpha: 0, y: 10 },
-        { 
-            autoAlpha: 1, 
-            y: function(index, target, targets) {
-                if(index === 0) return 1;
-                return 0;
+        tl
+        .fromTo('.summary__item--header', { autoAlpha: 0, y: 15 },{ autoAlpha: 1, y: 0, stagger: duration })
+        .fromTo('.summary__section-content', { autoAlpha: 0, y: 15 },{ autoAlpha: 1, y: 0, stagger: duration }, `<.1`)
+        .fromTo('.summary__btn', 
+            { autoAlpha: 0, y: 10 },
+            { 
+                autoAlpha: 1, 
+                y: function(index, target, targets) {
+                    if(index === 0) return 1;
+                    return 0;
+                }, 
+                stagger: { from: 'end', each: .1 } 
             }, 
-            stagger: { from: 'end', each: SPEED_FASTEST } 
-        }, '<')    
-    
+        '<');
+ 
+
     return tl;
 }
 
-export const animateSummaryOut = () => {
-    const tl = gsap.timeline({
-        defaults: { 
-            duration: SPEED_FASTER,
-            immediateRender: false 
-        },
-    });
+export const animateCompanySummaryIn = (jobsLength) => {
+    const tl = gsap.timeline()
+      .add(animateHeadingIn(), '<')
+      .add(animateContactSectionIn(), `<.06`);
+
+      if(jobsLength > 0) {
+        //   tl.add(animateTableBodyIn('company-jobs'), `<.2`);
+          // OR
+          tl.add(animateCompanyJobSectionIn(document.querySelector('.tbody--company-jobs')), '<')
+
+      } else {
+          tl.add(animateTablePlaceholderIn(document.querySelector('.company-jobs-placeholder')), '<')
+      }
+
+    tl.fromTo('.pagination__content--company-jobs', {autoAlpha: 0, y:3 }, {autoAlpha:1, y: 0, duration: .35, ease: 'ease-out'}, '<')
+    .add(animateContactControlsIn(), `<`)
+    .add(animateAddressSectionIn(), `<.06`)
+    .add(animateAddressControlsIn(), `<`)
+    .add(animateCompanyJobControlsIn(), `<`);
+
+    return tl;
+}
+
+export const animateSummaryOut = (page) => {
+    const tl = gsap.timeline();
 
     // Check for modals to remove
     const modal = document.querySelector('.summary__modal');
     const confirmation = document.querySelector('.confirmation');
     const element = modal || confirmation;
 
-    // if(element) tl.fromTo(element, { autoAlpha: 1 }, { autoAlpha: 0, duration: 2, onComplete: () => { element.parentElement.removeChild(element) } });
     if(element) tl.add(animateSummaryModalOut(element));
 
-    tl
-    .fromTo('.summary__header-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -10, onStart: () => console.log('TableSummaryOut')})
-    .fromTo('.summary__section-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y:-10, stagger: SPEED_FASTEST }, '<0.1')
-    .fromTo('.summary__btn', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y:10, stagger: { from: 'end', each: SPEED_FASTEST } }, '<');
+    switch(page) {
+        case 'companies': {
+            tl.add(animateCompanySummaryOut());
+        
+            break;
+        }
+        default:
+            // tl
+            // .fromTo('.summary__header-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -10 , duration: .3})
+            // .fromTo('.summary__section-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y:-10, stagger: { each: .1 } }, '<')
+            // .fromTo('.summary__btn', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y:10, stagger: { from: 'end', each: .1 } }, '<');
+            // console.log(tl.getChildren());
+            
+        tl
+        .fromTo('.summary__item--header', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -15, stagger: .2 })
+        .fromTo('.summary__section-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -15 }, `<.1`)
+        .fromTo('.summary__btn', 
+            { autoAlpha: 1, y: 0 },
+            { 
+                autoAlpha: 0, 
+                y:15, 
+                stagger: { from: 'end', each: .1 } 
+            }, 
+        '<');
+    }
 
     return tl;
+}
+
+const animateCompanySummaryOut = () => {
+
+    const tl = gsap.timeline()
+        .add(animateHeadingOut())
+        .add(animateContactSectionOut(), `<.06`)
+
+    const tbody = document.querySelector('.tbody--company-jobs');
+
+    // If there's a tbody, animate it out and remove it
+    if(tbody) {
+        tl.add(animateCompanyJobSectionOut(tbody), `<`);
+    } 
+
+    // If there's a placeholder animate it out and remove it
+    const placeholder = document.querySelector('.company-jobs-placeholder');
+    if(placeholder) {
+        tl.add(animateTablePlaceholderOut(placeholder), '<');
+    }
+    
+
+    tl.to('.pagination__content--company-jobs', {autoAlpha: 0, y:3, duration: .3, ease: 'ease-out'}, '<')
+      .add(animateContactControlsOut(), `<`)
+      .add(animateAddressSectionOut(), `<.06`)
+      .add(animateAddressControlsOut(), `<`)
+      .add(animateCompanyJobControlsOut(), `<`);
+
+    return tl;
+}
+
+
+const animateHeadingOut = () => {
+    return gsap.to(
+        '.summary__item--header', 
+        { autoAlpha: 0, y: -3, duration: .3, ease: 'ease-out' }
+    );
+}
+const animateHeadingIn = () => {
+    return gsap.fromTo(
+        '.summary__item--header', 
+        { autoAlpha: 0, y: 3 }, 
+        { autoAlpha: 1, y: 0, duration: .35,  ease: 'ease-out' }
+    );
+}
+
+const animateContactSectionOut = () => {
+    return gsap.timeline()
+        .to('.summary__section-content--contacts', { autoAlpha: 0, y: -3, duration: .3,  ease: 'ease-out' })
+        .to('.pagination__content--company-contacts', { autoAlpha: 0, y: -3, duration: .3, ease: 'ease-out' }, '<')
+}
+function animateContactSectionIn() {
+    return gsap.timeline()
+        .fromTo(
+            '.summary__section-content--contacts', 
+            { autoAlpha: 0, y: 3 },
+            { autoAlpha: 1, y: 0, duration: .35, ease: 'ease-out' })
+        .fromTo('.pagination__content--company-contacts', {autoAlpha: 0, y:3 }, {autoAlpha:1, y: 0, duration: .35, ease: 'ease-out'}, '<')
+}
+
+function animateContactControlsOut() {
+    return gsap.to('.summary__btn--contacts', { autoAlpha: 0, y: -3, stagger: { amount: 0.1 },  ease: 'ease-out' });
+}
+function animateContactControlsIn() {
+    return gsap.fromTo(
+      '.summary__btn--contacts', 
+      { autoAlpha: 0, y: 3 },
+      { autoAlpha: 1, y: 0, stagger: { amount: 0.2 }, ease: 'ease-out' }
+    );
+}
+
+function animateAddressSectionOut() {
+    return gsap.timeline()
+        .to('.summary__section-content--addresses', { autoAlpha: 0, y: -3, duration: .3,  ease: 'ease-out' })
+        .to('.pagination__content--company-addresses', {autoAlpha:0, y: -3, duration: .3, ease: 'ease-out'}, '<')
+
+}
+function animateAddressSectionIn() {
+    return gsap.timeline()
+        .fromTo(
+            '.summary__section-content--addresses', 
+            { autoAlpha: 0, y: 3 },
+            { autoAlpha: 1, y: 0, duration: .35, ease: 'ease-out' } )
+        .fromTo('.pagination__content--company-addresses', {autoAlpha: 0, y:3 }, {autoAlpha:1, y: 0, duration: .35, ease: 'ease-out'}, '<')
+
+}
+
+function animateAddressControlsOut() {
+    return gsap.to('.summary__btn--addresses', { autoAlpha: 0, y: -3, stagger: { amount: 0.1 },  ease: 'ease-out' });
+}
+function animateAddressControlsIn() {
+    return gsap.fromTo(
+        '.summary__btn--addresses', 
+        { autoAlpha: 0, y: 3 },
+        { autoAlpha: 1, y: 0, stagger: { amount: 0.2 }, ease: 'ease-out'}
+    );
+}
+
+function animateCompanyJobSectionOut(tbody) {
+    return gsap.timeline().to('.row--company-jobs', 
+        { 
+            autoAlpha: 0, 
+            y: -8, 
+            stagger: .1, 
+    
+            onComplete: () => { 
+                tbody.parentElement.removeChild(tbody);
+            }
+        })
+
+}
+function animateCompanyJobSectionIn() {
+
+    return gsap.timeline().fromTo(
+      '.row--company-jobs', 
+      { autoAlpha: 0, y: 8 },
+      { 
+          autoAlpha: 1, 
+          y: 0, 
+          stagger: .1, 
+      })
+
+}
+
+function animateCompanyJobControlsOut() {
+    return gsap.to('.summary__btn--company-jobs', { autoAlpha: 0, y: -3, stagger: { amount: 0.1 },  ease: 'ease-out'  });
+}
+function animateCompanyJobControlsIn() {
+    return gsap.fromTo(
+      '.summary__btn--company-jobs', 
+      { autoAlpha: 0, y: 3 },
+      { autoAlpha: 1, y: 0, stagger: { amount: 0.2 }, ease: 'ease-out' }
+    );
 }

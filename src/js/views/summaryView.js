@@ -476,17 +476,17 @@ export const createCompanySummaryContent = ({id, companyName, companyDate, conta
 
     const contactsControls = `
         <div class="summary__controls-content summary__controls-content--contacts">
-            <div class="summary__btn summary__new-contact-btn--companies">
+            <div class="summary__btn summary__btn--contacts summary__new-contact-btn--companies">
                 <svg class="summary__new-contact-icon summary__icon">
                     <use xlink:href="svg/spritesheet.svg#add">
                 </svg>
             </div>
-            <div class="summary__btn summary__edit-contact-btn--companies">
+            <div class="summary__btn summary__btn--contacts summary__edit-contact-btn--companies">
                 <svg class="summary__icon summary__edit-contact-icon--companies">
                     <use xlink:href="svg/spritesheet.svg#edit-np1">
                 </svg>
             </div>
-            <div class="summary__btn summary__delete-contact-btn--companies">
+            <div class="summary__btn summary__btn--contacts summary__delete-contact-btn--companies">
                 <svg class="summary__icon summary__delete-contact-icon--companies">
                     <use xlink:href="svg/spritesheet.svg#delete-np1">
                 </svg>
@@ -496,17 +496,17 @@ export const createCompanySummaryContent = ({id, companyName, companyDate, conta
 
     const addressesControls = `
         <div class="summary__controls-content summary__controls-content--addresses">
-            <div class="summary__btn summary__new-address-btn--companies">
+            <div class="summary__btn summary__btn--addresses summary__new-address-btn--companies">
                 <svg class="summary__icon summary__new-address-icon--companies">
                     <use xlink:href="svg/spritesheet.svg#add">
                 </svg>
             </div>
-            <div class="summary__btn summary__edit-address-btn--companies">
+            <div class="summary__btn summary__btn--addresses summary__edit-address-btn--companies">
                 <svg class="summary__icon summary__edit-address-icon--companies">
                     <use xlink:href="svg/spritesheet.svg#edit-np1">
                 </svg>
             </div>
-            <div class="summary__btn summary__delete-address-btn--companies">
+            <div class="summary__btn summary__btn--addresses summary__delete-address-btn--companies">
                 <svg class="summary__icon summary__delete-address-icon--companies">
                     <use xlink:href="svg/spritesheet.svg#delete-np1">
                 </svg>
@@ -516,22 +516,22 @@ export const createCompanySummaryContent = ({id, companyName, companyDate, conta
 
     const companyControls = `
        <div class="summary__controls-content summary__controls-content--companies">
-            <div class="summary__btn summary__new-company-btn--companies">
+            <div class="summary__btn summary__btn--company-jobs summary__new-company-btn--companies">
                 <svg class="summary__icon summary__new-company-icon--companies">
                     <use xlink:href="svg/spritesheet.svg#add">
                 </svg>
             </div>
-            <div class="summary__btn summary__edit-company-btn--companies">
+            <div class="summary__btn summary__btn--company-jobs summary__edit-company-btn--companies">
                 <svg class="summary__icon summary__edit-company-icon--companies">
                     <use xlink:href="svg/spritesheet.svg#edit-np1">
                 </svg>
             </div>
-            <div class="summary__btn summary__hubspot-btn--companies">
+            <div class="summary__btn summary__btn--company-jobs summary__hubspot-btn--companies">
                 <svg class="summary__icon summary__hubspot-icon--companies">
                     <use xlink:href="svg/spritesheet.svg#hubspot">
                 </svg>
             </div>
-            <div class="summary__btn summary__delete-company-btn--companies">
+            <div class="summary__btn summary__btn--company-jobs summary__delete-company-btn--companies">
                 <svg class="summary__icon summary__delete-company-icon--companies">
                     <use xlink:href="svg/spritesheet.svg#delete-np1">
                 </svg>

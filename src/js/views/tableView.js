@@ -59,16 +59,18 @@ export const createTableTest = (title, theads, rows, displayIndex = false) => {
                     }).join('')} 
                 </tr>
             </thead>
-            <tbody class="tbody--${title}">
-                ${
-                    rows.map(row => {
-                        return `<tr class="row row--${title}">${row.map(col => {
-                            return `${col}`
-                        }).join('')}</tr>`
-                    }).join('')
+            ${rows.length > 0? 
+                `<tbody class="tbody--${title}">
+                    ${
+                        rows.map(row => {
+                            return `<tr class="row row--${title}">${row.map(col => {
+                                return `${col}`
+                            }).join('')}</tr>`
+                        }).join('')
 
-                }
-            </tbody>
+                    }
+                </tbody>`: ''
+            }
         </table>
     `;
     return markup;

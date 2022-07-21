@@ -44,7 +44,7 @@ export const calculatePagination = (index, limit, totalItems) => {
 // };
 
 export const renderPagination = (pages, current, tableName) => {
-    console.log({pages}, {current}, {tableName})
+    // console.log({pages}, {current}, {tableName})
     const paginationWrapper = document.querySelector(`.pagination-wrapper--${tableName}`);
     // Remove pagination if present
     const paginationContent = document.querySelector(`.pagination__content--${tableName}`);
