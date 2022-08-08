@@ -8,6 +8,8 @@ export const calculatePagination = (index, limit, totalItems) => {
     const pages = totalItems === 0? 1 : Math.ceil(totalItems / limit);
     // index/limit = zero index page number
     index = index/limit;
+    // console.log('new index:', {index}, 'pages: ', {pages});
+
 
     return { pages, index };
 }
@@ -43,8 +45,8 @@ export const calculatePagination = (index, limit, totalItems) => {
 //     return markup;
 // };
 
-export const renderPagination = (pages, current, tableName) => {
-    // console.log({pages}, {current}, {tableName})
+export const initPagination = (pages, current, tableName) => {
+
     const paginationWrapper = document.querySelector(`.pagination-wrapper--${tableName}`);
     // Remove pagination if present
     const paginationContent = document.querySelector(`.pagination__content--${tableName}`);
@@ -74,7 +76,26 @@ export const renderPagination = (pages, current, tableName) => {
     const selectClassNames = [tableName];
     if(pages === 1) selectClassNames.push(`${tableName}-disabled`);
     const animations = getPaginationSelectAnimations();
-    new Select({select, modifiers: selectClassNames, selectIcon:false, animations});
+    const CustomSelect = new Select({select, modifiers: selectClassNames, selectIcon:false, animations});
+
+    switch(tableName) {
+        case 'companies': {
+            CustomSelect.addCustomSelectListeners(tableName);
+            break;
+        }
+        case 'company-jobs': {
+            CustomSelect.addCustomSelectListeners(tableName);
+            break;
+        }
+        case 'company-addresses' : {
+            CustomSelect.addCustomSelectListeners(tableName);
+            break;
+        }
+        case 'company-contacts': {
+            CustomSelect.addCustomSelectListeners(tableName);
+            break;
+        }
+    }
 
     // const markup = `
     //     <div class="pagination__content pagination__content--${tableName}">
@@ -86,12 +107,24 @@ export const renderPagination = (pages, current, tableName) => {
     // paginationWrapper.insertAdjacentHTML('beforeend', markup);
 }
 
+export const updatePaginationView = (pages, current, tableName) => {
+    const previousBtn = document.querySelector(`.pagination__previous--${tableName}`);
+    const nextBtn = document.querySelector(`.pagination__next--${tableName}`);
+
+    previousBtn.setAttribute('class', `pagination__previous pagination__previous--${tableName} ${current === 0? 'pagination__previous--inactive':''}`);
+    nextBtn.setAttribute('class', `pagination__next pagination__next--${tableName} ${current === pages-1 || pages === 1? 'pagination__next--inactive':''}`);
+
+}
+
 const createPaginationSelect = (pages, current, table) => {
+
     const input = document.createElement('select');
     input.setAttribute('class', `pagination__item pagination__item--${table}`);
     for(let x = 0; x < pages; x++) {
         const option = new Option(x+1, x+1);
         option.className = `pagination__option pagination__option--${table}`;
+        
+        // if(x === current) {option.className = 'selected';}
         input.append(option);
     }
 
@@ -107,29 +140,29 @@ const createPaginationSelect = (pages, current, table) => {
     // return markup;
 };
 
-export const updatePaginationView = (index) => {
-    // Get the pagination items
-    const items = document.querySelectorAll('.pagination__item');
+// export const updatePaginationView = (index) => {
+//     // Get the pagination items
+//     const items = document.querySelectorAll('.pagination__item');
 
-    items.forEach(item => {
-        if(item.classList.contains('pagination__item--active')) {
-            item.classList.remove('pagination__item--active');
-        }
-    })
+//     items.forEach(item => {
+//         if(item.classList.contains('pagination__item--active')) {
+//             item.classList.remove('pagination__item--active');
+//         }
+//     })
 
-    items[index].classList.add('pagination__item--active');
+//     items[index].classList.add('pagination__item--active');
 
-    if(index === 0) {
-        document.querySelector('.pagination__previous').classList.add('pagination__previous--inactive');
-    }  else {
-        document.querySelector('.pagination__previous').classList.remove('pagination__previous--inactive');
-    }
-    if(index === items.length -1) {
-        document.querySelector('.pagination__next').classList.add('pagination__next--inactive');
-    } else {
-        document.querySelector('.pagination__next').classList.remove('pagination__next--inactive');
-    }
-}
+//     if(index === 0) {
+//         document.querySelector('.pagination__previous').classList.add('pagination__previous--inactive');
+//     }  else {
+//         document.querySelector('.pagination__previous').classList.remove('pagination__previous--inactive');
+//     }
+//     if(index === items.length -1) {
+//         document.querySelector('.pagination__next').classList.add('pagination__next--inactive');
+//     } else {
+//         document.querySelector('.pagination__next').classList.remove('pagination__next--inactive');
+//     }
+// }
 
 export const animatePaginationContentIn = (table) => {
     return (

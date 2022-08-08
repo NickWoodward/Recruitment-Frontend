@@ -53,10 +53,11 @@ export const swapElement = (icon1, icon2) => {
 };
 
 export const changeActiveRow = (row, rows) => {
+    // The active row has to be on the first column, not row, because of styling/pseudo element issues on <tr>s
     rows.forEach(row => {
-        if(row.classList.contains('row--active')) row.classList.remove('row--active'); 
+        if(row.firstElementChild.classList.contains('row--active')) row.firstElementChild.classList.remove('row--active'); 
     });
-    row.classList.add('row--active');
+    row.firstElementChild.classList.add('row--active');
 };
 
 export const warn = (message, controls, type, data) => {
@@ -106,7 +107,7 @@ export const formatSalary = (number) => {
     let text ='';
     const reversed = number.toString().split("").reverse();
     reversed.forEach((number, index) => {
-        if(index % 3 === 0 && index !== 0 ) { text += ',' }
+        if(index % 3 === 0 && index !== 0 ) { text += ' ,' }
         text += number;
     })
 

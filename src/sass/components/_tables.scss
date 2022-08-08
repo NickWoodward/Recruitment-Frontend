@@ -5,11 +5,13 @@
     &--companies,
     &--applications,
     &--company-jobs {
-        width: 100%;
+        min-width: 100%;
     }
 
-    &--company-jobs {
+    &--jobs, &--companies, &--company-jobs {
         table-layout: fixed;
+        width: 100%;
+
     }
 }
 
@@ -23,124 +25,202 @@ thead, tbody {
 }
 th, td {
     display: table-cell;
-    text-align: left;
     text-transform:initial;
 }
 
 // TABLE HEADS
-// Widths of THs have to match max-widths of tds for ellipsis overflow to work
 
 th {
     font-size: 1.5rem;
     font-weight: 400;
-}
-td {
-    padding: 0 var(--thead-padding);
-}
 
-.thead--jobs, .thead--applications, .thead--company-jobs {
-    & th {
-        padding: var(--thead-padding);
-    }
+    background-color: white;
+    color: $color-secondary;
 }
 
 //// COMPANIES TABLE
 
 // Headers
 .thead--companies {
-    & .th--id {
-        width: 10rem;
-        padding: 2rem 3rem 2rem 3rem;
-        // border: 1px solid green;
+    & th {
+        padding-left: var(--thead-h-padding);
+        // Set height, not vertical padding (used in visible row calculation)
+        height: var(--table-heading-height);
 
+
+        &:first-of-type {
+            padding-left: var(--row-h-padding);
+        }
+        &:last-of-type {
+            padding-right: var(--row-h-padding);
+        }
+        &:not(.thead--companies .th--added) {
+            text-align: left;
+        }
+
+    }
+    & .th--id {
+        width: 8rem;
     }
 
     & .th--name {
-        width: 100%;
-        padding: 0 2rem;
-        // border: 1px solid red;
+        // width: 100%;
     }
 
     & .th--added {
-        width: 10rem;
-        padding: 0 2rem 0 3rem;
+        width: 13rem;
         text-align: end;
-        // border: 1px solid blue;
-
     }
 }
-// Cells
-.table--companies {
-    & .td-data {
-        &--company-id {
-            width: 10rem;
-            padding: 0 2rem 0 3rem;
+
+// Rows/cells
+.row--companies {
+    & .td--companies {
+        padding-left: var(--thead-h-padding);
+
+        &:first-of-type {
+            padding-left: var(--row-h-padding);
         }
-        &--company-name {
-            // border: 1px solid red;
-            max-width: 100%;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
+        &:last-of-type {
+            padding-right: var(--row-h-padding);
         }
     }
-    
+
+    & .td-data--company-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    & .td-data--added {
+        text-align: end;
+    }
 }
 
 //// COMPANY-JOBS TABLE 
 .thead--company-jobs {
+    & th {
+        padding-left: var(--thead-h-padding);
+        // Set height, not vertical padding (used in visible row calculation)
+        height: var(--table-heading-height);
+
+
+        &:first-of-type {
+            padding-left: var(--row-h-padding);
+        }
+        &:last-of-type {
+            padding-right: var(--row-h-padding);
+        }
+        &:not(.thead--company-jobs .th--added) {
+            text-align: left;
+        }
+
+    }
+
     & .th--id {
-        width: 3rem;
+        width: 6rem;
+    }
+    & .th--wage {
+        width: 10rem;
     }
     & .th--added {
-        // width: 2rem;
+        width: 13rem;
+        text-align: end;
+    }
+}
+.row--company-jobs {
+    & .td--company-jobs {
+        padding-left: var(--thead-h-padding);
+
+        &:first-of-type {
+            padding-left: var(--row-h-padding);
+        }
+        &:last-of-type {
+            padding-right: var(--row-h-padding);
+        }
+    }
+
+    & .td-data--title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    & .td-data--location {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    & .td-data--added {
+        text-align: end;
+        padding-right: var(--thead-padding);
     }
 }
 
 //// JOBS TABLE
 .thead--jobs {
+    & th {
+        padding-left: var(--thead-h-padding);
+        height: var(--table-heading-height);
 
+        &:first-of-type {
+            padding-left: var(--row-h-padding);
+        }
+        &:last-of-type {
+            padding-right: var(--row-h-padding);
+        }
+        &:not(.thead--jobs .th--added) {
+            text-align: left;
+        }
+    }
 
     & .th--id {
         width: 10rem;
         padding: 0 3rem;
     }
-    & .th--company {
-        width: 20rem;
-    }
-    & .th--title {
-        width: 22rem;
-    }
-}
-
-.table--jobs {
-    & .td-data {
-        &--jobId {
-            width: 2.5rem;
-            padding: 0 3rem;
-
-        }
-        &--company {
-            max-width: 20rem;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-        }
-        &--title {
-            max-width: 25rem;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-        }
-        &--location {
-            max-width: 10rem;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-        }
+    // & .th--company {
+    //     width: 20rem;
+    // }
+    // & .th--title {
+    //     width: 22rem;
+    // }
+    & .th--added {
+        width: 13rem;
+        text-align: end;
     }
 }
 
+// Rows/cells
+.row--jobs {
+    & .td--jobs {
+        padding-left: var(--thead-h-padding);
+
+        &:first-of-type {
+            padding-left: var(--row-h-padding);
+        }
+        &:last-of-type {
+            padding-right: var(--row-h-padding);
+        }
+    }
+
+    & .td-data--company,
+    & .td-data--title,
+    & .td-data--location {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    & .td-data--added {
+        text-align: end;
+    }
+}
+
+
+.thead--applications {
+    & th {
+        height: var(--table-header-height);
+    }
+}
 // Set max cell widths
 .table--applications {
     & .td-data--first-name {
@@ -244,37 +324,37 @@ td:nth-of-type(8)::before {
         color: white;
         background-color: $color-primary-new;
     }
-    .thead {
-        &--applications tr, &--company-jobs tr, &--nested-user-jobs tr,
-        &--jobs tr, &--companies tr {
-            background-color: white;
-            color: $color-secondary;
-            font-size: 1.2rem;
-        }
+    // .thead {
+    //     &--applications tr, &--company-jobs tr, &--nested-user-jobs tr,
+    //     &--jobs tr, &--companies tr {
+    //         background-color: white;
+    //         color: $color-secondary;
+    //         font-size: 1.2rem;
+    //     }
         
-    }
+    // }
 
     // .table--applications .td-data--applicationId {
     //     padding: 2rem 1rem 2rem 2.5rem;
     // }
 
 
-    .table--applications .th--id {
-        width: 8.5rem;
-    }
+    // .table--applications .th--id {
+    //     width: 8.5rem;
+    // }
  
-    tbody {
-        overflow: hidden;
-    }
+    // tbody {
+    //     overflow: hidden;
+    // }
 
-    tr {
-        position: relative;
-        display: table-row;
-        width: 100%;
-    }
-    table {
-        display: table;
-    }
+    // tr {
+    //     position: relative;
+    //     display: table-row;
+    //     width: 100%;
+    // }
+    // table {
+    //     display: table;
+    // }
     td:nth-of-type(n)::before {
         content: ""
     }

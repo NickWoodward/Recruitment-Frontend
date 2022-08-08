@@ -36,6 +36,39 @@ export default class Select {
 
       return selectedIndex
     }
+
+    addCustomSelectListeners(selectName) {
+      const changeValueEvents = [];
+      const changeOptionEvents = [];
+
+
+      if(selectName === 'companies') {
+        changeValueEvents.push('companiesForwards');
+        changeValueEvents.push('companiesBackwards');
+        changeOptionEvents.push('removeCompanyOption');
+        changeOptionEvents.push('addCompanyOption');
+      }
+      if(selectName === 'company-jobs') {
+        changeValueEvents.push('companyJobsForwards');
+        changeValueEvents.push('companyJobsBackwards');
+      }
+      if(selectName === 'company-addresses') {
+        changeValueEvents.push('companyAddressesForwards');
+        changeValueEvents.push('companyAddressesBackwards');
+      }
+      if(selectName === 'company-contacts') {
+        changeValueEvents.push('companyContactsForwards');
+        changeValueEvents.push('companyContactsBackwards');
+      }
+
+      changeValueEvents.forEach(event => {
+        // ++ is because of zero index, not because it's moving the page forwards or backwards
+        this.customSelect.addEventListener(event, e => {console.log(e.detail);this.selectValue(`${++e.detail.page}`)});
+      });
+      changeOptionEvents.forEach(event => {
+        this.customSelect.addEventListener(event, e => console.log('HA',e));
+      });
+    } 
   
     selectValue(value, group) {
       const newSelectedOption = this.selectOptions.find(option => {
@@ -158,7 +191,7 @@ export default class Select {
         
         select.selectValue(option.value, option.group)
         select.customOptions.classList.remove("show")
-        select.customSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        // select.customSelect.dispatchEvent(new Event('change', { bubbles: true }));
 
         if(select.animateOut) select.animateOut(select.customOptions)
       })
@@ -190,7 +223,7 @@ export default class Select {
 
 
     })
-    select.customSelect.append(select.customOptions)
+    select.customSelect.append(select.customOptions);
 
     // Set the customOptions to autoAlpha 0
     if(select.animateIn) gsap.set(select.customOptions, { autoAlpha:0 })
@@ -209,7 +242,6 @@ export default class Select {
   
     select.customSelect.addEventListener("blur", () => {
       // If it loses focus AND isn't already hidden (from other methods eg closing via clicking an option)
-      
       if(select.customOptions.classList.contains("show")){
         select.customOptions.classList.remove("show")
 

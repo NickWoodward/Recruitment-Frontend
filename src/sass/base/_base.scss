@@ -88,10 +88,13 @@ textarea, input {
     // Tables
     --table-heading-font-size: 1.7rem;
     --table-content-font-size: 1.5rem;
-    --table-heading-height: 6rem;
+    --table-heading-height: 5rem;
     --table-heading-bg-color: rgb(249, 250, 251);
     --table-padding: 1.5rem 2.5rem;
-    --thead-padding: 2rem;
+    --row-h-padding: 3rem; 
+    --thead-v-padding: 2rem;
+    --thead-h-padding: 2rem;
+
 
 
 }

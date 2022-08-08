@@ -30,9 +30,9 @@
     cursor: pointer;
     user-select: none;
 }
-.custom-select-value.placeholder {
-    color: grey;
-}
+// .custom-select-value.placeholder {
+//     color: grey;
+// }
 
 
 .custom-select-container:focus > .custom-select-value {
@@ -50,7 +50,7 @@
 }
 
 .custom-select-options {
-    // display: none;
+    display: none;
     position: absolute;
     padding: 1rem 0;
     margin:0;
@@ -60,10 +60,10 @@
     max-height: 20rem;
     overflow-y: auto;
     background-color: white;
-    z-index: 202;
+    z-index: 210;
 } 
 .custom-select-options.show {
-    // display: block;
+    display: block;
 }
 
 .custom-select-group {
@@ -131,9 +131,11 @@
 .custom-select-container {
     // These 2 are in a table head
     &--companies, &--jobs {
+        color: white;
         min-width: 2rem;
         margin-right: 1.2rem;
     }
+
     &--companies.custom-select-container--companies-disabled {
         margin-right: 0;
     }
@@ -154,15 +156,24 @@
     &--company-jobs.custom-select-container--company-jobs-disabled {
         margin-right: 0;
     } 
+
+
+    &--companies-disabled {
+        color: #5a889f !important; // important because the placeholder class in the custom select is more specific
+        cursor: default;
+        pointer-events: none;
+        border: none;
+    }
 }
 
 
 .custom-select-value {
+    &--companies { color: white; }
     &--companies, &--jobs {
         font-size: 1.3rem;
         // padding: .6rem .6rem;
         border: none;
-        border-bottom: 1px solid #7293a5;
+        border-bottom: 1px solid white;
     }
     &--company-contacts, &--company-addresses, &--company-jobs {
         font-size: 1.3rem;
@@ -178,10 +189,10 @@
         position:absolute;
         right: -1rem;
         margin-top: 6px;
-        border-top-color: #7293a5;
+        border-top-color: white;
     }
     &--companies-disabled, &--jobs-disabled {
-        color: lighten(grey, 10%) !important; // important because the placeholder class in the custom select is more specific
+        color: #5a889f !important; // important because the placeholder class in the custom select is more specific
         cursor: default;
         pointer-events: none;
         border: none;
@@ -220,7 +231,8 @@
 }
 
 .custom-select-options {
-    &--companies, &--company-contacts, &--company-addresses, &--company-jobs {
+    &--companies, &--company-contacts, &--company-addresses, &--company-jobs,
+    &--jobs {
         font-size: 1.3rem;
         padding: .1rem 0;
         // margin-top: .5rem;
@@ -228,7 +240,8 @@
 }
 
 .custom-select-option {
-    &--companies, &--company-contacts, &--company-addresses, &--company-jobs {
+    &--companies, &--company-contacts, &--company-addresses, &--company-jobs,
+    &--jobs {
         padding: .6rem 0;
         justify-content: center;
         color: black;

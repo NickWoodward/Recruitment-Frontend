@@ -728,48 +728,48 @@ export const populateUserSummary = (user) => {
     addCvElement(user);
 }
 
-export const renderCompanyModal = (data, type) => {
-    const summary = document.querySelector('.summary-wrapper');
-    // Coordinates to position the modal on top of the summary
-    const { left: summaryLeft, top: summaryTop, width: summaryWidth, height: summaryHeight} = summary.getBoundingClientRect();
+// export const renderCompanyModal = (data, type) => {
+//     const summary = document.querySelector('.summary-wrapper');
+//     // Coordinates to position the modal on top of the summary
+//     const { left: summaryLeft, top: summaryTop, width: summaryWidth, height: summaryHeight} = summary.getBoundingClientRect();
 
-    const adminWrapper = document.querySelector('.admin-wrapper');
+//     const adminWrapper = document.querySelector('.admin-wrapper');
     
-    switch(type) {
-        case 'new': 
-            adminWrapper.insertAdjacentHTML('afterbegin', createCompanyModal(data, 'new-company', false));
-            break; 
-        case 'edit': 
-            adminWrapper.insertAdjacentHTML('afterbegin', createCompanyModal(data, 'edit-company', true));
-            break;
-        case 'new-contact':
-            // The new contact modal is just an edited new company modal
-            const element = createCompanyModal(data, 'new-contact', false);
-            adminWrapper.insertAdjacentHTML('afterbegin', element);
-            break;
-        case 'edit-contact':
-            adminWrapper.insertAdjacentHTML('afterbegin', createCompanyModal(data, 'edit-contact', true));
-            break; 
-        case 'new-address':
-            adminWrapper.insertAdjacentHTML('afterbegin', createCompanyModal(data, 'new-address', false));
-            break; 
-        case 'edit-address':
-            adminWrapper.insertAdjacentHTML('afterbegin', createCompanyModal(data, 'edit-address', true));
-            break;
+//     switch(type) {
+//         case 'new': 
+//             adminWrapper.insertAdjacentHTML('afterbegin', createCompanyModal(data, 'new-company', false));
+//             break; 
+//         case 'edit': 
+//             adminWrapper.insertAdjacentHTML('afterbegin', createCompanyModal(data, 'edit-company', true));
+//             break;
+//         case 'new-contact':
+//             // The new contact modal is just an edited new company modal
+//             const element = createCompanyModal(data, 'new-contact', false);
+//             adminWrapper.insertAdjacentHTML('afterbegin', element);
+//             break;
+//         case 'edit-contact':
+//             adminWrapper.insertAdjacentHTML('afterbegin', createCompanyModal(data, 'edit-contact', true));
+//             break; 
+//         case 'new-address':
+//             adminWrapper.insertAdjacentHTML('afterbegin', createCompanyModal(data, 'new-address', false));
+//             break; 
+//         case 'edit-address':
+//             adminWrapper.insertAdjacentHTML('afterbegin', createCompanyModal(data, 'edit-address', true));
+//             break;
         
-    }
-    // Set the modal to the same position and dimensions as the summary
-    const modalElement = document.querySelector('.company-summary__modal');
-    modalElement.style.left = `${summaryLeft}px`;
-    modalElement.style.top = `${summaryTop}px`;
-    modalElement.style.width = `${summaryWidth}px`;
-    modalElement.style.height = `${summaryHeight}px`;
+//     }
+//     // Set the modal to the same position and dimensions as the summary
+//     const modalElement = document.querySelector('.company-summary__modal');
+//     modalElement.style.left = `${summaryLeft}px`;
+//     modalElement.style.top = `${summaryTop}px`;
+//     modalElement.style.width = `${summaryWidth}px`;
+//     modalElement.style.height = `${summaryHeight}px`;
 
-    gsap.timeline().fromTo(modalElement,
-        {autoAlpha: 0},
-        {autoAlpha: 1, duration: .2}
-    );
-};
+//     gsap.timeline().fromTo(modalElement,
+//         {autoAlpha: 0},
+//         {autoAlpha: 1, duration: .2}
+//     );
+// };
 
 
 
@@ -1406,16 +1406,13 @@ export const getDeleteAddressHtml = (addressId) => {
     `);
 }
 export const getDeleteCompanyHtml = (companyId) => {
-    const companyDate = document.querySelector('.company-summary__field--date').innerText;
-    const companyName = document.querySelector('.company-summary__company-name').innerText;
-    const companyContact = document.querySelector('.company-summary__field--name').innerText;
-    const location = document.querySelector('.company-summary__field--city').innerText;
+    const companyDate = document.querySelector('.summary__date').innerText;
+    const companyName = document.querySelector('.summary__title').innerText;
+    const companyContact = document.querySelector('.summary__link--name').innerText;
+    const location = document.querySelector('.summary__field--city').innerText;
     return (`
         <div class='confirmation confirmation--delete'>
-            <div class="company-summary__modal-header">
-                <div>${companyId}</div>
-                <div>${companyDate}</div>
-            </div>
+            
             <div class='confirmation__header'>
                 <div class='confirmation__svg-wrapper'>
                     <svg class='confirmation__svg confirmation__svg--delete'><use xlink:href="svg/spritesheet.svg#alert-circled"></svg>
@@ -1428,7 +1425,7 @@ export const getDeleteCompanyHtml = (companyId) => {
                     <div class='confirmation__field'>${companyName}</div>
                 </div>
                 <div class='confirmation__item'>
-                    <div class='confirmation__label'>Main Contact:</div>
+                    <div class='confirmation__label'>Contact:</div>
                     <div class='confirmation__field'>${companyContact}</div>
                 </div>
                 <div class='confirmation__item'>
@@ -1907,12 +1904,12 @@ export const formatJobs = (jobs) => {
 };
 const createJobElement = (job) => {
     const row = [
-        `<td class="td-data--jobId" data-id=${job.id}>${job.id}</td>`,
-        `<td class="td-data--company" data-id=${job.id}>${job.companyName}</td>`,
-        `<td class="td-data--title">${job.title}</td>`,
-        `<td class="td-data--location">${job.location}</td>`,
-        `<td class="td-data--featured">${job.featured? 'Yes':'No'}</td>`,
-        `<td class="td-data--location">${job.jobDate}</td>`
+        `<td class="td--jobs td-data--jobId" data-id=${job.id}>${job.id}</td>`,
+        `<td class="td--jobs td-data--company" data-id=${job.id}>${job.companyName}</td>`,
+        `<td class="td--jobs td-data--title">${job.title}</td>`,
+        `<td class="td--jobs td-data--location">${job.location}</td>`,
+        `<td class="td--jobs td-data--featured">${job.featured? 'Yes':'No'}</td>`,
+        `<td class="td--jobs td-data--added">${job.jobDate}</td>`
 
     ];
     return row;
@@ -2064,9 +2061,9 @@ export const formatCompanies = (companies) => {
 
 const createCompanyElement = ({ id, companyName, companyDate }) => {
     const row = [
-        `<td class="td-data--company-id">${id}</td>`,
-        `<td class="td-data--company-name" data-id=${id}>${companyName}</td>`,
-        `<td class="td-data--date" data-id=${id}>${companyDate}</td>`
+        `<td class="td--companies td-data--company-id">${id}</td>`,
+        `<td class="td--companies td-data--company-name" data-id=${id}>${companyName}</td>`,
+        `<td class="td--companies td-data--added" data-id=${id}>${companyDate}</td>`
     ];
     return row;
 }
@@ -2081,11 +2078,11 @@ export const formatCompanyJobs = (jobs) => {
 };
 const createCompanyJobElement = (job) => {
     const row = [
-        `<td class="td-data--jobId" data-id=${job.jobId}>${job.jobId}</td>`,
-        `<td class="td-data--title">${job.title}</td>`,
-        `<td class="td-data--location">${job.location}</td>`,
-        `<td class="td-data--wage">${job.wage}</td>`,
-        `<td class="td-data--location">${job.jobDate}</td>`
+        `<td class="td--company-jobs td-data--jobId" data-id=${job.jobId}>${job.jobId}</td>`,
+        `<td class="td--company-jobs td-data--title" title="${job.title}">${job.title}</td>`,
+        `<td class="td--company-jobs td-data--location" title="${job.location}">${job.location}</td>`,
+        `<td class="td--company-jobs td-data--wage">${utils.formatSalary(job.wage)}</td>`,
+        `<td class="td--company-jobs td-data--added">${job.jobDate}</td>`
     ];
     return row;
 }; 
@@ -2132,203 +2129,203 @@ export const createUserJobsPlaceholder = () => {
     return(markup);
 }
 
-    /**
-     * Create the markup for the new/edit company modal
-     * @param {Object | Object[]} data: The company data to be rendered
-     * @param {string} type: The type of modal to be created, determining the fields to be disabled. Opts: 'new-company'/'new-contact'/'new-address'.
-     * @param {boolean} editMode: Changes the placeholder information in each input
-     * @returns {string} A markup string is returned
-    */
-const createCompanyModal = ({companyNumber, companyName, contact, address, contact: {firstName, lastName, position, phone, email}, address: {firstLine, secondLine, city, county, postcode}}, type, editMode) => {
+//     /**
+//      * Create the markup for the new/edit company modal
+//      * @param {Object | Object[]} data: The company data to be rendered
+//      * @param {string} type: The type of modal to be created, determining the fields to be disabled. Opts: 'new-company'/'new-contact'/'new-address'.
+//      * @param {boolean} editMode: Changes the placeholder information in each input
+//      * @returns {string} A markup string is returned
+//     */
+// const createCompanyModal = ({companyNumber, companyName, contact, address, contact: {firstName, lastName, position, phone, email}, address: {firstLine, secondLine, city, county, postcode}}, type, editMode) => {
     
-    // Potential states:
-    // Form     |   editMode   |  type                      |   Disabled sections
+//     // Potential states:
+//     // Form     |   editMode   |  type                      |   Disabled sections
 
-    // company      false         type === 'new-company'        No sections disabled
-    // contact      false         type === 'new-contact'        Company && Address disabled
-    // address      false         type === 'new-address'        Company && Contact disabled
+//     // company      false         type === 'new-company'        No sections disabled
+//     // contact      false         type === 'new-contact'        Company && Address disabled
+//     // address      false         type === 'new-address'        Company && Contact disabled
 
-    // company      true          type === 'edit-company'       No sections disabled
-    // contact      true          type === 'edit-contact'       Company && Address disabled
-    // address      true          type === 'edit-address'       Company && Contact disabled
+//     // company      true          type === 'edit-company'       No sections disabled
+//     // contact      true          type === 'edit-contact'       Company && Address disabled
+//     // address      true          type === 'edit-address'       Company && Contact disabled
 
 
-    const contactDisabled = type === 'new-address' || type === 'edit-address';
-    const addressDisabled = type === 'new-contact' || type === 'edit-contact';
-    const companyDisabled = type === 'new-address' || type === 'edit-address' || type==='new-contact' || type === 'edit-contact';
+//     const contactDisabled = type === 'new-address' || type === 'edit-address';
+//     const addressDisabled = type === 'new-contact' || type === 'edit-contact';
+//     const companyDisabled = type === 'new-address' || type === 'edit-address' || type==='new-contact' || type === 'edit-contact';
 
-    const edit = type === 'edit-address' || type === 'edit-contact' || type === 'edit-address' || type === 'edit-company';
+//     const edit = type === 'edit-address' || type === 'edit-contact' || type === 'edit-address' || type === 'edit-company';
 
-console.log(type, 'contactDisabled:', contactDisabled, 'addressDisabled:', addressDisabled, 'companyDisabled:', companyDisabled);
+// console.log(type, 'contactDisabled:', contactDisabled, 'addressDisabled:', addressDisabled, 'companyDisabled:', companyDisabled);
 
-    const today = new Date();
-    const date = `${today.getDate()}/${today.getMonth()+1}/${+today.getFullYear()}`;
+//     const today = new Date();
+//     const date = `${today.getDate()}/${today.getMonth()+1}/${+today.getFullYear()}`;
 
-    const action = edit? 'Edit':'Create';
-    const markup  = `
-    <div class="company-summary__modal company-summary__modal--${type}">
+//     const action = edit? 'Edit':'Create';
+//     const markup  = `
+//     <div class="company-summary__modal company-summary__modal--${type}">
 
-        <div class="company-summary__modal-header">
-            <div class="company-summary__modal-item company-summary__modal-item--id">${companyNumber}</div>
-            <div>${action} a${edit? 'n Existing':' New'} ${type==='new-company' || type==='edit-company'? 'Company' : type === 'new-contact' || type === 'edit-contact'? 'Contact':'Address'}</div>
-            <div class="company-summary__modal-item company-summary__modal-item--date">${date}</div>
-        </div>
+//         <div class="company-summary__modal-header">
+//             <div class="company-summary__modal-item company-summary__modal-item--id">${companyNumber}</div>
+//             <div>${action} a${edit? 'n Existing':' New'} ${type==='new-company' || type==='edit-company'? 'Company' : type === 'new-contact' || type === 'edit-contact'? 'Contact':'Address'}</div>
+//             <div class="company-summary__modal-item company-summary__modal-item--date">${date}</div>
+//         </div>
     
-        <form class="form--${type}">
-            <div class="form__close--${type}">
-                <svg class="form__close-svg--${type}"><use xlink:href="svg/spritesheet.svg#cross"></svg>
-            </div>
+//         <form class="form--${type}">
+//             <div class="form__close--${type}">
+//                 <svg class="form__close-svg--${type}"><use xlink:href="svg/spritesheet.svg#cross"></svg>
+//             </div>
 
-            <div class="form__content--${type}">
-                <div class="summary__column summary__column--${type} summary__column--${type}-company">
-                     <div class="summary__heading ${companyDisabled ? 'summary__heading--disabled':''} summary__heading--company">Company</div>
+//             <div class="form__content--${type}">
+//                 <div class="summary__column summary__column--${type} summary__column--${type}-company">
+//                      <div class="summary__heading ${companyDisabled ? 'summary__heading--disabled':''} summary__heading--company">Company</div>
 
-                     <div class="form__field--${type} form__company-name--${type} ${type === 'new-company' || type === 'edit-company' ?  '':'disabled'}">
-                        <label for="company-name" class="form__label--${type}">Company Name</label>
-                        <input type="text" placeholder=${edit || companyDisabled ? companyName : 'Company Name'} id="company-name" class="form__input--${type} form__company-name-input--${type}" ${companyDisabled ? 'disabled': ''}>
-                        <i class="form__icon form__icon--success">
-                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
-                        </i>
-                        <i class="form__icon form__icon--error">
-                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
-                        </i>
-                        <small class="form__error-msg"></small>
-                    </div>
-                </div>
+//                      <div class="form__field--${type} form__company-name--${type} ${type === 'new-company' || type === 'edit-company' ?  '':'disabled'}">
+//                         <label for="company-name" class="form__label--${type}">Company Name</label>
+//                         <input type="text" placeholder=${edit || companyDisabled ? companyName : 'Company Name'} id="company-name" class="form__input--${type} form__company-name-input--${type}" ${companyDisabled ? 'disabled': ''}>
+//                         <i class="form__icon form__icon--success">
+//                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+//                         </i>
+//                         <i class="form__icon form__icon--error">
+//                             <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+//                         </i>
+//                         <small class="form__error-msg"></small>
+//                     </div>
+//                 </div>
 
-                <div class="summary__column summary__column--${type} summary__column--${type}-contact">
-                    <div class="summary__heading ${contactDisabled ? 'summary__heading--disabled' : ''} summary__heading--contacts">Contact</div>
+//                 <div class="summary__column summary__column--${type} summary__column--${type}-contact">
+//                     <div class="summary__heading ${contactDisabled ? 'summary__heading--disabled' : ''} summary__heading--contacts">Contact</div>
 
-                    <div class="form__field--${type} form__contact-first-name--${type} ${contactDisabled? 'disabled':''}">
-                        <label for="contact-first-name" class="form__label--${type}">First Name</label>
-                        <input type="text" placeholder="${edit || contactDisabled ? firstName : 'First Name'}" id="contact-first-name" class="form__input--${type} form__contact-first-name-input--${type}" ${contactDisabled ? 'disabled':''}>
-                        <i class="form__icon form__icon--success">
-                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
-                        </i>
-                        <i class="form__icon form__icon--error">
-                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
-                        </i>
-                        <small class="form__error-msg"></small>
-                    </div>
-                    <div class="form__field--${type} form__contact-surname--${type} ${contactDisabled ? 'disabled':''}">
-                        <label for="contact-surname" class="form__label--${type}">Surname</label>
-                        <input type="text" placeholder="${edit || contactDisabled ? lastName : 'Surname'}" id="contact-surname" class="form__input--${type} form__contact-surname-input--${type}" ${contactDisabled ? 'disabled':''}>
-                        <i class="form__icon form__icon--success">
-                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
-                        </i>
-                        <i class="form__icon form__icon--error">
-                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
-                        </i>
-                        <small class="form__error-msg"></small>
-                    </div>
-                    <div class="form__field--${type} form__position--${type} ${contactDisabled ? 'disabled':''}">
-                        <label for="position" class="form__label--${type}">Position</label>
-                        <input type="text" placeholder="${edit || contactDisabled ? position : 'Surname'}" class="form__input--${type} form__position-input--${type}" ${contactDisabled ? 'disabled':''}>
-                        <i class="form__icon form__icon--success">
-                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
-                        </i>
-                        <i class="form__icon form__icon--error">
-                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
-                        </i>
-                        <small class="form__error-msg"></small>
-                    </div>
-                    <div class="form__field--${type} form__phone--${type} ${contactDisabled? 'disabled':''}">
-                        <label for="phone" class="form__label--${type}">Phone</label>
-                        <input type="text" placeholder="${edit || contactDisabled ? phone : 'Phone'}" id="phone" class="form__input--${type} form__phone-input--${type}" ${contactDisabled? 'disabled':''}>
-                        <i class="form__icon form__icon--success">
-                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
-                        </i>
-                        <i class="form__icon form__icon--error">
-                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
-                        </i>
-                        <small class="form__error-msg"></small>
-                    </div>
-                    <div class="form__field--${type} form__email--${type} ${contactDisabled? 'disabled':''}">
-                        <label for="email" class="form__label--${type}">Email</label>
-                        <input type="text" placeholder="${edit || contactDisabled ? email : 'Email'}" id="email" class="form__input--${type} form__email-input--${type}" ${contactDisabled ? 'disabled':''}>
-                        <i class="form__icon form__icon--success">
-                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
-                        </i>
-                        <i class="form__icon form__icon--error">
-                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
-                        </i>
-                        <small class="form__error-msg"></small>
-                    </div>
-                </div>
+//                     <div class="form__field--${type} form__contact-first-name--${type} ${contactDisabled? 'disabled':''}">
+//                         <label for="contact-first-name" class="form__label--${type}">First Name</label>
+//                         <input type="text" placeholder="${edit || contactDisabled ? firstName : 'First Name'}" id="contact-first-name" class="form__input--${type} form__contact-first-name-input--${type}" ${contactDisabled ? 'disabled':''}>
+//                         <i class="form__icon form__icon--success">
+//                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+//                         </i>
+//                         <i class="form__icon form__icon--error">
+//                             <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+//                         </i>
+//                         <small class="form__error-msg"></small>
+//                     </div>
+//                     <div class="form__field--${type} form__contact-surname--${type} ${contactDisabled ? 'disabled':''}">
+//                         <label for="contact-surname" class="form__label--${type}">Surname</label>
+//                         <input type="text" placeholder="${edit || contactDisabled ? lastName : 'Surname'}" id="contact-surname" class="form__input--${type} form__contact-surname-input--${type}" ${contactDisabled ? 'disabled':''}>
+//                         <i class="form__icon form__icon--success">
+//                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+//                         </i>
+//                         <i class="form__icon form__icon--error">
+//                             <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+//                         </i>
+//                         <small class="form__error-msg"></small>
+//                     </div>
+//                     <div class="form__field--${type} form__position--${type} ${contactDisabled ? 'disabled':''}">
+//                         <label for="position" class="form__label--${type}">Position</label>
+//                         <input type="text" placeholder="${edit || contactDisabled ? position : 'Surname'}" class="form__input--${type} form__position-input--${type}" ${contactDisabled ? 'disabled':''}>
+//                         <i class="form__icon form__icon--success">
+//                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+//                         </i>
+//                         <i class="form__icon form__icon--error">
+//                             <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+//                         </i>
+//                         <small class="form__error-msg"></small>
+//                     </div>
+//                     <div class="form__field--${type} form__phone--${type} ${contactDisabled? 'disabled':''}">
+//                         <label for="phone" class="form__label--${type}">Phone</label>
+//                         <input type="text" placeholder="${edit || contactDisabled ? phone : 'Phone'}" id="phone" class="form__input--${type} form__phone-input--${type}" ${contactDisabled? 'disabled':''}>
+//                         <i class="form__icon form__icon--success">
+//                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+//                         </i>
+//                         <i class="form__icon form__icon--error">
+//                             <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+//                         </i>
+//                         <small class="form__error-msg"></small>
+//                     </div>
+//                     <div class="form__field--${type} form__email--${type} ${contactDisabled? 'disabled':''}">
+//                         <label for="email" class="form__label--${type}">Email</label>
+//                         <input type="text" placeholder="${edit || contactDisabled ? email : 'Email'}" id="email" class="form__input--${type} form__email-input--${type}" ${contactDisabled ? 'disabled':''}>
+//                         <i class="form__icon form__icon--success">
+//                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+//                         </i>
+//                         <i class="form__icon form__icon--error">
+//                             <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+//                         </i>
+//                         <small class="form__error-msg"></small>
+//                     </div>
+//                 </div>
 
-                <div class="summary__column summary__column--${type} summary__column--${type}-address">
-                    <div class="summary__heading ${addressDisabled ? 'summary__heading--disabled' : ''} summary__heading--addresses">Address</div>
+//                 <div class="summary__column summary__column--${type} summary__column--${type}-address">
+//                     <div class="summary__heading ${addressDisabled ? 'summary__heading--disabled' : ''} summary__heading--addresses">Address</div>
 
-                    <div class="form__field--${type} form__first-line--${type} ${addressDisabled ? 'disabled':''}">
-                        <label for="first-line" class="form__label--${type}">First Line</label>
-                        <input type="text" placeholder="${edit || addressDisabled ? firstLine : 'First Line'}" id="first-line" class="form__input--${type} form__first-line-input--${type}" ${addressDisabled? 'disabled':''}>
-                        <i class="form__icon form__icon--success">
-                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
-                        </i>
-                        <i class="form__icon form__icon--error">
-                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
-                        </i>
-                        <small class="form__error-msg"></small>
-                    </div>
+//                     <div class="form__field--${type} form__first-line--${type} ${addressDisabled ? 'disabled':''}">
+//                         <label for="first-line" class="form__label--${type}">First Line</label>
+//                         <input type="text" placeholder="${edit || addressDisabled ? firstLine : 'First Line'}" id="first-line" class="form__input--${type} form__first-line-input--${type}" ${addressDisabled? 'disabled':''}>
+//                         <i class="form__icon form__icon--success">
+//                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+//                         </i>
+//                         <i class="form__icon form__icon--error">
+//                             <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+//                         </i>
+//                         <small class="form__error-msg"></small>
+//                     </div>
 
-                    <div class="form__field--${type} form__second-line--${type} ${addressDisabled ? 'disabled':''}">
-                        <label for="second-line" class="form__label--${type}">Second Line</label>
-                        <input type="text" placeholder="${edit || addressDisabled ? secondLine : 'Second Line'}" id="second-line" class="form__input--${type} form__second-line-input--${type}" ${addressDisabled? 'disabled':''}>
-                        <i class="form__icon form__icon--success">
-                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
-                        </i>
-                        <i class="form__icon form__icon--error">
-                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
-                        </i>
-                        <small class="form__error-msg"></small>
-                    </div>
+//                     <div class="form__field--${type} form__second-line--${type} ${addressDisabled ? 'disabled':''}">
+//                         <label for="second-line" class="form__label--${type}">Second Line</label>
+//                         <input type="text" placeholder="${edit || addressDisabled ? secondLine : 'Second Line'}" id="second-line" class="form__input--${type} form__second-line-input--${type}" ${addressDisabled? 'disabled':''}>
+//                         <i class="form__icon form__icon--success">
+//                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+//                         </i>
+//                         <i class="form__icon form__icon--error">
+//                             <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+//                         </i>
+//                         <small class="form__error-msg"></small>
+//                     </div>
 
-                    <div class="form__field--${type} form__city--${type} ${addressDisabled ? 'disabled':''}">
-                        <label for="city" class="form__label--${type}">City</label>
-                        <input type="text" placeholder="${edit || addressDisabled ? city : 'City'}" id="city" class="form__input--${type} form__city-input--${type}" ${addressDisabled ? 'disabled':''}>
-                        <i class="form__icon form__icon--success">
-                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
-                        </i>
-                        <i class="form__icon form__icon--error">
-                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
-                        </i>
-                        <small class="form__error-msg"></small>
-                    </div>
+//                     <div class="form__field--${type} form__city--${type} ${addressDisabled ? 'disabled':''}">
+//                         <label for="city" class="form__label--${type}">City</label>
+//                         <input type="text" placeholder="${edit || addressDisabled ? city : 'City'}" id="city" class="form__input--${type} form__city-input--${type}" ${addressDisabled ? 'disabled':''}>
+//                         <i class="form__icon form__icon--success">
+//                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+//                         </i>
+//                         <i class="form__icon form__icon--error">
+//                             <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+//                         </i>
+//                         <small class="form__error-msg"></small>
+//                     </div>
 
-                    <div class="form__field--${type} form__county--${type} ${addressDisabled ? 'disabled':''}">
-                        <label for="county" class="form__label--${type}">County</label>
-                        <input type="text" placeholder="${edit || addressDisabled ? county :'County'}" id="county" class="form__input--${type} form__county-input--${type}" ${addressDisabled ? 'disabled':''}>
-                        <i class="form__icon form__icon--success">
-                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
-                        </i>
-                        <i class="form__icon form__icon--error">
-                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
-                        </i>
-                        <small class="form__error-msg"></small>
-                    </div>
+//                     <div class="form__field--${type} form__county--${type} ${addressDisabled ? 'disabled':''}">
+//                         <label for="county" class="form__label--${type}">County</label>
+//                         <input type="text" placeholder="${edit || addressDisabled ? county :'County'}" id="county" class="form__input--${type} form__county-input--${type}" ${addressDisabled ? 'disabled':''}>
+//                         <i class="form__icon form__icon--success">
+//                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+//                         </i>
+//                         <i class="form__icon form__icon--error">
+//                             <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+//                         </i>
+//                         <small class="form__error-msg"></small>
+//                     </div>
 
-                    <div class="form__field--${type} form__postcode--${type} ${addressDisabled ? 'disabled':''}">
-                        <label for="postcode" class="form__label--${type}">Postcode</label>
-                        <input type="text" placeholder="${edit || addressDisabled ? postcode:'Postcode'}" id="postcode" class="form__input--${type} form__postcode-input--${type}" ${addressDisabled ? 'disabled':''}>
-                        <i class="form__icon form__icon--success">
-                            <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
-                        </i>
-                        <i class="form__icon form__icon--error">
-                            <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
-                        </i>
-                        <small class="form__error-msg"></small>
-                    </div>
+//                     <div class="form__field--${type} form__postcode--${type} ${addressDisabled ? 'disabled':''}">
+//                         <label for="postcode" class="form__label--${type}">Postcode</label>
+//                         <input type="text" placeholder="${edit || addressDisabled ? postcode:'Postcode'}" id="postcode" class="form__input--${type} form__postcode-input--${type}" ${addressDisabled ? 'disabled':''}>
+//                         <i class="form__icon form__icon--success">
+//                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
+//                         </i>
+//                         <i class="form__icon form__icon--error">
+//                             <svg><use xlink:href="svg/spritesheet.svg#error"></svg>
+//                         </i>
+//                         <small class="form__error-msg"></small>
+//                     </div>
 
-                </div>
+//                 </div>
                 
-                <button class="form__submit--${type}">Submit</button>
-                <div class="alert-wrapper alert-wrapper--${type} alert-wrapper--hidden"></div>
-            </div>
-        </form>
-    </div>
-    `;
-    return markup;
-}
+//                 <button class="form__submit--${type}">Submit</button>
+//                 <div class="alert-wrapper alert-wrapper--${type} alert-wrapper--hidden"></div>
+//             </div>
+//         </form>
+//     </div>
+//     `;
+//     return markup;
+// }
 
 const createEditCompanyModal = ({ companyNumber }) => {
     const today = new Date();
@@ -3207,8 +3204,8 @@ export const animateTableBodyIn = (table) => {
         }, '<')
 }
 
-export const renderAdminLoaders = () => {
-    const tableContent = document.querySelector('.table__content');
+export const renderAdminLoaders = (tableName) => {
+    const tableContent = document.querySelector(`.table__content--${tableName}`);
     // const summaryWrapper = document.querySelector('.summary-wrapper');
 
     // Add a loader to the table wrapper
@@ -3337,10 +3334,10 @@ const addCompanySummaryTemplate = (adminContent) => {
     const jobsSection = createSummaryElement('summary__section summary__section--company-jobs');
     const jobsTable = createTableContent('company-jobs');
     const jobsHeading = createSummaryElement('summary__heading summary__heading--companies-page');
-    const jobsControlsWrapper = createSummaryElement('summary__jobs-controls-wrapper--companies-page');
+    // const jobsControlsWrapper = createSummaryElement('summary__jobs-controls-wrapper--companies-page');
     const jobsPagination = createPagination('company-jobs');
     
-    const companyControls = createSummaryElement('summary__controls summary__company-controls--companies-page');
+    // const companyControls = createSummaryElement('summary__controls summary__company-controls--companies-page');
 
     // Adding Heading Text
     contactsHeading.innerText = 'Contacts';
@@ -3352,14 +3349,13 @@ const addCompanySummaryTemplate = (adminContent) => {
         contactControlsWrapper, 
         addressesSection, 
         addressControlsWrapper,
-        // addressPagination, 
         jobsSection,
-        jobsControlsWrapper
+        // jobsControlsWrapper
     );
     contactControlsWrapper.append(contactControls);
     addressControlsWrapper.append(addressControls);
-    // The jobs control wrapper contains the jobs pagination and the overall company controls
-    jobsControlsWrapper.append(companyControls);
+    // // The jobs control wrapper contains the jobs pagination and the overall company controls
+    // jobsControlsWrapper.append(companyControls);
 
     addressesHeading.append(addressPagination);
     contactsHeading.append(contactPagination);
@@ -3452,10 +3448,17 @@ const addTableWrapper = (container, page) => {
     const tablePagination = createPagination(page);
 
     switch(page) {
-        case 'jobs':
-        case 'companies': {
+        case 'jobs': {
             tableHeader.append(tablePagination);
             tableWrapper.append(tableHeader, tableContent);
+            break;
+        }
+        case 'companies': {
+            const companyControls =  createSummaryElement('summary__controls summary__company-controls--companies-page');
+
+            tableHeader.append(tablePagination);
+            tableWrapper.append(tableHeader, tableContent, companyControls);
+
             break;
         }
         default: {
@@ -3486,6 +3489,35 @@ const createPagination = (page) => {
     pagination.setAttribute('class', `pagination-wrapper pagination-wrapper--${page}`);
     return pagination;
 };
+
+export const createCompaniesControls = () => {
+    const companyControls = `
+        <div class="summary__controls-content summary__controls-content--companies">
+            <div class="summary__btn summary__btn--company-jobs summary__new-company-btn--companies">
+                <svg class="summary__icon summary__new-company-icon--companies">
+                    <use xlink:href="svg/spritesheet.svg#add">
+                </svg>
+            </div>
+            <div class="summary__btn summary__btn--company-jobs summary__edit-company-btn--companies">
+                <svg class="summary__icon summary__edit-company-icon--companies">
+                    <use xlink:href="svg/spritesheet.svg#edit-np1">
+                </svg>
+            </div>
+            <div class="summary__btn summary__btn--company-jobs summary__hubspot-btn--companies">
+                <svg class="summary__icon summary__hubspot-icon--companies">
+                    <use xlink:href="svg/spritesheet.svg#hubspot">
+                </svg>
+            </div>
+            <div class="summary__btn summary__btn--company-jobs summary__delete-company-btn--companies">
+                <svg class="summary__icon summary__delete-company-icon--companies">
+                    <use xlink:href="svg/spritesheet.svg#delete-np1">
+                </svg>
+            </div>
+        </div>
+    `;
+
+    return companyControls;
+}
 
 
 export const initialiseAdminPage = (page) => {

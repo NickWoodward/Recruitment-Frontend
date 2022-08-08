@@ -30,10 +30,9 @@ export const animateAlert = (alertWrapper, paused) => {
 //// MODALS ////
 
 export const animateSummaryModalIn = (modal) => {
-    gsap.fromTo(modal, 
-    { autoAlpha: 0,  }, 
-    { autoAlpha: 1, duration: .2 }
-);
+    return gsap.fromTo(modal, 
+        { autoAlpha: 0,  }, 
+        { autoAlpha: 1, duration: .2 });
 }
 
 export const animateSummaryModalOut = (modal) => {
@@ -71,11 +70,14 @@ export const animateAdminLoadersOut = () => {
 export const animateTablePlaceholderIn = (placeholder) => {
     return gsap.fromTo(placeholder, { autoAlpha: 0 }, { autoAlpha: 1, duration: .4 });
 };
-export const animateTablePlaceholderOut = (placeholder) => {
-    return gsap.to(placeholder, { 
+export const animateTablePlaceholderOut = () => {
+    return gsap.to('.company-jobs-placeholder', { 
         autoAlpha: 0, 
         duration: .4, 
-        onComplete: () => placeholder.parentElement.removeChild(placeholder) 
+        onComplete: () => {
+            const element = document.querySelector('.company-jobs-placeholder');
+            if(element) element.parentElement.removeChild(element) 
+        }
     });
 }
 
@@ -146,13 +148,20 @@ export const animateTableBodyIn = (table) => {
         }, '<')
 }
 
-// @TODO: RENAME TO animatTableBodyOut & check that the tbody selector can be changed to a template string
+// @TODO: RENAME TO animatTableBodyOut 
 export const animateTableContentOut = (table) => {
-    // const tableContent = document.querySelector(`.tbody--${table}`);
+
     const tableContent = document.querySelector(`.tbody--${table}`);
     
     return (
-      gsap.fromTo(tableContent, { autoAlpha: 1 }, {autoAlpha: 0, duration: SPEED_SLOW, immediateRender:false})
+      gsap.fromTo(tableContent, 
+        { autoAlpha: 1 }, 
+        {
+            autoAlpha: 0, 
+            // overwrite: true,
+            duration: SPEED_SLOW, 
+            immediateRender:false
+        })
     );
 }
 
@@ -161,7 +170,6 @@ export const animateTableContentOut = (table) => {
 
 export const animateSummaryIn = (firstAnimation) => {
     const tl = gsap.timeline();
-    console.log('SUMMARY IN');
 
     // Slower animations on first render
     const duration = firstAnimation? .4:.3;
@@ -188,7 +196,7 @@ export const animateSummaryIn = (firstAnimation) => {
 export const animateCompanySummaryIn = (jobsLength) => {
     const tl = gsap.timeline()
       .add(animateHeadingIn(), '<')
-      .add(animateContactSectionIn(), `<.06`);
+      .add(animateContactSectionIn(true), `<.06`);
 
       if(jobsLength > 0) {
         //   tl.add(animateTableBodyIn('company-jobs'), `<.2`);
@@ -201,9 +209,9 @@ export const animateCompanySummaryIn = (jobsLength) => {
 
     tl.fromTo('.pagination__content--company-jobs', {autoAlpha: 0, y:3 }, {autoAlpha:1, y: 0, duration: .35, ease: 'ease-out'}, '<')
     .add(animateContactControlsIn(), `<`)
-    .add(animateAddressSectionIn(), `<.06`)
+    .add(animateAddressSectionIn(true), `<.06`)
     .add(animateAddressControlsIn(), `<`)
-    .add(animateCompanyJobControlsIn(), `<`);
+    // .add(animateCompanyJobControlsIn(), `<`);
 
     return tl;
 }
@@ -216,12 +224,14 @@ export const animateSummaryOut = (page) => {
     const confirmation = document.querySelector('.confirmation');
     const element = modal || confirmation;
 
-    if(element) tl.add(animateSummaryModalOut(element));
+    if(element) {
+        tl.add(animateSummaryModalOut(element));
+        if(modal) animateSummaryModalOut(document.querySelector('.summary__modal-header'))
+    }
 
     switch(page) {
         case 'companies': {
             tl.add(animateCompanySummaryOut());
-        
             break;
         }
         default:
@@ -231,17 +241,17 @@ export const animateSummaryOut = (page) => {
             // .fromTo('.summary__btn', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y:10, stagger: { from: 'end', each: .1 } }, '<');
             // console.log(tl.getChildren());
             
-        tl
-        .fromTo('.summary__item--header', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -15, stagger: .2 })
-        .fromTo('.summary__section-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -15 }, `<.1`)
-        .fromTo('.summary__btn', 
-            { autoAlpha: 1, y: 0 },
-            { 
-                autoAlpha: 0, 
-                y:15, 
-                stagger: { from: 'end', each: .1 } 
-            }, 
-        '<');
+            tl
+            .fromTo('.summary__item--header', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -15, stagger: .2 })
+            .fromTo('.summary__section-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -15 }, `<.1`)
+            .fromTo('.summary__btn', 
+                { autoAlpha: 1, y: 0 },
+                { 
+                    autoAlpha: 0, 
+                    y:15, 
+                    stagger: { from: 'end', each: .1 } 
+                }, 
+            '<');
     }
 
     return tl;
@@ -249,29 +259,29 @@ export const animateSummaryOut = (page) => {
 
 const animateCompanySummaryOut = () => {
 
-    const tl = gsap.timeline()
+    const tl = gsap.timeline({defaults: { overwrite: true }})
         .add(animateHeadingOut())
-        .add(animateContactSectionOut(), `<.06`)
+        .add(animateContactSectionOut(true), `<.06`)
 
     const tbody = document.querySelector('.tbody--company-jobs');
 
     // If there's a tbody, animate it out and remove it
     if(tbody) {
-        tl.add(animateCompanyJobSectionOut(tbody), `<`);
+        tl.add(animateCompanyJobSectionOut(), `<`);
     } 
 
     // If there's a placeholder animate it out and remove it
     const placeholder = document.querySelector('.company-jobs-placeholder');
     if(placeholder) {
-        tl.add(animateTablePlaceholderOut(placeholder), '<');
+        tl.add(animateTablePlaceholderOut(), '<');
     }
     
 
     tl.to('.pagination__content--company-jobs', {autoAlpha: 0, y:3, duration: .3, ease: 'ease-out'}, '<')
       .add(animateContactControlsOut(), `<`)
-      .add(animateAddressSectionOut(), `<.06`)
+      .add(animateAddressSectionOut(true), `<.06`)
       .add(animateAddressControlsOut(), `<`)
-      .add(animateCompanyJobControlsOut(), `<`);
+    //   .add(animateCompanyJobControlsOut(), `<`);
 
     return tl;
 }
@@ -291,18 +301,22 @@ const animateHeadingIn = () => {
     );
 }
 
-const animateContactSectionOut = () => {
-    return gsap.timeline()
-        .to('.summary__section-content--contacts', { autoAlpha: 0, y: -3, duration: .3,  ease: 'ease-out' })
-        .to('.pagination__content--company-contacts', { autoAlpha: 0, y: -3, duration: .3, ease: 'ease-out' }, '<')
+export const animateContactSectionOut = (pagination) => {
+    const tl = gsap.timeline();
+    tl.to('.summary__section-content--contacts', { autoAlpha: 0, y: -3, duration: .3,  ease: 'ease-out' });
+    if(pagination) tl.to('.pagination__content--company-contacts', { autoAlpha: 0, y: -3, duration: .3, ease: 'ease-out' }, '<')
+
+    return tl
 }
-function animateContactSectionIn() {
-    return gsap.timeline()
-        .fromTo(
-            '.summary__section-content--contacts', 
-            { autoAlpha: 0, y: 3 },
-            { autoAlpha: 1, y: 0, duration: .35, ease: 'ease-out' })
-        .fromTo('.pagination__content--company-contacts', {autoAlpha: 0, y:3 }, {autoAlpha:1, y: 0, duration: .35, ease: 'ease-out'}, '<')
+export function animateContactSectionIn(pagination) {
+    const tl = gsap.timeline();
+    tl.fromTo(
+        '.summary__section-content--contacts', 
+        { autoAlpha: 0, y: 3 },
+        { autoAlpha: 1, y: 0, duration: .35, ease: 'ease-out' });
+
+    if(pagination) tl.fromTo('.pagination__content--company-contacts', {autoAlpha: 0, y:3 }, {autoAlpha:1, y: 0, duration: .35, ease: 'ease-out'}, '<')
+    return tl  
 }
 
 function animateContactControlsOut() {
@@ -316,20 +330,22 @@ function animateContactControlsIn() {
     );
 }
 
-function animateAddressSectionOut() {
-    return gsap.timeline()
-        .to('.summary__section-content--addresses', { autoAlpha: 0, y: -3, duration: .3,  ease: 'ease-out' })
-        .to('.pagination__content--company-addresses', {autoAlpha:0, y: -3, duration: .3, ease: 'ease-out'}, '<')
+export function animateAddressSectionOut(pagination) {
+    const tl = gsap.timeline();
+    tl.to('.summary__section-content--addresses', { autoAlpha: 0, y: -3, duration: .3,  ease: 'ease-out' })
+    if(pagination) tl.to('.pagination__content--company-addresses', {autoAlpha:0, y: -3, duration: .3, ease: 'ease-out'}, '<')
 
+    return tl;
 }
-function animateAddressSectionIn() {
-    return gsap.timeline()
-        .fromTo(
-            '.summary__section-content--addresses', 
-            { autoAlpha: 0, y: 3 },
-            { autoAlpha: 1, y: 0, duration: .35, ease: 'ease-out' } )
-        .fromTo('.pagination__content--company-addresses', {autoAlpha: 0, y:3 }, {autoAlpha:1, y: 0, duration: .35, ease: 'ease-out'}, '<')
+export function animateAddressSectionIn(pagination) {
+    const tl = gsap.timeline();
+    tl.fromTo(
+        '.summary__section-content--addresses', 
+        { autoAlpha: 0, y: 3 },
+        { autoAlpha: 1, y: 0, duration: .35, ease: 'ease-out' } );
+    if(pagination) tl.fromTo('.pagination__content--company-addresses', {autoAlpha: 0, y:3 }, {autoAlpha:1, y: 0, duration: .35, ease: 'ease-out'}, '<')
 
+    return tl;
 }
 
 function animateAddressControlsOut() {
@@ -343,7 +359,7 @@ function animateAddressControlsIn() {
     );
 }
 
-function animateCompanyJobSectionOut(tbody) {
+export function animateCompanyJobSectionOut() {
     return gsap.timeline().to('.row--company-jobs', 
         { 
             autoAlpha: 0, 
@@ -351,12 +367,13 @@ function animateCompanyJobSectionOut(tbody) {
             stagger: .1, 
     
             onComplete: () => { 
-                tbody.parentElement.removeChild(tbody);
+                const element = document.querySelector('.tbody--company-jobs');
+                if(element) element.parentElement.removeChild(element);
             }
         })
 
 }
-function animateCompanyJobSectionIn() {
+export function animateCompanyJobSectionIn() {
 
     return gsap.timeline().fromTo(
       '.row--company-jobs', 
@@ -369,13 +386,13 @@ function animateCompanyJobSectionIn() {
 
 }
 
-function animateCompanyJobControlsOut() {
-    return gsap.to('.summary__btn--company-jobs', { autoAlpha: 0, y: -3, stagger: { amount: 0.1 },  ease: 'ease-out'  });
-}
-function animateCompanyJobControlsIn() {
-    return gsap.fromTo(
-      '.summary__btn--company-jobs', 
-      { autoAlpha: 0, y: 3 },
-      { autoAlpha: 1, y: 0, stagger: { amount: 0.2 }, ease: 'ease-out' }
-    );
-}
+// function animateCompanyJobControlsOut() {
+//     return gsap.to('.summary__btn--company-jobs', { autoAlpha: 0, y: -3, stagger: { amount: 0.1 },  ease: 'ease-out'  });
+// }
+// function animateCompanyJobControlsIn() {
+//     return gsap.fromTo(
+//       '.summary__btn--company-jobs', 
+//       { autoAlpha: 0, y: 3 },
+//       { autoAlpha: 1, y: 0, stagger: { amount: 0.2 }, ease: 'ease-out' }
+//     );
+// }

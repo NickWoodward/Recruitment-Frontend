@@ -339,7 +339,7 @@ export const insertNewJobSummary = (job) => {
 
 export const insertNewCompanySummary = (company) => {
     // Create new content
-    const { headerContent, contactsContent, addressesContent, contactsControls, addressesControls, companyControls } = createCompanySummaryContent(company);
+    const { headerContent, contactsContent, addressesContent, contactsControls, addressesControls } = createCompanySummaryContent(company);
     
     // Add new content
     document.querySelector('.summary__header').insertAdjacentHTML('afterbegin', headerContent);
@@ -347,7 +347,6 @@ export const insertNewCompanySummary = (company) => {
     document.querySelector('.summary__section--addresses').insertAdjacentHTML('beforeend', addressesContent);
     document.querySelector('.summary__contact-controls--companies-page').insertAdjacentHTML('beforeend', contactsControls);
     document.querySelector('.summary__address-controls--companies-page').insertAdjacentHTML('beforeend', addressesControls);
-    document.querySelector('.summary__company-controls--companies-page').insertAdjacentHTML('beforeend', companyControls);
 }
 
 export const switchCompanySummary = (company) => {
@@ -362,7 +361,6 @@ const removeOldCompanySummary = () => {
 
     const oldContactControls = document.querySelector('.summary__controls-content--contacts');
     const oldAddressControls = document.querySelector('.summary__controls-content--addresses');
-    const oldCompanyControls = document.querySelector('.summary__controls-content--companies');
 
     // The company-jobs element is handled as a table
 
@@ -372,7 +370,6 @@ const removeOldCompanySummary = () => {
         oldAddressesContent, 
         oldContactControls, 
         oldAddressControls,
-        oldCompanyControls
     ];
 
     // Remove old content
@@ -394,85 +391,9 @@ export const createCompanySummaryContent = ({id, companyName, companyDate, conta
 
     // Section wrappers and headers are created/inserted in the initAdmin function
 
-    const contactsContent = `
-        <div class="summary__section-content summary__section-content--contacts">
-            <div class="summary__column summary__column--companies-page">
+    const contactsContent = createCompanyContact(contacts[0]);
 
-                <div class="summary__item summary__item--companies-page">
-                    <div class="summary__label summary__label">Name:</div>
-                    <div class="summary__field summary__field--name" data-id="${contacts[0].contactId}" title="${contacts[0].firstName} ${contacts[0].lastName}">
-                        <a class="summary__link summary__link--name">${contacts[0].firstName} ${contacts[0].lastName}</a>
-                    </div>
-                </div>
-
-                <div class="summary__item summary__item--companies-page">
-                    <div class="summary__label summary__label">Position:</div>
-                    <div class="summary__field summary__field--position">
-                        ${contacts[0].position}
-                    </div>
-                </div>
-            </div>
-
-            <div class="summary__column summary__column--companies-page">
-
-                <div class="summary__item summary__item--companies-page">
-                    <div class="summary__label summary__label">Email:</div>
-                    <div class="summary__field summary__field--email" title="${contacts[0].email}">
-                        <a class="summary__link summary__link--email">${contacts[0].email}</a>
-                    </div>
-                </div>
-
-                <div class="summary__item summary__item--companies-page">
-                    <div class="summary__label summary__label">Phone:</div>
-                    <div class="summary__field summary__field--phone">${contacts[0].phone}</div>
-                </div>
-
-            </div> 
-        </div>
-    `; 
-
-    const addressesContent = `
-        <div class="summary__section-content summary__section-content--addresses">
-            <div class="summary__column summary__column--companies-page">
-
-                <div class="summary__item summary__item--companies-page">
-                    <div class="summary__label summary__label">First Line:</div>
-                    <div class="summary__field summary__field--first-line">${addresses[0].firstLine}</div>
-                </div>
-
-                ${addresses[0].secondLine? `
-                    <div class="summary__item summary__item--companies-page">
-                        <div class="summary__label summary__label">SecondLine:</div>
-                        <div class="summary__field summary__field--second-line">
-                            ${addresses[0].secondLine}
-                        </div>
-                    </div>
-                `:''}    
-
-                <div class="summary__item summary__item--companies-page">
-                    <div class="summary__label summary__label">City:</div>
-                    <div class="summary__field summary__field--city">${addresses[0].city}</div>
-                </div>
-
-            </div>
-
-            <div class="summary__column summary__column--companies-page">
-
-                <div class="summary__item summary__item--companies-page">
-                    <div class="summary__label summary__label">County:</div>
-                    <div class="summary__field summary__field--county">
-                        <a class="summary__link summary__link--county">${addresses[0].county}</a>
-                    </div>
-                </div>
-
-                <div class="summary__item summary__item--companies-page">
-                    <div class="summary__label summary__label">Postcode:</div>
-                    <div class="summary__field summary__field--postcode">${addresses[0].postcode}</div>
-                </div>
-
-            </div> 
-        </div>
-    `;
+    const addressesContent = createCompanyAddress(addresses[0]);
 
     const contactsControls = `
         <div class="summary__controls-content summary__controls-content--contacts">
@@ -514,34 +435,103 @@ export const createCompanySummaryContent = ({id, companyName, companyDate, conta
         </div>
     `;
 
-    const companyControls = `
-       <div class="summary__controls-content summary__controls-content--companies">
-            <div class="summary__btn summary__btn--company-jobs summary__new-company-btn--companies">
-                <svg class="summary__icon summary__new-company-icon--companies">
-                    <use xlink:href="svg/spritesheet.svg#add">
-                </svg>
+
+    return { headerContent, contactsContent, addressesContent, contactsControls, addressesControls };
+};
+
+export const switchContact = (contact) => {
+    const oldContact = document.querySelector('.summary__section-content--contacts');
+    oldContact.parentElement.removeChild(oldContact);
+    document.querySelector('.summary__section--contacts').insertAdjacentHTML('beforeend', createCompanyContact(contact));
+};
+export const switchAddress = (address) => {
+    const oldAddress = document.querySelector('.summary__section-content--addresses');
+    oldAddress.parentElement.removeChild(oldAddress);
+    document.querySelector('.summary__section--addresses').insertAdjacentHTML('beforeend', createCompanyAddress(address));
+};
+
+const createCompanyContact = ({contactId, firstName, lastName, position, email, phone}) => {
+    return `
+        <div class="summary__section-content summary__section-content--contacts">
+            <div class="summary__column summary__column--companies-page">
+
+                <div class="summary__item summary__item--companies-page">
+                    <div class="summary__label summary__label">Name:</div>
+                    <div class="summary__field summary__field--name" data-id="${contactId}" title="${firstName} ${lastName}">
+                        <a class="summary__link summary__link--name">${firstName} ${lastName}</a>
+                    </div>
+                </div>
+
+                <div class="summary__item summary__item--companies-page">
+                    <div class="summary__label summary__label">Position:</div>
+                    <div class="summary__field summary__field--position">
+                        ${position}
+                    </div>
+                </div>
             </div>
-            <div class="summary__btn summary__btn--company-jobs summary__edit-company-btn--companies">
-                <svg class="summary__icon summary__edit-company-icon--companies">
-                    <use xlink:href="svg/spritesheet.svg#edit-np1">
-                </svg>
+
+            <div class="summary__column summary__column--companies-page">
+
+                <div class="summary__item summary__item--companies-page">
+                    <div class="summary__label summary__label">Email:</div>
+                    <div class="summary__field summary__field--email" title="${email}">
+                        <a class="summary__link summary__link--email">${email}</a>
+                    </div>
+                </div>
+
+                <div class="summary__item summary__item--companies-page">
+                    <div class="summary__label summary__label">Phone:</div>
+                    <div class="summary__field summary__field--phone">${phone}</div>
+                </div>
+
+            </div> 
+        </div>
+    `; 
+}
+
+const createCompanyAddress = ({firstLine, secondLine, city, county, postcode}) => {
+    return `
+        <div class="summary__section-content summary__section-content--addresses">
+            <div class="summary__column summary__column--companies-page">
+
+                <div class="summary__item summary__item--companies-page">
+                    <div class="summary__label summary__label">First Line:</div>
+                    <div class="summary__field summary__field--first-line">${firstLine}</div>
+                </div>
+
+                ${secondLine? `
+                    <div class="summary__item summary__item--companies-page">
+                        <div class="summary__label summary__label">SecondLine:</div>
+                        <div class="summary__field summary__field--second-line">
+                            ${secondLine}
+                        </div>
+                    </div>
+                `:''}    
+
+                <div class="summary__item summary__item--companies-page">
+                    <div class="summary__label summary__label">City:</div>
+                    <div class="summary__field summary__field--city">${city}</div>
+                </div>
+
             </div>
-            <div class="summary__btn summary__btn--company-jobs summary__hubspot-btn--companies">
-                <svg class="summary__icon summary__hubspot-icon--companies">
-                    <use xlink:href="svg/spritesheet.svg#hubspot">
-                </svg>
-            </div>
-            <div class="summary__btn summary__btn--company-jobs summary__delete-company-btn--companies">
-                <svg class="summary__icon summary__delete-company-icon--companies">
-                    <use xlink:href="svg/spritesheet.svg#delete-np1">
-                </svg>
-            </div>
+
+            <div class="summary__column summary__column--companies-page">
+
+                <div class="summary__item summary__item--companies-page">
+                    <div class="summary__label summary__label">County:</div>
+                    <div class="summary__field summary__field--county">
+                        <a class="summary__link summary__link--county">${county}</a>
+                    </div>
+                </div>
+
+                <div class="summary__item summary__item--companies-page">
+                    <div class="summary__label summary__label">Postcode:</div>
+                    <div class="summary__field summary__field--postcode">${postcode}</div>
+                </div>
+
+            </div> 
         </div>
     `;
-    
-
-
-    return { headerContent, contactsContent, addressesContent, contactsControls, addressesControls, companyControls };
-};
+}
 
 //// END COMPANY SUMMARY VIEW ////

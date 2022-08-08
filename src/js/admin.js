@@ -74,10 +74,12 @@ class AdminController {
         this.state= {
             isActiveRequest: false,
             isActivePaginationAnimation: false,
+            isActiveAnimation: false,
             companies: {
                 companyNames: [],
                 totalCompanies: 0,
                 currentCompany: {},
+                currentPage: 0,
                 currentAddressIndex: 0,
                 currentContactIndex: 0,
                 searchOptions: {
@@ -86,19 +88,25 @@ class AdminController {
                     orderField: "createdAt",
                     orderDirection: "ASC"
                 },
-                companyJobPagination: {
-                    jobIndex: 0, 
-                    jobLimit: 0, 
+
+                // Nested sections pagination objects (similar to searchOption objects used for ajax requests)
+                // Limits should be at least 1 (because one must be displayed)
+                companyJobsPagination: {
+                    currentPage: 0,
+                    index: 0, 
+                    limit: 1, 
                     totalJobs: 0,
                 },
-                contactPagination: {
-                    contactIndex: 0,
-                    contactLimit: 0,
+                companyContactsPagination: {
+                    currentPage: 0,
+                    index: 0,
+                    limit: 1,
                     totalContacts: 0
                 },
-                addressPagination: {
-                    addressIndex: 0,
-                    addressLimit: 0,
+                companyAddressesPagination: {
+                    currentPage: 0,
+                    index: 0,
+                    limit: 1,
                     totalAddresses: 0
                 },
                 paginatedJobs: []
@@ -130,13 +138,15 @@ class AdminController {
                     orderDirection: "DESC"
                 },
                 userJobsPagination: {
-                    jobLimit: 0,
-                    jobIndex: 0,
+                    currentPage: 0,
+                    limit: 0,
+                    index: 0,
                     totalJobs: 0
                 },
-                addressPagination: {
-                    addressIndex: 0,
-                    addressLimit: 0,
+                companyAddressesPagination: {
+                    currentPage: 0,
+                    index: 0,
+                    limit: 0,
                     totalAddresses: 0
                 },
                 paginatedJobs: []
@@ -155,7 +165,6 @@ class AdminController {
             jobsTable: {
                 index: 0
             }
-            
         }
 
         
@@ -502,6 +511,7 @@ class AdminController {
 
         // PAGINATION CONTROLS
         document.body.addEventListener('click', this.handlePaginationEvent.bind(this));
+
             
     }
 
@@ -527,7 +537,7 @@ class AdminController {
                         // Add pagination
                         const { totalApplications, searchOptions: {index: appIndex, limit: appLimit} } = this.state.applications;
                         const { pages, index } = paginationView.calculatePagination(appIndex, appLimit, totalApplications);
-                        paginationView.renderPagination(pages, index, 'applications');
+                        paginationView.initPagination(pages, index, 'applications');
 
                         // Render table
                         this.renderApplicationTable();
@@ -549,7 +559,7 @@ class AdminController {
                         // Add pagination
                         const { totalJobs, searchOptions: {index: jobIndex, limit: jobLimit} } = this.state.jobs;
                         const { pages, index } = paginationView.calculatePagination(jobIndex, jobLimit, totalJobs);
-                        paginationView.renderPagination(pages, index, 'jobs');
+                        paginationView.initPagination(pages, index, 'jobs');
 
                         // Render table
                         this.renderJobsTable();
@@ -579,7 +589,7 @@ class AdminController {
                             pages, 
                             index 
                         } = paginationView.calculatePagination(companiesIndex, companiesLimit, totalCompanies);
-                        paginationView.renderPagination(pages, index, 'companies');
+                        paginationView.initPagination(pages, index, 'companies');
 
                     //// End
 
@@ -589,14 +599,10 @@ class AdminController {
                         summaryView.insertNewCompanySummary(this.companies[0]);
 
                         // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
-                        this.setCompanyJobsState();
+                        this.initCompanyJobsState();
 
                         // // Add pagination for nested contacts, addresses, and jobs elements
                         this.addCompanyNestedPagination();
-
-                        // // remove any companyJobs placeholders
-                        // const placeholder = document.querySelector('.company-jobs-placeholder');
-                        // if(placeholder) placeholder.parentElement.removeChild(placeholder);
 
                         // Render the summary company jobs table
                         this.renderCompanyJobsTable();  
@@ -610,7 +616,8 @@ class AdminController {
 
                         } 
 
-                        // this.addCompanySummaryListeners();
+                        this.addCompanySummaryListeners();
+
                         break;
                     }
 
@@ -884,40 +891,41 @@ class AdminController {
         //// Nested Company Jobs table
 
         // Paginate companyJobs array
-        const { totalJobs: totalCompanyJobs, jobIndex: companyJobsIndex, jobLimit: companyJobsLimit } = this.state.companies.companyJobPagination;
-        const { 
-            pages: numCompanyJobPages, 
-            index: currentCompanyJobPage 
-        } = paginationView.calculatePagination(companyJobsIndex, companyJobsLimit, totalCompanyJobs);
+        const { totalJobs, index: jobsIndex, limit: jobsLimit } = this.state.companies.companyJobsPagination;
+        // const { 
+        //     pages: numCompanyJobPages, 
+        //     index: currentCompanyJobPage 
+        // } = paginationView.calculatePagination(jobsIndex, jobsLimit, totalCompanyJobs);
+        const jobsPagination = paginationView.calculatePagination(jobsIndex, jobsLimit, totalJobs);
 
-        paginationView.renderPagination(numCompanyJobPages, currentCompanyJobPage, 'company-jobs');
+        paginationView.initPagination(jobsPagination.pages, jobsPagination.index, 'company-jobs');
 
         //// Nested Contacts pagination
-        this.state.companies.contactPagination.totalContacts = this.state.companies.currentCompany.contacts.length;
-        const { totalContacts, contactIndex } = this.state.companies.contactPagination;
+        this.state.companies.companyContactsPagination.totalContacts = this.state.companies.currentCompany.contacts.length;
+        const { totalContacts, index: contactIndex } = this.state.companies.companyContactsPagination;
 
         // No need to calculate contact pagination - displayed 1 at a time, so number of pages = contacts.length
-        paginationView.renderPagination(totalContacts, contactIndex, 'company-contacts');
+        paginationView.initPagination(totalContacts, contactIndex, 'company-contacts');
 
         //// Nested Addresses pagination
-        this.state.companies.addressPagination.totalAddresses = this.state.companies.currentCompany.addresses.length;
-        const { totalAddresses, addressIndex } = this.state.companies.addressPagination;
+        this.state.companies.companyAddressesPagination.totalAddresses = this.state.companies.currentCompany.addresses.length;
+        const { totalAddresses, index: addressIndex } = this.state.companies.companyAddressesPagination;
     
         // No need to calculate address pagination - displayed 1 at a time, so number of pages = address.length
-        paginationView.renderPagination(totalAddresses, addressIndex, 'company-addresses');
+        paginationView.initPagination(totalAddresses, addressIndex, 'company-addresses');
     }
 
     addUserNestedPagination() {
         // Paginate userJobs array
-        const { totalJobs, jobIndex, jobLimit } = this.state.users.userJobsPagination;
+        const { totalJobs, index: jobIndex, limit: jobLimit } = this.state.users.userJobsPagination;
         const { pages, current } = adminView.calculatePagination(jobIndex, jobLimit, totalJobs);
         // Render the userJobs pagination
         adminView.renderPagination(pages, current, document.querySelector('.table-wrapper--nested-user-jobs'), 'nested-user-jobs');
 
         //// Nested Addresses pagination
         // Displayed 1 at a time
-        this.state.users.addressPagination.totalAddresses = this.state.users.currentUser.addresses.length;
-        const { totalAddresses, addressIndex } = this.state.users.addressPagination;
+        this.state.users.addressesPagination.totalAddresses = this.state.users.currentUser.addresses.length;
+        const { totalAddresses, index: addressIndex } = this.state.users.addressesPagination;
 
         // No need to calculate contact pagination - displayed 1 at a time, so number of pages = contacts.length
         adminView.renderPagination(totalAddresses, addressIndex, document.querySelector('.pagination-wrapper--addresses'), 'addresses');
@@ -938,7 +946,7 @@ class AdminController {
                 this.state.users.searchOptions.limit = adminView.calculateRows(sectionName, true, false);
                 break;
             case 'company-jobs':
-                this.state.companies.companyJobPagination.jobLimit = adminView.calculateRows(sectionName, true, false);
+                this.state.companies.companyJobsPagination.limit = adminView.calculateRows(sectionName, true, false);
                 break;
             case 'nested-user-jobs':
                 this.state.users.userJobsPagination.jobLimit = adminView.calculateRows(sectionName, true, true);
@@ -946,7 +954,6 @@ class AdminController {
     }
 
     async getData(sectionName, indexId) {
-        console.log('getting');
         switch(sectionName) {
             case 'applications':
                 const { data: { applications: { rows: appRows, count: appCount } } } = await this.Admin.getApplications(this.state.applications.searchOptions, indexId);
@@ -962,7 +969,6 @@ class AdminController {
             case 'companies':
                 const { data: { companies, companyTotal } } = await this.Admin.getCompanies(this.state.companies.searchOptions, indexId);
                 this.companies = companies;
-                console.log(this.companies);
                 this.state.companies.totalCompanies = companyTotal;
                 break;
             case 'users':
@@ -1415,7 +1421,7 @@ class AdminController {
 
                         // set up animation timeline (before data updated)
                         const tl = gsap.timeline();
-                        adminView.renderAdminLoaders();
+                        adminView.renderAdminLoaders('applications');
                         tl
                         .add(animation.animateAdminLoadersIn())
                         .add(animation.animateTableContentOut('applications'), '<')
@@ -1449,7 +1455,7 @@ class AdminController {
                             // Update pagination
                             const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
                             const { pages, index: current } = paginationView.calculatePagination(index, limit, totalApplications);
-                            paginationView.renderPagination(pages, current, 'applications');
+                            paginationView.initPagination(pages, current, 'applications');
                         })
 
                     }
@@ -1516,7 +1522,7 @@ class AdminController {
                             this.handleApplicationPagination(null, true, null)
                         } else {
 
-                            adminView.renderAdminLoaders();
+                            adminView.renderAdminLoaders('applications');
 
                             const tl = gsap.timeline();
                             tl.add(animation.animateAdminLoadersIn())
@@ -1548,7 +1554,7 @@ class AdminController {
 
                                 const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
                                 const { pages, index: current } = paginationView.calculatePagination(index, limit, totalApplications);
-                                paginationView.renderPagination(pages, current, 'applications');
+                                paginationView.initPagination(pages, current, 'applications');
                             
                             })   
                         }
@@ -1788,7 +1794,9 @@ class AdminController {
                 jobNumber: this.getNextId('jobs')
             }, 'new');
             const jobSummaryModal = document.querySelector('.summary__modal--new-job');
-            animation.animateSummaryModalIn(jobSummaryModal)
+            const jobSummaryHeader = document.querySelector('.summary__modal-header--jobs');
+            animation.animateSummaryModalIn(jobSummaryModal);
+            animation.animateSummaryModalIn(jobSummaryHeader);
 
             // Modal Elements
             const alertWrapper = document.querySelector('.alert-wrapper');
@@ -1840,7 +1848,7 @@ class AdminController {
                             // Set up an animation tl (before data updated)
                             const tl = gsap.timeline();
                             // Outside of animation
-                            adminView.renderAdminLoaders();
+                            adminView.renderAdminLoaders('jobs');
                             tl
                               .add(animation.animateAdminLoadersIn())
                               .add(animation.animateTableContentOut('jobs'), '<')
@@ -1866,12 +1874,14 @@ class AdminController {
                                 // Add to the successAnimation once the getData() call has now completed
                                 // NB: animating the modal out, not the summary out (which would also animate the modal)
                                 successAnimation.add(animation.animateSummaryModalOut(jobSummaryModal));
+                                successAnimation.add(animation.animateSummaryModalOut(jobSummaryHeader));
+
 
                             // PAGINATION RENDERING
                                 // Update pagination
                                 const { totalJobs, searchOptions: {index, limit} } = this.state.jobs;
                                 const { pages, index: current } = paginationView.calculatePagination(index, limit, totalJobs);
-                                paginationView.renderPagination(pages, current, 'jobs');
+                                paginationView.initPagination(pages, current, 'jobs');
                               }); 
                         }
                     } catch(err) {
@@ -2025,10 +2035,10 @@ class AdminController {
                         if(this.jobs.length === 1) {
                             console.log('Last item')
 
-                            this.handleJobPagination(null, true, null);
+                            this.handleJobsPagination(null, true, null);
 
                             //  // Set the pagination state (2nd param simulates pressing the prev btn)
-                            //  this.setJobPaginationState(null, true, null);
+                            //  this.setJobsPaginationState(null, true, null);
                             //  paginationView.updatePaginationView(this.state.jobs.currentPage -1);
                              
                             // // Render the admin loaders and animate them in and the table out
@@ -2044,14 +2054,14 @@ class AdminController {
 
                             //     const { totalJobs, searchOptions: {index, limit} } = this.state.jobs;
                             //     const { pages, index: current } = paginationView.calculatePagination(index, limit, totalJobs);
-                            //     paginationView.renderPagination(pages, current, 'jobs'); 
+                            //     paginationView.initPagination(pages, current, 'jobs'); 
                             //   })
 
 
                         } else {
                            
                             // Render the admin loaders and animate them in and the table out
-                            adminView.renderAdminLoaders(0);
+                            adminView.renderAdminLoaders('jobs');
 
                             tl.add(animation.animateTableContentOut('jobs'))
                               .add(animation.animateAdminLoadersIn(), '<')
@@ -2060,7 +2070,7 @@ class AdminController {
                                 await this.getData('jobs');
 
                                 // Update the current job
-                                this.state.jobs.currentApplication = this.jobs[0];
+                                this.state.jobs.currentJob = this.jobs[0];
 
                             // TABLE RENDERING/ANIMATION
                                 this.renderJobsTable();
@@ -2082,7 +2092,7 @@ class AdminController {
 
                                 const { totalJobs, searchOptions: {index, limit} } = this.state.jobs;
                                 const { pages, index: current } = paginationView.calculatePagination(index, limit, totalJobs);
-                                paginationView.renderPagination(pages, current, 'jobs'); 
+                                paginationView.initPagination(pages, current, 'jobs'); 
                               })
                         }
 
@@ -2124,7 +2134,7 @@ class AdminController {
                     //     // Deal with pagination if only 1 item left on the page
                     //     if(this.jobs.length === 1) {
                     //         // 2nd arg is the 'prevBtn' argument
-                    //         this.setJobPaginationState(null, true, null);
+                    //         this.setJobsPaginationState(null, true, null);
                     //         // Set the view
                     //         adminView.updatePaginationView(this.state.jobs.currentPage -1);
 
@@ -2200,7 +2210,10 @@ class AdminController {
                 jobNumber: this.getNextId('jobs')
             }, 'edit');
             const jobSummaryModal = document.querySelector('.summary__modal--edit-job');
+            const jobSummaryModalHeader = document.querySelector('.summary__modal-header--jobs');
             animation.animateSummaryModalIn(jobSummaryModal)
+            animation.animateSummaryModalIn(jobSummaryModalHeader)
+
 
             const alertWrapper = document.querySelector('.alert-wrapper');
             const jobForm = document.querySelector('.form--edit-job');
@@ -2284,12 +2297,14 @@ class AdminController {
                                 // Add to the successAnimation once the getData() call has now completed
                                 // NB: animating the modal out, not the summary out (which would also animate the modal)
                                 successAnimation.add(animation.animateSummaryModalOut(jobSummaryModal));
+                                successAnimation.add(animation.animateSummaryModalOut(jobSummaryModalHeader));
+
 
                             // PAGINATION RENDERING
                                 // Update pagination
                                 const { totalJobs, searchOptions: {index, limit} } = this.state.jobs;
                                 const { pages, index: current } = paginationView.calculatePagination(index, limit, totalJobs);
-                                paginationView.renderPagination(pages, current, 'jobs');
+                                paginationView.initPagination(pages, current, 'jobs');
                               })
 
                             // this.renderJobsTable();
@@ -2797,10 +2812,10 @@ class AdminController {
         // Set the state for the summary's nested table
         this.getNumOfRows('nested-user-jobs');
         this.state.users.userJobsPagination.totalJobs = this.state.users.currentUser.jobs.length;
-        const { jobIndex, jobLimit } = this.state.users.userJobsPagination;
+        const { index, limit } = this.state.users.userJobsPagination;
 
         // Paginate the company jobs
-        this.state.users.paginatedJobs = this.state.users.currentUser.jobs.slice(jobIndex, jobIndex + jobLimit);
+        this.state.users.paginatedJobs = this.state.users.currentUser.jobs.slice(index, index + limit);
 
     }
 
@@ -2822,15 +2837,36 @@ class AdminController {
         adminView.animateTableContentIn('nested-user-jobs')
     }
 
-    setCompanyJobsState() {
-        // Set the state for the summary's nested table
+    initCompanyJobsState() {
+        // Calculates the number of rows and sets this.state.companies.companyJobsPagination.limit
         this.getNumOfRows('company-jobs');
-        this.state.companies.companyJobPagination.totalJobs = this.state.companies.currentCompany.jobs.length;
-        const { jobIndex, jobLimit } = this.state.companies.companyJobPagination;
+        this.state.companies.companyJobsPagination.totalJobs = this.state.companies.currentCompany.jobs.length;
+        const { index, limit } = this.state.companies.companyJobsPagination;
 
         // Paginate the company jobs
-        this.state.companies.paginatedJobs = this.state.companies.currentCompany.jobs.slice(jobIndex, jobIndex + jobLimit);
+        this.state.companies.paginatedJobs = this.state.companies.currentCompany.jobs.slice(index, index + limit);
     }
+
+//     setCompanyJobsState(companyJobsOption, companyJobsPrevious, companyJobsNext, companyJobsState, pages) {
+// console.log(companyJobsState);
+//         if(companyJobsPrevious && !(companyJobsState.currentPage < 1)) {
+//             console.log('backwards');
+
+//             this.movePageBackwards(companyJobsState);
+//         }
+//         if(companyJobsNext && !(companyJobsState.currentPage >= pages)) {
+//             console.log('forwards');
+
+//             this.movePageForwards(companyJobsState);
+//         }
+//         if(companyJobsOption) {
+//             console.log('move');
+//             const page = companyJobsOption.dataset.value;
+
+//             this.movePage(companyJobsState, page);
+//         }
+      
+//     }
 
     renderCompanyJobsTable() {
         // Format the paginated jobs into html elements
@@ -2845,7 +2881,6 @@ class AdminController {
         if(!table) { 
             console.log('no table');
             tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('company-jobs', headers, rows, false));
-            console.log(this.state.companies.paginatedJobs, rows);
         } else {
             console.log('table');
 
@@ -2877,11 +2912,18 @@ class AdminController {
             const newTable = tableView.createTableTest('companies', headers, rows, false);
             tableContent.insertAdjacentHTML('afterbegin', newTable);
 
+            // Render the controls the first time the table is created
+            
+            document.querySelector('.summary__company-controls--companies-page')
+                .insertAdjacentHTML('beforeend', adminView.createCompaniesControls());
+
+            const tableControls = document.querySelector('.summary__company-controls--companies-page');
+            tableControls.addEventListener('click', (e) => this.companyControlsListener(e));
+
             // Else remove the tbody and render just the content
         } else {
             utils.removeElement(document.querySelector('tbody'));
             document.querySelector('thead').insertAdjacentHTML('afterend', tableView.updateTableContent('companies', rows));
-            // adminView.animateTableBodyIn('companies');
         }
     
 
@@ -2896,9 +2938,13 @@ class AdminController {
         // Add table row listeners
         companyRows.forEach(row => {
             row.addEventListener('click', e => {
+                // Reset the nested pagination state
+                this.resetCompanyState();
+
+                // if(this.state.isActiveAnimation) return;
+                // this.state.isActiveAnimation = true;
                 const tl = gsap.timeline({ paused: true });
 
-                // Table pagination animates out separately to pagination in summary headings
                 tl.add(animation.animateSummaryOut('companies'))
                   
                 tl.add(() => {
@@ -2917,10 +2963,9 @@ class AdminController {
 
                     // Unlike the Jobs and Apps summaries, clicking another row has to re-calculate pagination
                     // on nested tables and contact/address sections
-                    console.log('STATE:', this.state.companies.currentCompany.jobs);
-                    console.log('PAGINATED JOBS:', this.state.companies.paginatedJobs.length)
+
                     // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
-                    this.setCompanyJobsState();
+                    this.initCompanyJobsState();
                     
                     // // Add pagination for nested contacts, addresses, and jobs elements
                     this.addCompanyNestedPagination();
@@ -2940,7 +2985,7 @@ class AdminController {
                     // } 
 
                     // Animate the summary back in
-                    animation.animateCompanySummaryIn(this.state.companies.paginatedJobs.length);
+                    animation.animateCompanySummaryIn(this.state.companies.paginatedJobs.length)
                 });
 
                 tl.play(0); 
@@ -2965,7 +3010,7 @@ class AdminController {
                 //     adminView.switchSummary(summary, newSummary);
 
                 //     // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
-                //     this.setCompanyJobsState();
+                //     this.initCompanyJobsState();
 
                 //     // Render the summary company jobs table
                 //     if(this.state.companies.paginatedJobs.length > 0) {
@@ -3105,7 +3150,8 @@ class AdminController {
     }
 
     addCompanySummaryListeners() {
-        const companySummary = document.querySelector('.company-summary');
+
+        const companySummary = document.querySelector('.summary--companies-page');
         companySummary.addEventListener(
             'click',
             (e) => this.companySummaryListener(e)
@@ -3114,11 +3160,8 @@ class AdminController {
 
     async companySummaryListener(e) {
         // Animations
-        const newCompanyAlertAnimation = gsap.timeline({paused: true});
-        const editCompanyAlertAnimation = gsap.timeline({paused: true});
-        const deleteCompanyAlertAnimation = gsap.timeline({paused: true});
 
-        const newContactAlertAnimation = gsap.timeline({paused: true});
+        // const newContactAlertAnimation = gsap.timeline({paused: true});
         const editContactAlertAnimation = gsap.timeline({paused: true});
         const deleteContactAlertAnimation = gsap.timeline({paused: true});
         
@@ -3128,16 +3171,16 @@ class AdminController {
 
 
         // Buttons
-        const newBtn = e.target.closest('.company-summary__btn--new');
-        const newContactBtn = e.target.closest('.company-summary__btn--new-contact');
+        const newContactBtn = e.target.closest('.summary__new-contact-btn--companies');
         const newAddressBtn = e.target.closest('.company-summary__btn--new-address');
-        const hubspotBtn = e.target.closest('.company-summary__btn--hubspot');
-        const editBtn = e.target.closest('.company-summary__btn--edit');
+        console.log(newContactBtn);
+
         const editContactBtn = e.target.closest('.company-summary__btn--edit-contact');
         const editAddressBtn = e.target.closest('.company-summary__btn--edit-address');
-        const deleteBtn = e.target.closest('.company-summary__btn--delete');
+
         const deleteContactBtn = e.target.closest('.company-summary__btn--delete-contact');
         const deleteAddressBtn = e.target.closest('.company-summary__btn--delete-address');
+
         const jobBtn = e.target.closest('.row');
 
         // Links
@@ -3155,206 +3198,205 @@ class AdminController {
         }
 
         if(jobBtn) {
-            console.log(this);
             const jobId = jobBtn.firstElementChild.dataset.id;
             this.displayAdminContent('jobs', jobId);
             adminView.changeActiveMenuItem(document.querySelector('.sidebar__item--jobs')); 
         }
 
-        if(newBtn) {
-            let alert;
-            const { 
-                id,
-                companyName,
-                addresses,
-                contacts
-            } = this.state.companies.currentCompany;
-            adminView.renderCompanyModal({
-                companyNumber: this.getNextId('companies'),
-                id,
-                companyName,
-                contact: contacts[this.state.companies.contactPagination.contactIndex],
-                address: addresses[this.state.companies.addressPagination.addressIndex]
-            }, 'new');
+        // if(newBtn) {
+        //     let alert;
+        //     const { 
+        //         id,
+        //         companyName,
+        //         addresses,
+        //         contacts
+        //     } = this.state.companies.currentCompany;
+        //     adminView.renderCompanyModal({
+        //         companyNumber: this.getNextId('companies'),
+        //         id,
+        //         companyName,
+        //         contact: contacts[this.state.companies.companyContactsPagination.contactIndex],
+        //         address: addresses[this.state.companies.addressesPagination.addressIndex]
+        //     }, 'new');
 
-            const alertWrapper = document.querySelector('.alert-wrapper');
-            const companyForm = document.querySelector('.form--new-company');
-            const closeBtn = document.querySelector('.form__close--new-company');
-            const submitBtn = document.querySelector('.form__submit--new-company');
+        //     const alertWrapper = document.querySelector('.alert-wrapper');
+        //     const companyForm = document.querySelector('.form--new-company');
+        //     const closeBtn = document.querySelector('.form__close--new-company');
+        //     const submitBtn = document.querySelector('.form__submit--new-company');
 
-            // Get the field elements
-            const fields = adminView.getCompanyFields('new-company');
-            const { 
-                companyNameField, 
-                contactFirstNameField,
-                contactSurnameField,
-                contactPositionField,
-                phoneField,
-                emailField,
-                firstLineField,
-                secondLineField,
-                cityField,
-                countyField,
-                postcodeField
-            } = fields;
+        //     // Get the field elements
+        //     const fields = adminView.getCompanyFields('new-company');
+        //     const { 
+        //         companyNameField, 
+        //         contactFirstNameField,
+        //         contactSurnameField,
+        //         contactPositionField,
+        //         phoneField,
+        //         emailField,
+        //         firstLineField,
+        //         secondLineField,
+        //         cityField,
+        //         countyField,
+        //         postcodeField
+        //     } = fields;
 
-            // Add the animation for the company alerts (paused)
-            newCompanyAlertAnimation
-            .from(alertWrapper, {
-                autoAlpha: 0
-            })
-            .to(alertWrapper, {
-                autoAlpha: 0
-            }, '+=3')
+        //     // Add the animation for the company alerts (paused)
+        //     newCompanyAlertAnimation
+        //     .from(alertWrapper, {
+        //         autoAlpha: 0
+        //     })
+        //     .to(alertWrapper, {
+        //         autoAlpha: 0
+        //     }, '+=3')
 
-            closeBtn.addEventListener('click', () => {
-                adminView.removeCompanyModal();
-            });
+        //     closeBtn.addEventListener('click', () => {
+        //         adminView.removeCompanyModal();
+        //     });
 
-            companyForm.addEventListener('submit', async e => {
-                e.preventDefault();
-                // Clear the alert wrapper contents
-                while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+        //     companyForm.addEventListener('submit', async e => {
+        //         e.preventDefault();
+        //         // Clear the alert wrapper contents
+        //         while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
 
-                const data = adminView.getCompanyValues(fields); 
-                const { changed, ...values } = data;
-                const errors = validator.validateCompany(values);
+        //         const data = adminView.getCompanyValues(fields); 
+        //         const { changed, ...values } = data;
+        //         const errors = validator.validateCompany(values);
 
-                if(!errors) {
-                    try {
-                        const res = await this.Admin.createCompany(values);
+        //         if(!errors) {
+        //             try {
+        //                 const res = await this.Admin.createCompany(values);
 
-                        if(res.status !== 201) {
+        //                 if(res.status !== 201) {
 
-                            alert = modalView.getAlert('Company Not Created', false);
-                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                            newCompanyAlertAnimation.play(0);
-                        }else {  
-                            alert = modalView.getAlert('Company Created', true);
-                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                            newCompanyAlertAnimation.play(0);
+        //                     alert = modalView.getAlert('Company Not Created', false);
+        //                     alertWrapper.insertAdjacentHTML('afterbegin', alert);
+        //                     newCompanyAlertAnimation.play(0);
+        //                 }else {  
+        //                     alert = modalView.getAlert('Company Created', true);
+        //                     alertWrapper.insertAdjacentHTML('afterbegin', alert);
+        //                     newCompanyAlertAnimation.play(0);
 
-                            await this.getData('companies');
-                            this.state.companies.currentCompany = res.data.company;
-                            this.resetCompanyState();
+        //                     await this.getData('companies');
+        //                     this.state.companies.currentCompany = res.data.company;
+        //                     this.resetCompanyState();
 
-                            const summary = document.querySelector('.summary');
-                            const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
+        //                     const summary = document.querySelector('.summary');
+        //                     const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
 
-                            // No animation needed as it's behind the modal
-                            adminView.switchSummary(summary, newSummary);
+        //                     // No animation needed as it's behind the modal
+        //                     adminView.switchSummary(summary, newSummary);
 
-                            // Render the summary company jobs table
-                            if(this.state.companies.paginatedJobs.length > 0) {
-                                // remove any placeholders
-                                const placeholder = document.querySelector('.company-jobs-placeholder')
+        //                     // Render the summary company jobs table
+        //                     if(this.state.companies.paginatedJobs.length > 0) {
+        //                         // remove any placeholders
+        //                         const placeholder = document.querySelector('.company-jobs-placeholder')
 
-                                if(placeholder) placeholder.parentElement.removeChild(placeholder);
+        //                         if(placeholder) placeholder.parentElement.removeChild(placeholder);
 
-                                this.renderCompanyJobsTable();
-                            } else {
-                                // render a placeholder saying 'no jobs'
-                                document.querySelector('.table-wrapper--nested-jobs')
-                                    .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
-                            } 
+        //                         this.renderCompanyJobsTable();
+        //                     } else {
+        //                         // render a placeholder saying 'no jobs'
+        //                         document.querySelector('.table-wrapper--nested-jobs')
+        //                             .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
+        //                     } 
 
-                            // Add pagination for nested contacts, addresses, and jobs elements
-                            this.addCompanyNestedPagination();
+        //                     // Add pagination for nested contacts, addresses, and jobs elements
+        //                     this.addCompanyNestedPagination();
 
-                            // Add the listener to the new summary
-                            document.querySelector('.summary').addEventListener('click', (e) => this.companySummaryListener(e))
+        //                     // Add the listener to the new summary
+        //                     document.querySelector('.summary').addEventListener('click', (e) => this.companySummaryListener(e))
 
 
-                            this.renderCompaniesTable();
-                            // Update pagination
-                            const { totalCompanies, searchOptions: {index: companyIndex, limit: companyLimit} } = this.state.companies;
-                            adminView.renderPagination(companyIndex, companyLimit, document.querySelector('.table-wrapper'), 'companies');
+        //                     this.renderCompaniesTable();
+        //                     // Update pagination
+        //                     const { totalCompanies, searchOptions: {index: companyIndex, limit: companyLimit} } = this.state.companies;
+        //                     adminView.renderPagination(companyIndex, companyLimit, document.querySelector('.table-wrapper'), 'companies');
                     
-                            console.log(this.state.companies.currentCompany);
-                        }
-                    } catch(err) {
-                        console.log(err)
+        //                 }
+        //             } catch(err) {
+        //                 console.log(err)
 
-                        if(err?.response?.data?.validationErrors.length > 0){
-                            alert = modalView.getAlert(err.response.data.validationErrors[0].msg, false);
-                        } else {
-                            alert = modalView.getAlert('Company Not Created', false);
-                        }
-                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                        newCompanyAlertAnimation.play(0);
-                    }
-                } else {
-                    if(errors.companyName) 
-                        validator.setErrorFor(companyNameField, errors.companyName); 
-                    else validator.setSuccessFor(companyNameField);
+        //                 if(err?.response?.data?.validationErrors.length > 0){
+        //                     alert = modalView.getAlert(err.response.data.validationErrors[0].msg, false);
+        //                 } else {
+        //                     alert = modalView.getAlert('Company Not Created', false);
+        //                 }
+        //                 alertWrapper.insertAdjacentHTML('afterbegin', alert);
+        //                 newCompanyAlertAnimation.play(0);
+        //             }
+        //         } else {
+        //             if(errors.companyName) 
+        //                 validator.setErrorFor(companyNameField, errors.companyName); 
+        //             else validator.setSuccessFor(companyNameField);
     
-                    if(errors.firstName)  
-                        validator.setErrorFor(contactFirstNameField, errors.firstName);
-                    else validator.setSuccessFor(contactFirstNameField);
+        //             if(errors.firstName)  
+        //                 validator.setErrorFor(contactFirstNameField, errors.firstName);
+        //             else validator.setSuccessFor(contactFirstNameField);
     
-                    if(errors.lastName) 
-                        validator.setErrorFor(contactSurnameField, errors.lastName);
-                    else validator.setSuccessFor(contactSurnameField);
+        //             if(errors.lastName) 
+        //                 validator.setErrorFor(contactSurnameField, errors.lastName);
+        //             else validator.setSuccessFor(contactSurnameField);
     
-                    if(errors.position) 
-                        validator.setErrorFor(contactPositionField, errors.position);
-                    else validator.setSuccessFor(contactPositionField);
+        //             if(errors.position) 
+        //                 validator.setErrorFor(contactPositionField, errors.position);
+        //             else validator.setSuccessFor(contactPositionField);
     
-                    if(errors.phone) 
-                        validator.setErrorFor(phoneField, errors.phone);
-                    else validator.setSuccessFor(phoneField);
+        //             if(errors.phone) 
+        //                 validator.setErrorFor(phoneField, errors.phone);
+        //             else validator.setSuccessFor(phoneField);
     
-                    if(errors.email) 
-                        validator.setErrorFor(emailField, errors.email);
-                    else validator.setSuccessFor(emailField);
+        //             if(errors.email) 
+        //                 validator.setErrorFor(emailField, errors.email);
+        //             else validator.setSuccessFor(emailField);
     
-                    if(errors.firstLine) 
-                        validator.setErrorFor(firstLineField, errors.firstLine);
-                    else validator.setSuccessFor(firstLineField);
+        //             if(errors.firstLine) 
+        //                 validator.setErrorFor(firstLineField, errors.firstLine);
+        //             else validator.setSuccessFor(firstLineField);
     
-                    if(errors.secondLine) 
-                        validator.setErrorFor(secondLineField, errors.secondLine); 
-                    else validator.setSuccessFor(secondLineField);
+        //             if(errors.secondLine) 
+        //                 validator.setErrorFor(secondLineField, errors.secondLine); 
+        //             else validator.setSuccessFor(secondLineField);
 
-                    if(errors.city) 
-                        validator.setErrorFor(cityField, errors.city); 
-                    else validator.setSuccessFor(cityField);
-                    if(errors.county) 
-                        validator.setErrorFor(countyField, errors.county); 
-                    else validator.setSuccessFor(countyField);
-                    if(errors.postcode) 
-                        validator.setErrorFor(postcodeField, errors.postcode); 
-                    else validator.setSuccessFor(postcodeField);
-                }
-            });
+        //             if(errors.city) 
+        //                 validator.setErrorFor(cityField, errors.city); 
+        //             else validator.setSuccessFor(cityField);
+        //             if(errors.county) 
+        //                 validator.setErrorFor(countyField, errors.county); 
+        //             else validator.setSuccessFor(countyField);
+        //             if(errors.postcode) 
+        //                 validator.setErrorFor(postcodeField, errors.postcode); 
+        //             else validator.setSuccessFor(postcodeField);
+        //         }
+        //     });
 
-            // Validate each field on lost focus
-            companyForm.addEventListener('focusout', e => {
-                if(e.target === submitBtn) return;
-                const data = adminView.getCompanyValues(fields);
-                const {name, value} = this.getCompanyDataToValidate(e, data, fields);
-               console.log(name, value);
-                const error = validator.validateCompanyField({ name,  value });
+        //     // Validate each field on lost focus
+        //     companyForm.addEventListener('focusout', e => {
+        //         if(e.target === submitBtn) return;
+        //         const data = adminView.getCompanyValues(fields);
+        //         const {name, value} = this.getCompanyDataToValidate(e, data, fields);
+        //         const error = validator.validateCompanyField({ name,  value });
 
-                if(error) validator.setErrorFor(e.target, error);
-                else validator.setSuccessFor(e.target);
-            });
+        //         if(error) validator.setErrorFor(e.target, error);
+        //         else validator.setSuccessFor(e.target);
+        //     });
 
-            Object.values(fields).forEach(field => {
-                field.addEventListener('focus', e => {
-                    if(field.parentElement.classList.contains('success')) {
-                        field.parentElement.classList.remove('success');
-                    }
-                    if(field.parentElement.classList.contains('error')) {
-                        field.parentElement.classList.remove('error');
-                    }
-                    // Remove the success msg
-                    field.nextElementSibling.nextElementSibling.nextElementSibling.innerText = '';
-                });
-            });
+        //     Object.values(fields).forEach(field => {
+        //         field.addEventListener('focus', e => {
+        //             if(field.parentElement.classList.contains('success')) {
+        //                 field.parentElement.classList.remove('success');
+        //             }
+        //             if(field.parentElement.classList.contains('error')) {
+        //                 field.parentElement.classList.remove('error');
+        //             }
+        //             // Remove the success msg
+        //             field.nextElementSibling.nextElementSibling.nextElementSibling.innerText = '';
+        //         });
+        //     });
 
-        }
+        // }
         if(newContactBtn) {
+            let errorAnimation;
+            let successAnimation;
             let alert;
 
             const { 
@@ -3364,45 +3406,56 @@ class AdminController {
                 contacts
             } = this.state.companies.currentCompany;
 
-            adminView.renderCompanyModal({
+            modalView.renderCompanyModal({
                 companyNumber: id,
                 companyName,
-                contact: contacts[this.state.companies.contactPagination.contactIndex],
-                address: addresses[this.state.companies.addressPagination.addressIndex]
+                contact: contacts[this.state.companies.companyContactsPagination.index],
+                address: addresses[this.state.companies.companyAddressesPagination.index]
             }, 'new-contact');
 
             const alertWrapper = document.querySelector('.alert-wrapper');
             const companyForm = document.querySelector('.form--new-contact');
             const closeBtn = document.querySelector('.form__close--new-contact');
             const submitBtn = document.querySelector('.form__submit--new-contact');
-            const modal = document.querySelector('.company-summary__modal');
+            // const modal = document.querySelector('.company-summary__modal');
+
+            // const companySummaryModal = document.querySelector('.summary__modal--new-company');
+            // const companySummaryModalHeader = document.querySelector('.summary__modal-header--companies');
 
             const fields = adminView.getCompanyFields('new-contact');
             const { contactFirstNameField, contactSurnameField, contactPositionField, phoneField, emailField } = fields;
 
-            // Add the animation for the company alerts (paused)
-            newContactAlertAnimation
-            .from(alertWrapper, {
-                autoAlpha: 0
-            })
-            .to(alertWrapper, {
-                autoAlpha: 0,
-                duration: .2,
-            }, '+=1.5')
-            .add(() => {
-                if(!document.querySelector('.alert--error')) {
-                    return gsap.to(modal, {
-                        autoAlpha: 0,
-                        duration: .2,
-                        onComplete: () => {
+            // Get the animation for the application alerts (paused)
+            errorAnimation = animation.animateAlert(alertWrapper, true);
+            // Success animation is the same, but appended later (paused)
+            successAnimation = animation.animateAlert(alertWrapper, true);
 
-                            modal.parentElement.removeChild(modal);
-                        }
-                    })
-                }
-            })
+            // // Add the animation for the company alerts (paused)
+            // newContactAlertAnimation
+            // .from(alertWrapper, {
+            //     autoAlpha: 0
+            // })
+            // .to(alertWrapper, {
+            //     autoAlpha: 0,
+            //     duration: .2,
+            // }, '+=1.5')
+            // .add(() => {
+            //     if(!document.querySelector('.alert--error')) {
+            //         return gsap.to(modal, {
+            //             autoAlpha: 0,
+            //             duration: .2,
+            //             onComplete: () => {
 
-            closeBtn.addEventListener('click', ()=>adminView.removeCompanyModal());
+            //                 modal.parentElement.removeChild(modal);
+            //             }
+            //         })
+            //     }
+            // })
+
+            // closeBtn.addEventListener('click', ()=>adminView.removeCompanyModal());
+            closeBtn.addEventListener('click', () => {
+                modalView.removeAdminModal('company-contacts');
+            });
 
             companyForm.addEventListener('submit', async e => {
                 e.preventDefault();
@@ -3421,17 +3474,26 @@ class AdminController {
                         if(res.status !== 201) {
                             alert = modalView.getAlert('Contact Not Created', false);
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                            newContactAlertAnimation.play(0);
+                            successAnimation.play(0);
                         } else {
                             alert = modalView.getAlert('Contact Created', true);
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                            newContactAlertAnimation.play(0);
+                            errorAnimation.play(0);
 
                             this.state.companies.currentCompany.contacts.push(res.data.contact);
-                            this.state.companies.contactPagination.totalContacts++;
+                            console.log('contacts',this.state.companies.currentCompany.contacts);
+                            this.state.companies.companyContactsPagination.totalContacts++;
 
-                            const { totalContacts, contactIndex } = this.state.companies.contactPagination;
-                            adminView.renderPagination(totalContacts, contactIndex, document.querySelector('.pagination-wrapper--contacts'), 'contacts');
+                            const { totalContacts, index } = this.state.companies.companyContactsPagination;
+                            // totalContacts === pages for the contact section (1 per page)
+                            paginationView.initPagination(totalContacts, index, 'company-contacts');
+
+                        //     // Emit a custom event so the number of select options changes
+                        //     const addOption = new CustomEvent('addCompanyOption');
+                        //     const customSelect = document.querySelector('.custom-select-container--company-contacts');
+                        //    console.log('option:', addOption, 'customSelect:', customSelect);
+                        //     customSelect.dispatchEvent(addOption, { bubbles: true });
+                        //     console.log('dispatching');
 
                         }
                     } catch(err) {
@@ -3443,7 +3505,7 @@ class AdminController {
                             alert = modalView.getAlert('Contact Not Created', false);
                         }
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                        newContactAlertAnimation.play(0);
+                        errorAnimation.play(0);
                     } 
                     
                     
@@ -3510,8 +3572,8 @@ class AdminController {
             adminView.renderCompanyModal({
                 companyNumber: id,
                 companyName,
-                contact: contacts[this.state.companies.contactPagination.contactIndex],
-                address: addresses[this.state.companies.addressPagination.addressIndex]
+                contact: contacts[this.state.companies.companyContactsPagination.index],
+                address: addresses[this.state.companies.companyAddressesPagination.index]
             }, 'new-address');
 
             const alertWrapper = document.querySelector('.alert-wrapper');
@@ -3578,10 +3640,10 @@ class AdminController {
                             newAddressAlertAnimation.play(0);
 
                             this.state.companies.currentCompany.addresses.push(res.data.address);
-                            this.state.companies.addressPagination.totalAddresses++;
+                            this.state.companies.companyAddressesPagination.totalAddresses++;
 
-                            const { totalAddresses, addressIndex } = this.state.companies.addressPagination;
-                            adminView.renderPagination(totalAddresses, addressIndex, document.querySelector('.pagination-wrapper--addresses'), 'addresses');
+                            const { totalAddresses, index } = this.state.companies.companyAddressesPagination;
+                            adminView.renderPagination(totalAddresses, index, document.querySelector('.pagination-wrapper--addresses'), 'addresses');
 
                         }
                     } catch(err) {
@@ -3647,196 +3709,195 @@ class AdminController {
             });
             
         }
-        if(editBtn) {
-            const { 
-                id,
-                companyName,
-                addresses,
-                contacts
-            } = this.state.companies.currentCompany;
+        // if(editBtn) {
+        //     const { 
+        //         id,
+        //         companyName,
+        //         addresses,
+        //         contacts
+        //     } = this.state.companies.currentCompany;
 
-            adminView.renderCompanyModal({
-                companyNumber: id,
-                companyName,
-                contact: contacts[this.state.companies.contactPagination.contactIndex],
-                address: addresses[this.state.companies.addressPagination.addressIndex]
-            }, 'edit');
+        //     adminView.renderCompanyModal({
+        //         companyNumber: id,
+        //         companyName,
+        //         contact: contacts[this.state.companies.companyContactsPagination.contactIndex],
+        //         address: addresses[this.state.companies.addressesPagination.addressIndex]
+        //     }, 'edit');
 
-            let alert;
-            const alertWrapper = document.querySelector('.alert-wrapper');
-            const companyForm = document.querySelector('.form--edit-company');
-            const closeBtn = document.querySelector('.form__close--edit-company');
-            const modal = document.querySelector('.company-summary__modal');
+        //     let alert;
+        //     const alertWrapper = document.querySelector('.alert-wrapper');
+        //     const companyForm = document.querySelector('.form--edit-company');
+        //     const closeBtn = document.querySelector('.form__close--edit-company');
+        //     const modal = document.querySelector('.company-summary__modal');
 
-            const fields = adminView.getCompanyFields('edit-company');
-            const { 
-                companyNameField, 
-                contactFirstNameField,
-                contactSurnameField,
-                contactPositionField,
-                phoneField,
-                emailField,
-                firstLineField,
-                secondLineField,
-                cityField,
-                countyField,
-                postcodeField
-            } = fields;
+        //     const fields = adminView.getCompanyFields('edit-company');
+        //     const { 
+        //         companyNameField, 
+        //         contactFirstNameField,
+        //         contactSurnameField,
+        //         contactPositionField,
+        //         phoneField,
+        //         emailField,
+        //         firstLineField,
+        //         secondLineField,
+        //         cityField,
+        //         countyField,
+        //         postcodeField
+        //     } = fields;
 
-            // Add the animation for the company alerts (paused)
-            editCompanyAlertAnimation
-                .from(alertWrapper, {
-                    autoAlpha: 0
-                })
-                .to(alertWrapper, {
-                    autoAlpha: 0
-                }, '+=1')
-                .add(() => {
-                    if(!document.querySelector('.alert--error')) {
-                        return gsap.to(modal, {
-                            autoAlpha: 0,
-                            duration: .2,
-                            onComplete: () => {
-                                modal.parentElement.removeChild(modal);
-                            }
-                        })
-                    }
-                })
+        //     // Add the animation for the company alerts (paused)
+        //     editCompanyAlertAnimation
+        //         .from(alertWrapper, {
+        //             autoAlpha: 0
+        //         })
+        //         .to(alertWrapper, {
+        //             autoAlpha: 0
+        //         }, '+=1')
+        //         .add(() => {
+        //             if(!document.querySelector('.alert--error')) {
+        //                 return gsap.to(modal, {
+        //                     autoAlpha: 0,
+        //                     duration: .2,
+        //                     onComplete: () => {
+        //                         modal.parentElement.removeChild(modal);
+        //                     }
+        //                 })
+        //             }
+        //         })
 
-            closeBtn.addEventListener('click', adminView.removeCompanyModal);
+        //     closeBtn.addEventListener('click', adminView.removeCompanyModal);
 
-            companyForm.addEventListener('submit', async () => {
-                e.preventDefault();
-                // Clear the alert wrapper contents
-                while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+        //     companyForm.addEventListener('submit', async () => {
+        //         e.preventDefault();
+        //         // Clear the alert wrapper contents
+        //         while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
 
-                const data = adminView.getCompanyValues(fields, true); 
-                const { changed, ...values } = data;
+        //         const data = adminView.getCompanyValues(fields, true); 
+        //         const { changed, ...values } = data;
 
-                const errors = validator.validateCompany(values);
+        //         const errors = validator.validateCompany(values);
                 
-                if(!changed.length > 0) {
-                    alert = modalView.getAlert(`No Fields Changed`, false);
-                    alertWrapper.insertAdjacentHTML('afterbegin', alert);
+        //         if(!changed.length > 0) {
+        //             alert = modalView.getAlert(`No Fields Changed`, false);
+        //             alertWrapper.insertAdjacentHTML('afterbegin', alert);
 
-                    editCompanyAlertAnimation.play(0);
-                    return;
-                }
+        //             editCompanyAlertAnimation.play(0);
+        //             return;
+        //         }
 
-                const contactId = this.state.companies.currentCompany.contacts[this.state.companies.currentContactIndex].contactId;
+        //         const contactId = this.state.companies.currentCompany.contacts[this.state.companies.currentContactIndex].contactId;
 
-                const addressId = this.state.companies.currentCompany.addresses[this.state.companies.currentAddressIndex].id;
+        //         const addressId = this.state.companies.currentCompany.addresses[this.state.companies.currentAddressIndex].id;
 
-                if(!errors) {
-                    try {
-                        const res = await this.Admin.editCompany({ id, contactId, addressId, ...values });      
+        //         if(!errors) {
+        //             try {
+        //                 const res = await this.Admin.editCompany({ id, contactId, addressId, ...values });      
 
-                        if(res.status !== 201) {
-                            alert = modalView.getAlert('Company Not Edited', false);
-                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                            editCompanyAlertAnimation.play(0);
-                        } else {
-                            await this.getData('companies');
-                            this.state.companies.currentCompany = res.data.company;
+        //                 if(res.status !== 201) {
+        //                     alert = modalView.getAlert('Company Not Edited', false);
+        //                     alertWrapper.insertAdjacentHTML('afterbegin', alert);
+        //                     editCompanyAlertAnimation.play(0);
+        //                 } else {
+        //                     await this.getData('companies');
+        //                     this.state.companies.currentCompany = res.data.company;
 
-                            const summary = document.querySelector('.summary');
-                            const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
+        //                     const summary = document.querySelector('.summary');
+        //                     const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
 
-                            // No animation needed as it's behind the modal
-                            adminView.switchSummary(summary, newSummary);
+        //                     // No animation needed as it's behind the modal
+        //                     adminView.switchSummary(summary, newSummary);
                             
-                            // No need to set the companyJobs state because it's not changed
+        //                     // No need to set the companyJobs state because it's not changed
 
-                            // Render the summary company jobs table
-                            if(this.state.companies.paginatedJobs.length > 0) {
-                                // remove any placeholders
-                                const placeholder = document.querySelector('.company-jobs-placeholder')
+        //                     // Render the summary company jobs table
+        //                     if(this.state.companies.paginatedJobs.length > 0) {
+        //                         // remove any placeholders
+        //                         const placeholder = document.querySelector('.company-jobs-placeholder')
 
-                                if(placeholder) placeholder.parentElement.removeChild(placeholder);
+        //                         if(placeholder) placeholder.parentElement.removeChild(placeholder);
 
-                                this.renderCompanyJobsTable();
-                            } else {
-                                // render a placeholder saying 'no jobs'
-                                document.querySelector('.table-wrapper--nested-jobs')
-                                    .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
-                            } 
+        //                         this.renderCompanyJobsTable();
+        //                     } else {
+        //                         // render a placeholder saying 'no jobs'
+        //                         document.querySelector('.table-wrapper--nested-jobs')
+        //                             .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
+        //                     } 
 
-                            // Add pagination for nested contacts, addresses, and jobs elements
-                            this.addCompanyNestedPagination();
+        //                     // Add pagination for nested contacts, addresses, and jobs elements
+        //                     this.addCompanyNestedPagination();
 
-                            // Add the listener to the new summary
-                            document.querySelector('.summary').addEventListener('click', (e) => this.companySummaryListener(e))
+        //                     // Add the listener to the new summary
+        //                     document.querySelector('.summary').addEventListener('click', (e) => this.companySummaryListener(e))
 
-                            // Remove any modals
-                            adminView.removeSummaryModals();
+        //                     // Remove any modals
+        //                     adminView.removeSummaryModals();
 
-                            alert = modalView.getAlert('Company Edited', true);
-                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                            editCompanyAlertAnimation.play(0);
+        //                     alert = modalView.getAlert('Company Edited', true);
+        //                     alertWrapper.insertAdjacentHTML('afterbegin', alert);
+        //                     editCompanyAlertAnimation.play(0);
 
-                            console.log(changed);
-                            // If companyName has changed, update the table
-                            if(changed.indexOf('companyName') !== -1) this.renderCompaniesTable();
+        //                     // If companyName has changed, update the table
+        //                     if(changed.indexOf('companyName') !== -1) this.renderCompaniesTable();
 
-                        }
+        //                 }
 
-                    } catch(err) {
-                        console.log(err)
+        //             } catch(err) {
+        //                 console.log(err)
 
-                        if(err?.response?.data?.validationErrors.length > 0){
-                            alert = modalView.getAlert(err.response.data.validationErrors[0].msg, false);
-                        } else {
-                            alert = modalView.getAlert('Company Not Edited', false);
-                        }
-                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                        editCompanyAlertAnimation.play(0);
-                    }
-                } else {
-                    if(errors.companyName) 
-                        validator.setErrorFor(companyNameField, errors.companyName); 
-                    else validator.setSuccessFor(companyNameField);
+        //                 if(err?.response?.data?.validationErrors.length > 0){
+        //                     alert = modalView.getAlert(err.response.data.validationErrors[0].msg, false);
+        //                 } else {
+        //                     alert = modalView.getAlert('Company Not Edited', false);
+        //                 }
+        //                 alertWrapper.insertAdjacentHTML('afterbegin', alert);
+        //                 editCompanyAlertAnimation.play(0);
+        //             }
+        //         } else {
+        //             if(errors.companyName) 
+        //                 validator.setErrorFor(companyNameField, errors.companyName); 
+        //             else validator.setSuccessFor(companyNameField);
 
-                    if(errors.firstName)  
-                        validator.setErrorFor(contactFirstNameField, errors.firstName);
-                    else validator.setSuccessFor(contactFirstNameField);
+        //             if(errors.firstName)  
+        //                 validator.setErrorFor(contactFirstNameField, errors.firstName);
+        //             else validator.setSuccessFor(contactFirstNameField);
 
-                    if(errors.lastName) 
-                        validator.setErrorFor(contactSurnameField, errors.lastName);
-                    else validator.setSuccessFor(contactSurnameField);
+        //             if(errors.lastName) 
+        //                 validator.setErrorFor(contactSurnameField, errors.lastName);
+        //             else validator.setSuccessFor(contactSurnameField);
 
-                    if(errors.position) 
-                        validator.setErrorFor(contactPositionField, errors.position);
-                    else validator.setSuccessFor(contactPositionField);
+        //             if(errors.position) 
+        //                 validator.setErrorFor(contactPositionField, errors.position);
+        //             else validator.setSuccessFor(contactPositionField);
 
-                    if(errors.phone) 
-                        validator.setErrorFor(phoneField, errors.phone);
-                    else validator.setSuccessFor(phoneField);
+        //             if(errors.phone) 
+        //                 validator.setErrorFor(phoneField, errors.phone);
+        //             else validator.setSuccessFor(phoneField);
 
-                    if(errors.email) 
-                        validator.setErrorFor(emailField, errors.email);
-                    else validator.setSuccessFor(emailField);
+        //             if(errors.email) 
+        //                 validator.setErrorFor(emailField, errors.email);
+        //             else validator.setSuccessFor(emailField);
 
-                    if(errors.firstLine) 
-                        validator.setErrorFor(firstLineField, errors.firstLine);
-                    else validator.setSuccessFor(firstLineField);
+        //             if(errors.firstLine) 
+        //                 validator.setErrorFor(firstLineField, errors.firstLine);
+        //             else validator.setSuccessFor(firstLineField);
 
-                    if(errors.secondLine) 
-                        validator.setErrorFor(secondLineField, errors.secondLine); 
-                    else validator.setSuccessFor(secondLineField);
+        //             if(errors.secondLine) 
+        //                 validator.setErrorFor(secondLineField, errors.secondLine); 
+        //             else validator.setSuccessFor(secondLineField);
 
-                    if(errors.city) 
-                        validator.setErrorFor(cityField, errors.city); 
-                    else validator.setSuccessFor(cityField);
-                    if(errors.county) 
-                        validator.setErrorFor(countyField, errors.county); 
-                    else validator.setSuccessFor(countyField);
-                    if(errors.postcode) 
-                        validator.setErrorFor(postcodeField, errors.postcode); 
-                    else validator.setSuccessFor(postcodeField);
-                }
+        //             if(errors.city) 
+        //                 validator.setErrorFor(cityField, errors.city); 
+        //             else validator.setSuccessFor(cityField);
+        //             if(errors.county) 
+        //                 validator.setErrorFor(countyField, errors.county); 
+        //             else validator.setSuccessFor(countyField);
+        //             if(errors.postcode) 
+        //                 validator.setErrorFor(postcodeField, errors.postcode); 
+        //             else validator.setSuccessFor(postcodeField);
+        //         }
                 
-            });
-        }
+        //     });
+        // }
         if(editContactBtn) {
             let alert;
             const { 
@@ -3849,8 +3910,8 @@ class AdminController {
             adminView.renderCompanyModal({
                 companyNumber: id,
                 companyName,
-                contact: contacts[this.state.companies.contactPagination.contactIndex],
-                address: addresses[this.state.companies.addressPagination.addressIndex]
+                contact: contacts[this.state.companies.companyContactsPagination.index],
+                address: addresses[this.state.companies.companyAddressesPagination.index]
             }, 'edit-contact');
 
             const alertWrapper = document.querySelector('.alert-wrapper');
@@ -3931,7 +3992,6 @@ class AdminController {
                     try {
                         const res = await this.Admin.editContact({id, contactId, ...values});
 
-                        console.log(res.status);
                         if(res.status !== 201) {
                             alert = modalView.getAlert('Contact Not Edited', false);
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
@@ -4018,8 +4078,8 @@ class AdminController {
             adminView.renderCompanyModal({
                 companyNumber: id,
                 companyName,
-                contact: contacts[this.state.companies.contactPagination.contactIndex],
-                address: addresses[this.state.companies.addressPagination.addressIndex]
+                contact: contacts[this.state.companies.companyContactsPagination.index],
+                address: addresses[this.state.companies.companyAddressesPagination.index]
             }, 'edit-address');
 
             const alertWrapper = document.querySelector('.alert-wrapper');
@@ -4096,7 +4156,6 @@ class AdminController {
                 if(!errors) {
                     try {
                         const res = await this.Admin.editAddress({id, addressId, ...values});
-                        console.log(res.status);
                         if(res.status !== 201) {
                             alert = modalView.getAlert('Address Not Edited', false);
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
@@ -4153,137 +4212,136 @@ class AdminController {
                 }
             });
         }
-        if(deleteBtn) {
-            let alert;
-            const companyId = document.querySelector('.company-summary').dataset.id;
-            const summaryWrapper = document.querySelector('.summary-wrapper');
+        // if(deleteBtn) {
+        //     let alert;
+        //     const companyId = document.querySelector('.company-summary').dataset.id;
+        //     const summaryWrapper = document.querySelector('.summary-wrapper');
 
-            // Render confirmation modal
-            const confirmationHtml = adminView.getDeleteCompanyHtml(companyId);
-            summaryWrapper.insertAdjacentHTML('afterbegin', confirmationHtml);
+        //     // Render confirmation modal
+        //     const confirmationHtml = adminView.getDeleteCompanyHtml(companyId);
+        //     summaryWrapper.insertAdjacentHTML('afterbegin', confirmationHtml);
 
-            // Select and animate confirmation modal
-            const confirmation = document.querySelector('.confirmation');
-            gsap.from(confirmation, {
-                autoAlpha: 0,
-                duration: .2
-            });
+        //     // Select and animate confirmation modal
+        //     const confirmation = document.querySelector('.confirmation');
+        //     gsap.from(confirmation, {
+        //         autoAlpha: 0,
+        //         duration: .2
+        //     });
 
-            // Alert animation
-            const alertWrapper = document.querySelector('.alert-wrapper');
-            // Add the animation for the company alerts
-            deleteCompanyAlertAnimation
-            .from(alertWrapper, {
-                autoAlpha: 0
-            })
-            .to(alertWrapper, {
-                autoAlpha: 0
-            }, '+=1')
-            .add(() => {
-                if(!document.querySelector('.alert--error')) {
-                    return gsap.to(confirmation, {
-                        autoAlpha: 0,
-                        duration: .2,
-                        onComplete: () => {
-                            confirmation.parentElement.removeChild(confirmation);
-                        }
-                    })
-                }
-            })
+        //     // Alert animation
+        //     const alertWrapper = document.querySelector('.alert-wrapper');
+        //     // Add the animation for the company alerts
+        //     deleteCompanyAlertAnimation
+        //     .from(alertWrapper, {
+        //         autoAlpha: 0
+        //     })
+        //     .to(alertWrapper, {
+        //         autoAlpha: 0
+        //     }, '+=1')
+        //     .add(() => {
+        //         if(!document.querySelector('.alert--error')) {
+        //             return gsap.to(confirmation, {
+        //                 autoAlpha: 0,
+        //                 duration: .2,
+        //                 onComplete: () => {
+        //                     confirmation.parentElement.removeChild(confirmation);
+        //                 }
+        //             })
+        //         }
+        //     })
             
-            const confirm = document.querySelector('.confirmation__btn--confirm');
-            const cancel = document.querySelector('.confirmation__btn--cancel');
+        //     const confirm = document.querySelector('.confirmation__btn--confirm');
+        //     const cancel = document.querySelector('.confirmation__btn--cancel');
 
-            confirm.addEventListener('click', async() => {
-                // Clear the alert wrapper contents
-                while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+        //     confirm.addEventListener('click', async() => {
+        //         // Clear the alert wrapper contents
+        //         while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
 
 
-                if(this.companies.length === 1) {
-                    alert = modalView.getAlert(`Cannot delete last remaining address`, false);
-                    alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                    // Add to the animation to remove the modal (usually failed modals remain)
-                    deleteAddressAlertAnimation.to(confirmation, {
-                        autoAlpha: 0,
-                        duration: .2,
-                        onComplete: () => {
-                            confirmation.parentElement.removeChild(confirmation);
-                        }
-                    })
-                    deleteAddressAlertAnimation.play(0);
+        //         if(this.companies.length === 1) {
+        //             alert = modalView.getAlert(`Cannot delete last remaining address`, false);
+        //             alertWrapper.insertAdjacentHTML('afterbegin', alert);
+        //             // Add to the animation to remove the modal (usually failed modals remain)
+        //             deleteAddressAlertAnimation.to(confirmation, {
+        //                 autoAlpha: 0,
+        //                 duration: .2,
+        //                 onComplete: () => {
+        //                     confirmation.parentElement.removeChild(confirmation);
+        //                 }
+        //             })
+        //             deleteAddressAlertAnimation.play(0);
                     
-                    return;
-                }
+        //             return;
+        //         }
 
-                try {
-                    const res = await this.Admin.deleteCompany(companyId);
-                    if(res.status === 200) {
-                        console.log('success');
-                        alert = modalView.getAlert(`Company ${companyId} deleted`, true);
-                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
+        //         try {
+        //             const res = await this.Admin.deleteCompany(companyId);
+        //             if(res.status === 200) {
+        //                 alert = modalView.getAlert(`Company ${companyId} deleted`, true);
+        //                 alertWrapper.insertAdjacentHTML('afterbegin', alert);
 
-                        // Update the companies array
-                        await this.getData('companies');
+        //                 // Update the companies array
+        //                 await this.getData('companies');
 
-                        // Rerender table
-                        this.renderCompaniesTable();
+        //                 // Rerender table
+        //                 this.renderCompaniesTable();
 
-                        // Update current company
-                        this.state.companies.currentCompany = this.companies[0];
+        //                 // Update current company
+        //                 this.state.companies.currentCompany = this.companies[0];
 
-                        // Change the summary
-                        const summary = document.querySelector('.summary');
-                        const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
-                        // No animation needed as it's behind the modal
-                        adminView.switchSummary(summary, newSummary);
+        //                 // Change the summary
+        //                 const summary = document.querySelector('.summary');
+        //                 const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
+        //                 // No animation needed as it's behind the modal
+        //                 adminView.switchSummary(summary, newSummary);
 
 
-                        // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
-                        this.setCompanyJobsState();
+        //                 // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
+        //                 this.initCompanyJobsState();
 
-                        // Render the summary company jobs table
-                        if(this.state.companies.paginatedJobs.length > 0) {
-                            // remove any placeholders
-                            const placeholder = document.querySelector('.company-jobs-placeholder');
-                            if(placeholder) placeholder.parentElement.removeChild(placeholder);
+        //                 // Render the summary company jobs table
+        //                 if(this.state.companies.paginatedJobs.length > 0) {
+        //                     // remove any placeholders
+        //                     const placeholder = document.querySelector('.company-jobs-placeholder');
+        //                     if(placeholder) placeholder.parentElement.removeChild(placeholder);
 
-                            this.renderCompanyJobsTable();
-                        } else {
-                            // render a placeholder saying 'no jobs'
-                            document.querySelector('.table-wrapper--nested-jobs')
-                                .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
-                        } 
-                        // Add pagination for nested contacts, addresses, and jobs elements
-                        this.addCompanyNestedPagination();
+        //                     this.renderCompanyJobsTable();
+        //                 } else {
+        //                     // render a placeholder saying 'no jobs'
+        //                     document.querySelector('.table-wrapper--nested-jobs')
+        //                         .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
+        //                 } 
+        //                 // Add pagination for nested contacts, addresses, and jobs elements
+        //                 this.addCompanyNestedPagination();
 
-                        this.addCompanySummaryListeners();
+        //                 this.addCompanySummaryListeners();
 
-                        // Play the alert animation
-                        deleteCompanyAlertAnimation.play(0);
-                    } else { 
-                        // Clear the alert wrapper contents
-                        while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
-                        alert = modalView.getAlert(`Company not deleted`, false);
-                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                    }
-                } catch(err) {
-                    // Clear the alert wrapper contents
-                    while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
-                    alert = modalView.getAlert(`Company not deleted`, false);
-                    alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                }
-            });
+        //                 // Play the alert animation
+        //                 deleteCompanyAlertAnimation.play(0);
+        //             } else { 
+        //                 // Clear the alert wrapper contents
+        //                 while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+        //                 alert = modalView.getAlert(`Company not deleted`, false);
+        //                 alertWrapper.insertAdjacentHTML('afterbegin', alert);
+        //             }
+        //         } catch(err) {
+        //             // Clear the alert wrapper contents
+        //             while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+        //             alert = modalView.getAlert(`Company not deleted`, false);
+        //             alertWrapper.insertAdjacentHTML('afterbegin', alert);
+        //         }
+        //     });
 
-            cancel.addEventListener('click', () => {
-                gsap.to(confirmation, {
-                    autoAlpha: 0,
-                    duration: .2,
-                    onComplete: () => {
-                        confirmation.parentElement.removeChild(confirmation);
-                    }
-                })
-            });
-        }
+        //     cancel.addEventListener('click', () => {
+        //         gsap.to(confirmation, {
+        //             autoAlpha: 0,
+        //             duration: .2,
+        //             onComplete: () => {
+        //                 confirmation.parentElement.removeChild(confirmation);
+        //             }
+        //         })
+        //     });
+        // }
         if(deleteContactBtn) {
             console.log('deleteContact');
             
@@ -4367,7 +4425,7 @@ class AdminController {
                         adminView.switchSummary(summary, newSummary);
 
                         // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
-                        this.setCompanyJobsState();
+                        this.initCompanyJobsState();
 
                         // Render the summary company jobs table
                         if(this.state.companies.paginatedJobs.length > 0) {
@@ -4487,7 +4545,7 @@ class AdminController {
                         adminView.switchSummary(summary, newSummary);
 
                         // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
-                        this.setCompanyJobsState();
+                        this.initCompanyJobsState();
 
                         // Render the summary company jobs table
                         if(this.state.companies.paginatedJobs.length > 0) {
@@ -4536,8 +4594,658 @@ class AdminController {
         }
     }
 
+    async companyControlsListener(e) {
+
+        // Buttons
+        const newBtn = e.target.closest('.summary__new-company-btn--companies');
+        const editBtn = e.target.closest('.summary__edit-company-btn--companies');
+        const hubspotBtn = e.target.closest('.company-summary__btn--hubspot');
+        const deleteBtn = e.target.closest('.summary__delete-company-btn--companies');
+
+        if(newBtn) {
+            const modalExists = document.querySelector('.summary__modal');
+            const modalHeaderExists = document.querySelector('.summary__modal-header');
+            let errorAnimation;
+            let successAnimation;
+
+            let alert;
+            const { 
+                id,
+                companyName,
+                addresses,
+                contacts
+            } = this.state.companies.currentCompany;
+
+            modalView.renderCompanyModal({
+                companyNumber: this.getNextId('companies'),
+                id,
+                companyName,
+                contact: contacts[this.state.companies.companyContactsPagination.index],
+                address: addresses[this.state.companies.companyAddressesPagination.index]
+            }, 'new');
+
+            const companySummaryModal = document.querySelector('.summary__modal--new-company');
+            const companySummaryModalHeader = document.querySelector('.summary__modal-header--companies');
+
+            // If a modal exists, the modal above will render behind the existing one, so animate it out
+            // to give a smooth transition. Otherwise animate the new modal in
+            if(modalExists) {
+                gsap.timeline()
+                    // AnimateModalOut removes the modal from the dom
+                    .add(animation.animateSummaryModalOut(modalExists))
+                    .add(animation.animateSummaryModalOut(modalHeaderExists), '<')
+                    // .add(() => { modalView.removeAdminModal('existing', [ modalExists, modalHeaderExists ]) })
+            } else {
+                animation.animateSummaryModalIn(companySummaryModal);
+                animation.animateSummaryModalIn(companySummaryModalHeader);
+            }
 
 
+            const alertWrapper = document.querySelector('.alert-wrapper');
+            const companyForm = document.querySelector('.form--new-company');
+            const closeBtn = document.querySelector('.form__close--new-company');
+            const submitBtn = document.querySelector('.form__submit--new-company');
+
+            // Get the field elements
+            const fields = adminView.getCompanyFields('new-company');
+            const { 
+                companyNameField, 
+                contactFirstNameField,
+                contactSurnameField,
+                contactPositionField,
+                phoneField,
+                emailField,
+                firstLineField,
+                secondLineField,
+                cityField,
+                countyField,
+                postcodeField
+            } = fields;
+
+            // Get the animation for the application alerts (paused)
+            errorAnimation = animation.animateAlert(alertWrapper, true);
+            // Success animation is the same, but appended later (paused)
+            successAnimation = animation.animateAlert(alertWrapper, true);
+
+            closeBtn.addEventListener('click', () => {
+                modalView.removeAdminModal('companies');
+            });
+
+            companyForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                // Clear the alert wrapper contents
+                while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+
+                const data = adminView.getCompanyValues(fields); 
+                const { changed, ...values } = data;
+                const errors = validator.validateCompany(values);
+
+                if(!errors) {
+                    try {
+                        const res = await this.Admin.createCompany(values);
+
+                        if(res.status !== 201) {
+                            throw new Error();
+                        }else {  
+                            alert = modalView.getAlert('Company Created', true);
+                            alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                            successAnimation.play(0);
+
+                            // await this.getData('companies');
+                            // this.state.companies.currentCompany = res.data.company;
+
+                            // Set up an animation tl before data updated
+                            const tl = gsap.timeline();
+                            // Add loaders outside of animation
+                            adminView.renderAdminLoaders('companies');
+
+                            tl
+                              .add(animation.animateAdminLoadersIn())
+                              .add(animation.animateTableContentOut('companies'), '<')
+                              .add(async() => {
+                                  // Get data (updates total companies)
+                                  await this.getData('companies', res.data.company.id);
+                                  this.state.companies.currentCompany = res.data.company;
+                                  this.resetCompanyState();
+
+                                  // TABLE RENDERING/ANIMATION
+                                  this.renderCompaniesTable();
+
+                                // Animate table body in (body, not content, because the table will already be present
+                                // if adding a company), and the loaders out
+                                gsap
+                                .timeline()
+                                .add(animation.animateTableBodyIn('companies'))
+                                .add(animation.animateAdminLoadersOut(), '<')
+
+                                // SUMMARY RENDERING/ANIMATION
+                                // Switch summary (No animation needed as behind the modal)
+                                summaryView.switchCompanySummary(this.companies[0]);
+
+                                // // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
+                                // this.initCompanyJobsState();
+
+                                // // Add pagination for nested contacts, addresses, and jobs elements
+                                this.addCompanyNestedPagination();
+
+                                // Render the summary company jobs table
+                                this.renderCompanyJobsTable();  
+
+                                if(this.state.companies.paginatedJobs.length === 0) {
+                                    // render a placeholder saying 'no jobs'
+                                    document.querySelector('.table__content--company-jobs')
+                                    .insertAdjacentHTML('beforeend', adminView.createNoJobsPlaceholder());
+                                    // Animate the placeholder in
+                                    animation.animateTablePlaceholderIn(document.querySelector('.company-jobs-placeholder'));   
+
+                                } 
+
+                                this.addCompanySummaryListeners();
+
+                                // Add to the successAnimation once the getData() call has now completed
+                                // NB: animating the modal out, not the summary out (which would also animate the modal)
+                                successAnimation.add(animation.animateSummaryModalOut(companySummaryModal));
+                                successAnimation.add(animation.animateSummaryModalOut(companySummaryModalHeader));
+
+                            // PAGINATION RENDERING
+                                // Update pagination
+                                const { totalCompanies, searchOptions: {index, limit} } = this.state.companies;
+                                const { pages, index: current } = paginationView.calculatePagination(index, limit, totalCompanies);
+                                paginationView.initPagination(pages, current, 'companies');
+
+                              })
+
+
+
+
+                            // const summary = document.querySelector('.summary');
+                            // const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
+
+                            // // No animation needed as it's behind the modal
+                            // adminView.switchSummary(summary, newSummary);
+
+                            // // Render the summary company jobs table
+                            // if(this.state.companies.paginatedJobs.length > 0) {
+                            //     // remove any placeholders
+                            //     const placeholder = document.querySelector('.company-jobs-placeholder')
+
+                            //     if(placeholder) placeholder.parentElement.removeChild(placeholder);
+
+                            //     this.renderCompanyJobsTable();
+                            // } else {
+                            //     // render a placeholder saying 'no jobs'
+                            //     document.querySelector('.table-wrapper--nested-jobs')
+                            //         .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
+                            // } 
+
+                            // // Add pagination for nested contacts, addresses, and jobs elements
+                            // this.addCompanyNestedPagination();
+
+                            // // Add the listener to the new summary
+                            // document.querySelector('.summary').addEventListener('click', (e) => this.companySummaryListener(e))
+
+
+                            // this.renderCompaniesTable();
+                            // // Update pagination
+                            // const { totalCompanies, searchOptions: {index: companyIndex, limit: companyLimit} } = this.state.companies;
+                            // adminView.renderPagination(companyIndex, companyLimit, document.querySelector('.table-wrapper'), 'companies');
+                    
+                        }
+                    } catch(err) {
+                        console.log(err)
+
+                        if(err?.response?.data?.validationErrors.length > 0){
+                            alert = modalView.getAlert(err.response.data.validationErrors[0].msg, false);
+                        } else {
+                            alert = modalView.getAlert('Company Not Created', false);
+                        }
+                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                        errorAnimation.play(0);
+                    }
+                } else {
+                    if(errors.companyName) 
+                        validator.setErrorFor(companyNameField, errors.companyName); 
+                    else validator.setSuccessFor(companyNameField);
+    
+                    if(errors.firstName)  
+                        validator.setErrorFor(contactFirstNameField, errors.firstName);
+                    else validator.setSuccessFor(contactFirstNameField);
+    
+                    if(errors.lastName) 
+                        validator.setErrorFor(contactSurnameField, errors.lastName);
+                    else validator.setSuccessFor(contactSurnameField);
+    
+                    if(errors.position) 
+                        validator.setErrorFor(contactPositionField, errors.position);
+                    else validator.setSuccessFor(contactPositionField);
+    
+                    if(errors.phone) 
+                        validator.setErrorFor(phoneField, errors.phone);
+                    else validator.setSuccessFor(phoneField);
+    
+                    if(errors.email) 
+                        validator.setErrorFor(emailField, errors.email);
+                    else validator.setSuccessFor(emailField);
+    
+                    if(errors.firstLine) 
+                        validator.setErrorFor(firstLineField, errors.firstLine);
+                    else validator.setSuccessFor(firstLineField);
+    
+                    if(errors.secondLine) 
+                        validator.setErrorFor(secondLineField, errors.secondLine); 
+                    else validator.setSuccessFor(secondLineField);
+
+                    if(errors.city) 
+                        validator.setErrorFor(cityField, errors.city); 
+                    else validator.setSuccessFor(cityField);
+                    if(errors.county) 
+                        validator.setErrorFor(countyField, errors.county); 
+                    else validator.setSuccessFor(countyField);
+                    if(errors.postcode) 
+                        validator.setErrorFor(postcodeField, errors.postcode); 
+                    else validator.setSuccessFor(postcodeField);
+                }
+            });
+
+            // Validate each field on lost focus
+            companyForm.addEventListener('focusout', e => {
+                if(e.target === submitBtn) return;
+                const data = adminView.getCompanyValues(fields);
+                const {name, value} = this.getCompanyDataToValidate(e, data, fields);
+                const error = validator.validateCompanyField({ name,  value });
+
+                if(error) validator.setErrorFor(e.target, error);
+                else validator.setSuccessFor(e.target);
+            });
+
+            Object.values(fields).forEach(field => {
+                field.addEventListener('focus', e => {
+                    if(field.parentElement.classList.contains('success')) {
+                        field.parentElement.classList.remove('success');
+                    }
+                    if(field.parentElement.classList.contains('error')) {
+                        field.parentElement.classList.remove('error');
+                    }
+                    // Remove the success msg
+                    field.nextElementSibling.nextElementSibling.nextElementSibling.innerText = '';
+                });
+            });
+
+        }
+        if(editBtn) {
+            const modalExists = document.querySelector('.summary__modal');
+            const modalHeaderExists = document.querySelector('.summary__modal-header');
+            let errorAnimation;
+            let successAnimation;
+            let alert;
+
+            const { 
+                id,
+                companyName,
+                addresses,
+                contacts
+            } = this.state.companies.currentCompany;
+
+            modalView.renderCompanyModal({
+                companyNumber: id,
+                companyName,
+                companyDate: this.state.companies.currentCompany.companyDate,
+                contact: contacts[this.state.companies.companyContactsPagination.index],
+                address: addresses[this.state.companies.companyAddressesPagination.index]
+            }, 'edit');
+
+            const companySummaryModal = document.querySelector('.summary__modal--edit-company');
+            const companySummaryModalHeader = document.querySelector('.summary__modal-header--companies');
+
+            // If a modal exists, the modal above will render behind the existing one, so animate it out
+            // to give a smooth transition. Otherwise animate the new modal in
+            if(modalExists) {
+                gsap.timeline()
+                    // AnimateModalOut removes the modal from the dom
+                    .add(animation.animateSummaryModalOut(modalExists))
+                    .add(animation.animateSummaryModalOut(modalHeaderExists), '<')
+                    // .add(() => { modalView.removeAdminModal('existing', [ modalExists, modalHeaderExists ]) })
+            } else {
+                animation.animateSummaryModalIn(companySummaryModal);
+                animation.animateSummaryModalIn(companySummaryModalHeader);
+            }
+
+            const alertWrapper = document.querySelector('.alert-wrapper');
+            const companyForm = document.querySelector('.form--edit-company');
+            const closeBtn = document.querySelector('.form__close--edit-company');
+            const modal = document.querySelector('.summary__modal');
+
+            const fields = adminView.getCompanyFields('edit-company');
+            const { 
+                companyNameField, 
+                contactFirstNameField,
+                contactSurnameField,
+                contactPositionField,
+                phoneField,
+                emailField,
+                firstLineField,
+                secondLineField,
+                cityField,
+                countyField,
+                postcodeField
+            } = fields;
+
+            // Get the animation for the application alerts (paused)
+            errorAnimation = animation.animateAlert(alertWrapper, true);
+            // Success animation is the same, but appended later (paused)
+            successAnimation = animation.animateAlert(alertWrapper, true);
+
+            closeBtn.addEventListener('click', () => {
+                modalView.removeAdminModal('companies');
+            });
+            
+            companyForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                // Clear the alert wrapper contents
+                while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+
+                const data = adminView.getCompanyValues(fields, true); 
+                const { changed, ...values } = data;
+
+                
+                if(!changed.length > 0) {
+                    alert = modalView.getAlert(`No Fields Changed`, false);
+                    alertWrapper.insertAdjacentHTML('afterbegin', alert);
+
+                    errorAnimation.play(0);
+                    return;
+                }
+
+                const contactId = this.state.companies.currentCompany.contacts[this.state.companies.currentContactIndex].contactId;
+
+                const addressId = this.state.companies.currentCompany.addresses[this.state.companies.currentAddressIndex].id;
+
+                const errors = validator.validateCompany(values);
+
+                if(!errors) {
+                    try {
+                        const res = await this.Admin.editCompany({ id, contactId, addressId, ...values });
+
+                        if(res.status !== 201) throw new Error();
+
+                        console.log('Before edit:', this.state.companies.currentCompany.contacts[0].firstName);
+                        this.state.companies.currentCompany = res.data.company;
+
+                        // Display the success modal
+                        alert = modalView.getAlert('Company Edited', true);
+                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                        successAnimation.play(0);
+
+                        // The animation should start before the updated data is fetched
+                        const tl = gsap.timeline();
+
+                        // Add loaders outside of animation
+                        adminView.renderAdminLoaders('companies');
+
+                        tl
+                          .add(animation.animateAdminLoadersIn())
+                          .add(animation.animateTableContentOut('companies'), '<')
+                          .add(async() => {
+                            // Get data (updates total companies)
+                            await this.getData('companies');
+                            // this.state.companies.currentCompany = res.data.company;
+
+                          // TABLE RENDERING/ANIMATION
+                            this.renderCompaniesTable();
+                            // Animate table body in (body, not content, because the table will already be present
+                            // if adding a company), and the loaders out
+                            gsap
+                              .timeline()
+                              .add(animation.animateTableBodyIn('companies'))
+                              .add(animation.animateAdminLoadersOut(), '<')
+
+                          // SUMMARY RENDERING/ANIMATION
+                            // Switch summary (No animation needed as behind the modal)
+                            console.log('After edit',this.state.companies.currentCompany.contacts[0].firstName);
+                            summaryView.switchCompanySummary(this.state.companies.currentCompany);
+
+                            // Add pagination for nested contacts, addresses, and jobs elements
+                            this.addCompanyNestedPagination();
+
+                            // Render the summary company jobs table
+                            this.renderCompanyJobsTable();  
+
+                            if(this.state.companies.paginatedJobs.length === 0) {
+                                // render a placeholder saying 'no jobs'
+                                document.querySelector('.table__content--company-jobs')
+                                .insertAdjacentHTML('beforeend', adminView.createNoJobsPlaceholder());
+                                // Animate the placeholder in
+                                animation.animateTablePlaceholderIn(document.querySelector('.company-jobs-placeholder'));   
+                            } 
+
+                            this.addCompanySummaryListeners();
+
+                            // Add to the successAnimation once the getData() call has now completed
+                            // NB: animating the modal out, not the summary out (which would also animate the modal)
+                            successAnimation.add(animation.animateSummaryModalOut(companySummaryModal));
+                            successAnimation.add(animation.animateSummaryModalOut(companySummaryModalHeader));
+                       
+                          // PAGINATION RENDERING
+                            // Update pagination
+                            const { totalCompanies, searchOptions: {index, limit} } = this.state.companies;
+                            const { pages, index: current } = paginationView.calculatePagination(index, limit, totalCompanies);
+                            paginationView.initPagination(pages, current, 'companies');
+
+                        })
+                        
+
+
+
+
+
+                    } catch(err) {
+                        console.log(err);
+
+                        if(err?.response?.data?.validationErrors.length > 0){
+                            alert = modalView.getAlert(err.response.data.validationErrors[0].msg, false);
+                        } else {
+                            alert = modalView.getAlert('Company Not Edited', false);
+                        }
+                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                        errorAnimation.play(0);
+                    }
+                } else {
+                    if(errors.companyName) 
+                        validator.setErrorFor(companyNameField, errors.companyName); 
+                    else validator.setSuccessFor(companyNameField);
+
+                    if(errors.firstName)  
+                        validator.setErrorFor(contactFirstNameField, errors.firstName);
+                    else validator.setSuccessFor(contactFirstNameField);
+
+                    if(errors.lastName) 
+                        validator.setErrorFor(contactSurnameField, errors.lastName);
+                    else validator.setSuccessFor(contactSurnameField);
+
+                    if(errors.position) 
+                        validator.setErrorFor(contactPositionField, errors.position);
+                    else validator.setSuccessFor(contactPositionField);
+
+                    if(errors.phone) 
+                        validator.setErrorFor(phoneField, errors.phone);
+                    else validator.setSuccessFor(phoneField);
+
+                    if(errors.email) 
+                        validator.setErrorFor(emailField, errors.email);
+                    else validator.setSuccessFor(emailField);
+
+                    if(errors.firstLine) 
+                        validator.setErrorFor(firstLineField, errors.firstLine);
+                    else validator.setSuccessFor(firstLineField);
+
+                    if(errors.secondLine) 
+                        validator.setErrorFor(secondLineField, errors.secondLine); 
+                    else validator.setSuccessFor(secondLineField);
+
+                    if(errors.city) 
+                        validator.setErrorFor(cityField, errors.city); 
+                    else validator.setSuccessFor(cityField);
+                    if(errors.county) 
+                        validator.setErrorFor(countyField, errors.county); 
+                    else validator.setSuccessFor(countyField);
+                    if(errors.postcode) 
+                        validator.setErrorFor(postcodeField, errors.postcode); 
+                    else validator.setSuccessFor(postcodeField);
+                }
+            });
+        }
+        if(deleteBtn) {
+            let errorAnimation;
+            let successAnimation;
+            let alert;
+
+            const companyId = document.querySelector('.summary__header-content').dataset.id;
+
+            // Create, insert and animate the confirmation modal into the DOM
+            const summaryWrapper = document.querySelector('.summary__content');
+            const confirmationHtml = adminView.getDeleteCompanyHtml(companyId);
+            summaryWrapper.insertAdjacentHTML('afterbegin', confirmationHtml);
+            const confirmation = document.querySelector('.confirmation');
+
+            // Confirmation animation 
+            gsap.from(confirmation, {
+                autoAlpha: 0,
+                duration: .2
+            });
+
+            // Alert animation
+            const alertWrapper = document.querySelector('.alert-wrapper');
+
+            // Get the animation for the job alerts
+            errorAnimation = animation.animateAlert(alertWrapper, true);
+            // Success animation is the same, but is added to after async call to get data
+            successAnimation = animation.animateAlert(alertWrapper, true);
+        
+            const confirm = document.querySelector('.confirmation__btn--confirm');
+            const cancel = document.querySelector('.confirmation__btn--cancel');
+            
+            confirm.addEventListener('click', async() => {
+                e.preventDefault();
+
+                // Clear the alert wrapper contents
+                while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+
+                try {
+                    const { status } = await this.Admin.deleteCompany(companyId);
+
+                    if(status === 200) {
+                        // Reset the nested pagination state
+                        this.resetCompanyState();
+
+                        const tl = gsap.timeline();
+
+                        alert = modalView.getAlert(`Company ${companyId} deleted`, true);
+                        alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                        successAnimation.play(0);
+
+                        // If it's the last item on the page
+                        if(this.companies.length === 1) {
+
+                            this.handleCompaniesPagination(null, true, null);
+
+                            //  // Set the pagination state (2nd param simulates pressing the prev btn)
+                            //  this.setJobsPaginationState(null, true, null);
+                            //  paginationView.updatePaginationView(this.state.jobs.currentPage -1);
+                             
+                            // // Render the admin loaders and animate them in and the table out
+                            // adminView.renderAdminLoaders(0);
+
+                            // tl.add(adminView.animateTableContentOut())
+                            //   .add(adminView.animateAdminLoadersIn(), '<')
+                            //   .add(async() => {
+                            //     // Update the jobs array
+                            //     await this.getData('jobs');
+
+                            //     this.changeTablePageAnimation(tl, 'jobs');
+
+                            //     const { totalJobs, searchOptions: {index, limit} } = this.state.jobs;
+                            //     const { pages, index: current } = paginationView.calculatePagination(index, limit, totalJobs);
+                            //     paginationView.initPagination(pages, current, 'jobs'); 
+                            //   })
+
+
+                        } else {
+                            
+                            // 1: Render loaders
+                            adminView.renderAdminLoaders('companies');
+
+                            // 2: Animate the loaders in / table body out
+                            tl.add(animation.animateTableContentOut('companies'))
+                            .add(animation.animateAdminLoadersIn(), '<')
+                            // 3: Nest subsequent functions so they execute after the above animations
+                            .add(async () => {
+                                // 4: Update the data and state (getData fn also updates the total count)
+                                await this.getData('companies');
+                                this.state.companies.currentCompany = this.companies[0];
+                                this.resetCompanyState();
+                                this.state.isActiveRequest = false;
+                                // SUMMARY (NESTED TL)
+                                // 5: Animate the Summary out (modal animation handled in animateSummaryOut)
+                                gsap
+                                    .timeline().add(animation.animateSummaryOut('companies'))
+                                    // 6: Switch the summary *after* the out animation has occurred
+                                    .add(() => {
+                                        summaryView.switchCompanySummary(this.companies[0]);
+
+                                        // Unlike the Jobs and Apps summaries, clicking another row has to re-calculate pagination
+                                        // on nested tables and contact/address sections
+
+                                            // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
+                                            this.initCompanyJobsState();
+                        
+                                            // // Add pagination for nested contacts, addresses, and jobs elements
+                                            this.addCompanyNestedPagination();
+                                            this.renderCompanyJobsTable()
+
+                                        // 7: Animate the summary back in
+                                        animation.animateCompanySummaryIn(this.state.companies.paginatedJobs.length);
+                                    })  
+
+                                // TABLE (NESTED TL) 
+                                // 8: Change table
+                                this.renderCompaniesTable();
+                                // 9: Animate table body in (body, not content, because the table will already be present)
+                                //    and the loaders out
+                                gsap
+                                    .timeline()
+                                    .add(animation.animateTableBodyIn('companies'))
+                                    .add(animation.animateAdminLoadersOut(), '<')
+
+                                // CALCULATE/RENDER PAGINATION
+                                const { totalCompanies, searchOptions: {index, limit} } = this.state.companies;
+                                const { pages, index: current } = paginationView.calculatePagination(index, limit, totalCompanies);
+
+                                const customSelect = document.querySelector('.custom-select-container--companies');
+                                paginationView.updatePaginationView(pages, current, 'companies');
+                            })
+                        }
+
+                    } else {
+                        throw new Error();
+                    }
+
+                } catch(err) {
+                    // Clear the alert wrapper contents
+                    while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
+                    
+                    alert = modalView.getAlert(`Error: Job ${jobId} not deleted`, false);
+                    alertWrapper.insertAdjacentHTML('afterbegin', alert);
+                    errorAnimation.play(0);
+
+                    console.log(err)
+                }
+            });
+
+            cancel.addEventListener('click', () => {
+                animation.animateSummaryModalOut(confirmation)
+            });
+        }
+    }
 
 
     // addCompanySummaryListeners() {
@@ -4777,15 +5485,22 @@ class AdminController {
     // }
 
     resetCompanyState() {
-        this.state.companies.companyJobPagination.jobIndex = 0;
-        this.state.companies.companyJobPagination.jobLimit = 0;
-        this.state.companies.companyJobPagination.totalJobs = 0;
-        this.state.companies.contactPagination.contactIndex = 0;
-        this.state.companies.contactPagination.contactLimit = 0;
-        this.state.companies.contactPagination.totalContacts = 0;
-        this.state.companies.addressPagination.addressIndex = 0;
-        this.state.companies.addressPagination.addressLimit = 0;
-        this.state.companies.addressPagination.totalAddresses = 0;
+        // Limit should be at least 1 (because one must be displayed)
+        this.state.companies.companyJobsPagination.index = 0;
+        this.state.companies.companyJobsPagination.limit = 1;
+        this.state.companies.companyJobsPagination.totalJobs = 0;
+        this.state.companies.companyJobsPagination.currentPage = 0;
+
+        this.state.companies.companyContactsPagination.index = 0;
+        this.state.companies.companyContactsPagination.limit = 1;
+        this.state.companies.companyContactsPagination.totalContacts = 0;
+        this.state.companies.companyContactsPagination.currentPage = 0;
+
+        this.state.companies.companyAddressesPagination.index = 0;
+        this.state.companies.companyAddressesPagination.limit = 1;
+        this.state.companies.companyAddressesPagination.totalAddresses = 0;
+        this.state.companies.companyAddressesPagination.currentPage = 0;
+
         this.state.companies.paginatedJobs = [];
     }
 
@@ -4889,27 +5604,52 @@ class AdminController {
         if(!e.target.closest('.pagination-wrapper')) return;
 
         // Find the element that has been clicked
-        const userBtn = e.target.closest('.pagination__item--users');
-        const jobBtn = e.target.closest('.pagination__item--jobs');
-        const companyBtn = e.target.closest('.pagination__item--companies');
-        const applicationBtn = e.target.closest('.pagination__item--applications');
-        const userPrevious = e.target.closest('.pagination__previous--users');
-        const userNext = e.target.closest('.pagination__next--users');
-        const jobPrevious = e.target.closest('.pagination__previous--jobs');
-        const jobNext = e.target.closest('.pagination__next--jobs');
-        const companyPrevious = e.target.closest('.pagination__previous--companies');
-        const companyNext = e.target.closest('.pagination__next--companies');
-        const applicationPrevious = e.target.closest('.pagination__previous--applications');
-        const applicationNext = e.target.closest('.pagination__next--applications');
 
+        // Applications Table
+        const applicationsOption = e.target.closest('.pagination__item--applications');
+        const applicationsPrevious = e.target.closest('.pagination__previous--applications');
+        const applicationsNext = e.target.closest('.pagination__next--applications');
+        
+        // Users Table
+        const usersOption = e.target.closest('.pagination__item--users');
+        const usersPrevious = e.target.closest('.pagination__previous--users');
+        const usersNext = e.target.closest('.pagination__next--users');
 
-        const application = applicationPrevious || applicationNext || applicationBtn;
-        const job = jobPrevious || jobNext || jobBtn;
-        const company = companyPrevious || companyNext || companyBtn;
-        const user = userPrevious || userNext || userBtn;
+        // Jobs Table
+        const jobsOption = e.target.closest('.pagination__item--jobs');
+        const jobsPrevious = e.target.closest('.pagination__previous--jobs');
+        const jobsNext = e.target.closest('.pagination__next--jobs');
+
+        // Companies Table
+        const companiesOption = e.target.closest('.custom-select-option--companies');
+        const companiesPrevious = e.target.closest('.pagination__previous--companies');
+        const companiesNext = e.target.closest('.pagination__next--companies');
+
+        // Company Summary Jobs Table
+        const companyJobsOption = e.target.closest('.custom-select-option--company-jobs');
+        const companyJobsPrevious = e.target.closest('.pagination__previous--company-jobs');
+        const companyJobsNext = e.target.closest('.pagination__next--company-jobs');
+
+        // Company Summary Contacts
+        const companyContactsOption = e.target.closest('.custom-select-option--company-contacts');
+        const companyContactsPrevious = e.target.closest('.pagination__previous--company-contacts');
+        const companyContactsNext = e.target.closest('.pagination__next--company-contacts');
+
+        // Company Summary Contacts
+        const companyAddressesOption = e.target.closest('.custom-select-option--company-addresses');
+        const companyAddressesPrevious = e.target.closest('.pagination__previous--company-addresses');
+        const companyAddressesNext = e.target.closest('.pagination__next--company-addresses');
+
+        const applications = applicationsPrevious || applicationsNext || applicationsOption;
+        const jobs = jobsPrevious || jobsNext || jobsOption;
+        const companies = companiesPrevious || companiesNext || companiesOption;
+        const companyJobs = companyJobsPrevious || companyJobsNext || companyJobsOption;
+        const companyContacts = companyContactsPrevious || companyContactsNext || companyContactsOption;
+        const companyAddresses = companyAddressesPrevious || companyAddressesNext || companyAddressesOption;
+        const users = usersPrevious || usersNext || usersOption;
 
         // If no pagination btns are clicked, return
-        if(!application && !job && !company && !user) return;
+        if(!applications && !jobs && !companies && !users && !companyJobs && !companyContacts && !companyAddresses) return;
 
         // // if there's an animation still running, ignore input
         // if(this.state.isActivePaginationAnimation) {
@@ -4928,18 +5668,23 @@ class AdminController {
         this.state.isActivePaginationAnimation = true;
         this.state.isActiveRequest = true;
         
-  
 
         // Choose which table's pagination is being updated, and with which functions
-        if(userBtn || userPrevious || userNext) {
-            this.handleUserPagination(userBtn, userPrevious, userNext);
-        } else if(jobBtn || jobPrevious || jobNext){
-            this.handleJobPagination(jobBtn, jobPrevious, jobNext);
-        } else if(companyBtn || companyPrevious || companyNext) {
-            this.handleCompanyPagination(companyBtn, companyPrevious, companyNext);
-        } else if(applicationBtn || applicationPrevious || applicationNext) {
+        if(users) {
+            this.handleUsersPagination(usersOption, usersPrevious, usersNext);
+        } else if(jobs){
+            this.handleJobsPagination(jobsOption, jobsPrevious, jobsNext);
+        } else if(companies) {
+            this.handleCompaniesPagination(companiesOption, companiesPrevious, companiesNext);
+        } else if(companyJobs) {
+            this.handleCompanyJobsPagination(companyJobsOption, companyJobsPrevious, companyJobsNext);
+        } else  if(companyContacts){
+            this.handleCompanyContactsPagination(companyContactsOption, companyContactsPrevious, companyContactsNext);
+        } else if(companyAddresses) {
+            this.handleCompanyAddressesPagination(companyAddressesOption, companyAddressesPrevious, companyAddressesNext);
+        } else if(applications) {
             // this.handleApplicationPagination(applicationBtn, applicationPrevious, applicationNext, tl);
-            this.handleApplicationPagination(applicationBtn, applicationPrevious, applicationNext);
+            this.handleApplicationsPagination(applicationsOption, applicationsPrevious, applicationsNext);
         } else {
             return;
         }
@@ -4981,20 +5726,20 @@ class AdminController {
        
     };
 
-    handleUserPagination(userBtn, userPrevious, userNext) {
+    handleUsersPagination(option, previous, next) {
         const userState = this.state.users;
         // If the page changes the active user should be the first in the table
         userState.currentUser = this.users[0];
         const pages = Math.ceil(userState.totalUsers / userState.searchOptions.limit);
 
-        if(userPrevious && !(userState.currentPage < 1)) {
+        if(previous && !(userState.currentPage < 1)) {
             this.movePageBackwards(userState);
         }
-        if(userNext && !(userState.currentPage >= pages-1) ) {
+        if(next && !(userState.currentPage >= pages-1) ) {
             this.movePageForwards(userState);
         }
-        if(userBtn) {
-            this.movePage(userState, userBtn);
+        if(option) {
+            this.movePage(userState, option);
         }
         this.Admin.getUsers(this.state.users.searchOptions)
             .then((res) => {
@@ -5012,57 +5757,59 @@ class AdminController {
             .catch(err => console.log(err));
     };
 
-    setJobPaginationState(jobBtn, jobPrevious, jobNext) {
+    setJobsPaginationState(option, previous, next) {
         const jobState = this.state.jobs;
         // // Changing page = new current job
         // jobState.currentJob = this.jobs[0];
 
         const pages = Math.ceil(jobState.totalJobs / jobState.searchOptions.limit);
 
-        if(jobPrevious && !(jobState.currentPage <= 1)) {
+        if(previous && !(jobState.currentPage <= 1)) {
             console.log('backwards');
 
             this.movePageBackwards(jobState);
         }
-        if(jobNext && !(jobState.currentPage >= pages)) {
+        if(next && !(jobState.currentPage >= pages)) {
             console.log('forwards');
 
             this.movePageForwards(jobState);
         }
-        if(jobBtn) {
+        if(option) {
             console.log('move');
 
-            this.movePage(jobState, jobBtn);
+            this.movePage(jobState, option);
         }
 
     }
 
-    async handleJobPagination(jobBtn, jobPrevious, jobNext) {
-        adminView.renderAdminLoaders();
+    // async handleJobPagination(jobBtn, jobPrevious, jobNext) {
+    //     console.log('here?');
+    //     adminView.renderAdminLoaders();
 
-        const tl = gsap.timeline();
-        tl.add(adminView.animateTableContentOut())
-          .add(adminView.animateAdminLoadersIn(), '<')
-
-        // Set the state
-        this.setJobPaginationState(jobBtn, jobPrevious, jobNext);
-        // Update the view
-        paginationView.updatePaginationView(this.state.jobs.currentPage -1);
-
-        // get the new data
-        await this.getData('jobs');
-        this.state.isActiveRequest = false;
-
-        // Update the current job state
-        this.state.jobs.currentJob = this.jobs[0];
-        this.state.isActiveRequest = false;
-
-        this.changeTablePageAnimation(tl, 'jobs');
-    }
-
-    // handleJobPagination(jobBtn, jobPrevious, jobNext) {
     //     const tl = gsap.timeline();
+    //     tl.add(adminView.animateTableContentOut())
+    //       .add(adminView.animateAdminLoadersIn(), '<')
 
+    //     // Set the state
+    //     this.setJobsPaginationState(jobBtn, jobPrevious, jobNext);
+    //     // Update the view
+    //     paginationView.updatePaginationView(this.state.jobs.currentPage -1);
+
+    //     // get the new data
+    //     await this.getData('jobs');
+    //     this.state.isActiveRequest = false;
+
+    //     // Update the current job state
+    //     this.state.jobs.currentJob = this.jobs[0];
+    //     this.state.isActiveRequest = false;
+
+    //     console.log('test');
+    //     this.changeTablePageAnimation(tl, 'jobs');
+    // }
+
+
+
+    // Add to function above
     //     // If there's an active request, cancel it
     //     if(this.state.isActiveRequest) { 
     //         cancelTokenSource();
@@ -5070,64 +5817,294 @@ class AdminController {
     //         console.log('cancelled')
     //     }
 
-    //     const jobState = this.state.jobs;
-    //     // Changing page = new current job
-    //     jobState.currentJob = this.jobs[0];
 
-    //     const pages = Math.ceil(jobState.totalJobs / jobState.searchOptions.limit);
 
-    //     if(jobPrevious && !(jobState.currentPage < 1)) {
-    //         this.movePageBackwards(jobState);
+    // setCompanyPaginationState(companyOption, companyPrevious, companyNext) {
+    //     const companyState = this.state.companies;
+    //     const pages = Math.ceil(companyState.totalCompanies / companyState.searchOptions.limit);
+
+    //     if(companyPrevious && !(companyState.currentPage < 1)) {
+    //         console.log('backwards');
+
+    //         this.movePageBackwards(companyState);
     //     }
-    //     if(jobNext && !(jobState.currentPage >= pages-1)) {
-    //         this.movePageForwards(jobState);
+    //     if(companyNext && !(companyState.currentPage >= pages)) {
+    //         console.log('forwards');
+
+    //         this.movePageForwards(companyState);
     //     }
-    //     if(jobBtn) {
-    //         this.movePage(jobState, jobBtn);
+    //     if(companyOption) {
+    //         console.log('move');
+    //         const page = companyOption.dataset.value;
+
+    //         this.movePage(companyState, page);
     //     }
+    // }
 
-    //     this.Admin.getJobs(this.state.jobs.searchOptions)
-    //         .then(res => {
-    //             this.jobs = res.data.jobs;
-    //             this.state.jobs.totalJobs = res.data.total;
+    // setCompanyContactsState(option, previous, next, state, pages) {
+    //     console.log(state.currentPage, pages);
 
-    //             // Set the table index to 0
-    //             this.state.jobsTable.index = 0;
-    //             this.renderJobsTable();
-    //             adminView.populateJobSummary(this.jobs[0]);
-    //         }).catch(err => console.log(err));
-    // };
+    //     if(previous && !(state.currentPage < 1)) {
+    //         console.log('backwards');
 
-    handleCompanyPagination(companyBtn, companyPrevious, companyNext) {
+    //         this.movePageBackwards(state);
+    //     }
+    //     if(next && !(state.currentPage >= pages)) {
+    //         console.log('forwards');
+
+    //         this.movePageForwards(state);
+    //     }
+    //     if(option) {
+    //         console.log('move');
+    //         const page = option.dataset.value;
+
+    //         this.movePage(state, page);
+    //     }
+    // }
+
+    setPaginationState(option, previous, next, state, pages) {
+
+        if(previous && !(state.currentPage < 1)) {
+            console.log('backwards');
+
+            this.movePageBackwards(state);
+        }
+        if(next && !(state.currentPage >= pages)) {
+            console.log('forwards');
+
+            this.movePageForwards(state);
+        }
+        if(option) {
+            console.log('move');
+            const page = option.dataset.value;
+            this.movePage(state, page);
+        }
+    }
+
+    handleCompanyContactsPagination(option, previous, next) {
+        const companyContactsState = this.state.companies.companyContactsPagination;
+        const pages = Math.ceil(companyContactsState.totalContacts / companyContactsState.limit);
+
+        const tl = gsap.timeline();
+        tl.add(animation.animateContactSectionOut())
+          .add(() => {
+            // Set the pagination state (This does to the company jobs array what limit and offset do in the api call
+            // and sets the paginatedJobs array for the company
+            this.setPaginationState(option, previous, next, companyContactsState, pages);
+            // Set the current contact (because only 1 is displayed it's just the index)
+            const currentContact = this.state.companies.currentCompany.contacts[companyContactsState.index]
+            summaryView.switchContact(currentContact);
+
+            // Animate the company jobs table back in
+            animation.animateContactSectionIn();
+
+            paginationView.updatePaginationView(pages, companyContactsState.currentPage, 'company-contacts');
+
+            const customSelect = document.querySelector('.custom-select-container--company-contacts');
+
+            if(previous) {
+                const eventBackwards = new CustomEvent('companyContactsBackwards', { detail: { page: companyContactsState.currentPage } });
+                customSelect.dispatchEvent(eventBackwards, { bubbles: true });
+            }
+            if(next) {
+                const eventForwards = new CustomEvent('companyContactsForwards', { detail: { page: companyContactsState.currentPage } });
+                customSelect.dispatchEvent(eventForwards, { bubbles: true });
+            }
+        })
+    }
+
+    handleCompanyAddressesPagination(option, previous, next) {
+        const companyAddressesState = this.state.companies.companyAddressesPagination;
+        const pages = Math.ceil(companyAddressesState.totalAddresses / companyAddressesState.limit);
+
+        // Pagination flow:
+        const tl = gsap.timeline();
+        tl.add(animation.animateAddressSectionOut())
+          .add(() => {
+            // Set the pagination state (This does to the company jobs array what limit and offset do in the api call
+            // and sets the paginatedJobs array for the company
+            this.setPaginationState(option, previous, next, companyAddressesState, pages);
+            // Set the current contact (because only 1 is displayed it's just the index)
+            const currentAddress = this.state.companies.currentCompany.addresses[companyAddressesState.index]
+            summaryView.switchAddress(currentAddress);
+
+            // Animate the company jobs table back in
+            animation.animateAddressSectionIn();
+
+            // Setup to allow the navigation btns (previous/next) to control the custom select element
+
+            // Get the custom select / eventTarget
+            const customSelect = document.querySelector('.custom-select-container--company-addresses');
+            
+            if(previous) {
+                const eventBackwards = new CustomEvent('companyAddressesBackwards', { detail: { page: companyAddressesState.currentPage } });
+                customSelect.dispatchEvent(eventBackwards, { bubbles: true });
+            }
+            if(next) {
+                console.log('handlePagDspatch')
+                const eventForwards = new CustomEvent('companyAddressesForwards', { detail: { page: companyAddressesState.currentPage } });
+                customSelect.dispatchEvent(eventForwards, { bubbles: true });
+            }
+
+            paginationView.updatePaginationView(pages, companyAddressesState.currentPage, 'company-addresses');
+        })
+    }
+
+    handleCompanyJobsPagination(option, previous, next) {
+        const companyJobsState = this.state.companies.companyJobsPagination;
+        const pages = Math.ceil(companyJobsState.totalJobs / companyJobsState.limit);
+
+        const tl = gsap.timeline();
+        tl.add(animation.animateCompanyJobSectionOut())
+          .add(() => {
+            // Set the pagination state (This does to the company jobs array what limit and offset do in the api call
+            // and sets the paginatedJobs array for the company
+            this.setPaginationState(option, previous, next, companyJobsState, pages);
+
+            // Paginate the companyJobs array
+            const { index, limit } = this.state.companies.companyJobsPagination;
+            this.state.companies.paginatedJobs = this.state.companies.currentCompany.jobs.slice(index, index + limit);
+
+            this.renderCompanyJobsTable();
+
+            // Animate the company jobs table back in
+            animation.animateCompanyJobSectionIn();
+
+            paginationView.updatePaginationView(pages, companyJobsState.currentPage, 'company-jobs');
+
+            // Get the custom select / eventTarget
+            const customSelect = document.querySelector('.custom-select-container--company-jobs');
+
+            if(previous) {
+                const eventBackwards = new CustomEvent('companyJobsBackwards', { detail: { page: companyJobsState.currentPage } });
+                customSelect.dispatchEvent(eventBackwards, { bubbles: true });
+            }
+            if(next) {
+                const eventForwards = new CustomEvent('companyJobsForwards', { detail: { page: companyJobsState.currentPage } });
+                customSelect.dispatchEvent(eventForwards, { bubbles: true });
+            }
+        })
+    }
+
+    async handleCompaniesPagination(option, previous, next) {
+        const tl = gsap.timeline();
+
+        // Set the pagination state
         const companyState = this.state.companies;
-        // New page, new current company
-        companyState.currentCompany = this.companies[0];
         const pages = Math.ceil(companyState.totalCompanies / companyState.searchOptions.limit);
- 
-        if(companyPrevious && !(companyState.currentPage < 1)) {
-            this.movePageBackwards(companyState);
-        }
-        if(companyNext && !(companyState.currentPage >= pages-1) ) {
-            this.movePageForwards(companyState);
-        }
-        if(companyBtn) {
-            this.movePage(companyState, companyBtn);
-        }
-        this.Admin.getCompanies(this.state.companies.searchOptions)
-            .then((res) => {
-                if(res.data.companies) {
-                    // Store and render data
-                    this.companies = res.data.companies;
-                    this.state.companies.totalCompanies = res.data.total;
+        this.setPaginationState(option, previous, next, companyState, pages);
 
-                    this.renderCompaniesTable();
-                    // Initialise company summary
-                    adminView.populateCompanySummary(this.companies[0]);
-                    adminView.populateAddressSummary(this.companies[0].id, this.companies[0].addresses[0]);
-                    adminView.populateContactSummary(this.companies[0].id, this.companies[0].people[0]);
-                }
-            })
-            .catch(err => console.log(err));
+        // ANIMATION ORDER/LOGIC
+        // 1: Place the loaders in the DOM
+        // 2: Animate the loaders in, while animating the table body out
+        // 3: The following functions have to be called in a function added to the main timeline
+        //    which will execute in order (& wait for the async call)
+        //    4: Update the data/state
+
+        // SUMMARY (NESTED TL)
+        //    5: Animate the summary out
+        //    6: Switch summary in a function nested in the new timeline
+        //    7: Animate the summary back in
+
+        // TABLE (NESTED TL)
+        //    8: Render the table
+        //    9: Animate the new table body in / and the loaders out in a new nested timeline
+
+
+        // 1: Render loaders
+        adminView.renderAdminLoaders('companies');
+
+        // 2: Animate the loaders in / table body out
+        tl.add(animation.animateTableContentOut('companies'))
+          .add(animation.animateAdminLoadersIn(), '<')
+          // 3: Nest subsequent functions so they execute after the above animations
+          .add(async () => {
+              // 4: Update the data and state (getData fn also updates the total count)
+              await this.getData('companies');
+              this.state.companies.currentCompany = this.companies[0];
+              this.resetCompanyState();
+              this.state.isActiveRequest = false;
+            // SUMMARY (NESTED TL)
+              // 5: Animate the Summary out (modal animation handled in animateSummaryOut)
+              gsap
+                .timeline().add(animation.animateSummaryOut('companies'))
+                // 6: Switch the summary *after* the out animation has occurred
+                .add(() => {
+                    summaryView.switchCompanySummary(this.companies[0]);
+
+                    // Unlike the Jobs and Apps summaries, clicking another row has to re-calculate pagination
+                    // on nested tables and contact/address sections
+
+                        // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
+                        this.initCompanyJobsState();
+    
+                        // // Add pagination for nested contacts, addresses, and jobs elements
+                        this.addCompanyNestedPagination();
+                        this.renderCompanyJobsTable()
+
+                    // 7: Animate the summary back in
+                    animation.animateCompanySummaryIn(this.state.companies.paginatedJobs.length);
+                })  
+
+            // TABLE (NESTED TL) 
+              // 8: Change table
+              this.renderCompaniesTable();
+              // 9: Animate table body in (body, not content, because the table will already be present)
+              //    and the loaders out
+              gsap
+                .timeline()
+                .add(animation.animateTableBodyIn('companies'))
+                .add(animation.animateAdminLoadersOut(), '<')
+
+            // CALCULATE/RENDER PAGINATION
+            const { totalCompanies, searchOptions: {index, limit} } = this.state.companies;
+            const { pages, index: current } = paginationView.calculatePagination(index, limit, totalCompanies);
+
+            const customSelect = document.querySelector('.custom-select-container--companies');
+            paginationView.updatePaginationView(pages, current, 'companies', customSelect);
+
+            if(previous) {
+                const eventBackwards = new CustomEvent('companiesBackwards', { detail: { page: companyState.currentPage } });
+                customSelect.dispatchEvent(eventBackwards, { bubbles: true });
+            }
+            if(next) {
+                const eventForwards = new CustomEvent('companiesForwards', { detail: { page: companyState.currentPage } });
+                customSelect.dispatchEvent(eventForwards, { bubbles: true });
+            }
+
+            // paginationView.initPagination(pages, current, 'companies');  
+
+          })
+
+        // const companyState = this.state.companies;
+        // // New page, new current company
+        // companyState.currentCompany = this.companies[0];
+        // const pages = Math.ceil(companyState.totalCompanies / companyState.searchOptions.limit);
+ 
+        // if(companyPrevious && !(companyState.currentPage < 1)) {
+        //     this.movePageBackwards(companyState);
+        // }
+        // if(companyNext && !(companyState.currentPage >= pages-1) ) {
+        //     this.movePageForwards(companyState);
+        // }
+        // if(companyBtn) {
+        //     this.movePage(companyState, companyBtn);
+        // }
+        // this.Admin.getCompanies(this.state.companies.searchOptions)
+        //     .then((res) => {
+        //         if(res.data.companies) {
+        //             // Store and render data
+        //             this.companies = res.data.companies;
+        //             this.state.companies.totalCompanies = res.data.total;
+
+        //             this.renderCompaniesTable();
+        //             // Initialise company summary
+        //             adminView.populateCompanySummary(this.companies[0]);
+        //             adminView.populateAddressSummary(this.companies[0].id, this.companies[0].addresses[0]);
+        //             adminView.populateContactSummary(this.companies[0].id, this.companies[0].people[0]);
+        //         }
+        //     })
+        //     .catch(err => console.log(err));
     };
 
     // The handler to run when a pagination button is clicked
@@ -5151,7 +6128,7 @@ class AdminController {
         
     }
 
-    setApplicationPagination(applicationBtn, applicationPrevious, applicationNext) {
+    setApplicationsPagination(option, previous, next) {
         const applicationState = this.state.applications;
       
         // // New page, new application
@@ -5159,24 +6136,24 @@ class AdminController {
 
         const pages = Math.ceil(applicationState.totalApplications / applicationState.searchOptions.limit);
 
-        if(applicationPrevious && !(applicationState.currentPage <= 1)) {
+        if(previous && !(applicationState.currentPage <= 1)) {
             console.log('backwards');
             this.movePageBackwards(applicationState);
-        } else if(applicationNext && !(applicationState.currentPage >= pages)) {
+        } else if(next && !(applicationState.currentPage >= pages)) {
             console.log('forwards');
             this.movePageForwards(applicationState);
-        } else if(applicationBtn) {
+        } else if(option) {
             console.log('move');
-            this.movePage(applicationState, applicationBtn);
+            this.movePage(applicationState, option);
         }
 
     }
 
-    async handleApplicationPagination(applicationBtn, applicationPrevious, applicationNext) {
+    async handleApplicationsPagination(option, previous, next) {
         const tl = gsap.timeline();
 
         // Set the pagination state
-        this.setApplicationPagination(applicationBtn, applicationPrevious, applicationNext);
+        this.setApplicationsPagination(option, previous, next);
         
         // ANIMATION ORDER/LOGIC
         // 1: Place the loaders in the DOM
@@ -5196,7 +6173,7 @@ class AdminController {
 
         
         // 1: Render loaders
-        adminView.renderAdminLoaders();
+        adminView.renderAdminLoaders('applications');
 
         // 2: Animate the loaders in / table body out
         tl.add(animation.animateTableContentOut('applications'))
@@ -5232,7 +6209,7 @@ class AdminController {
             // CALCULATE/RENDER PAGINATION
             const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
             const { pages, index: current } = paginationView.calculatePagination(index, limit, totalApplications);
-            paginationView.renderPagination(pages, current, 'applications');  
+            paginationView.initPagination(pages, current, 'applications');  
 
           })
 
@@ -5262,11 +6239,11 @@ class AdminController {
         // .add(adminView.animateSummaryIn())
     }
 
-    async handleJobPagination(jobBtn, jobPrevious, jobNext) {
+    async handleJobsPagination(option, previous, next) {
         const tl = gsap.timeline();
 
         // Set the pagination state
-        this.setJobPaginationState(jobBtn, jobPrevious, jobNext);
+        this.setJobsPaginationState(option, previous, next);
         
         // ANIMATION ORDER/LOGIC
         // 1: Place the loaders in the DOM
@@ -5286,7 +6263,7 @@ class AdminController {
 
         
         // 1: Render loaders
-        adminView.renderAdminLoaders();
+        adminView.renderAdminLoaders('jobs');
 
         // 2: Animate the loaders in / table body out
         tl.add(animation.animateTableContentOut('jobs'))
@@ -5322,7 +6299,7 @@ class AdminController {
             // CALCULATE/RENDER PAGINATION
             const { totalJobs, searchOptions: {index, limit} } = this.state.jobs;
             const { pages, index: current } = paginationView.calculatePagination(index, limit, totalJobs);
-            paginationView.renderPagination(pages, current, 'jobs');  
+            paginationView.initPagination(pages, current, 'jobs');  
 
           })
     }
@@ -5330,7 +6307,8 @@ class AdminController {
     changeTablePageAnimation(timeline, table) {
         let switchSummary;
 
-        // Handle the summary switch
+        // Set the function to switch the summary
+        // Executed in the animation timeline below
         switch(table) {
             case 'applications': 
                 switchSummary = () => {
@@ -5349,8 +6327,17 @@ class AdminController {
 
                     // Animate the summary back in
                     adminView.animateSummaryIn();
+                    console.log('HHAHAHA')
                 }
                 break;
+            case 'companies': 
+                switchSummary = () => {
+                    // Remove old summary items, add new ones
+                    summaryView.switchCompanySummary(this.companies[0]);
+
+                    // Animate the summary back in
+                    adminView.animateSummaryIn(); 
+                }
         }
 
         // timeline
@@ -5372,6 +6359,8 @@ class AdminController {
                     case 'jobs':
                         this.renderJobsTable();
                         break;
+                    case 'companies': 
+                        this.renderCompaniesTable();
                 }
     
                 this.state.isActivePaginationAnimation = false;
@@ -5459,16 +6448,36 @@ class AdminController {
 
     movePageBackwards(state) {
         state.currentPage--;
-        state.searchOptions.index -= state.searchOptions.limit;
+
+        // Ajax requests (for main tables) use a searchOption object
+        // Nested tables/summary sections just have the index/limit property
+        if(state.searchOptions) state.searchOptions.index -= state.searchOptions.limit;
+        else state.index -= state.limit;
 
     }
     movePageForwards(state) {
+
         state.currentPage++;
-        state.searchOptions.index += state.searchOptions.limit;
+
+        // Ajax requests (for main tables) use a searchOption object
+        // Nested tables/summary sections just have the index/limit property
+        if(state.searchOptions) state.searchOptions.index += state.searchOptions.limit;
+        else state.index += state.limit
+
     }
-    movePage(state, btn) {
-        state.searchOptions.index = btn.dataset.id * state.searchOptions.limit;
-        state.currentPage = state.searchOptions.index / state.searchOptions.limit +1;
+    movePage(state, page) {
+
+        // Ajax requests (for main tables) use a searchOption object
+        // Nested tables/summary sections just have the index/limit property
+        if(state.searchOptions) {
+            state.searchOptions.index = (page -1) * state.searchOptions.limit;
+            state.currentPage = state.searchOptions.index / state.searchOptions.limit;
+        }    
+        else {
+            state.index = (page -1) * state.limit;
+            state.currentPage = state.index / state.limit;
+        } 
+
     }
 
     simulateMouseEVent(type, elem) {
