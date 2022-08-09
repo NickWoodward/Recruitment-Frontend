@@ -145,7 +145,7 @@ const createHeaderModal = (data, type, editMode) => {
     const month = `${today.getMonth()+1}`.padStart(2, '0');
     const year = `${today.getFullYear()}`.substring(2);
     let date = `${day}/${month}/${year}`;
-    // console.log({data});
+    console.log('create modal header', {data});
 
     let id;
     switch(type) {
@@ -160,6 +160,11 @@ const createHeaderModal = (data, type, editMode) => {
             id = data.companyNumber;
             date = editMode? data.companyDate : date;
             break;
+        case 'new-contact': 
+            id = 'New Contact';
+            break;
+        case 'edit-contact': 
+            id = data.companyNumber;
     }
 
     const header = `
@@ -463,6 +468,7 @@ export const removeAdminModal = (type, modals) => {
         case 'jobs':
         case 'companies':
         case 'company-contacts':
+        case 'company-addresses':
             elements.push(document.querySelector('.summary__modal'));
             elements.push(document.querySelector('.summary__modal-header'));
             break;
@@ -639,7 +645,7 @@ export const renderCompanyModal = (data, type) => {
  * @param {boolean} editMode: Changes the placeholder information in each input
  * @returns {string} A markup string is returned
 */
-    const createCompanyModal = ({companyNumber, companyName, contact, address, contact: {firstName, lastName, position, phone, email}, address: {firstLine, secondLine, city, county, postcode}}, type, editMode) => {
+    const createCompanyModal = ({companyName, contact: {firstName, lastName, position, phone, email} = {}, address: {firstLine, secondLine, city, county, postcode} = {}}, type, editMode) => {
 
     // Potential states:
     // Form     |   editMode   |  type                      |   Disabled sections
@@ -658,8 +664,6 @@ export const renderCompanyModal = (data, type) => {
     const companyDisabled = type === 'new-address' || type === 'edit-address' || type==='new-contact' || type === 'edit-contact';
 
     const edit = type === 'edit-address' || type === 'edit-contact' || type === 'edit-address' || type === 'edit-company';
-
-console.log(type, 'contactDisabled:', contactDisabled, 'addressDisabled:', addressDisabled, 'companyDisabled:', companyDisabled);
 
     const today = new Date();
     const date = `${today.getDate()}/${today.getMonth()+1}/${+today.getFullYear()}`;
@@ -782,7 +786,7 @@ console.log(type, 'contactDisabled:', contactDisabled, 'addressDisabled:', addre
                     </div>
                     <div class="form__field--${type} form__position--${type} ${contactDisabled ? 'disabled':''}">
                         <label for="position" class="form__label--${type}">Position</label>
-                        <input type="text" placeholder="${edit || contactDisabled ? position : 'Surname'}" class="form__input--${type} form__position-input--${type}" ${contactDisabled ? 'disabled':''}>
+                        <input type="text" placeholder="${edit || contactDisabled ? position : 'Position'}" class="form__input--${type} form__position-input--${type}" ${contactDisabled ? 'disabled':''}>
                         <i class="form__icon form__icon--success">
                             <svg><use xlink:href="svg/spritesheet.svg#success"></svg>
                         </i>

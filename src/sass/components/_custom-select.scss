@@ -237,6 +237,24 @@
         padding: .1rem 0;
         // margin-top: .5rem;
     }
+
+    &--company-contacts {
+        &::-webkit-scrollbar {
+
+            width: 1px;
+        }
+        &::-webkit-scrollbar-thumb {
+
+            background-color: grey;
+        }
+        &::-webkit-scrollbar-track {
+
+            background-color: #eaeaea;
+        }
+        /* remove scrollbar from Firefox */
+        overflow: auto;
+        scrollbar-width: thin;
+    }
 }
 
 .custom-select-option {

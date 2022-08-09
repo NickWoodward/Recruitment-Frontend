@@ -3172,14 +3172,13 @@ class AdminController {
 
         // Buttons
         const newContactBtn = e.target.closest('.summary__new-contact-btn--companies');
-        const newAddressBtn = e.target.closest('.company-summary__btn--new-address');
-        console.log(newContactBtn);
+        const newAddressBtn = e.target.closest('.summary__new-address-btn--companies');
 
-        const editContactBtn = e.target.closest('.company-summary__btn--edit-contact');
-        const editAddressBtn = e.target.closest('.company-summary__btn--edit-address');
+        const editContactBtn = e.target.closest('.summary__edit-contact-btn--companies');
+        const editAddressBtn = e.target.closest('.summary__edit-address-btn--companies');
 
-        const deleteContactBtn = e.target.closest('.company-summary__btn--delete-contact');
-        const deleteAddressBtn = e.target.closest('.company-summary__btn--delete-address');
+        const deleteContactBtn = e.target.closest('.summary__delete-contact-btn--companies');
+        const deleteAddressBtn = e.target.closest('.summary__delete-address-btn--companies');
 
         const jobBtn = e.target.closest('.row');
 
@@ -3413,14 +3412,17 @@ class AdminController {
                 address: addresses[this.state.companies.companyAddressesPagination.index]
             }, 'new-contact');
 
+            const companySummaryModal = document.querySelector('.summary__modal--new-contact');
+            const companySummaryModalHeader = document.querySelector('.summary__modal-header--new-contact');
+
+            // Don't have to worry about modals already existing as they would cover the buttons needed to get here
+            animation.animateSummaryModalIn(companySummaryModal);
+            animation.animateSummaryModalIn(companySummaryModalHeader);
+
             const alertWrapper = document.querySelector('.alert-wrapper');
             const companyForm = document.querySelector('.form--new-contact');
             const closeBtn = document.querySelector('.form__close--new-contact');
             const submitBtn = document.querySelector('.form__submit--new-contact');
-            // const modal = document.querySelector('.company-summary__modal');
-
-            // const companySummaryModal = document.querySelector('.summary__modal--new-company');
-            // const companySummaryModalHeader = document.querySelector('.summary__modal-header--companies');
 
             const fields = adminView.getCompanyFields('new-contact');
             const { contactFirstNameField, contactSurnameField, contactPositionField, phoneField, emailField } = fields;
@@ -3430,27 +3432,6 @@ class AdminController {
             // Success animation is the same, but appended later (paused)
             successAnimation = animation.animateAlert(alertWrapper, true);
 
-            // // Add the animation for the company alerts (paused)
-            // newContactAlertAnimation
-            // .from(alertWrapper, {
-            //     autoAlpha: 0
-            // })
-            // .to(alertWrapper, {
-            //     autoAlpha: 0,
-            //     duration: .2,
-            // }, '+=1.5')
-            // .add(() => {
-            //     if(!document.querySelector('.alert--error')) {
-            //         return gsap.to(modal, {
-            //             autoAlpha: 0,
-            //             duration: .2,
-            //             onComplete: () => {
-
-            //                 modal.parentElement.removeChild(modal);
-            //             }
-            //         })
-            //     }
-            // })
 
             // closeBtn.addEventListener('click', ()=>adminView.removeCompanyModal());
             closeBtn.addEventListener('click', () => {
@@ -3474,26 +3455,36 @@ class AdminController {
                         if(res.status !== 201) {
                             alert = modalView.getAlert('Contact Not Created', false);
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                            successAnimation.play(0);
+                            errorAnimation.play(0);
                         } else {
                             alert = modalView.getAlert('Contact Created', true);
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                            errorAnimation.play(0);
+            
+                            // Add to the successAnimation once the getData() call has now completed
+                            // NB: animating the modal out, not the summary out (which would also animate the modal)
+                            successAnimation.add(animation.animateSummaryModalOut(companySummaryModal));
+                            successAnimation.add(animation.animateSummaryModalOut(companySummaryModalHeader));
+
+                            successAnimation.play(0);
 
                             this.state.companies.currentCompany.contacts.push(res.data.contact);
-                            console.log('contacts',this.state.companies.currentCompany.contacts);
                             this.state.companies.companyContactsPagination.totalContacts++;
 
+                            // InitPagination to add the new option
                             const { totalContacts, index } = this.state.companies.companyContactsPagination;
-                            // totalContacts === pages for the contact section (1 per page)
                             paginationView.initPagination(totalContacts, index, 'company-contacts');
 
-                        //     // Emit a custom event so the number of select options changes
-                        //     const addOption = new CustomEvent('addCompanyOption');
-                        //     const customSelect = document.querySelector('.custom-select-container--company-contacts');
-                        //    console.log('option:', addOption, 'customSelect:', customSelect);
-                        //     customSelect.dispatchEvent(addOption, { bubbles: true });
-                        //     console.log('dispatching');
+                            // Get select option that matches the new contact
+                            const selectOption = document.querySelector(`.custom-select-option--company-contacts[data-value="${totalContacts}"]`);
+                            // Update the contact
+                            this.handleCompanyContactsPagination(selectOption, null, null);
+                            // Update the pagination
+                            paginationView.updatePaginationView(totalContacts, this.state.companies.currentCompany.contacts.length, 'company-contacts')
+                            // Change the select value
+                            const customSelect = document.querySelector('.custom-select-container--company-contacts');
+
+                            const moveEvent = new CustomEvent('companyContactsChange', { detail: { page: this.state.companies.currentCompany.contacts.length - 1 } });
+                            customSelect.dispatchEvent(moveEvent, { bubbles: true });
 
                         }
                     } catch(err) {
@@ -3560,6 +3551,8 @@ class AdminController {
 
         }
         if(newAddressBtn) {
+            let errorAnimation;
+            let successAnimation;
             let alert;
 
             const { 
@@ -3569,53 +3562,36 @@ class AdminController {
                 contacts
             } = this.state.companies.currentCompany;
 
-            adminView.renderCompanyModal({
+            modalView.renderCompanyModal({
                 companyNumber: id,
                 companyName,
                 contact: contacts[this.state.companies.companyContactsPagination.index],
                 address: addresses[this.state.companies.companyAddressesPagination.index]
             }, 'new-address');
 
+            const companySummaryModal = document.querySelector('.summary__modal--new-address');
+            const companySummaryModalHeader = document.querySelector('.summary__modal-header--new-address');
+          
+            // Don't have to worry about modals already existing as they would cover the buttons needed to get here
+            animation.animateSummaryModalIn(companySummaryModal);
+            animation.animateSummaryModalIn(companySummaryModalHeader);
+            console.log(companySummaryModal, companySummaryModalHeader);
+
             const alertWrapper = document.querySelector('.alert-wrapper');
             const companyForm = document.querySelector('.form--new-address');
             const closeBtn = document.querySelector('.form__close--new-address');
             const submitBtn = document.querySelector('.form__submit--new-address');
-            const modal = document.querySelector('.company-summary__modal');
 
+            console.log(closeBtn);
             const fields = adminView.getCompanyFields('new-address');
             const { firstLineField, secondLineField, cityField, countyField, postcodeField } = fields;
 
-            // Add the animation for the company alerts (paused)
-            newAddressAlertAnimation
-            .from(alertWrapper, {
-                autoAlpha: 0
-            })
-            .to(alertWrapper, {
-                autoAlpha: 0,
-                duration: .2,
-            }, '+=1.5')
-            .add(() => {
-                if(!document.querySelector('.alert--error')) {
-                    return gsap.to(modal, {
-                        autoAlpha: 0,
-                        duration: .2,
-                        onComplete: () => {
+            // Get the animation for the application alerts (paused)
+            errorAnimation = animation.animateAlert(alertWrapper, true);
+            // Success animation is the same, but appended later (paused)
+            successAnimation = animation.animateAlert(alertWrapper, true);      
 
-                            modal.parentElement.removeChild(modal);
-                        }
-                    })
-                }
-            })
-
-            closeBtn.addEventListener('click', ()=>
-                gsap.to('.company-summary__modal', {
-                    autoAlpha: 0,
-                    duration: .2,
-                    onComplete: () => {
-                        adminView.removeCompanyModal()
-                    }
-                })
-            );
+            closeBtn.addEventListener('click', () => modalView.removeAdminModal('company-addresses'));
 
             companyForm.addEventListener('submit', async e => {
                 e.preventDefault();
@@ -3630,20 +3606,39 @@ class AdminController {
                 if(!errors) {
                     try {
                         const res = await this.Admin.createAddress({id, ...values});
+
                         if(!res.status === 201) {
                             alert = modalView.getAlert('Address Not Created', false);
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                            newAddressAlertAnimation.play(0);
+                            errorAnimation.play(0);
                         } else {
                             alert = modalView.getAlert('Address Created', true);
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                            newAddressAlertAnimation.play(0);
+
+                            // Add to the successAnimation once the getData() call has now completed
+                            // NB: animating the modal out, not the summary out (which would also animate the modal)
+                            successAnimation.add(animation.animateSummaryModalOut(companySummaryModal));
+                            successAnimation.add(animation.animateSummaryModalOut(companySummaryModalHeader));
+
+                            successAnimation.play(0);
 
                             this.state.companies.currentCompany.addresses.push(res.data.address);
                             this.state.companies.companyAddressesPagination.totalAddresses++;
 
                             const { totalAddresses, index } = this.state.companies.companyAddressesPagination;
-                            adminView.renderPagination(totalAddresses, index, document.querySelector('.pagination-wrapper--addresses'), 'addresses');
+                            paginationView.initPagination(totalAddresses, index, 'company-addresses');
+
+                            // Get select option that matches the new contact
+                            const selectOption = document.querySelector(`.custom-select-option--company-addresses[data-value="${totalAddresses}"]`);
+                            // Update the contact
+                            this.handleCompanyAddressesPagination(selectOption, null, null);
+                            // Update the pagination
+                            paginationView.updatePaginationView(totalAddresses, this.state.companies.currentCompany.addresses.length, 'company-addresses')
+                            // Change the select value
+                            const customSelect = document.querySelector('.custom-select-container--company-addresses');
+
+                            const moveEvent = new CustomEvent('companyAddressesChange', { detail: { page: this.state.companies.currentCompany.addresses.length - 1 } });
+                            customSelect.dispatchEvent(moveEvent, { bubbles: true });
 
                         }
                     } catch(err) {
@@ -3657,7 +3652,7 @@ class AdminController {
                             alert = modalView.getAlert('Address not created', false);
                         }
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                        newAddressAlertAnimation.play(0);
+                        errorAnimation.play(0);
 
                     }
                 } else {
@@ -3899,7 +3894,10 @@ class AdminController {
         //     });
         // }
         if(editContactBtn) {
+            let errorAnimation;
+            let successAnimation;
             let alert;
+console.log(this.state.companies.currentCompany.contacts);
             const { 
                 id,
                 companyName,
@@ -3907,17 +3905,23 @@ class AdminController {
                 contacts
             } = this.state.companies.currentCompany;
 
-            adminView.renderCompanyModal({
+            modalView.renderCompanyModal({
                 companyNumber: id,
                 companyName,
                 contact: contacts[this.state.companies.companyContactsPagination.index],
                 address: addresses[this.state.companies.companyAddressesPagination.index]
             }, 'edit-contact');
 
+            const companySummaryModal = document.querySelector('.summary__modal--edit-contact');
+            const companySummaryModalHeader = document.querySelector('.summary__modal-header--edit-contact');
+
+            // Don't have to worry about modals already existing as they would cover the buttons needed to get here
+            animation.animateSummaryModalIn(companySummaryModal);
+            animation.animateSummaryModalIn(companySummaryModalHeader);
+
             const alertWrapper = document.querySelector('.alert-wrapper');
             const companyForm = document.querySelector('.form--edit-contact');
             const closeBtn = document.querySelector('.form__close--edit-contact');
-            const modal = document.querySelector('.company-summary__modal');
 
             const fields = adminView.getCompanyFields('edit-contact');
             const { 
@@ -3928,36 +3932,16 @@ class AdminController {
                 emailField,
             } = fields;
 
-            // Add the animation for the company alerts (paused)
-            editContactAlertAnimation
-            .from(alertWrapper, {
-                autoAlpha: 0
-            })
-            .to(alertWrapper, {
-                autoAlpha: 0,
-                duration: .2,
-            }, '+=2')
-            .add(() => {
-                if(!document.querySelector('.alert--error')) {
-                    return gsap.to(modal, {
-                        autoAlpha: 0,
-                        duration: .2,
-                        onComplete: () => {
-                            modal.parentElement.removeChild(modal);
-                        }
-                    })
-                }
-            })
+            
+            // Get the animation for the application alerts (paused)
+            errorAnimation = animation.animateAlert(alertWrapper, true);
+            // Success animation is the same, but appended later (paused)
+            successAnimation = animation.animateAlert(alertWrapper, true);
 
-            closeBtn.addEventListener('click', ()=>
-                gsap.to('.company-summary__modal', {
-                    autoAlpha: 0,
-                    duration: .2,
-                    onComplete: () => {
-                        adminView.removeCompanyModal()
-                    }
-                })
-            );
+            // closeBtn.addEventListener('click', ()=>adminView.removeCompanyModal());
+            closeBtn.addEventListener('click', () => {
+                modalView.removeAdminModal('company-contacts');
+            });
 
             companyForm.addEventListener('submit', async e => {
                 e.preventDefault();
@@ -3965,13 +3949,14 @@ class AdminController {
                 while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
 
                 const data = adminView.getCompanyValues(fields, true); 
+                console.log(data);
                 // Remove the changed field, and others not applicable to the new contact form
                 const { changed, companyName, firstLine, secondLine, city, county, postcode, ...values } = data;
                 if(!changed.length > 0) {
                     alert = modalView.getAlert(`No Fields Changed`, false);
                     alertWrapper.insertAdjacentHTML('afterbegin', alert);
 
-                    editContactAlertAnimation.play(0);
+                    errorAnimation.play(0);
 
                     // Reset validation fields (edge case where a field is changed from and then back to the placeholder value)
                     [
@@ -3984,7 +3969,7 @@ class AdminController {
                     return;
                 }
 
-                const contactId = this.state.companies.currentCompany.contacts[this.state.companies.currentContactIndex].contactId;
+                const contactId = this.state.companies.currentCompany.contacts[this.state.companies.companyContactsPagination.currentPage].contactId;
 
                 const errors = validator.validateContact(values);
 
@@ -3995,53 +3980,36 @@ class AdminController {
                         if(res.status !== 201) {
                             alert = modalView.getAlert('Contact Not Edited', false);
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                            editContactAlertAnimation.play(0);
+                            errorAnimation.play(0);
                         } else {
-                            await this.getData('companies');
-                            // editContact returns all the contacts, not 1
-                            this.state.companies.currentCompany.contacts = res.data.contacts;
-                            
-                            const summary = document.querySelector('.summary');
-                            const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
-                            // No animation needed as it's behind the modal
-                            adminView.switchSummary(summary, newSummary);
-
-                            // No need to set the companyJobs state because it's not changed
-
-                            // Render the summary company jobs table
-                            if(this.state.companies.paginatedJobs.length > 0) {
-                                // remove any placeholders
-                                const placeholder = document.querySelector('.company-jobs-placeholder')
-
-                                if(placeholder) placeholder.parentElement.removeChild(placeholder);
-
-                                this.renderCompanyJobsTable();
-                            } else {
-                                // render a placeholder saying 'no jobs'
-                                document.querySelector('.table-wrapper--nested-jobs')
-                                    .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
-                            } 
-
-                            // Add pagination for nested contacts, addresses, and jobs elements
-                            this.addCompanyNestedPagination();
-
-                            // Add the listener to the new summary
-                            document.querySelector('.summary').addEventListener('click', (e) => this.companySummaryListener(e))
-
                             alert = modalView.getAlert('Contact Edited', true);
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                            editContactAlertAnimation.play(0);
+ 
+                            const contactIndex = this.state.companies.currentCompany.contacts.map(contact => contact.id).indexOf(res.data.contact.id);
+                            this.state.companies.currentCompany.contacts[contactIndex] = res.data.contact;
 
+                            // Add to the successAnimation once the getData() call has now completed
+                            // NB: animating the modal out, not the summary out (which would also animate the modal)
+                            successAnimation.add(animation.animateSummaryModalOut(companySummaryModal));
+                            successAnimation.add(animation.animateSummaryModalOut(companySummaryModalHeader));
+
+                            successAnimation.play(0);
+
+                            // Get select option that matches the new contact
+                            const selectOption = document.querySelector(`.custom-select-option--company-contacts[data-value="${this.state.companies.companyContactsPagination.currentPage+1}"]`);
+                            // Update the contact - although we're editing, so not swapping pages, this will rerender the contacts section
+                            this.handleCompanyContactsPagination(selectOption, null, null);
+                            
                         }
                     } catch(err) {
                         console.log(err);
                         if(err?.response?.data?.validationErrors.length > 0){
                             alert = modalView.getAlert(err.response.data.validationErrors[0].msg, false);
                         } else {
-                            alert = modalView.getAlert('Contact Not Created', false);
+                            alert = modalView.getAlert('Contact Not Edited', false);
                         }
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
-                        newContactAlertAnimation.play(0);
+                        errorAnimation.play(0);
                     }
                 } else {
                     if(errors.firstName)  
@@ -5902,14 +5870,11 @@ class AdminController {
 
             const customSelect = document.querySelector('.custom-select-container--company-contacts');
 
-            if(previous) {
-                const eventBackwards = new CustomEvent('companyContactsBackwards', { detail: { page: companyContactsState.currentPage } });
-                customSelect.dispatchEvent(eventBackwards, { bubbles: true });
-            }
-            if(next) {
-                const eventForwards = new CustomEvent('companyContactsForwards', { detail: { page: companyContactsState.currentPage } });
-                customSelect.dispatchEvent(eventForwards, { bubbles: true });
-            }
+            // This will work for next/prev or option
+            const moveEvent = new CustomEvent('companyContactsChange', { detail: { page: companyContactsState.currentPage } });
+            customSelect.dispatchEvent(moveEvent, { bubbles: true });
+        
+
         })
     }
 

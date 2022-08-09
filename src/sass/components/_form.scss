@@ -13,7 +13,7 @@
         position: relative;
         display: flex;
     }
-    &--new-company, &--edit-company, &--new-contact {
+    &--new-company, &--edit-company, &--new-contact, &--edit-contact, &--new-address {
         width: 100%;
     }
 
@@ -62,7 +62,9 @@
         }
         &--new-company,
         &--edit-company,
-        &--new-contact {
+        &--new-contact,
+        &--edit-contact,
+        &--new-address {
             padding: 4.5rem 4rem;
             margin-top: 0;
         }
@@ -70,7 +72,9 @@
 
     &__column--new-company,
     &__column--edit-company,
-    &__column--new-contact {
+    &__column--new-contact,
+    &__column--edit-contact,
+    &__column--new-address {
         // border: 1px solid red;
         display: grid;
         column-gap: 2rem;
@@ -152,8 +156,11 @@
     }
     &__contact-first-name--new-company,
     &__contact-first-name--new-contact,
+    &__contact-first-name--new-address,
     &__contact-surname--new-company,
     &__contact-surname--new-contact,
+    &__contact-surname--edit-contact,
+    &__contact-surname--new-address,
     &__contact-first-name--edit-company,
     &__contact-first-name--edit-contact,
     &__contact-surname--edit-company
@@ -163,7 +170,9 @@
 
     &__company-name--new-company,
     &__company-name--edit-company,
-    &__company-name--new-contact {
+    &__company-name--new-contact,
+    &__company-name--edit-contact,
+    &__company-name--new-address {
         grid-column: 1/3;
     }
     // &__first-line--new-company,
@@ -176,6 +185,7 @@
     // }
     &__email--new-company, 
     &__email--new-contact,
+    &__email--edit-contact,
     &__email--edit-company  {
         grid-column: 1/3;
     }
