@@ -473,6 +473,39 @@
         &--header-date {
             justify-content: flex-end;
         }
+        &--header-search {
+            // border: 1px solid red;
+            display:flex; 
+            justify-content: flex-end;
+        }
+    }
+    &__search {
+        display: flex;
+        width: 2.5rem;
+        height: 2.5rem;
+        fill: white;
+        cursor: pointer;
+
+        &-input {
+            width: 15rem;
+            margin-right: 2rem;
+            background-color: $color-primary-new;
+            border: none;
+            border-bottom: 1px solid white;
+            color: white;
+
+            &:focus {
+                outline-style: none;
+                box-shadow: none;
+                border-left-color: transparent;
+                border-top-color: transparent;
+                border-right-color: transparent;
+                background-color: none;
+                color: none;
+                caret-color: white;
+            }
+          
+        }
     }
 
     &__address-controls,
@@ -829,9 +862,20 @@
             font-size: 1.7rem;
             color: white;
             z-index: 100;
+            // Header items (space evenly && center the middle item)
             &>div {
+                display: flex;
                 padding: 0 3rem;
+                min-width: 20rem;
+
+                &:nth-child(2){
+                    justify-content: center;
+                }
+                &:nth-child(3){
+                    justify-content: flex-end;
+                }
             }
+         
         }
     }
 }

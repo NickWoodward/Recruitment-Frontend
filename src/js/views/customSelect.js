@@ -41,16 +41,11 @@ export default class Select {
       const changeValueEvents = [];
 
       if(selectName === 'companies') {
-        changeValueEvents.push('companiesForwards');
-        changeValueEvents.push('companiesBackwards');
+        changeValueEvents.push('companiesChange');
       }
       if(selectName === 'company-jobs') {
         changeValueEvents.push('companyJobsForwards');
         changeValueEvents.push('companyJobsBackwards');
-      }
-      if(selectName === 'company-addresses') {
-        changeValueEvents.push('companyAddressesForwards');
-        changeValueEvents.push('companyAddressesBackwards');
       }
       if(selectName === 'company-contacts') {
         changeValueEvents.push('companyContactsChange');
@@ -58,10 +53,9 @@ export default class Select {
       if(selectName === 'company-addresses') {
         changeValueEvents.push('companyAddressesChange');
       }
-
       changeValueEvents.forEach(event => {
         // ++ is because of zero index, not because it's moving the page forwards or backwards
-        this.customSelect.addEventListener(event, e => {console.log(e.detail);this.selectValue(`${++e.detail.page}`)});
+        this.customSelect.addEventListener(event, e => {this.selectValue(`${++e.detail.page}`)});
       });
 
     } 

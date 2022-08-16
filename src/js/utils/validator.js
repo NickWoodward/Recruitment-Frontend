@@ -129,9 +129,8 @@ const newCompanySchema = Joi.object({
             "any.required": `Required`,
         }),
     secondLine: 
-        Joi.string().trim().min(3).max(50).required().messages({
+        Joi.string().trim().empty('').allow('').min(3).max(50).messages({
             "string.base": `Must be text`,
-            "string.empty": `Cannot be empty`,
             "string.min": `Must be > 3`,
             "string.max": `Must be < than 50`,
             "any.required": `Required`,
@@ -169,9 +168,8 @@ const newAddressSchema = Joi.object({
             "any.required": `Required`,
         }),
     secondLine: 
-        Joi.string().trim().min(3).max(50).required().messages({
+        Joi.string().trim().empty('').allow('').min(3).max(50).messages({
             "string.base": `Must be text`,
-            "string.empty": `Cannot be empty`,
             "string.min": `Must be > 3`,
             "string.max": `Must be < than 50`,
             "any.required": `Required`,

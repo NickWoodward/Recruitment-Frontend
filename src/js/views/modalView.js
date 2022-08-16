@@ -145,9 +145,9 @@ const createHeaderModal = (data, type, editMode) => {
     const month = `${today.getMonth()+1}`.padStart(2, '0');
     const year = `${today.getFullYear()}`.substring(2);
     let date = `${day}/${month}/${year}`;
-    console.log('create modal header', {data});
 
     let id;
+    let title ='';
     switch(type) {
         case 'applications':
             id = data.appNumber;
@@ -156,20 +156,37 @@ const createHeaderModal = (data, type, editMode) => {
             id = editMode? data.job.id : data.jobNumber;
             date = editMode? data.job.jobDate : date; 
             break;
-        case 'companies':
-            id = data.companyNumber;
-            date = editMode? data.companyDate : date;
+        case 'new-company':
+            id = `${data.companyNumber}: Add Company`;
+            date = date;
+            break;
+        case 'edit-company': 
+            id = 'Edit Company';
+            title = data.companyName;
+            date = data.companyDate;
             break;
         case 'new-contact': 
-            id = 'New Contact';
+            id = `Add Contact`;
+            title = data.companyName;
             break;
         case 'edit-contact': 
-            id = data.companyNumber;
+            id = `Edit Contact`;
+            title = data.companyName;
+            break;
+        case 'new-address': 
+            id = `Add Address`;
+            title = data.companyName;
+            break;
+        case 'edit-address': 
+            id = `Edit Address`;
+            title = data.companyName;
+            break;
     }
 
     const header = `
         <div class="summary__modal-header summary__modal-header--${type}">
             <div>${id}</div>
+            <div>${title}</div>
             <div>${date}</div>
         </div>
     `;
@@ -601,12 +618,12 @@ export const renderCompanyModal = (data, type) => {
     const summaryHeader = document.querySelector('.summary__header');
     const summary = document.querySelector('.summary__content');
     switch(type) {
-        case 'new': 
-            summaryHeader.insertAdjacentHTML('afterbegin', createHeaderModal(data, 'companies'));
+        case 'new-company': 
+            summaryHeader.insertAdjacentHTML('afterbegin', createHeaderModal(data, 'new-company'));
             summary.insertAdjacentHTML('afterbegin', createCompanyModal(data, 'new-company', false));
             break; 
-        case 'edit': 
-            summaryHeader.insertAdjacentHTML('afterbegin', createHeaderModal(data, 'companies', true));
+        case 'edit-company': 
+            summaryHeader.insertAdjacentHTML('afterbegin', createHeaderModal(data, 'edit-company', true));
             summary.insertAdjacentHTML('afterbegin', createCompanyModal(data, 'edit-company', true));
             break;
         case 'new-contact':

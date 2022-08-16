@@ -33,10 +33,12 @@
             position: relative;
 
         }
-        &--new-company, &--new-contact, &--new-address {
+        &--new-company, &--edit-company, &--new-contact, &--edit-contact, &--new-address, &--edit-address {
             grid-column: 2/3;
-            grid-row: 4/5;
-            bottom: 1rem;
+            // grid-row: 4/5;
+            grid-row-end: 4;
+            align-self: end;
+            // bottom: 1rem;
         }
 
         &--hidden {

@@ -27,6 +27,38 @@ th, td {
     display: table-cell;
     text-transform:initial;
 }
+th {
+    position: relative;
+}
+.th__arrow {
+    position: absolute;
+    top: 50%;
+    // left: var(--row-h-padding);
+    display: flex;
+    height: 1.2rem;
+    width: 1.2rem;
+    fill: $color-secondary;
+
+    &--active {
+        transform: rotate(90deg);
+    }
+
+    &--companies-id,
+    &--companies-name
+    {    
+        transform: translate(calc(-100% - 8px), calc(-50% + 1px));
+    }
+    &--companies-added {
+        // // Place on the right
+        // right: var(--row-h-padding);
+        // transform: translate(calc(100% + 8px), calc(-50% + 1px)) rotate(90deg);
+
+        // Place on the left
+        transform: translate(100%, calc(-50% + 1px));
+    }
+
+}
+
 
 // TABLE HEADS
 
@@ -46,7 +78,7 @@ th {
         padding-left: var(--thead-h-padding);
         // Set height, not vertical padding (used in visible row calculation)
         height: var(--table-heading-height);
-
+        cursor: pointer;
 
         &:first-of-type {
             padding-left: var(--row-h-padding);
@@ -61,6 +93,7 @@ th {
     }
     & .th--id {
         width: 8rem;
+
     }
 
     & .th--name {

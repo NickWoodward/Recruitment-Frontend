@@ -408,11 +408,13 @@ export default class JobsController {
         if(!jobView.getAnimationState())
             jobView.updateJobView(jobId, job, newJob);
     }
+
     initialiseMenuItems() {
         this.navItems = Array.from(document.querySelectorAll('.jobs-menu__item-wrapper'));
 
         this.navItems.forEach((item) => {
             const itemContent = item.querySelector('.jobs-menu__content');
+
 
             // Calculate max visible height
             // const yPos = itemContent.getBoundingClientRect().y;
@@ -426,7 +428,9 @@ export default class JobsController {
             item.addEventListener('click', (e) => {
                 if(e.target.closest('.jobs-menu__content')) { console.log('return'); return; }
 
+                // The activeNavItem is the dropdown content, not the nav heading
                 if(this.activeNavItem) {
+
                     // Close any item that's open
                     this.activeNavItem.animation.reverse();
                     // Rotate the arrow back

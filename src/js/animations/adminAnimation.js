@@ -2,29 +2,32 @@ import { gsap } from 'gsap';
 import * as loader from '../views/loader';
 
 const SPEED_TEST = 2;
-const SPEED_SLOW = 1;
+const SPEED_SLOW = .4;
 
 
 //// ALERTS ////
 
-export const animateAlert = (alertWrapper, paused) => {
+export const animateAlert = (alertWrapper, success, paused) => {
+    const delay = success? '+=1.2': '+=1.4';
     
-    const tl = gsap.timeline({paused: paused})
+    const tl = gsap.timeline({ paused: paused })
     return tl
         .fromTo(alertWrapper, 
             { autoAlpha: 0 },
             { 
                 autoAlpha: 1, 
-                duration: SPEED_SLOW
+                duration: SPEED_SLOW,
+                onStart: () => console.log('starting'),
+                onComplete: () => console.log('ending')
             }
         )
         .fromTo(alertWrapper,
             { autoAlpha: 1 },
             {
                 autoAlpha: 0,
-                duration: 1,
+                duration: SPEED_SLOW,
                 immediateRender: false
-        }, '+=1')
+        }, delay)
 }
 
 //// MODALS ////
@@ -225,8 +228,9 @@ export const animateSummaryOut = (page) => {
     const element = modal || confirmation;
 
     if(element) {
+
         tl.add(animateSummaryModalOut(element));
-        if(modal) animateSummaryModalOut(document.querySelector('.summary__modal-header'))
+        if(document.querySelector('.summary__modal-header')) animateSummaryModalOut(document.querySelector('.summary__modal-header'))
     }
 
     switch(page) {

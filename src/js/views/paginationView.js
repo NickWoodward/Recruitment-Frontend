@@ -10,7 +10,6 @@ export const calculatePagination = (index, limit, totalItems) => {
     index = index/limit;
     // console.log('new index:', {index}, 'pages: ', {pages});
 
-
     return { pages, index };
 }
 
@@ -77,7 +76,6 @@ export const initPagination = (pages, current, tableName) => {
     if(pages === 1) selectClassNames.push(`${tableName}-disabled`);
     const animations = getPaginationSelectAnimations();
     const CustomSelect = new Select({select, modifiers: selectClassNames, selectIcon:false, animations});
-
     switch(tableName) {
         case 'companies': {
             CustomSelect.addCustomSelectListeners(tableName);

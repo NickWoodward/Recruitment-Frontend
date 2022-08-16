@@ -85,14 +85,15 @@ export default class Admin {
     }
 
     ////////// Company Methods ///////////
-    getCompanies({limit, index, orderField, orderDirection} = {}, indexId) {
+    getCompanies({limit, index, orderField, orderDirection, searchTerm} = {}, indexId) {
         return JRS.get('/admin/companies', {
             params: {
                 limit,
                 index,
                 orderDirection,
                 orderField,
-                indexId
+                indexId, 
+                searchTerm
             },
             cancelToken: new axios.CancelToken(c => cancelTokenSource = c)
 

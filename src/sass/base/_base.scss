@@ -91,7 +91,7 @@ textarea, input {
     --table-heading-height: 5rem;
     --table-heading-bg-color: rgb(249, 250, 251);
     --table-padding: 1.5rem 2.5rem;
-    --row-h-padding: 3rem; 
+    --row-h-padding: 3.5rem; 
     --thead-v-padding: 2rem;
     --thead-h-padding: 2rem;
 
@@ -158,6 +158,16 @@ input[type=text]:focus, select:focus {
     outline: none;
     border: 1px solid $color-secondary;
 }
+
+// .no-focusborder:focus {
+//     outline-style: none;
+//     box-shadow: none;
+//     border-left-color: transparent;
+//     border-top-color: transparent;
+//     border-right-color: transparent;
+//     background-color: none;
+//     color: none;
+//   }
 
 
 fieldset {

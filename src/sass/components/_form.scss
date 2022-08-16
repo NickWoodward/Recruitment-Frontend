@@ -13,7 +13,7 @@
         position: relative;
         display: flex;
     }
-    &--new-company, &--edit-company, &--new-contact, &--edit-contact, &--new-address {
+    &--new-company, &--edit-company, &--new-contact, &--edit-contact, &--new-address, &--edit-address {
         width: 100%;
     }
 
@@ -64,7 +64,8 @@
         &--edit-company,
         &--new-contact,
         &--edit-contact,
-        &--new-address {
+        &--new-address,
+        &--edit-address {
             padding: 4.5rem 4rem;
             margin-top: 0;
         }
@@ -74,7 +75,8 @@
     &__column--edit-company,
     &__column--new-contact,
     &__column--edit-contact,
-    &__column--new-address {
+    &__column--new-address,
+    &__column--edit-address {
         // border: 1px solid red;
         display: grid;
         column-gap: 2rem;
@@ -155,15 +157,17 @@
         }
     }
     &__contact-first-name--new-company,
+    &__contact-first-name--edit-company,
     &__contact-first-name--new-contact,
+    &__contact-first-name--edit-contact,
     &__contact-first-name--new-address,
+    &__contact-first-name--edit-address,
     &__contact-surname--new-company,
+    &__contact-surname--edit-company,
     &__contact-surname--new-contact,
     &__contact-surname--edit-contact,
     &__contact-surname--new-address,
-    &__contact-first-name--edit-company,
-    &__contact-first-name--edit-contact,
-    &__contact-surname--edit-company
+    &__contact-surname--edit-address
     {
         grid-column: 1/3;
     }
@@ -172,7 +176,8 @@
     &__company-name--edit-company,
     &__company-name--new-contact,
     &__company-name--edit-contact,
-    &__company-name--new-address {
+    &__company-name--new-address,
+    &__company-name--edit-address {
         grid-column: 1/3;
     }
     // &__first-line--new-company,
@@ -184,9 +189,12 @@
     //     grid-column: 2/3;
     // }
     &__email--new-company, 
+    &__email--edit-company,
     &__email--new-contact,
     &__email--edit-contact,
-    &__email--edit-company  {
+    &__email--new-address,
+    &__email--edit-address
+  {
         grid-column: 1/3;
     }
 

@@ -1,4 +1,5 @@
 import * as utils from '../utils/utils';
+import { gsap } from 'gsap';
 
 //// APPLICATION SUMMARY VIEW ////
 
@@ -347,6 +348,21 @@ export const insertNewCompanySummary = (company) => {
     document.querySelector('.summary__section--addresses').insertAdjacentHTML('beforeend', addressesContent);
     document.querySelector('.summary__contact-controls--companies-page').insertAdjacentHTML('beforeend', contactsControls);
     document.querySelector('.summary__address-controls--companies-page').insertAdjacentHTML('beforeend', addressesControls);
+
+    // Add animation to the search bar
+    const searchBtn = document.querySelector('.summary__search');
+    const searchInput = searchBtn.previousElementSibling;
+
+    const tl = gsap.timeline({ paused: true });
+    gsap.set(searchInput, { scaleX: 0 })
+    tl.to(searchInput, {
+        scaleX: 1, 
+        transformOrigin: "right center", 
+        duration: .3, 
+        onComplete: ()=> searchInput.focus()
+    });
+
+    searchInput.animation = tl;
 }
 
 export const switchCompanySummary = (company) => {
@@ -377,20 +393,23 @@ const removeOldCompanySummary = () => {
 }
 
 export const createCompanySummaryContent = ({id, companyName, companyDate, contacts, addresses, jobs}) => {
-
     const headerContent = `
         <div class="summary__header-content" data-id=${id}>
             <div class="summary__item summary__item--header summary__item--header-title">
                 <div class="summary__title">${companyName}</div>
             </div>
-            <div class="summary__item summary__item--header summary__item--header-date">
-                <div class="summary__date">${companyDate}</div>
-            </div>
+
+            <form class="summary__item summary__item--header summary__item--header-search">
+                <input class="summary__search-input no-focusborder">
+                <div class="summary__search"><svg><use xlink:href="svg/spritesheet.svg#search"></svg></div>
+            </form>
+
+
         </div>
     `;
 
     // Section wrappers and headers are created/inserted in the initAdmin function
-
+    console.log(id, companyName, contacts, addresses)
     const contactsContent = createCompanyContact(contacts[0]);
 
     const addressesContent = createCompanyAddress(addresses[0]);
@@ -452,7 +471,7 @@ export const switchAddress = (address) => {
 
 const createCompanyContact = ({contactId, firstName, lastName, position, email, phone}) => {
     return `
-        <div class="summary__section-content summary__section-content--contacts">
+        <div class="summary__section-content summary__section-content--contacts" data-id="${contactId}" >
             <div class="summary__column summary__column--companies-page">
 
                 <div class="summary__item summary__item--companies-page">
@@ -489,9 +508,9 @@ const createCompanyContact = ({contactId, firstName, lastName, position, email, 
     `; 
 }
 
-const createCompanyAddress = ({firstLine, secondLine, city, county, postcode}) => {
+const createCompanyAddress = ({id, firstLine, secondLine, city, county, postcode}) => {
     return `
-        <div class="summary__section-content summary__section-content--addresses">
+        <div class="summary__section-content summary__section-content--addresses" data-id="${id}">
             <div class="summary__column summary__column--companies-page">
 
                 <div class="summary__item summary__item--companies-page">
@@ -519,9 +538,7 @@ const createCompanyAddress = ({firstLine, secondLine, city, county, postcode}) =
 
                 <div class="summary__item summary__item--companies-page">
                     <div class="summary__label summary__label">County:</div>
-                    <div class="summary__field summary__field--county">
-                        <a class="summary__link summary__link--county">${county}</a>
-                    </div>
+                    <div class="summary__field summary__field--county">${county}</div>
                 </div>
 
                 <div class="summary__item summary__item--companies-page">

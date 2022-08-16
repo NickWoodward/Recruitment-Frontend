@@ -1,3 +1,4 @@
+import { gsap } from 'gsap';
 
 /**
  * 
@@ -98,3 +99,45 @@ export const createTableHeader = (page, title) => {
     `;
     return markup;
 };
+
+export const insertTableArrows = (tableName) => {
+    let containers;
+    switch(tableName) {
+        case 'companies': {
+            containers = [
+                ['id', document.querySelector('.thead--companies .th--id')],
+                ['name', document.querySelector('.thead--companies .th--name')],
+                ['added', document.querySelector('.thead--companies .th--added')]
+            ]
+            break;
+        }
+        case 'company-jobs': {
+            containers = [
+                ['id', document.querySelector('.thead--company-jobs .th--id')],
+                ['name', document.querySelector('.thead--company-jobs .th--name')],
+                ['added', document.querySelector('.thead--company-jobs .th--added')]
+            ];
+            break;
+        }
+    }
+    containers.forEach(container => {
+        container[1].insertAdjacentHTML('beforeend', `<div class="th__arrow th__arrow--companies th__arrow--companies-${container[0]}"><svg><use xlink:href="svg/spritesheet.svg#arrow-right"></svg></div>`)
+    });
+}
+
+export const addTableArrowAnimations = (tableName, order) => {
+    // Put an animation on each arrow so they can individually be reversed when another is clicked
+    switch(tableName) {
+        case 'companies': {
+            // Select all the table arrows
+            const arrows = document.querySelectorAll('.th__arrow--companies');
+            arrows.forEach(arrow => {
+                const tl = gsap.timeline({ paused: true });
+                tl.to(arrow, { rotation: '90', duration: .2 });
+
+                arrow.animation = tl;
+            });
+            break;
+        }
+    }
+}

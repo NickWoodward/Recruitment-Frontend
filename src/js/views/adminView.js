@@ -1307,16 +1307,14 @@ export const calculateRows = (tableName, header, pagination) => {
 // };
 
 export const getDeleteContactHtml = (contactId) => {
-    const name = document.querySelector('.company-summary__field--name').innerText;
-    const position = document.querySelector('.company-summary__field--position')?.innerText;
-    const phone = document.querySelector('.company-summary__field--contact-phone').innerText;
-    const email = document.querySelector('.company-summary__field--contact-email').innerText;
+    const name = document.querySelector('.summary__link--name').innerText;
+    const position = document.querySelector('.summary__field--position').innerText;
+    const phone = document.querySelector('.summary__field--phone').innerText;
+    const email = document.querySelector('.summary__link--email').innerText;
 
     return (`
-        <div class='confirmation confirmation--delete'>
-            <div class="company-summary__modal-header">
-                <div>${contactId}</div>
-            </div>
+        <div class='summary__modal summary__modal--delete-contact'>
+           
             <div class='confirmation__header'>
                 <div class='confirmation__svg-wrapper'>
                     <svg class='confirmation__svg confirmation__svg--delete'><use xlink:href="svg/spritesheet.svg#alert-circled"></svg>
@@ -1353,17 +1351,15 @@ export const getDeleteContactHtml = (contactId) => {
 }
 
 export const getDeleteAddressHtml = (addressId) => {
-    const firstLine = document.querySelector('.company-summary__field--first-line').innerText;
-    const secondLine = document.querySelector('.company-summary__field--second-line')?.innerText;
-    const city = document.querySelector('.company-summary__field--city').innerText;
-    const county = document.querySelector('.company-summary__field--county').innerText;
-    const postcode = document.querySelector('.company-summary__field--postcode').innerText;
+    const firstLine = document.querySelector('.summary__field--first-line').innerText;
+    const secondLine = document.querySelector('.summary__field--second-line')?.innerText;
+    const city = document.querySelector('.summary__field--city').innerText;
+    const county = document.querySelector('.summary__field--county').innerText;
+    const postcode = document.querySelector('.summary__field--postcode').innerText;
 
     return (`
         <div class='confirmation confirmation--delete'>
-            <div class="company-summary__modal-header">
-                <div>${addressId}</div>
-            </div>
+
             <div class='confirmation__header'>
                 <div class='confirmation__svg-wrapper'>
                     <svg class='confirmation__svg confirmation__svg--delete'><use xlink:href="svg/spritesheet.svg#alert-circled"></svg>
@@ -1406,12 +1402,11 @@ export const getDeleteAddressHtml = (addressId) => {
     `);
 }
 export const getDeleteCompanyHtml = (companyId) => {
-    const companyDate = document.querySelector('.summary__date').innerText;
     const companyName = document.querySelector('.summary__title').innerText;
     const companyContact = document.querySelector('.summary__link--name').innerText;
     const location = document.querySelector('.summary__field--city').innerText;
     return (`
-        <div class='confirmation confirmation--delete'>
+        <div class='summary__modal summary__modal--delete-company'>
             
             <div class='confirmation__header'>
                 <div class='confirmation__svg-wrapper'>
