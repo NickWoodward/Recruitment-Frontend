@@ -3159,17 +3159,6 @@ class AdminController {
     }
 
     async companySummaryListener(e) {
-        // Animations
-
-        // const newContactAlertAnimation = gsap.timeline({paused: true});
-        const editContactAlertAnimation = gsap.timeline({paused: true});
-        const deleteContactAlertAnimation = gsap.timeline({paused: true});
-        
-        const newAddressAlertAnimation = gsap.timeline({paused: true});
-        const editAddressAlertAnimation = gsap.timeline({paused: true});
-        const deleteAddressAlertAnimation = gsap.timeline({paused: true});
-
-
         // Buttons
         const newContactBtn = e.target.closest('.summary__new-contact-btn--companies');
         const newAddressBtn = e.target.closest('.summary__new-address-btn--companies');
