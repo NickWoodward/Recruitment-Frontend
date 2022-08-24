@@ -93,6 +93,10 @@ export const initPagination = (pages, current, tableName) => {
             CustomSelect.addCustomSelectListeners(tableName);
             break;
         }
+        case 'jobs': {
+            CustomSelect.addCustomSelectListeners(tableName);
+            break;
+        }
     }
 
     // const markup = `

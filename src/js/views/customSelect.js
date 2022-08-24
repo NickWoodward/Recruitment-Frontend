@@ -53,6 +53,9 @@ export default class Select {
       if(selectName === 'company-addresses') {
         changeValueEvents.push('companyAddressesChange');
       }
+      if(selectName == 'jobs') {
+        changeValueEvents.push('jobsChange');
+      }
       changeValueEvents.forEach(event => {
         // ++ is because of zero index, not because it's moving the page forwards or backwards
         this.customSelect.addEventListener(event, e => {this.selectValue(`${++e.detail.page}`)});

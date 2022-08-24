@@ -2045,16 +2045,31 @@ const getJob = (e) => {
 
 //////////  COMPANIES PAGE  ///////////
 
-export const formatCompanies = (companies) => {
+export const formatCompanies = (companies, searchTerm) => {
     // Headers should match the returned divs in createCompanyElement
     const headers = ['ID', 'Name', 'Added'];
     const rows = companies.map(company => {
-        return createCompanyElement(formatProperties(company, ['companyId', 'companyDate']));
+        return createCompanyElement(formatProperties(company, ['companyId', 'companyDate']), searchTerm);
     });
     return { headers, rows };
 };
 
-const createCompanyElement = ({ id, companyName, companyDate }) => {
+
+const createCompanyElement = ({ id, companyName, companyDate }, searchTerm) => {
+
+    if(searchTerm) {
+        const start = companyName.toLowerCase().indexOf(searchTerm.toLowerCase());
+        const end = start + searchTerm.length;
+        if(start !== -1) {
+            const name = companyName.split('');
+            name.splice(start, 0, '<mark>');
+            name.splice(end+1, 0, '</mark>');
+            companyName = name.join('');
+        }
+    }
+
+    // const nameElement = start !== -1? :  
+
     const row = [
         `<td class="td--companies td-data--company-id">${id}</td>`,
         `<td class="td--companies td-data--company-name" data-id=${id}>${companyName}</td>`,

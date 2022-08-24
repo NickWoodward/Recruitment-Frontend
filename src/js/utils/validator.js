@@ -236,6 +236,17 @@ const newContactSchema = Joi.object({
 
 });
 
+const newSearchSchema = Joi.object({
+    searchTerm:
+        Joi.string().trim().min(1).max(50).required().messages({
+            "string.base": `Must be text`,
+            "string.empty": `Cannot be empty`,
+            "string.min": `Must be > 2`,
+            "string.max": `Must be < than 50`,
+            "any.required": `Required`,
+        })
+})
+
 export const validateJob = (data) => validate(data, newJobSchema);
 export const validateJobField = (data) => validateProperty(data, newJobSchema);
 
@@ -244,6 +255,8 @@ export const validateCompanyField = (data) => validateProperty(data, newCompanyS
 
 export const validateContact = (data) => validate(data, newContactSchema);
 export const validateAddress = (data) => validate(data, newAddressSchema);
+
+export const validateSearch = (data) => validate(data, newSearchSchema);
 
 // ************* Reusable validation code *************
 

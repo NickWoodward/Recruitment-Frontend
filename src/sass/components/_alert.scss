@@ -31,7 +31,8 @@
 
         &--new-job {
             position: relative;
-
+            width: 100%;
+            transform: translateY(-6px);
         }
         &--new-company, &--edit-company, &--new-contact, &--edit-contact, &--new-address, &--edit-address {
             grid-column: 2/3;

@@ -338,7 +338,7 @@ export const insertNewJobSummary = (job) => {
 
 //// COMPANY SUMMARY VIEW ////
 
-export const insertNewCompanySummary = (company) => {
+export const insertNewCompanySummary = (company, searchTerm) => {
     // Create new content
     const { headerContent, contactsContent, addressesContent, contactsControls, addressesControls } = createCompanySummaryContent(company);
     
@@ -348,6 +348,9 @@ export const insertNewCompanySummary = (company) => {
     document.querySelector('.summary__section--addresses').insertAdjacentHTML('beforeend', addressesContent);
     document.querySelector('.summary__contact-controls--companies-page').insertAdjacentHTML('beforeend', contactsControls);
     document.querySelector('.summary__address-controls--companies-page').insertAdjacentHTML('beforeend', addressesControls);
+
+    // Insert New tag if needed
+    if(searchTerm) addSearchTag(searchTerm);
 
     // Add animation to the search bar
     const searchBtn = document.querySelector('.summary__search');
@@ -365,9 +368,9 @@ export const insertNewCompanySummary = (company) => {
     searchInput.animation = tl;
 }
 
-export const switchCompanySummary = (company) => {
+export const switchCompanySummary = (company, searchTerm) => {
     removeOldCompanySummary();
-    insertNewCompanySummary(company);
+    insertNewCompanySummary(company, searchTerm);
 }
 const removeOldCompanySummary = () => {
     // Select old content
@@ -392,6 +395,17 @@ const removeOldCompanySummary = () => {
     items.forEach(item => item.parentElement.removeChild(item));
 }
 
+export const addSearchTag = (searchTerm) => {
+    const searchContainer = document.querySelector('.summary__item--header-search');
+
+    const markup = `
+      <div class="summary__tag">
+        <div class="summary__tag-content">${searchTerm}</div>
+        <div class="summary__tag-close"><svg><use xlink:href="svg/spritesheet.svg#cross"></svg></div>  
+      </div>`;
+    searchContainer.insertAdjacentHTML('afterbegin', markup);
+}
+
 export const createCompanySummaryContent = ({id, companyName, companyDate, contacts, addresses, jobs}) => {
     const headerContent = `
         <div class="summary__header-content" data-id=${id}>
@@ -401,7 +415,7 @@ export const createCompanySummaryContent = ({id, companyName, companyDate, conta
 
             <form class="summary__item summary__item--header summary__item--header-search">
                 <input class="summary__search-input no-focusborder">
-                <div class="summary__search"><svg><use xlink:href="svg/spritesheet.svg#search"></svg></div>
+                <div class="summary__search" tabindex="-1"><svg><use xlink:href="svg/spritesheet.svg#search"></svg></div>
             </form>
 
 
@@ -409,7 +423,6 @@ export const createCompanySummaryContent = ({id, companyName, companyDate, conta
     `;
 
     // Section wrappers and headers are created/inserted in the initAdmin function
-    console.log(id, companyName, contacts, addresses)
     const contactsContent = createCompanyContact(contacts[0]);
 
     const addressesContent = createCompanyAddress(addresses[0]);

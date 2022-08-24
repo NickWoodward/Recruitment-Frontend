@@ -278,5 +278,9 @@
             grid-row-end: 3;
             align-self:end;
         }
+
+        &--new-job, &--edit-job {
+            grid-column: 1/3;
+        }
     }
 }

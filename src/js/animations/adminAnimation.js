@@ -293,13 +293,13 @@ const animateCompanySummaryOut = () => {
 
 const animateHeadingOut = () => {
     return gsap.to(
-        '.summary__item--header', 
+        '.summary__item--header-title', 
         { autoAlpha: 0, y: -3, duration: .3, ease: 'ease-out' }
     );
 }
 const animateHeadingIn = () => {
     return gsap.fromTo(
-        '.summary__item--header', 
+        '.summary__item--header-title', 
         { autoAlpha: 0, y: 3 }, 
         { autoAlpha: 1, y: 0, duration: .35,  ease: 'ease-out' }
     );
