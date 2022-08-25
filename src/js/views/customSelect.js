@@ -37,6 +37,7 @@ export default class Select {
       return selectedIndex
     }
 
+    // These listen for events from external controls (next/prev buttons etc)
     addCustomSelectListeners(selectName) {
       const changeValueEvents = [];
 
@@ -67,6 +68,7 @@ export default class Select {
       const newSelectedOption = this.selectOptions.find(option => {
         return option.value === value && option.group === group
       })
+      // console.log({value}, {newSelectedOption});
       if(!newSelectedOption) return;
 
       // Placeholder class removed from label when any option selected
@@ -94,7 +96,7 @@ export default class Select {
             .querySelector(`[data-value="${prevSelectedOption.value}"][data-group="${prevSelectedOption.group}"]`).children[0];
 
           iconWrapper.classList.remove('selected');
-          gsap.to(iconWrapper, {autoAlpha: 0, duration: .1});
+          gsap.set(iconWrapper, {autoAlpha: 0});
           }
       }
         
@@ -104,7 +106,7 @@ export default class Select {
       newCustomElement.classList.add("selected")
       if(this.customIcon){
         newCustomElement.children[0].classList.add('selected');
-        gsap.to(newCustomElement.children[0], {autoAlpha: 1, duration: 1});
+        gsap.set(newCustomElement.children[0], {autoAlpha: 1});
       }
       newCustomElement.scrollIntoView({ block: "nearest" })
 

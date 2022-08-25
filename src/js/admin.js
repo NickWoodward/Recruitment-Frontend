@@ -528,6 +528,14 @@ class AdminController {
             // This sets the first element in the table, and is used to navigate to specific records from other admin summaries
             // EG: Clicking the application summary company href => company in the companies table
             tl.add(async () => {
+                switch(sectionName) {
+                    case 'companies': {
+                        // Reset the subpage search options / state before async call
+                        this.state.companies.currentPage = 0;
+                        this.state.companies.searchOptions.index = 0;
+                    }
+                }
+
                 // Calculate the # of rows that can fit on the page
                 this.getNumOfRows(sectionName);
                 await this.getData(sectionName, indexId);
@@ -578,6 +586,9 @@ class AdminController {
                     }
                     case 'companies': {
                         this.state.companies.currentCompany = this.companies[0];
+                        this.resetCompanyState();
+
+
 
                     //// Main Company Table ////
 
@@ -585,6 +596,7 @@ class AdminController {
                         this.renderCompaniesTable();
 
                         // Table and Summary animated in for the first time below this switch statement
+
                         // Add pagination for the company table
                         const { totalCompanies, searchOptions: {index: companiesIndex, limit: companiesLimit} } = this.state.companies;
 
@@ -620,7 +632,6 @@ class AdminController {
                         } 
 
                         this.addCompanySummaryListeners();
-
 
                         break;
                     }
@@ -1799,6 +1810,8 @@ class AdminController {
             }, 'new');
             const jobSummaryModal = document.querySelector('.summary__modal--new-job');
             const jobSummaryHeader = document.querySelector('.summary__modal-header--jobs');
+
+            //@TODO: defend against rendering twice
             animation.animateSummaryModalIn(jobSummaryModal);
             animation.animateSummaryModalIn(jobSummaryHeader);
 
@@ -1815,9 +1828,9 @@ class AdminController {
             const { companyField, typeField, positionField, pqeField, featuredField } = selects;
 
             // Get the animation for the application alerts (paused)
-            errorAnimation = animation.animateAlert(alertWrapper, false);
+            errorAnimation = animation.animateAlert(alertWrapper, false, 'paused');
             // Success animation is the same, but appended later (paused)
-            successAnimation = animation.animateAlert(alertWrapper, true);
+            successAnimation = animation.animateAlert(alertWrapper, true, 'paused');
   
             closeBtn.addEventListener('click', () => {
                 // Removes the header, modal + animates
@@ -2918,6 +2931,7 @@ class AdminController {
 
             const thead = document.querySelector('.thead--companies');
             thead.addEventListener('click', async e => {
+                this.state.companies.currentPage = 0;
                 tableView.changeArrow(e, this.state.companies, 'companies');
 
                 await this.getData('companies');
@@ -4210,6 +4224,7 @@ class AdminController {
             // If a modal exists, the modal above will render behind the existing one, so animate it out
             // to give a smooth transition. Otherwise animate the new modal in
             if(modalExists) {
+                console.log('MODAL EXISTS');
                 gsap.timeline()
                     // AnimateModalOut removes the modal from the dom
                     .add(animation.animateSummaryModalOut(modalExists))
@@ -5213,7 +5228,7 @@ console.log(companyForm);
         const usersNext = e.target.closest('.pagination__next--users');
 
         // Jobs Table
-        const jobsOption = e.target.closest('.pagination__item--jobs');
+        const jobsOption = e.target.closest('.custom-select-option--jobs');
         const jobsPrevious = e.target.closest('.pagination__previous--jobs');
         const jobsNext = e.target.closest('.pagination__next--jobs');
 
@@ -5270,6 +5285,7 @@ console.log(companyForm);
         if(users) {
             this.handleUsersPagination(usersOption, usersPrevious, usersNext);
         } else if(jobs){
+            console.log('jobs pagination')
             this.handleJobsPagination(jobsOption, jobsPrevious, jobsNext);
         } else if(companies) {
             this.handleCompaniesPagination(companiesOption, companiesPrevious, companiesNext);
@@ -5459,7 +5475,7 @@ console.log(companyForm);
     //     }
     // }
 
-    setPaginationState(option, previous, next, state, pages) {
+    setPage(option, previous, next, state, pages) {
 
         if(previous && !(state.currentPage < 1)) {
             console.log('backwards');
@@ -5487,7 +5503,7 @@ console.log(companyForm);
           .add(() => {
             // Set the pagination state (This does to the company jobs array what limit and offset do in the api call
             // and sets the paginatedJobs array for the company
-            this.setPaginationState(option, previous, next, companyContactsState, pages);
+            this.setPage(option, previous, next, companyContactsState, pages);
             // Set the current contact (because only 1 is displayed it's just the index)
             const currentContact = this.state.companies.currentCompany.contacts[companyContactsState.index]
             summaryView.switchContact(currentContact);
@@ -5518,7 +5534,7 @@ console.log(companyForm);
           .add(() => {
             // Set the pagination state (This does to the company jobs array what limit and offset do in the api call
             // and sets the paginatedJobs array for the company
-            this.setPaginationState(option, previous, next, companyAddressesState, pages);
+            this.setPage(option, previous, next, companyAddressesState, pages);
             // Set the current contact (because only 1 is displayed it's just the index)
             const currentAddress = this.state.companies.currentCompany.addresses[companyAddressesState.index]
             summaryView.switchAddress(currentAddress);
@@ -5554,7 +5570,7 @@ console.log(companyForm);
           .add(() => {
             // Set the pagination state (This does to the company jobs array what limit and offset do in the api call
             // and sets the paginatedJobs array for the company
-            this.setPaginationState(option, previous, next, companyJobsState, pages);
+            this.setPage(option, previous, next, companyJobsState, pages);
 
             // Paginate the companyJobs array
             const { index, limit } = this.state.companies.companyJobsPagination;
@@ -5586,7 +5602,7 @@ console.log(companyForm);
         // Set the pagination state
         const companyState = this.state.companies;
         const pages = Math.ceil(companyState.totalCompanies / companyState.searchOptions.limit);
-        this.setPaginationState(option, previous, next, companyState, pages);
+        this.setPage(option, previous, next, companyState, pages);
 
         // ANIMATION ORDER/LOGIC
         // 1: Place the loaders in the DOM
@@ -5859,7 +5875,7 @@ console.log(companyForm);
         // Set the pagination state
         const jobsState = this.state.jobs;
         const pages = Math.ceil(jobsState.totalJobs / jobsState.searchOptions.limit);
-        this.setPaginationState(option, previous, next, jobsState, pages);
+        this.setPage(option, previous, next, jobsState, pages);
 
         // ANIMATION ORDER/LOGIC
         // 1: Place the loaders in the DOM

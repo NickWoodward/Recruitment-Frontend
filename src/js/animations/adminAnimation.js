@@ -9,7 +9,7 @@ const SPEED_SLOW = .4;
 
 export const animateAlert = (alertWrapper, success, paused) => {
     const delay = success? '+=1.2': '+=1.4';
-    
+    console.trace();
     const tl = gsap.timeline({ paused: paused })
     return tl
         .fromTo(alertWrapper, 
@@ -17,6 +17,7 @@ export const animateAlert = (alertWrapper, success, paused) => {
             { 
                 autoAlpha: 1, 
                 duration: SPEED_SLOW,
+                immediateRender: false,
                 onStart: () => console.log('starting'),
                 onComplete: () => console.log('ending')
             }
