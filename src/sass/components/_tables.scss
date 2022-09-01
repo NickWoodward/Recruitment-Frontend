@@ -44,11 +44,16 @@ th {
     // }
 
     &--companies-id,
-    &--companies-name
+    &--companies-name,
+    &--jobs-id,
+    &--jobs-company,
+    &--jobs-location,
+    &--jobs-featured
     {    
         transform: translate(calc(-100% - 8px), calc(-50% + 1px));
     }
-    &--companies-added {
+    &--companies-added,
+    &--jobs-added {
         // // Place on the right
         // right: var(--row-h-padding);
         // transform: translate(calc(100% + 8px), calc(-50% + 1px)) rotate(90deg);
@@ -194,6 +199,7 @@ th {
     & th {
         padding-left: var(--thead-h-padding);
         height: var(--table-heading-height);
+        cursor: pointer;
 
         &:first-of-type {
             padding-left: var(--row-h-padding);

@@ -197,6 +197,28 @@ export const animateSummaryIn = (firstAnimation) => {
     return tl;
 }
 
+export const animateJobSummaryIn = (firstAnimation) => {
+    // Slower animations on first render
+    const duration = firstAnimation? .4:.3;
+
+    const tl = gsap.timeline();
+
+    tl
+    .fromTo('.summary__item--header--title', { autoAlpha: 0, y: 15 },{ autoAlpha: 1, y: 0, stagger: duration })
+    .fromTo('.summary__section-content', { autoAlpha: 0, y: 15 },{ autoAlpha: 1, y: 0, stagger: duration }, `<.1`)
+    .fromTo('.summary__btn', 
+        { autoAlpha: 0, y: 10 },
+        { 
+            autoAlpha: 1, 
+            y: function(index, target, targets) {
+                if(index === 0) return 1;
+                return 0;
+            }, 
+            stagger: { from: 'end', each: .1 } 
+        }, 
+    '<');
+}
+
 export const animateCompanySummaryIn = (jobsLength) => {
     const tl = gsap.timeline()
       .add(animateHeadingIn(), '<')
@@ -238,14 +260,12 @@ export const animateSummaryOut = (page) => {
         case 'companies': {
             tl.add(animateCompanySummaryOut());
             break;
+        } 
+        case 'jobs': {
+            tl.add(animateJobSummaryOut());
+            break;
         }
-        default:
-            // tl
-            // .fromTo('.summary__header-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -10 , duration: .3})
-            // .fromTo('.summary__section-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y:-10, stagger: { each: .1 } }, '<')
-            // .fromTo('.summary__btn', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y:10, stagger: { from: 'end', each: .1 } }, '<');
-            // console.log(tl.getChildren());
-            
+        default:       
             tl
             .fromTo('.summary__item--header', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -15, stagger: .2 })
             .fromTo('.summary__section-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -15 }, `<.1`)
@@ -260,6 +280,20 @@ export const animateSummaryOut = (page) => {
     }
 
     return tl;
+}
+
+const animateJobSummaryOut = () => {
+    return gsap.timeline({defaults: { overwrite: true }})
+            .add(animateHeadingOut())
+            .fromTo('.summary__section-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -15 }, `<.1`)
+            .fromTo('.summary__btn', 
+                { autoAlpha: 1, y: 0 },
+                { 
+                    autoAlpha: 0, 
+                    y:15, 
+                    stagger: { from: 'end', each: .1 } 
+                }, 
+            '<');
 }
 
 const animateCompanySummaryOut = () => {
@@ -391,13 +425,3 @@ export function animateCompanyJobSectionIn() {
 
 }
 
-// function animateCompanyJobControlsOut() {
-//     return gsap.to('.summary__btn--company-jobs', { autoAlpha: 0, y: -3, stagger: { amount: 0.1 },  ease: 'ease-out'  });
-// }
-// function animateCompanyJobControlsIn() {
-//     return gsap.fromTo(
-//       '.summary__btn--company-jobs', 
-//       { autoAlpha: 0, y: 3 },
-//       { autoAlpha: 1, y: 0, stagger: { amount: 0.2 }, ease: 'ease-out' }
-//     );
-// }

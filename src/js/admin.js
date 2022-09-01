@@ -125,8 +125,9 @@ class AdminController {
                     limit: 6,
                     titles: [],
                     locations: [],
-                    orderField: "createdAt",
-                    orderDirection: "DESC"
+                    orderField: "id",
+                    orderDirection: "DESC",
+                    searchTerm: ''
                 }
             },
             users: {
@@ -977,6 +978,7 @@ class AdminController {
                 this.state.applications.totalApplications = appCount;
                 break;
             case 'jobs':
+                console.log(this.state.jobs.searchOptions);
                 const { data: { jobs, total } } = await this.Admin.getJobs(this.state.jobs.searchOptions, indexId);
                 this.jobs = jobs;
                 this.state.jobs.totalJobs = total;
@@ -1634,7 +1636,7 @@ class AdminController {
 
     renderJobsTable() {
         // Format jobs/header into html elements
-        const {headers, rows} = adminView.formatJobs(this.jobs);
+        const {headers, rows} = adminView.formatJobs(this.jobs, this.state.jobs.searchOptions.searchTerm);
         
         const table = document.querySelector('.table--jobs');
         const tableContent = document.querySelector('.table__content--jobs');
@@ -1650,6 +1652,25 @@ class AdminController {
             const newTable = tableView.createTableTest('jobs', headers, rows, false);
             tableContent.insertAdjacentHTML('afterbegin', newTable);
 
+            // Insert order arrows
+            tableView.insertTableArrows('jobs', this.state.jobs);
+
+            const thead = document.querySelector('.thead--jobs');
+            thead.addEventListener('click', async e => {
+                // Get the header
+                const header = e.target.closest('th');
+                if(!header) return;
+
+                this.state.jobs.currentPage = 0;
+
+                // Change the table arrow direction, the searchOption direction
+                tableView.updateTableOrder(header, this.state.jobs, 'jobs');
+
+                await this.getData('jobs');
+                // Changing the page to 1 highlights the correct row and animates the summary and table in correctly
+                const selectOption = document.querySelector(`.custom-select-option--jobs[data-value="${this.state.jobs.currentPage+1}"]`);
+                this.handleJobsPagination(selectOption, null, null);
+            });
         } else {
             console.log('update table');
 
@@ -1672,7 +1693,7 @@ class AdminController {
 
                 const tl = gsap.timeline({ paused: true });
 
-                tl.add(animation.animateSummaryOut());
+                tl.add(animation.animateSummaryOut('jobs'));
 
                 tl.add(() => {
                     // Putting the row selection and switching logic inside the timeline
@@ -1693,7 +1714,7 @@ class AdminController {
                     summaryView.switchJobSummary(job);
 
                     // // Animate the summary back in
-                    animation.animateSummaryIn();
+                    animation.animateJobSummaryIn();
                 })
                 tl.play(0); 
 
@@ -1772,14 +1793,59 @@ class AdminController {
 
     addJobsSummaryListeners() {
         const jobSummary = document.querySelector('.summary--jobs-page');
+
+        jobSummary.addEventListener('focusout', this.handleJobSearchFocusEvent.bind(this));
+        jobSummary.addEventListener('submit', this.handleJobSearchSubmitEvent.bind(this));
+        // jobSummary.addEventListener('click', this.handleJobSearchSubmitEvent.bind(this));
+
         jobSummary.addEventListener(
             'click', 
-            this.jobSummaryListener.bind(this)
+            this.handleJobSummaryEvent.bind(this)
         );
 
     }
 
-    async jobSummaryListener(e) {
+    async handleJobSearchSubmitEvent(e) {
+        const inputOpen = document.querySelector('.summary__search-input.open');
+
+        const searchBtn = e.target.closest('.summary__search');
+        const searchForm = e.target.closest('.summary__item--header-search');
+
+        // Check the type, the origin of the event, and if we want to respond to it (if the input is open)
+        const submitEvent = e.type === 'submit' && searchForm && inputOpen;
+        const clickEvent = e.type === 'click' && searchBtn && inputOpen;
+
+        // Click events are already toggled, do the same with submit events
+        if(submitEvent) this.toggleSearch();
+
+        if((submitEvent || clickEvent) && inputOpen.value) {
+            this.state.jobs.searchOptions.searchTerm = inputOpen.value;
+            inputOpen.value = "";
+
+            summaryView.addSearchTag(this.state.jobs.searchOptions.searchTerm);
+            
+            await this.getData('jobs');
+            const selectOption = document.querySelector(`.custom-select-option--jobs[data-value="1"]`);
+            this.handleJobsPagination(selectOption, null, null);
+        }
+
+    }
+
+    handleJobSearchFocusEvent(e) {
+        const searchInput = e.target.closest('.summary__search-input');
+        const searchBtn = document.querySelector('.summary__search');
+        if(searchInput){
+            console.log(e.relatedTarget === searchBtn);
+            // If the input loses focus to the submit button, return (the click listener will handle it)
+            if(e.relatedTarget === searchBtn) return;
+
+            // If the input loses focus to anything else, close it
+            this.toggleSearch();
+        }
+        
+    }
+
+    async handleJobSummaryEvent(e) {
 
         // Buttons
         const newBtn = e.target.closest('.summary__new-job-btn--jobs');
@@ -1787,8 +1853,22 @@ class AdminController {
         const editBtn = e.target.closest('.summary__edit-job-btn--jobs');
         const hubspotBtn = e.target.closest('.summary__hubspot-btn--jobs');
 
+        const searchBtn = e.target.closest('.summary__search');
+        const searchTag = e.target.closest('.summary__tag');
+
         // Links
         const companyLink = e.target.closest('.summary__link--company');
+
+        if(searchBtn) {
+            this.toggleSearch();
+        }
+        if(searchTag) {
+            // Remove the searchTerm 
+            this.state.jobs.searchOptions.searchTerm = '';
+
+            const selectOption = document.querySelector(`.custom-select-option--jobs[data-value="1"]`);
+            this.handleJobsPagination(selectOption, null, null);
+        }
 
         if(newBtn) {
             let errorAnimation;
@@ -1839,6 +1919,9 @@ class AdminController {
            
             jobForm.addEventListener('submit', async e => {
                 e.preventDefault();
+                // Remove searchTerms
+                this.state.jobs.searchOptions.searchTerm = '';
+
                 // Clear the alert wrapper contents
                 while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
 
@@ -2024,9 +2107,9 @@ class AdminController {
             const alertWrapper = document.querySelector('.alert-wrapper');
 
             // Get the animation for the job alerts
-            errorAnimation = animation.animateAlert(alertWrapper, false);
+            errorAnimation = animation.animateAlert(alertWrapper, false, 'paused');
             // Success animation is the same, but is added to after async call to get data
-            successAnimation = animation.animateAlert(alertWrapper, true);
+            successAnimation = animation.animateAlert(alertWrapper, true, 'paused');
         
             const confirm = document.querySelector('.confirmation__btn--confirm');
             const cancel = document.querySelector('.confirmation__btn--cancel');
@@ -2336,7 +2419,7 @@ class AdminController {
 
                             //             // Update the summary
                             //             const summary = document.querySelector('.summary');
-                            //             adminView.swapSummary(summary, adminView.createJobSummary(this.state.jobs.currentJob), this.jobSummaryListener.bind(this)); 
+                            //             adminView.swapSummary(summary, adminView.createJobSummary(this.state.jobs.currentJob), this.handleJobSummaryEvent.bind(this)); 
                             //         }
                             //     });
                             // });
@@ -2927,12 +3010,17 @@ class AdminController {
             tableContent.insertAdjacentHTML('afterbegin', newTable);
             // Insert order arrows
             tableView.insertTableArrows('companies', this.state.companies);
-            // tableView.addTableArrowAnimations('companies', this.state.companies.searchOptions.orderField);
 
             const thead = document.querySelector('.thead--companies');
             thead.addEventListener('click', async e => {
+                // Get the header
+                const header = e.target.closest('th');
+                if(!header) return;
+
                 this.state.companies.currentPage = 0;
-                tableView.changeArrow(e, this.state.companies, 'companies');
+
+                // Change the table arrow direction, the searchOption direction
+                tableView.updateTableOrder(header, this.state.companies, 'companies');
 
                 await this.getData('companies');
                 // Changing the page to 1 highlights the correct row and animates the summary and table in correctly
@@ -2946,7 +3034,7 @@ class AdminController {
                 .insertAdjacentHTML('beforeend', adminView.createCompaniesControls());
 
             const tableControls = document.querySelector('.summary__company-controls--companies-page');
-            tableControls.addEventListener('click', (e) => {this.companyControlsListener(e), console.log('clicked table listener')});
+            tableControls.addEventListener('click', (e) => {this.companyControlsListener(e)});
 
             // Else remove the tbody and render just the content
         } else {
@@ -3204,7 +3292,7 @@ class AdminController {
         const clickEvent = e.type === 'click' && searchBtn && inputOpen;
 
         // Click events are already toggled, do the same with submit events
-        if(submitEvent) this.toggleCompanySearch();
+        if(submitEvent) this.toggleSearch();
 
         if((submitEvent || clickEvent) && inputOpen.value) {
 
@@ -3274,7 +3362,7 @@ class AdminController {
             if(e.relatedTarget === searchBtn) return;
 
             // If the input loses focus to anything else, close it
-            this.toggleCompanySearch();
+            this.toggleSearch();
         }
         
 
@@ -3300,7 +3388,7 @@ class AdminController {
         //     this.handleCompaniesPagination(selectOption, null, null);
         // });
     }
-    toggleCompanySearch() {
+    toggleSearch() {
         // If there's a searchTag, don't toggle
         const tag = document.querySelector('.summary__tag');
         if(tag) return
@@ -3343,7 +3431,7 @@ class AdminController {
             this.copyLink(emailCopy, text);
         }
         if(searchBtn) {
-            this.toggleCompanySearch();
+            this.toggleSearch();
         }
         if(searchTag) {
             // Remove the searchTerm 
@@ -3351,8 +3439,6 @@ class AdminController {
 
             const selectOption = document.querySelector(`.custom-select-option--companies[data-value="1"]`);
             this.handleCompaniesPagination(selectOption, null, null);
-
-            console.log(this.state.companies.searchOptions.orderField);
         }
 
         if(jobBtn) {
@@ -3408,6 +3494,8 @@ class AdminController {
 
             companyForm.addEventListener('submit', async e => {
                 e.preventDefault();
+                this.state.companies.searchOptions.searchTerm = '';
+
                 // Clear the alert wrapper
                 while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
 
@@ -3753,7 +3841,6 @@ class AdminController {
 
                 if(!errors) {
                     try {
-                        console.log('contactId:', contactId);
                         const res = await this.Admin.editContact({id, contactId, ...values});
 
                         if(res.status !== 201) {
@@ -4196,7 +4283,6 @@ class AdminController {
         const deleteBtn = e.target.closest('.summary__delete-company-btn--companies');
 
         if(newBtn) {
-            console.log('new', e, this);
             const modalExists = document.querySelector('.summary__modal');
             const modalHeaderExists = document.querySelector('.summary__modal-header');
             let errorAnimation;
@@ -4224,7 +4310,6 @@ class AdminController {
             // If a modal exists, the modal above will render behind the existing one, so animate it out
             // to give a smooth transition. Otherwise animate the new modal in
             if(modalExists) {
-                console.log('MODAL EXISTS');
                 gsap.timeline()
                     // AnimateModalOut removes the modal from the dom
                     .add(animation.animateSummaryModalOut(modalExists))
@@ -4264,7 +4349,6 @@ class AdminController {
             closeBtn.addEventListener('click', () => {
                 modalView.removeAdminModal('companies');
             });
-console.log(companyForm);
             companyForm.addEventListener('submit', async e => {
                 console.log('submit new');
                 e.preventDefault();

@@ -1441,7 +1441,6 @@ export const getDeleteCompanyHtml = (companyId) => {
 
 
 export const getDeleteJobHtml = (jobId) => {
-    const jobDate = document.querySelector('.summary__date').innerText;
     const jobTitle = document.querySelector('.summary__field--title').innerText;
     const companyName = document.querySelector('.summary__field--company').innerText;
     const location = document.querySelector('.summary__field--location').innerText;
@@ -1889,22 +1888,35 @@ const getJobFormValues = () => {
     return { title, location, wage, type, position, PQE, featured, description };
 }
 
-export const formatJobs = (jobs) => {
+export const formatJobs = (jobs, searchTerm) => {
+    console.log('called format jobs')
     // Headers should match the returned divs in createJobsElement
     const headers = ['ID', 'Company','Title','Location', 'Featured', 'Added'];
     const rows = jobs.map(job => {
-        return createJobElement(job);
+        return createJobElement(job, searchTerm);
     });
     return { headers, rows };
 };
-const createJobElement = (job) => {
+const createJobElement = ({id, companyName, title, location, featured, jobDate}, searchTerm) => {
+
+    if(searchTerm) {
+        const start = companyName.toLowerCase().indexOf(searchTerm.toLowerCase());
+        const end = start + searchTerm.length;
+        if(start !== -1) {
+            const name = companyName.split('');
+            name.splice(start, 0, '<mark>');
+            name.splice(end+1, 0, '</mark>');
+            companyName = name.join('');
+        }
+    }
+
     const row = [
-        `<td class="td--jobs td-data--jobId" data-id=${job.id}>${job.id}</td>`,
-        `<td class="td--jobs td-data--company" data-id=${job.id}>${job.companyName}</td>`,
-        `<td class="td--jobs td-data--title">${job.title}</td>`,
-        `<td class="td--jobs td-data--location">${job.location}</td>`,
-        `<td class="td--jobs td-data--featured">${job.featured? 'Yes':'No'}</td>`,
-        `<td class="td--jobs td-data--added">${job.jobDate}</td>`
+        `<td class="td--jobs td-data--jobId" data-id=${id}>${id}</td>`,
+        `<td class="td--jobs td-data--company" data-id=${id}>${companyName}</td>`,
+        `<td class="td--jobs td-data--title">${title}</td>`,
+        `<td class="td--jobs td-data--location">${location}</td>`,
+        `<td class="td--jobs td-data--featured">${featured? 'Yes':'No'}</td>`,
+        `<td class="td--jobs td-data--added">${jobDate}</td>`
 
     ];
     return row;
@@ -2067,8 +2079,6 @@ const createCompanyElement = ({ id, companyName, companyDate }, searchTerm) => {
             companyName = name.join('');
         }
     }
-
-    // const nameElement = start !== -1? :  
 
     const row = [
         `<td class="td--companies td-data--company-id">${id}</td>`,

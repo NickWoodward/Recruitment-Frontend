@@ -184,9 +184,10 @@ export const createJobSummaryContent = ({companyId, companyName, title, featured
             <div class="summary__item summary__item--header summary__item--header-title">
                 <div class="summary__title">${title}</div>
             </div>
-            <div class="summary__item summary__item--header summary__item--header-date">
-                <div class="summary__date">${jobDate}</div>
-            </div>
+            <form class="summary__item summary__item--header summary__item--header-search">
+                <input class="summary__search-input no-focusborder">
+                <div class="summary__search" tabindex="-1"><svg><use xlink:href="svg/spritesheet.svg#search"></svg></div>
+            </form>
         </div>
     `;
     // Section wrappers and headers are created/inserted in the initAdmin function
@@ -323,7 +324,7 @@ const removeOldJobSummary = () => {
     items.forEach(item => item.parentElement.removeChild(item));
 }
 
-export const insertNewJobSummary = (job) => {
+export const insertNewJobSummary = (job, searchTerm) => {
     // Create new content
     const { headerContent, detailsContent, descriptionContent, controlContent } = createJobSummaryContent(job);
     
@@ -332,6 +333,11 @@ export const insertNewJobSummary = (job) => {
     document.querySelector('.summary__section--details').insertAdjacentHTML('beforeend', detailsContent);
     document.querySelector('.summary__section--description').insertAdjacentHTML('beforeend', descriptionContent);
     document.querySelector('.summary__controls').insertAdjacentHTML('beforeend', controlContent);
+
+    // Insert New tag if needed
+    if(searchTerm) addSearchTag(searchTerm);
+
+    initSearchBar();
 }
 
 //// END JOB SUMMARY VIEW ////
@@ -352,20 +358,7 @@ export const insertNewCompanySummary = (company, searchTerm) => {
     // Insert New tag if needed
     if(searchTerm) addSearchTag(searchTerm);
 
-    // Add animation to the search bar
-    const searchBtn = document.querySelector('.summary__search');
-    const searchInput = searchBtn.previousElementSibling;
-
-    const tl = gsap.timeline({ paused: true });
-    gsap.set(searchInput, { scaleX: 0 })
-    tl.to(searchInput, {
-        scaleX: 1, 
-        transformOrigin: "right center", 
-        duration: .3, 
-        onComplete: ()=> searchInput.focus()
-    });
-
-    searchInput.animation = tl;
+    initSearchBar();
 }
 
 export const switchCompanySummary = (company, searchTerm) => {
@@ -565,3 +558,21 @@ const createCompanyAddress = ({id, firstLine, secondLine, city, county, postcode
 }
 
 //// END COMPANY SUMMARY VIEW ////
+
+
+const initSearchBar = () => {
+    // Add animation to the search bar
+    const searchBtn = document.querySelector('.summary__search');
+    const searchInput = searchBtn.previousElementSibling;
+
+    const tl = gsap.timeline({ paused: true });
+    gsap.set(searchInput, { scaleX: 0 })
+    tl.to(searchInput, {
+        scaleX: 1, 
+        transformOrigin: "right center", 
+        duration: .3, 
+        onComplete: ()=> searchInput.focus()
+    });
+
+    searchInput.animation = tl;
+}

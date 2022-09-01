@@ -123,6 +123,30 @@ export const insertTableArrows = (tableName, state) => {
             
             break;
         }
+        case 'jobs': {
+            const idTh = document.querySelector('.thead--jobs .th--id');
+            const companyTh = document.querySelector('.thead--jobs .th--company');
+            const locationTh = document.querySelector('.thead--jobs .th--location');
+            const featuredTh = document.querySelector('.thead--jobs .th--featured');
+            const addedTh = document.querySelector('.thead--jobs .th--added');
+
+            containers = [
+                ['id', idTh],
+                ['company', companyTh],
+                ['location', locationTh],
+                ['featured', featuredTh],
+                ['added', addedTh]
+            ];
+
+            header = 
+                state.searchOptions.orderField === 'id'? idTh :
+                state.searchOptions.orderField === 'company'? companyTh :
+                state.searchOptions.orderField === 'location'? locationTh :
+                state.searchOptions.orderField === 'featured'? featuredTh :
+                state.searchOptions.orderField === 'added'? addedTh : null;
+            
+            break;
+        }
         case 'company-jobs': {
             containers = [
                 ['id', document.querySelector('.thead--company-jobs .th--id')],
@@ -133,117 +157,84 @@ export const insertTableArrows = (tableName, state) => {
         }
     }
     containers.forEach(container => {
-        container[1].insertAdjacentHTML('beforeend', `<div class="th__arrow th__arrow--companies th__arrow--companies-${container[0]}"><svg><use xlink:href="svg/spritesheet.svg#arrow-right"></svg></div>`)
+        container[1].insertAdjacentHTML('beforeend', `<div class="th__arrow th__arrow--${tableName} th__arrow--${tableName}-${container[0]}"><svg><use xlink:href="svg/spritesheet.svg#arrow-right"></svg></div>`)
     });
 
-    // Add Table Arrow animations
-    addTableArrowAnimations(tableName);
+    const arrows = document.querySelectorAll(`.thead--${tableName} .th__arrow`);
+    arrows.forEach(arrow => arrow.direction = 'none');
 
-    // Set the active arrow
-    setSelectedArrow(header, state);
+    changeArrowDirection(header, state);
 }
 
-export const addTableArrowAnimations = (tableName) => {
-    // Put an animation on each arrow so they can individually be reversed when another is clicked
+export const updateTableOrder = (header, state, tableName) => {
+    changeOrderField(header, state, tableName);
+    changeArrowDirection(header, state);
+    resetOtherArrows(state, tableName);
+}
+
+const changeOrderField = (header, state, tableName) => {
+    // Remove any search term (will remove tags and highlighted row)
+    state.searchOptions.searchTerm = '';
+
     switch(tableName) {
         case 'companies': {
-            // Select all the table arrows
-            const arrows = document.querySelectorAll('.th__arrow--companies');
-            arrows.forEach(arrow => {
-                const tlDown = gsap.timeline({ paused: true });
-                const tlUp = gsap.timeline({ paused: true });
-                const tl180 = gsap.timeline({ paused: true });
+            // Select the table headers
+            const idTh = header.classList.contains('th--id');
+            const nameTh = header.classList.contains('th--name');
+            const addedTh = header.classList.contains('th--added');     
 
-                tlDown.add(gsap.to(arrow, { rotation: '90', duration: .2, onStart: ()=> console.log('down') }));
-                tlUp.add(gsap.to(arrow, { rotation: '-90', duration: .2, onStart: ()=> console.log('up') }));
-                tl180.add(gsap.fromTo(arrow, { rotation: '-90' }, { rotation: '90', duration: .4, immediateRender: false, onReverseComplete: ()=> console.log('up')  }));
+            // Set the orderField
+            if(idTh) state.searchOptions.orderField = 'id';
+            if(nameTh) state.searchOptions.orderField = 'name';
+            if(addedTh) state.searchOptions.orderField = 'createdAt';
 
-                arrow.animationDown = tlDown;
-                arrow.animationUp = tlUp;
-                arrow.animation180 = tl180;
-            });
+            break;
+        }
+        case 'jobs': {
+            // Select the table headers
+            const idTh = header.classList.contains('th--id');
+            const companyTh = header.classList.contains('th--company');
+            const locationTh = header.classList.contains('th--location');
+            const featuredTh = header.classList.contains('th--featured');
+            const addedTh = header.classList.contains('th--added');     
+
+            // Set the orderField
+            if(idTh) state.searchOptions.orderField = 'id';
+            if(companyTh) state.searchOptions.orderField = 'company';
+            if(locationTh) state.searchOptions.orderField = 'location';
+            if(featuredTh) state.searchOptions.orderField = 'featured';
+            if(addedTh) state.searchOptions.orderField = 'createdAt';
+
             break;
         }
     }
 }
 
-export const changeArrow = (e, state, tableName) => {
-    // Remove any search term (will remove tags and highlighted row)
-    state.searchOptions.searchTerm = '';
+const changeArrowDirection = (header, state) => {
+    const arrow = header.querySelector('.th__arrow');
 
-    let header;
+    state.activeTableArrow = arrow;
 
-    switch(tableName) {
-        case 'companies': {
-            // Select the table headers
-            const idTh = e.target.closest('.th--id');
-            const nameTh = e.target.closest('.th--name');
-            const addedTh = e.target.closest('.th--added');     
-
-            header = idTh || nameTh || addedTh;
-            // const orderField = idTh? 'id': nameTh? 'name' : addedTh? 'added' : '';
-            // setTableFieldOrder(state, orderField, tableName);
-            
-            // Set the orderField
-            if(idTh) state.searchOptions.orderField = 'id';
-            if(nameTh) state.searchOptions.orderField = 'name';
-            if(addedTh) state.searchOptions.orderField = 'createdAt';
-        }
+    if(arrow.direction === 'none' || arrow.direction === 'up') {
+        gsap.to(arrow, { rotation: 90 });
+        arrow.direction = 'down';
+        state.searchOptions.orderDirection = 'ASC';
+    } else {
+        gsap.to(arrow, {rotation: -90});
+        arrow.direction = 'up';
+        state.searchOptions.orderDirection = 'DESC';
     }
-
-    setSelectedArrow(header, state);
 }
 
-export const setSelectedArrow = (header, state) => {
-    if(!header) {return};
-    console.log('ORDER', state.searchOptions.orderDirection);
-    const selectedArrow = header.querySelector('.th__arrow');
+const resetOtherArrows = (state, tableName) => {
+    const arrows = document.querySelectorAll(`.th__arrow--${tableName}`);
 
-    // If an active arrow exists, and *is the current row*, animate 180, set the orderDirection (Then return)
-    if(!!state.activeTableArrow && state.activeTableArrow === selectedArrow) {
-        // ASC means arrow already down
-        if(state.searchOptions.orderDirection === 'ASC') {
-            console.log('Reverse 180, from down to up', 'progress', state.activeTableArrow.animation180.progress());
-            state.activeTableArrow.animation180.reverse(0);
-            state.searchOptions.orderDirection = 'DESC';
-        } else {
-            console.log('Play 180, from up to down');
-            state.activeTableArrow.animation180.play(0);
-            state.searchOptions.orderDirection = 'ASC';
+    //reset other arrows
+    arrows.forEach(function(arrow, index){
+        if (arrow != state.activeTableArrow){
+            gsap.to(arrow, {rotation:0})
+            arrow.direction = "none"
         }
-
-        return;
-    }
-
-    // If an active arrow exists, and it isn't the current active arrow, reverse its animation
-    if(!!state.activeTableArrow && state.activeTableArrow !== selectedArrow) {
-        // If the current order is 'ASC' (A-Z or 1-9)
-        // It means the arrow is pointing down, so reverse that
-        if(state.searchOptions.orderDirection === 'ASC') {
-            console.log('Arrow exists. Reverse down animation.', 'Search direction', state.searchOptions.orderDirection)
-            state.activeTableArrow.animationDown.reverse()
-        } else {
-            console.log('Arrow exists. Reverse up animation', 'Search direction', state.searchOptions.orderDirection)
-            state.activeTableArrow.animationUp.reverse()
-        }
-    }
-    // Even if an active arrow doesn't yet exist, set the selected arrow to the active arrow and animate down
-    if(state.activeTableArrow !== selectedArrow) {
-        console.log('New arrow animation')
-        state.activeTableArrow = selectedArrow;
-
-        state.activeTableArrow.animationDown.play(0);
-    }
-    // If it *is* the same arrow, change the orderDirection
+    })
 }
 
-// export const setTableFieldOrder = (state, orderField, tableName) => {
-//     switch(tableName) {
-//         case 'companies': {
-//             // Set the orderField
-//             if(orderField === 'id') state.searchOptions.orderField = 'id';
-//             if(orderField === 'name') state.searchOptions.orderField = 'name';
-//             if(orderField === 'added') state.searchOptions.orderField = 'createdAt';
-//         }
-//     }
-// }
