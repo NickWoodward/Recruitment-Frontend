@@ -54,6 +54,8 @@ export default class Admin {
 
     ///////////  Job Methods  ///////////
     getJobs({limit, index, titles, locations, orderField, orderDirection, searchTerm} = {}, indexId) {
+        console.log('CALLED GET JOBS', 'index', index, 'limit', limit, {indexId});
+
         return JRS.get('/admin/jobs', {
             params: {
                 limit,
@@ -87,7 +89,7 @@ export default class Admin {
 
     ////////// Company Methods ///////////
     getCompanies({limit, index, orderField, orderDirection, searchTerm} = {}, indexId) {
-        console.log('CALLED GET COMPANIES');
+        console.log('CALLED GET COMPANIES', 'index', index, 'limit', limit);
         return JRS.get('/admin/companies', {
             params: {
                 limit,

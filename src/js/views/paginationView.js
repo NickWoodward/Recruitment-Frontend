@@ -13,8 +13,10 @@ export const getCurrentPage = (index = 0, limit = 1) => {
     return index/limit + 1;
 }
 
-export const changePage = () => {
-
+export const onLastPage = (index, limit, total) => {
+    const page = getCurrentPage(index, limit);
+    const totalPages = getTotalPages(limit, total);
+    return page === totalPages;
 }
 
 export const initPagination = (totalPages, currentPage, tableName) => {
@@ -33,6 +35,11 @@ export const initPagination = (totalPages, currentPage, tableName) => {
 
     // Replace pagination selects with custom selects
     replaceSelects(totalPages, tableName);
+
+    // If currentPage is !== 1, change the select
+    if(currentPage !== 1){
+        changePaginationSelect(currentPage, tableName)
+    }
 }
 
 const removePagination = (tableName) => {
@@ -130,7 +137,7 @@ const changePaginationBtns = (pages, current, tableName) => {
 }
 
 const changePaginationSelect = (page, tableName) => {
-    const customSelect = document.querySelector('.custom-select-container--jobs');
+    const customSelect = document.querySelector(`.custom-select-container--${tableName}`);
 
     const moveEvent = new CustomEvent(`${tableName}Change`, { detail: { page } });
     customSelect.dispatchEvent(moveEvent, { bubbles: true });
