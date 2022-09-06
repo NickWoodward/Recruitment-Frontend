@@ -58,8 +58,7 @@ export default class Select {
         changeValueEvents.push('jobsChange');
       }
       changeValueEvents.forEach(event => {
-        // ++ is because of zero index, not because it's moving the page forwards or backwards
-        this.customSelect.addEventListener(event, e => {this.selectValue(`${++e.detail.page}`)});
+        this.customSelect.addEventListener(event, e => {this.selectValue(`${e.detail.page}`)});
       });
 
     } 

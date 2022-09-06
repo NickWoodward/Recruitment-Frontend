@@ -892,7 +892,12 @@
                 padding: 0 3rem;
             }
 
-            &--new-company, &--edit-company {
+            &--new-company, 
+            &--edit-company, 
+            &--new-contact, 
+            &--edit-contact,
+            &--new-address,
+            &--edit-address {
                 &>div {
                     display: flex;
                     padding: 0 3rem;

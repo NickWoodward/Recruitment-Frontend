@@ -1,5 +1,7 @@
 import { gsap } from 'gsap';
 
+const REM_TO_PX = 10;
+
 /**
  * 
  * @param {*} title - String table title
@@ -99,6 +101,44 @@ export const createTableHeader = (page, title) => {
     `;
     return markup;
 };
+
+
+export const calculateRows = (tableName) => {
+    // Sets whether the calculation should take the height of the header/pagination into account
+    let header;
+    let pagination;
+
+    switch(tableName) {
+        case 'applications':    
+            header = true; pagination = false;
+            break;
+        case 'jobs':            
+            header = true; pagination = false;
+            break;
+        case 'companies':       
+            header = true; pagination = false;
+            break;
+        case 'users': 
+            header = true; pagination = false;
+            break;
+        case 'company-jobs':
+            header = true; pagination = false;
+            break;
+        case 'nested-user-jobs':
+            header = true; pagination = true;
+            break;
+    }
+
+    const tableContentHeight = document.querySelector(`.table__content--${tableName}`).offsetHeight;
+    const headerHeight = header? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--table-header-height')) * REM_TO_PX : 0;
+    const paginationHeight = pagination? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pagination-height')) * REM_TO_PX : 0;
+    const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * REM_TO_PX;
+
+    const numOfRows = Math.floor((tableContentHeight - parseFloat(headerHeight) - parseFloat(paginationHeight)) / parseFloat(rowHeight));
+    // console.log({tableContentHeight}, {headerHeight}, {paginationHeight}, {rowHeight}, {numOfRows});
+
+    return numOfRows;
+}
 
 export const insertTableArrows = (tableName, state) => {
     let containers;

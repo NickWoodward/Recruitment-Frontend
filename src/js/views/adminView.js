@@ -10,7 +10,6 @@ import Select from './customSelect';
 import gsap from 'gsap';
 
 let summaryAnimationInProgress = false;
-const REM_TO_PX = 10;
 
 export const renderContent = (content, container) => {
     content.forEach(item => {
@@ -1275,37 +1274,6 @@ const getUserFormValues = () => {
 };
 
 
-export const calculateRows = (tableName, header, pagination) => {
-    // const tableWrapperHeight = document.querySelector(`.table-wrapper--${tableName}`).offsetHeight;
-
-    const tableContentHeight = document.querySelector(`.table__content--${tableName}`).offsetHeight;
-    const headerHeight = header? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--table-header-height')) * REM_TO_PX : 0;
-    const paginationHeight = pagination? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pagination-height')) * REM_TO_PX : 0;
-    const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * REM_TO_PX;
-
-    const numOfRows = Math.floor((tableContentHeight - parseFloat(headerHeight) - parseFloat(paginationHeight)) / parseFloat(rowHeight));
-    // console.log('\ntableContentHeight',tableContentHeight);
-    // console.log('headerHeight', headerHeight);
-    // console.log('paginationHeigh', paginationHeight);
-    // console.log('rowHeight',rowHeight);
-    // console.log('numRows', numOfRows);
-    return numOfRows;
-}
-
-// const getRemainingTableSpace = (table) => {
-//     const numRows = table.querySelectorAll('tr').length;
-//     const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * REM_TO_PX;
-//     const tableHeight = table.getBoundingClientRect().height;
-//     const spaceRemaining = tableHeight - (numRows * rowHeight);
-//     return spaceRemaining;
-// }
-// export const jobBtnFits = () => {
-//     const space = getRemainingTableSpace(document.querySelector('.table__content--company-jobs'));
-//     // Allow 3 rows worth of space for the button
-//     const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) * REM_TO_PX;
-//     return rowHeight * 3 <= space;
-// };
-
 export const getDeleteContactHtml = (contactId) => {
     const name = document.querySelector('.summary__link--name').innerText;
     const position = document.querySelector('.summary__field--position').innerText;
@@ -1889,7 +1857,6 @@ const getJobFormValues = () => {
 }
 
 export const formatJobs = (jobs, searchTerm) => {
-    console.log('called format jobs')
     // Headers should match the returned divs in createJobsElement
     const headers = ['ID', 'Company','Title','Location', 'Featured', 'Added'];
     const rows = jobs.map(job => {

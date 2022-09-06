@@ -87,6 +87,7 @@ export default class Admin {
 
     ////////// Company Methods ///////////
     getCompanies({limit, index, orderField, orderDirection, searchTerm} = {}, indexId) {
+        console.log('CALLED GET COMPANIES');
         return JRS.get('/admin/companies', {
             params: {
                 limit,

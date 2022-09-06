@@ -307,9 +307,9 @@ export const createJobSummaryContent = ({companyId, companyName, title, featured
     return {headerContent, detailsContent, descriptionContent, controlContent};
 }
 
-export const switchJobSummary = (job) => {
+export const switchJobSummary = (job, searchTerm) => {
     removeOldJobSummary();
-    insertNewJobSummary(job);
+    insertNewJobSummary(job, searchTerm);
 }
 
 const removeOldJobSummary = () => {
