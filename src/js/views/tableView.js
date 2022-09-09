@@ -145,6 +145,36 @@ export const insertTableArrows = (tableName, state) => {
     let header;
 
     switch(tableName) {
+        case 'applications': {
+            const idTh = document.querySelector('.thead--applications .th--id');
+            const nameTh = document.querySelector('.thead--applications .th--name');
+            const surnameTh = document.querySelector('.thead--applications .th--surname');
+            const positionTh = document.querySelector('.thead--applications .th--position');
+            const companyTh = document.querySelector('.thead--applications .th--company');
+            const cvTh = document.querySelector('.thead--applications .th--cv');
+            const addedTh = document.querySelector('.thead--applications .th--added');
+          
+            containers = [
+                ['id', idTh],
+                ['name', nameTh],
+                ['surname', surnameTh],
+                ['position', positionTh],
+                ['company', companyTh],
+                ['cv', cvTh],
+                ['added', addedTh]
+            ];
+
+            header = 
+                state.searchOptions.orderField === 'id'? idTh :
+                state.searchOptions.orderField === 'name'? nameTh :
+                state.searchOptions.orderField === 'surname'? surnameTh :
+                state.searchOptions.orderField === 'position'? positionTh :
+                state.searchOptions.orderField === 'company'? companyTh :
+                state.searchOptions.orderField === 'cv'? cvTh :
+                state.searchOptions.orderField === 'added'? addedTh : null;
+            console.log(containers);
+            break;
+        }
         case 'companies': {
             const idTh = document.querySelector('.thead--companies .th--id');
             const nameTh = document.querySelector('.thead--companies .th--name');
@@ -217,6 +247,22 @@ const changeOrderField = (header, state, tableName) => {
     state.searchOptions.searchTerm = '';
 
     switch(tableName) {
+        case 'applications': {
+            // Select the table headers
+            const idTh = header.classList.contains('th--id');
+            const nameTh = header.classList.contains('th--name');
+            const surnameTh = header.classList.contains('th--surname');
+
+            const addedTh = header.classList.contains('th--added');     
+
+            // Set the orderField
+            if(idTh) state.searchOptions.orderField = 'id';
+            if(nameTh) state.searchOptions.orderField = 'name';
+            if(surnameTh) state.searchOptions.orderField = 'surname';
+            if(addedTh) state.searchOptions.orderField = 'createdAt';
+
+            break;
+        }
         case 'companies': {
             // Select the table headers
             const idTh = header.classList.contains('th--id');

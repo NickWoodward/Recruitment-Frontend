@@ -5,7 +5,8 @@ import { getPaginationSelectAnimations } from '../animations/adminAnimation';
 
 export const getTotalPages = (limit = 1, totalItems = 1) => {
     limit === 0? 1 : limit;
-    totalItems === 0? 1 : totalItems;
+    totalItems = totalItems === 0? 1 : totalItems;
+
     return Math.ceil(totalItems / limit);
 }
 export const getCurrentPage = (index = 0, limit = 1) => {
@@ -138,6 +139,16 @@ const changePaginationBtns = (pages, current, tableName) => {
 
 const changePaginationSelect = (page, tableName) => {
     const customSelect = document.querySelector(`.custom-select-container--${tableName}`);
+    // Format the table name to match the event name the select expects (js camelcase vs hypenated class names)
+    switch(tableName) {
+        case 'companies':
+        case 'jobs':
+        case 'users':
+            break;
+        case 'company-contacts': tableName = 'companyContacts'; break;
+        case 'company-jobs': tableName = 'companyJobs'; break;
+        case 'company-addresses': tableName = 'companyAddresses'; break;
+    }
 
     const moveEvent = new CustomEvent(`${tableName}Change`, { detail: { page } });
     customSelect.dispatchEvent(moveEvent, { bubbles: true });

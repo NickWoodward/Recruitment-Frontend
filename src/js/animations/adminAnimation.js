@@ -16,9 +16,9 @@ export const animateAlert = (alertWrapper, success, paused) => {
             { 
                 autoAlpha: 1, 
                 duration: SPEED_SLOW,
-                immediateRender: false,
-                // onStart: () => console.log('starting'),
-                // onComplete: () => console.log('ending')
+                // immediateRender: false,
+                onStart: () => console.log('starting'),
+                onComplete: () => console.log('ending')
             }
         )
         .fromTo(alertWrapper,
@@ -202,7 +202,7 @@ export const animateJobSummaryIn = (firstAnimation) => {
     const tl = gsap.timeline();
 
     tl
-    .fromTo('.summary__item--header--title', { autoAlpha: 0, y: 15 },{ autoAlpha: 1, y: 0, stagger: duration })
+    .fromTo('.summary__item--header-title', { autoAlpha: 0, y: 15 },{ autoAlpha: 1, y: 0, stagger: duration })
     .fromTo('.summary__section-content', { autoAlpha: 0, y: 15 },{ autoAlpha: 1, y: 0, stagger: duration }, `<.1`)
     .fromTo('.summary__btn', 
         { autoAlpha: 0, y: 10 },

@@ -35,7 +35,7 @@ export const forceDownload = (res, filename, ext) => {
 // 
 export const formatApplications = (applications) => {
     // Headers should match the returned divs in createApplicationElement
-    const headers = ['ID', 'Name','Surname','Position','Company','CV', 'Applied']
+    const headers = ['ID', 'Name','Surname','Position','Company','CV', 'Added']
     const rows = applications.map(application => {
         
         return createApplicationElement(formatProperties(application, ['cvUrl']));
@@ -68,12 +68,12 @@ const createApplicationElement = ({
     if(cvUrl) cvType = cvUrl.indexOf('doc') !== -1? 'doc':'pdf';
 
     const row = [
-        `<td class="td-data--applicationId" data-application=${id}>${id}</td>`,
-        `<td class="td-data--first-name" data-id=${personId}>${firstName}</td>`,
-        `<td class="td-data--last-name" data-id=${personId}>${lastName}</td>`,
-        `<td class="td-data--position" data-id=${jobId}>${title}</td>`,
-        `<td class="td-data--company data-id=${companyId}">${companyName}</td>`,
-        `<td class="td-data--cv" data-cvUrl=${applicantId}>
+        `<td class="td--applications td-data--applicationId" data-application=${id}>${id}</td>`,
+        `<td class="td--applications td-data--first-name" data-id=${personId}>${firstName}</td>`,
+        `<td class="td--applications td-data--last-name" data-id=${personId}>${lastName}</td>`,
+        `<td class="td--applications td-data--position" data-id=${jobId}>${title}</td>`,
+        `<td class="td--applications td-data--company data-id=${companyId}">${companyName}</td>`,
+        `<td class="td--applications td-data--cv" data-cvUrl=${applicantId}>
             <div class="cv-wrapper">
                 <svg class="cv-icon">
                     ${cvUrl? 
@@ -84,7 +84,7 @@ const createApplicationElement = ({
                 </svg>
             </div>
         </td>`,
-        `<td class="td-data--application-date data-id=${id}">${applicationDate}</td>`,
+        `<td class="td--applications td-data--added data-id=${id}">${applicationDate}</td>`,
 
     ];
     return row;
@@ -3220,7 +3220,7 @@ export const clearAdminPage = (page) => {
         adminMain.removeChild(adminMain.firstChild);
     }
 }
-export const initAdminSection = (tl, sectionName) => {
+export const initAdminView = (tl, sectionName) => {
     const adminMain = document.querySelector('.admin__main');
     let adminTemplate;
     let loaderContainers;

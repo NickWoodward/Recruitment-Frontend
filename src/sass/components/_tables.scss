@@ -8,7 +8,7 @@
         min-width: 100%;
     }
 
-    &--jobs, &--companies, &--company-jobs {
+    &--applications, &--jobs, &--companies, &--company-jobs {
         table-layout: fixed;
         width: 100%;
 
@@ -43,6 +43,13 @@ th {
     //     transform: rotate(90deg);
     // }
 
+    &--applications-id,
+    &--applications-name,
+    &--applications-surname,
+    &--applications-position,
+    &--applications-company,
+    &--applications-cv,
+    &--applications-added,
     &--companies-id,
     &--companies-name,
     &--jobs-id,
@@ -52,6 +59,7 @@ th {
     {    
         transform: translate(calc(-100% - 8px), calc(-50% + 1px));
     }
+    &--applications-added,
     &--companies-added,
     &--jobs-added {
         // // Place on the right
@@ -191,6 +199,67 @@ th {
     & .td-data--added {
         text-align: end;
         padding-right: var(--thead-padding);
+    }
+}
+
+//// APPLICATIONS TABLE
+.thead--applications {
+    & th {
+        padding-left: var(--thead-h-padding);
+        // Set height, not vertical padding (used in visible row calculation)
+        height: var(--table-heading-height);
+        cursor: pointer;
+
+        &:first-of-type {
+            padding-left: var(--row-h-padding);
+        }
+        &:last-of-type {
+            padding-right: var(--row-h-padding);
+            border: 1px solid red;
+        }
+        &:not(.thead--applications .th--added) {
+            text-align: left;
+        }
+    }
+    & .th--id {
+        width: 10rem;
+    }
+    & .th--name {
+        // width: 14rem;
+    }
+    & .th--cv {
+        width: 10rem;
+    }
+    & .th--added {
+        width: 13rem;
+        text-align: end;
+    }
+}
+
+
+// Rows/cells
+.row--applications {
+    & .td--applications {
+        padding-left: var(--thead-h-padding);
+
+        &:first-of-type {
+            padding-left: var(--row-h-padding);
+        }
+        &:last-of-type {
+            padding-right: var(--row-h-padding);
+        }
+    }
+
+    & .td-data--company,
+    & .td-data--title,
+    & .td-data--location {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    & .td-data--added {
+        text-align: end;
     }
 }
 

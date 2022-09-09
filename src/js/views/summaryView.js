@@ -162,7 +162,7 @@ const removeOldApplicationSummary = () => {
     items.forEach(item => item.parentElement.removeChild(item));
 }
 
-export const insertNewApplicationSummary = (application) => {
+export const insertNewApplicationSummary = (application, searchTerm) => {
     // Create new content
     const { headerContent, applicantContent, positionContent, controlContent } = createApplicationSummaryContent(application);
     
@@ -171,6 +171,11 @@ export const insertNewApplicationSummary = (application) => {
     document.querySelector('.summary__section--application-person').insertAdjacentHTML('beforeend', applicantContent);
     document.querySelector('.summary__section--application-job').insertAdjacentHTML('beforeend', positionContent);
     document.querySelector('.summary__controls').insertAdjacentHTML('beforeend', controlContent);
+
+    // // Insert New tag if needed
+    // if(searchTerm) addSearchTag(searchTerm);
+
+    // initSearchBar();
 }
 
 //// END APPLICATION SUMMARY VIEW ////

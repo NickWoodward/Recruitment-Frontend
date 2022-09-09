@@ -120,6 +120,7 @@ class AdminController {
                 currentJob: {},
                 currentPage: 1,
                 jobNames: [],
+                activeTableArrow: null,
                 searchOptions: {
                     index: 0,
                     limit: 6,
@@ -135,6 +136,7 @@ class AdminController {
                 currentUser: {},
                 currentPage: 1,
                 applicantNames: [],
+                activeTableArrow: null,
                 searchOptions: {
                     index: 0,
                     limit: 6,
@@ -159,11 +161,13 @@ class AdminController {
                 totalApplications: 0,
                 currentApplication: {},
                 currentPage: 1,
+                activeTableArrow: null,
                 searchOptions: {
                     index: 0,
                     limit: 6,
                     orderField: "id",
-                    orderDirection: "DESC"
+                    orderDirection: "DESC",
+                    searchTerm: ''
                 }
             },
             jobsTable: {
@@ -239,120 +243,120 @@ class AdminController {
             // }).catch(err => console.log(err));
         });
 
-        // Handle editable elements when a user clicks elsewhere
-        document.body.addEventListener('mousedown', (e) => {
+        // // Handle editable elements when a user clicks elsewhere
+        // document.body.addEventListener('mousedown', (e) => {
                         
-            if(this.editUserLostFocus(e)) {
-                console.log('edit user lost focus');
-                const userSummary = document.querySelector('.user-summary');
+        //     if(this.editUserLostFocus(e)) {
+        //         console.log('edit user lost focus');
+        //         const userSummary = document.querySelector('.user-summary');
 
-                adminView.makeEditable(document.querySelectorAll('.user-summary__item'), false);
+        //         adminView.makeEditable(document.querySelectorAll('.user-summary__item'), false);
 
-                // Remove input listeners
-                userSummary.removeEventListener('focusin', adminView.focusInEditUserHandler);
-                userSummary.removeEventListener('focusout', this.boundFocusOutEditUserHandler);
+        //         // Remove input listeners
+        //         userSummary.removeEventListener('focusin', adminView.focusInEditUserHandler);
+        //         userSummary.removeEventListener('focusout', this.boundFocusOutEditUserHandler);
 
-                adminView.changeEditIcon('edit', 'user');
-                adminView.addCvElement(this.state.users.currentUser);
-            }
-            if(this.createUserLostFocus(e)) {
-                const userSummary = document.querySelector('.user-summary');
-                const items = document.querySelectorAll('.user-summary__item');
-                console.log('create user lost focus');
-                adminView.makeEditable(items, false);
+        //         adminView.changeEditIcon('edit', 'user');
+        //         adminView.addCvElement(this.state.users.currentUser);
+        //     }
+        //     if(this.createUserLostFocus(e)) {
+        //         const userSummary = document.querySelector('.user-summary');
+        //         const items = document.querySelectorAll('.user-summary__item');
+        //         console.log('create user lost focus');
+        //         adminView.makeEditable(items, false);
 
-                // Remove the item listeners
-                userSummary.removeEventListener('focusin', adminView.focusInNewUserHandler);
-                userSummary.removeEventListener('focusout', adminView.focusOutNewUserHandler);
+        //         // Remove the item listeners
+        //         userSummary.removeEventListener('focusin', adminView.focusInNewUserHandler);
+        //         userSummary.removeEventListener('focusout', adminView.focusOutNewUserHandler);
 
-                // Add the original user values
-                adminView.populateUserSummary(this.state.users.currentUser);
+        //         // Add the original user values
+        //         adminView.populateUserSummary(this.state.users.currentUser);
 
-                adminView.changeNewIcon('new', 'user');
-                adminView.addCvElement(this.state.users.currentUser);
-            }
-            if(this.editJobLostFocus(e)) {
-                console.log('edit jobs lost focus');
+        //         adminView.changeNewIcon('new', 'user');
+        //         adminView.addCvElement(this.state.users.currentUser);
+        //     }
+        //     if(this.editJobLostFocus(e)) {
+        //         console.log('edit jobs lost focus');
 
-                const jobSummary = document.querySelector('.job-summary');
-                // Remove element listeners
-                jobSummary.removeEventListener('focusin', adminView.focusInEditJobHandler);
-                jobSummary.removeEventListener('focusout', adminView.focusOutEditJobHandler);
-                document.removeEventListener('keydown', this.handleCtrl1);
+        //         const jobSummary = document.querySelector('.job-summary');
+        //         // Remove element listeners
+        //         jobSummary.removeEventListener('focusin', adminView.focusInEditJobHandler);
+        //         jobSummary.removeEventListener('focusout', adminView.focusOutEditJobHandler);
+        //         document.removeEventListener('keydown', this.handleCtrl1);
 
-                adminView.makeJobSummaryEditable(false, this.state.companies.currentCompany.featured);
-                adminView.removeJobDropdowns(this.state.jobs.currentJob);
-                adminView.changeSummaryIconState('edited', 'job');
+        //         adminView.makeJobSummaryEditable(false, this.state.companies.currentCompany.featured);
+        //         adminView.removeJobDropdowns(this.state.jobs.currentJob);
+        //         adminView.changeSummaryIconState('edited', 'job');
 
-                adminView.populateJobSummary(this.state.jobs.currentJob);
+        //         adminView.populateJobSummary(this.state.jobs.currentJob);
 
             
-            }
-            if(this.createJobLostFocus(e)) {
-                console.log('create jobs lost focus');
+        //     }
+        //     if(this.createJobLostFocus(e)) {
+        //         console.log('create jobs lost focus');
 
-                const jobSummary = document.querySelector('.job-summary');
+        //         const jobSummary = document.querySelector('.job-summary');
 
-                // Remove element listeners
-                document.body.removeEventListener('keydown', this.handleCtrlQ);
-                jobSummary.removeEventListener('focusin', adminView.focusInNewJobHandler);
-                jobSummary.removeEventListener('focusout', adminView.focusOutNewJobHandler);
+        //         // Remove element listeners
+        //         document.body.removeEventListener('keydown', this.handleCtrlQ);
+        //         jobSummary.removeEventListener('focusin', adminView.focusInNewJobHandler);
+        //         jobSummary.removeEventListener('focusout', adminView.focusOutNewJobHandler);
                 
-                // Remove the dropdown + replace with company div
-                adminView.removeCompanyDropdown(this.state.jobs.currentJob.companyName);
-                adminView.removeJobDropdowns(this.state.jobs.currentJob);
-                adminView.populateJobSummary(this.state.jobs.currentJob);
+        //         // Remove the dropdown + replace with company div
+        //         adminView.removeCompanyDropdown(this.state.jobs.currentJob.companyName);
+        //         adminView.removeJobDropdowns(this.state.jobs.currentJob);
+        //         adminView.populateJobSummary(this.state.jobs.currentJob);
 
-                adminView.makeJobSummaryEditable(false, this.state.companies.currentCompany.featured);
+        //         adminView.makeJobSummaryEditable(false, this.state.companies.currentCompany.featured);
 
-                adminView.changeSummaryIconState('created', 'job');
-            }
-            if(this.createCompanyLostFocus(e)) {
-                console.log('create company lost focus');
+        //         adminView.changeSummaryIconState('created', 'job');
+        //     }
+        //     if(this.createCompanyLostFocus(e)) {
+        //         console.log('create company lost focus');
 
-                const summaryWrapper = document.querySelector('.summary-wrapper');
-                const companyItems = document.querySelectorAll('.company-summary__item');
-                const contactItems = document.querySelectorAll('.contact-summary__item');
+        //         const summaryWrapper = document.querySelector('.summary-wrapper');
+        //         const companyItems = document.querySelectorAll('.company-summary__item');
+        //         const contactItems = document.querySelectorAll('.contact-summary__item');
 
-                adminView.makeEditable(companyItems, false);
-                adminView.makeEditable(contactItems, false);
+        //         adminView.makeEditable(companyItems, false);
+        //         adminView.makeEditable(contactItems, false);
 
-                // Remove the item listeners
-                summaryWrapper.removeEventListener('focusin', adminView.focusInNewCompanyHandler);
-                summaryWrapper.removeEventListener('focusout', adminView.focusOutNewCompanyHandler);
+        //         // Remove the item listeners
+        //         summaryWrapper.removeEventListener('focusin', adminView.focusInNewCompanyHandler);
+        //         summaryWrapper.removeEventListener('focusout', adminView.focusOutNewCompanyHandler);
 
-                // Add the original user values
-                adminView.populateCompanySummary(this.state.companies.currentCompany);
-                adminView.populateContactSummary(this.state.companies.currentCompany, this.state.companies.currentCompany.people[0]);
-                adminView.makeAddressEditable(false, 'value', this.state.companies.currentCompany.addresses[0]);
+        //         // Add the original user values
+        //         adminView.populateCompanySummary(this.state.companies.currentCompany);
+        //         adminView.populateContactSummary(this.state.companies.currentCompany, this.state.companies.currentCompany.people[0]);
+        //         adminView.makeAddressEditable(false, 'value', this.state.companies.currentCompany.addresses[0]);
 
-                adminView.changeSummaryIconState('created', 'company');
-            }
-            if(this.editCompanyLostFocus(e)) {
-                console.log('edit company lost focus');
-                document.body.removeEventListener('keydown', this.handleCtrlQ);
+        //         adminView.changeSummaryIconState('created', 'company');
+        //     }
+        //     if(this.editCompanyLostFocus(e)) {
+        //         console.log('edit company lost focus');
+        //         document.body.removeEventListener('keydown', this.handleCtrlQ);
 
-                const summaryWrapper = document.querySelector('.summary-wrapper');
-                const companyItems = document.querySelectorAll('.company-summary__item');
-                const contactItems = document.querySelectorAll('.contact-summary__item');
+        //         const summaryWrapper = document.querySelector('.summary-wrapper');
+        //         const companyItems = document.querySelectorAll('.company-summary__item');
+        //         const contactItems = document.querySelectorAll('.contact-summary__item');
 
-                adminView.makeEditable(companyItems, false);
-                adminView.makeEditable(contactItems, false);
+        //         adminView.makeEditable(companyItems, false);
+        //         adminView.makeEditable(contactItems, false);
 
-                // Remove the item listeners
-                summaryWrapper.removeEventListener('focusin', adminView.focusInNewCompanyHandler);
-                summaryWrapper.removeEventListener('focusout', adminView.focusOutNewCompanyHandler);
-                // Add the original user values
-                adminView.populateCompanySummary(this.state.companies.currentCompany);
-                adminView.populateContactSummary(this.state.companies.currentCompany, this.state.companies.currentCompany.people[0]);
+        //         // Remove the item listeners
+        //         summaryWrapper.removeEventListener('focusin', adminView.focusInNewCompanyHandler);
+        //         summaryWrapper.removeEventListener('focusout', adminView.focusOutNewCompanyHandler);
+        //         // Add the original user values
+        //         adminView.populateCompanySummary(this.state.companies.currentCompany);
+        //         adminView.populateContactSummary(this.state.companies.currentCompany, this.state.companies.currentCompany.people[0]);
 
-                adminView.makeAddressEditable(false, 'value', this.state.companies.currentCompany.addresses[0]);
+        //         adminView.makeAddressEditable(false, 'value', this.state.companies.currentCompany.addresses[0]);
 
-                adminView.changeSummaryIconState('edited', 'company');    
+        //         adminView.changeSummaryIconState('edited', 'company');    
 
-            }
+        //     }
 
-        })
+        // })
 
         // MODALS
         document.body.addEventListener('click', this.checkModals.bind(this));
@@ -522,51 +526,14 @@ class AdminController {
     async displayAdminContent(sectionName, indexId) {
         const tl = gsap.timeline({defaults: {duration: .4}});
 
-        adminView.initAdminSection(tl, sectionName);        
+        adminView.initAdminView(tl, sectionName);        
 
         try {
             // Index ID is only ever passed to getData from displayAdminContent
             // This sets the first element in the table, and is used to navigate to specific records from other admin summaries
             // EG: Clicking the application summary company href => company in the companies table
             tl.add(async () => {
-                switch(sectionName) {
-                    case 'companies': {
-                        // Reset the subpage search options / state before async call
-                        this.state.companies.currentPage = 1;
-                        this.state.companies.searchOptions.index = 0;
-                        this.state.companies.searchOptions.searchTerm = '';
-                        this.state.companies.searchOptions.orderDirection = 'ASC';
-                        this.state.companies.searchOptions.orderField = 'id';
-                        this.state.companies.searchOptions.activeTableArrow = null;
-
-                        // Calculate the # of rows that can fit in the table
-                        this.state.companies.searchOptions.limit = tableView.calculateRows(sectionName);
-
-                        console.log(this.state.companies.searchOptions.limit);
-
-                    }
-                    case 'jobs': {
-                        this.state.jobs.currentPage = 1;
-                        this.state.jobs.searchOptions.index = 0;
-                        this.state.jobs.searchOptions.searchTerm = '';
-                        this.state.jobs.searchOptions.orderDirection = 'ASC';
-                        this.state.jobs.searchOptions.orderField = 'id';
-                        this.state.jobs.searchOptions.activeTableArrow = null;
-
-                        // // Calculate the # of rows that can fit in the table
-                        this.state.jobs.searchOptions.limit = tableView.calculateRows(sectionName)
-
-                    }
-                    case 'applications': {
-                        // Calculate the # of rows that can fit in the table
-                        this.state.applications.searchOptions.limit = tableView.calculateRows(sectionName)
-                    }
-                    case 'users': {
-                        // Calculate the # of rows that can fit in the table
-                        this.state.users.searchOptions.limit = tableView.calculateRows(sectionName)
-
-                    }
-                }
+                this.initAdminState(sectionName);
 
                 await this.getData(sectionName, indexId);
 
@@ -575,9 +542,10 @@ class AdminController {
                         // Set current application
                         this.state.applications.currentApplication = this.applications[0];
 
-                        // Add pagination
-                        const { totalApplications, searchOptions: {index: appIndex, limit: appLimit} } = this.state.applications;
-                        const { pages, page } = paginationView.calculatePagination(appIndex, appLimit, totalApplications);
+                        // Init pagination
+                        const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
+                        const pages = paginationView.getTotalPages(limit, totalApplications);
+                        const page = paginationView.getCurrentPage(index, limit);
                         paginationView.initPagination(pages, page, 'applications');
 
                         // Render table
@@ -617,9 +585,7 @@ class AdminController {
                     }
                     case 'companies': {
                         this.state.companies.currentCompany = this.companies[0];
-                        this.resetCompanyState();
-
-
+                        this.resetNestedCompanyState();
 
                     //// Main Company Table ////
 
@@ -930,6 +896,56 @@ class AdminController {
     //     },1000);
         
     }
+
+    initAdminState(sectionName) {
+        switch(sectionName) {
+            case 'applications': {
+                // Reset the subpage search options / state before async call
+                this.state.applications.currentPage = 1;
+                this.state.applications.searchOptions.index = 0;
+                this.state.applications.searchOptions.searchTerm = '';
+                this.state.applications.searchOptions.orderDirection = 'ASC';
+                this.state.applications.searchOptions.orderField = 'id';
+                this.state.applications.activeTableArrow = null;
+
+                // Calculate the # of rows that can fit in the table
+                this.state.applications.searchOptions.limit = tableView.calculateRows(sectionName);
+            }
+            case 'companies': {
+                // Reset the subpage search options / state before async call
+                this.state.companies.currentPage = 1;
+                this.state.companies.searchOptions.index = 0;
+                this.state.companies.searchOptions.searchTerm = '';
+                this.state.companies.searchOptions.orderDirection = 'ASC';
+                this.state.companies.searchOptions.orderField = 'id';
+                this.state.companies.activeTableArrow = null;
+
+                // Calculate the # of rows that can fit in the table
+                this.state.companies.searchOptions.limit = tableView.calculateRows(sectionName);
+            }
+            case 'jobs': {
+                this.state.jobs.currentPage = 1;
+                this.state.jobs.searchOptions.index = 0;
+                this.state.jobs.searchOptions.searchTerm = '';
+                this.state.jobs.searchOptions.orderDirection = 'ASC';
+                this.state.jobs.searchOptions.orderField = 'id';
+                this.state.jobs.activeTableArrow = null;
+
+                // // Calculate the # of rows that can fit in the table
+                this.state.jobs.searchOptions.limit = tableView.calculateRows(sectionName)
+
+            }
+            case 'applications': {
+                // Calculate the # of rows that can fit in the table
+                this.state.applications.searchOptions.limit = tableView.calculateRows(sectionName)
+            }
+            case 'users': {
+                // Calculate the # of rows that can fit in the table
+                this.state.users.searchOptions.limit = tableView.calculateRows(sectionName)
+
+            }
+        }
+    } 
 
     addCompanyNestedPagination() {
         //// Nested Company Jobs table
@@ -1287,7 +1303,23 @@ class AdminController {
             const newTable = tableView.createTableTest('applications', headers, rows, false);
             tableContent.insertAdjacentHTML('afterbegin',newTable);
 
-            // adminView.animateTableContentIn('applications');
+            // Insert order arrows
+            tableView.insertTableArrows('applications', this.state.applications);
+
+            const thead = document.querySelector('.thead--applications');
+            thead.addEventListener('click', async e => {
+                // Get the header
+                const header = e.target.closest('th');
+                if(!header) return;
+
+                this.state.applications.currentPage = 1;
+
+                // Change the table arrow direction, the searchOption direction
+                tableView.updateTableOrder(header, this.state.applications, 'applications');
+
+                this.handleApplicationsPagination(this.state.applications.currentPage, null, null);
+            });
+
             // Else remove the tbody and render just the content
         } else {
             console.log('update table');
@@ -1704,7 +1736,6 @@ class AdminController {
         }
 
         const jobRows = document.querySelectorAll('.row--jobs');
-
         const activeRow = Array.from(jobRows).find(row => {
             return row.querySelector(`[data-id="${this.state.jobs.currentJob.id}"]`)
         }) || jobRows[0];
@@ -1736,7 +1767,6 @@ class AdminController {
     
                     // Remove old summary items, add new ones
                     summaryView.switchJobSummary(job);
-
                     // // Animate the summary back in
                     animation.animateJobSummaryIn();
                 })
@@ -2123,7 +2153,6 @@ class AdminController {
                         const lastRow = this.state.jobs.totalJobs % this.state.jobs.searchOptions.limit === 1;
                         // If it's the last item on the page
                         if(lastRow) {
-                            console.log('Last item')
                             const onLastPage = paginationView.onLastPage(this.state.jobs.searchOptions.index, this.state.jobs.searchOptions.limit, this.state.jobs.totalJobs);
                             const page = paginationView.getCurrentPage(this.state.jobs.searchOptions.index, this.state.jobs.searchOptions.limit);
                             this.changeJobsPage(onLastPage? null:page, onLastPage? true:null, null, 'delete');
@@ -2225,8 +2254,7 @@ class AdminController {
                             successAnimation.play(0);
 
                             const page = paginationView.getCurrentPage(this.state.jobs.searchOptions.index, this.state.jobs.searchOptions.limit);
-
-                            this.changeJobsPage(page);
+                            this.changeJobsPage(page, null, null, null, res.data.job);
 
                         }
                     } catch(err) {
@@ -2826,9 +2854,7 @@ class AdminController {
                 tableView.updateTableOrder(header, this.state.companies, 'companies');
 
                 await this.getData('companies');
-                // Changing the page to 1 highlights the correct row and animates the summary and table in correctly
-                const selectOption = document.querySelector(`.custom-select-option--companies[data-value="${this.state.companies.currentPage}"]`);
-                this.handleCompaniesPagination(selectOption, null, null);
+                this.changeCompaniesPage(this.state.companies.currentPage, null, null);
             });
 
             // Render the controls the first time the table is created
@@ -2848,6 +2874,7 @@ class AdminController {
 
         // Set active row
         const companyRows = document.querySelectorAll('.row--companies');
+
         const activeRow = Array.from(companyRows).find(row => {
             return row.querySelector(`[data-id="${this.state.companies.currentCompany.id}"]`);
         }) || companyRows[0];
@@ -2858,7 +2885,7 @@ class AdminController {
         companyRows.forEach(row => {
             row.addEventListener('click', e => {
                 // Reset the nested pagination state
-                this.resetCompanyState();
+                this.resetNestedCompanyState();
 
                 // if(this.state.isActiveAnimation) return;
                 // this.state.isActiveAnimation = true;
@@ -3079,7 +3106,7 @@ class AdminController {
         // Has to be after the submit listener as it changes the search input classname
         companySummary.addEventListener(
             'click',
-            (e) => {this.handleCompanySummaryEvent(e); console.log(this)}
+            (e) => {this.handleCompanySummaryEvent(e);}
         );
     }
 
@@ -3106,8 +3133,8 @@ class AdminController {
             
             await this.getData('companies');
 
-            const selectOption = document.querySelector(`.custom-select-option--companies[data-value="1"]`);
-            this.handleCompaniesPagination(selectOption, null, null);
+            // Move to the first page
+            this.changeCompaniesPage(1, null, null);
         }
 
 
@@ -3145,7 +3172,7 @@ class AdminController {
 //             await this.getData('companies');
 
 //             const selectOption = document.querySelector(`.custom-select-option--companies[data-value="1"]`);
-//             this.handleCompaniesPagination(selectOption, null, null);
+//             this.changeCompaniesPage(selectOption, null, null);
 //         }
     } 
 
@@ -3188,7 +3215,7 @@ class AdminController {
         //     await this.getData('companies');
 
         //     const selectOption = document.querySelector(`.custom-select-option--companies[data-value="1"]`);
-        //     this.handleCompaniesPagination(selectOption, null, null);
+        //     this.changeCompaniesPage(selectOption, null, null);
         // });
     }
     toggleSearch() {
@@ -3240,8 +3267,8 @@ class AdminController {
             // Remove the searchTerm 
             this.state.companies.searchOptions.searchTerm = '';
 
-            const selectOption = document.querySelector(`.custom-select-option--companies[data-value="1"]`);
-            this.handleCompaniesPagination(selectOption, null, null);
+            // Move to first page
+            this.changeCompaniesPage(1, null, null);
         }
 
         if(jobBtn) {
@@ -3285,10 +3312,11 @@ class AdminController {
             const { contactFirstNameField, contactSurnameField, contactPositionField, phoneField, emailField } = fields;
 
             // Get the animation for the application alerts (paused)
-            errorAnimation = animation.animateAlert(alertWrapper, false, true);
+            errorAnimation = animation.animateAlert(alertWrapper, false, 'paused');
             // Success animation is the same, but appended later (paused)
-            successAnimation = animation.animateAlert(alertWrapper, true, true);
-
+            successAnimation = animation.animateAlert(alertWrapper, true, 'paused');
+            successAnimation.add(animation.animateSummaryModalOut(companySummaryModal));
+            successAnimation.add(animation.animateSummaryModalOut(companySummaryModalHeader));
 
             // closeBtn.addEventListener('click', ()=>adminView.removeCompanyModal());
             closeBtn.addEventListener('click', () => {
@@ -3318,33 +3346,16 @@ class AdminController {
                         } else {
                             alert = modalView.getAlert('Contact Created', true);
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
-
-                            // Add to the successAnimation once the getData() call has now completed
-                            // NB: animating the modal out, not the summary out (which would also animate the modal)
-                            successAnimation.add(animation.animateSummaryModalOut(companySummaryModal));
-                            successAnimation.add(animation.animateSummaryModalOut(companySummaryModalHeader));
-
                             successAnimation.play(0);
 
+                           // Because there's no call to the db with contacts (which updates the total elements and adds to the array)
+                           // it should be done manually
                             this.state.companies.currentCompany.contacts.push(res.data.contact);
                             this.state.companies.companyContactsPagination.totalContacts++;
 
-                            // InitPagination to add the new option
-                            const { totalContacts, index } = this.state.companies.companyContactsPagination;
-                            paginationView.initPagination(totalContacts, index + 1, 'company-contacts');
-
-                            // Change the contact section
-                            const selectOption = document.querySelector(`.custom-select-option--company-contacts[data-value="${totalContacts}"]`);
-                            this.handleCompanyContactsPagination(selectOption, null, null);
-
-                            // Update the pagination
-                            paginationView.updatePaginationBtns(totalContacts, this.state.companies.currentCompany.contacts.length, 'company-contacts')
+                            // Company Contacts are 1 per page, so will always have a new page themselves
+                            this.handleCompanyContactsPagination(this.state.companies.companyContactsPagination.totalContacts, null, null, 'new');
                             
-                            // Change the select value
-                            const customSelect = document.querySelector('.custom-select-container--company-contacts');
-                            const moveEvent = new CustomEvent('companyContactsChange', { detail: { page: this.state.companies.currentCompany.contacts.length - 1 } });
-                            customSelect.dispatchEvent(moveEvent, { bubbles: true });
-
                         }
                     } catch(err) {
                         console.log(err);
@@ -3447,6 +3458,8 @@ class AdminController {
             errorAnimation = animation.animateAlert(alertWrapper, false, true);
             // Success animation is the same, but appended later (paused)
             successAnimation = animation.animateAlert(alertWrapper, true, true);      
+            successAnimation.add(animation.animateSummaryModalOut(companySummaryModal));
+            successAnimation.add(animation.animateSummaryModalOut(companySummaryModalHeader));
 
             closeBtn.addEventListener('click', () => modalView.removeAdminModal('company-addresses'));
 
@@ -3472,31 +3485,14 @@ class AdminController {
                             alert = modalView.getAlert('Address Created', true);
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
 
-                            // Add to the successAnimation once the getData() call has now completed
-                            // NB: animating the modal out, not the summary out (which would also animate the modal)
-                            successAnimation.add(animation.animateSummaryModalOut(companySummaryModal));
-                            successAnimation.add(animation.animateSummaryModalOut(companySummaryModalHeader));
-
                             successAnimation.play(0);
 
                             this.state.companies.currentCompany.addresses.push(res.data.address);
                             this.state.companies.companyAddressesPagination.totalAddresses++;
 
-                            const { totalAddresses, index } = this.state.companies.companyAddressesPagination;
-                            paginationView.initPagination(totalAddresses, index + 1, 'company-addresses');
-
-                            // Get select option that matches the new contact
-                            const selectOption = document.querySelector(`.custom-select-option--company-addresses[data-value="${totalAddresses}"]`);
-                            // Update the contact
-                            this.handleCompanyAddressesPagination(selectOption, null, null);
-                            // Update the pagination
-                            paginationView.updatePaginationBtns(totalAddresses, this.state.companies.currentCompany.addresses.length, 'company-addresses')
-                            // Change the select value
-                            const customSelect = document.querySelector('.custom-select-container--company-addresses');
-
-                            const moveEvent = new CustomEvent('companyAddressesChange', { detail: { page: this.state.companies.currentCompany.addresses.length - 1 } });
-                            customSelect.dispatchEvent(moveEvent, { bubbles: true });
-
+                            // Company Addresses are 1 per page, so will always have a new page themselves
+                            this.handleCompanyAddressesPagination(this.state.companies.companyAddressesPagination.totalAddresses, null, null, 'new');
+                            
                         }
                     } catch(err) {
                         console.log(err);
@@ -3606,13 +3602,15 @@ class AdminController {
             errorAnimation = animation.animateAlert(alertWrapper, false, true);
             // Success animation is the same, but appended later (paused)
             successAnimation = animation.animateAlert(alertWrapper, true, true);
+            successAnimation.add(animation.animateSummaryModalOut(companySummaryModal));
+            successAnimation.add(animation.animateSummaryModalOut(companySummaryModalHeader));
 
-            // closeBtn.addEventListener('click', ()=>adminView.removeCompanyModal());
             closeBtn.addEventListener('click', () => {
                 modalView.removeAdminModal('company-contacts');
             });
 
             companyForm.addEventListener('submit', async e => {
+                console.log('submit edit')
                 e.preventDefault();
                 // Clear the alert wrapper
                 while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
@@ -3658,17 +3656,10 @@ class AdminController {
 
                             this.state.companies.currentCompany.contacts[contactIndex] = res.data.contact;
 
-                            // Add to the successAnimation once the getData() call has now completed
-                            // NB: animating the modal out, not the summary out (which would also animate the modal)
-                            successAnimation.add(animation.animateSummaryModalOut(companySummaryModal));
-                            successAnimation.add(animation.animateSummaryModalOut(companySummaryModalHeader));
-
                             successAnimation.play(0);
 
-                            // Get select option that matches the new contact
-                            const selectOption = document.querySelector(`.custom-select-option--company-contacts[data-value="${this.state.companies.companyContactsPagination.currentPage}"]`);
                             // Update the contact - although we're editing, so not swapping pages, this will rerender the contacts section
-                            this.handleCompanyContactsPagination(selectOption, null, null);
+                            this.handleCompanyContactsPagination(this.state.companies.companyContactsPagination.currentPage, null, null);
                             
                         }
                     } catch(err) {
@@ -3744,7 +3735,9 @@ class AdminController {
             errorAnimation = animation.animateAlert(alertWrapper, false, true);
             // Success animation is the same, but appended later (paused)
             successAnimation = animation.animateAlert(alertWrapper, true, true);
-            
+            successAnimation.add(animation.animateSummaryModalOut(companySummaryModal));
+            successAnimation.add(animation.animateSummaryModalOut(companySummaryModalHeader));
+
             closeBtn.addEventListener('click', () => {
                 modalView.removeAdminModal('company-addresses');
             });
@@ -3793,17 +3786,10 @@ class AdminController {
                             const addressIndex = this.state.companies.currentCompany.addresses.map(address => address.id).indexOf(res.data.address.id);
                             this.state.companies.currentCompany.addresses[addressIndex] = res.data.address;
 
-                            // Add to the successAnimation once the getData() call has now completed
-                            // NB: animating the modal out, not the summary out (which would also animate the modal)
-                            successAnimation.add(animation.animateSummaryModalOut(companySummaryModal));
-                            successAnimation.add(animation.animateSummaryModalOut(companySummaryModalHeader));
-
                             successAnimation.play(0);
 
-                            // Get select option that matches the new contact
-                            const selectOption = document.querySelector(`.custom-select-option--company-contacts[data-value="${this.state.companies.companyAddressesPagination.currentPage}"]`);
                             // Update the contact - although we're editing, so not swapping pages, this will rerender the contacts section
-                            this.handleCompanyAddressesPagination(selectOption, null, null);
+                            this.handleCompanyAddressesPagination(this.state.companies.companyAddressesPagination.currentPage, null, null);
                         
                         }
                     } catch(err) {
@@ -3855,6 +3841,7 @@ class AdminController {
             const summaryWrapper = document.querySelector('.summary__content');
             const confirmationHtml = adminView.getDeleteContactHtml(contactId);
             summaryWrapper.insertAdjacentHTML('afterbegin', confirmationHtml);
+
             const confirmation = document.querySelector('.summary__modal--delete-contact');
 
             // If a modal exists, the modal above will render behind the existing one, so animate it out
@@ -3874,6 +3861,7 @@ class AdminController {
             // Get the animation for the job alerts
             errorAnimation = animation.animateAlert(alertWrapper, false, true);
             successAnimation = animation.animateAlert(alertWrapper, true, true);
+            successAnimation.add(animation.animateSummaryModalOut(confirmation));
 
             const confirm = document.querySelector('.confirmation__btn--confirm');
             const cancel = document.querySelector('.confirmation__btn--cancel');
@@ -3905,30 +3893,19 @@ class AdminController {
                         alert = modalView.getAlert(`Contact ${contactId} deleted`, true);
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
 
-                        successAnimation.add(animation.animateSummaryModalOut(confirmation));
                         successAnimation.play(0);
 
+                        // Check if last page before changing contact array and # contacts
+                        const onLastPage = paginationView.onLastPage(this.state.companies.companyContactsPagination.index, this.state.companies.companyContactsPagination.limit, this.state.companies.companyContactsPagination.totalContacts);
+                                            
                         // No need to update the company array or the company table
                         // Just remove the contact from the current company
                         const index = this.state.companies.currentCompany.contacts.findIndex(contact => contact.contactId === parseInt(contactId));
                         this.state.companies.currentCompany.contacts.splice(index, 1);
                         this.state.companies.companyContactsPagination.totalContacts--;
 
-                        // InitPagination to remove the select option
-                        const { totalContacts, index: contactIndex } = this.state.companies.companyContactsPagination;
-                        paginationView.initPagination(totalContacts, contactIndex + 1, 'company-contacts');
-                        
-                         // Update the pagination
-                        paginationView.updatePaginationBtns(totalContacts, this.state.companies.currentCompany.contacts.length, 'company-contacts')
-                            
-                        // Change the select value
-                        const customSelect = document.querySelector('.custom-select-container--company-contacts');
-                        const moveEvent = new CustomEvent('companyContactsChange', { detail: { page: this.state.companies.currentCompany.contacts.length - 1 } });
-                        customSelect.dispatchEvent(moveEvent, { bubbles: true });
+                        this.handleCompanyContactsPagination(onLastPage? null:this.state.companies.companyContactsPagination.currentPage, onLastPage? true:null, null, 'delete');
 
-                        // Change the contact section
-                        const selectOption = document.querySelector(`.custom-select-option--company-contacts[data-value="1"]`);
-                        this.handleCompanyContactsPagination(selectOption, null, null);
                     } else {
                         throw new Error();
                     }
@@ -3976,6 +3953,7 @@ class AdminController {
             // Get the animation for the job alerts
             errorAnimation = animation.animateAlert(alertWrapper, false, true);
             successAnimation = animation.animateAlert(alertWrapper, true, true);
+            successAnimation.add(animation.animateSummaryModalOut(confirmation));
 
             const confirm = document.querySelector('.confirmation__btn--confirm');
             const cancel = document.querySelector('.confirmation__btn--cancel');
@@ -4008,58 +3986,18 @@ class AdminController {
                         alert = modalView.getAlert(`Address ${addressId} deleted`, true);
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
 
-                        successAnimation.add(animation.animateSummaryModalOut(confirmation));
                         successAnimation.play(0);
 
+                        // Check if last page before changing contact array and # contacts
+                        const onLastPage = paginationView.onLastPage(this.state.companies.companyAddressesPagination.index, this.state.companies.companyAddressesPagination.limit, this.state.companies.companyAddressesPagination.totalAddresses);
+                                          
                         // No need to update the company array or the company table
                         // Just remove the address from the current company
                         const index = this.state.companies.currentCompany.addresses.findIndex(address => address.id === parseInt(addressId));
                         this.state.companies.currentCompany.addresses.splice(index, 1);
                         this.state.companies.companyAddressesPagination.totalAddresses--;
 
-                        // InitPagination to remove the select option
-                        const { totalAddresses, index: addressIndex } = this.state.companies.companyAddressesPagination;
-                        paginationView.initPagination(totalAddresses, addressIndex + 1, 'company-addresses');
-                        
-                         // Update the pagination
-                        paginationView.updatePaginationBtns(totalAddresses, this.state.companies.currentCompany.addresses.length, 'company-addresses')
-                            
-                        // Change the select value
-                        const customSelect = document.querySelector('.custom-select-container--company-addresses');
-                        const moveEvent = new CustomEvent('companyAddressesChange', { detail: { page: this.state.companies.currentCompany.addresses.length - 1 } });
-                        customSelect.dispatchEvent(moveEvent, { bubbles: true });
-
-                        // Change the contact section
-                        const selectOption = document.querySelector(`.custom-select-option--company-addresses[data-value="1"]`);
-                        this.handleCompanyAddressesPagination(selectOption, null, null);
-
-                        // // Change summary
-                        // const summary = document.querySelector('.summary');
-                        // const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
-                        // // No animation needed as it's behind the modal
-                        // adminView.switchSummary(summary, newSummary);
-
-                        // // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
-                        // this.initCompanyJobsState();
-
-                        // // Render the summary company jobs table
-                        // if(this.state.companies.paginatedJobs.length > 0) {
-                        //     // remove any placeholders
-                        //     const placeholder = document.querySelector('.company-jobs-placeholder');
-                        //     if(placeholder) placeholder.parentElement.removeChild(placeholder);
-
-                        //     this.renderCompanyJobsTable();
-                        // } else {
-                        //     // render a placeholder saying 'no jobs'
-                        //     document.querySelector('.table-wrapper--nested-jobs')
-                        //         .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
-                        // } 
-                        // // Add pagination for nested contacts, addresses, and jobs elements
-                        // this.addCompanyNestedPagination();
-
-                        // this.addCompanySummaryListeners();
-
-                        // deleteAddressAlertAnimation.play(0);
+                        this.handleCompanyAddressesPagination(onLastPage? null:this.state.companies.companyAddressesPagination.currentPage, onLastPage? true:null, null, 'delete');
                     } else {
                         const error = new Error();
                         error.statusCode = res.status;
@@ -4171,104 +4109,79 @@ class AdminController {
                         }else {  
                             alert = modalView.getAlert('Company Created', true);
                             alertWrapper.insertAdjacentHTML('afterbegin', alert);
+
                             successAnimation.play(0);
 
-                            // Set up an animation tl before data updated
-                            const tl = gsap.timeline();
-                            // Add loaders outside of animation
-                            adminView.renderAdminLoaders('companies');
+                            const newPage = this.state.companies.totalCompanies % this.state.companies.searchOptions.limit === 0;
+                            const pages = paginationView.getTotalPages(this.state.companies.searchOptions.limit, this.state.companies.totalCompanies);
+                            if(newPage) {
+                                this.changeCompaniesPage(pages+1, null, null, 'new', res.data.company);
+                            } else {
+                               this.changeCompaniesPage(pages, null, null, null, res.data.company);
+                            }
 
-                            tl
-                              .add(animation.animateAdminLoadersIn())
-                              .add(animation.animateTableContentOut('companies'), '<')
-                              .add(async() => {
-                                  // Get data (updates total companies)
-                                  await this.getData('companies', res.data.company.id);
-                                  this.state.companies.currentCompany = res.data.company;
-                                  this.resetCompanyState();
+                            // // Set up an animation tl before data updated
+                            // const tl = gsap.timeline();
+                            // // Add loaders outside of animation
+                            // adminView.renderAdminLoaders('companies');
 
-                                  // TABLE RENDERING/ANIMATION
-                                  this.renderCompaniesTable();
+                            // tl
+                            //   .add(animation.animateAdminLoadersIn())
+                            //   .add(animation.animateTableContentOut('companies'), '<')
+                            //   .add(async() => {
+                            //       // Get data (updates total companies)
+                            //       await this.getData('companies', res.data.company.id);
+                            //       this.state.companies.currentCompany = res.data.company;
+                            //       this.resetNestedCompanyState();
 
-                                // Animate table body in (body, not content, because the table will already be present
-                                // if adding a company), and the loaders out
-                                gsap
-                                .timeline()
-                                .add(animation.animateTableBodyIn('companies'))
-                                .add(animation.animateAdminLoadersOut(), '<')
+                            //       // TABLE RENDERING/ANIMATION
+                            //       this.renderCompaniesTable();
 
-                                // SUMMARY RENDERING/ANIMATION
-                                // Switch summary (No animation needed as behind the modal)
-                                summaryView.switchCompanySummary(this.companies[0], this.state.companies.searchOptions.searchTerm);
+                            //     // Animate table body in (body, not content, because the table will already be present
+                            //     // if adding a company), and the loaders out
+                            //     gsap
+                            //     .timeline()
+                            //     .add(animation.animateTableBodyIn('companies'))
+                            //     .add(animation.animateAdminLoadersOut(), '<')
 
-                                // // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
-                                // this.initCompanyJobsState();
+                            //     // SUMMARY RENDERING/ANIMATION
+                            //     // Switch summary (No animation needed as behind the modal)
+                            //     summaryView.switchCompanySummary(this.companies[0], this.state.companies.searchOptions.searchTerm);
 
-                                // // Add pagination for nested contacts, addresses, and jobs elements
-                                this.addCompanyNestedPagination();
+                            //     // // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
+                            //     // this.initCompanyJobsState();
 
-                                // Render the summary company jobs table
-                                this.renderCompanyJobsTable();  
+                            //     // // Add pagination for nested contacts, addresses, and jobs elements
+                            //     this.addCompanyNestedPagination();
 
-                                if(this.state.companies.paginatedJobs.length === 0) {
-                                    // render a placeholder saying 'no jobs'
-                                    document.querySelector('.table__content--company-jobs')
-                                    .insertAdjacentHTML('beforeend', adminView.createNoJobsPlaceholder());
-                                    // Animate the placeholder in
-                                    animation.animateTablePlaceholderIn(document.querySelector('.company-jobs-placeholder'));   
+                            //     // Render the summary company jobs table
+                            //     this.renderCompanyJobsTable();  
 
-                                } 
+                            //     if(this.state.companies.paginatedJobs.length === 0) {
+                            //         // render a placeholder saying 'no jobs'
+                            //         document.querySelector('.table__content--company-jobs')
+                            //         .insertAdjacentHTML('beforeend', adminView.createNoJobsPlaceholder());
+                            //         // Animate the placeholder in
+                            //         animation.animateTablePlaceholderIn(document.querySelector('.company-jobs-placeholder'));   
 
-                                // Add to the successAnimation once the getData() call has now completed
-                                // NB: animating the modal out, not the summary out (which would also animate the modal)
-                                successAnimation.add(animation.animateSummaryModalOut(companySummaryModal));
-                                successAnimation.add(animation.animateSummaryModalOut(companySummaryModalHeader));
+                            //     } 
 
-                            // PAGINATION RENDERING
-                                // Update pagination
-                                const { totalCompanies, searchOptions: {index, limit} } = this.state.companies;
-                                const { pages, page } = paginationView.calculatePagination(index, limit, totalCompanies);
+                            //     // Add to the successAnimation once the getData() call has now completed
+                            //     // NB: animating the modal out, not the summary out (which would also animate the modal)
+                            //     successAnimation.add(animation.animateSummaryModalOut(companySummaryModal));
+                            //     successAnimation.add(animation.animateSummaryModalOut(companySummaryModalHeader));
 
-                                console.log({pages}, {page}, {total});
-                                paginationView.initPagination(pages, page, 'companies');
+                            // // PAGINATION RENDERING
+                            //     // Update pagination
+                            //     const { totalCompanies, searchOptions: {index, limit} } = this.state.companies;
+                            //     const { pages, page } = paginationView.calculatePagination(index, limit, totalCompanies);
 
-                              })
+                            //     console.log({pages}, {page}, {total});
+                            //     paginationView.initPagination(pages, page, 'companies');
 
-
-
-
-                            // const summary = document.querySelector('.summary');
-                            // const newSummary = adminView.createCompanySummary(this.state.companies.currentCompany);
-
-                            // // No animation needed as it's behind the modal
-                            // adminView.switchSummary(summary, newSummary);
-
-                            // // Render the summary company jobs table
-                            // if(this.state.companies.paginatedJobs.length > 0) {
-                            //     // remove any placeholders
-                            //     const placeholder = document.querySelector('.company-jobs-placeholder')
-
-                            //     if(placeholder) placeholder.parentElement.removeChild(placeholder);
-
-                            //     this.renderCompanyJobsTable();
-                            // } else {
-                            //     // render a placeholder saying 'no jobs'
-                            //     document.querySelector('.table-wrapper--nested-jobs')
-                            //         .insertAdjacentHTML('afterbegin', adminView.generateCompanyJobsPlaceholder());
-                            // } 
-
-                            // // Add pagination for nested contacts, addresses, and jobs elements
-                            // this.addCompanyNestedPagination();
-
-                            // // Add the listener to the new summary
-                            // document.querySelector('.summary').addEventListener('click', (e) => this.handleCompanySummaryEvent(e))
+                            //   })
 
 
-                            // this.renderCompaniesTable();
-                            // // Update pagination
-                            // const { totalCompanies, searchOptions: {index: companyIndex, limit: companyLimit} } = this.state.companies;
-                            // adminView.renderPagination(companyIndex, companyLimit, document.querySelector('.table-wrapper'), 'companies');
-                    
                         }
                     } catch(err) {
                         console.log(err)
@@ -4392,7 +4305,6 @@ class AdminController {
             const alertWrapper = document.querySelector('.alert-wrapper');
             const companyForm = document.querySelector('.form--edit-company');
             const closeBtn = document.querySelector('.form__close--edit-company');
-            const modal = document.querySelector('.summary__modal');
 
             const fields = adminView.getCompanyFields('edit-company');
             const { 
@@ -4410,9 +4322,9 @@ class AdminController {
             } = fields;
 
             // Get the animation for the application alerts (paused)
-            errorAnimation = animation.animateAlert(alertWrapper, false);
+            errorAnimation = animation.animateAlert(alertWrapper, false, 'paused');
             // Success animation is the same, but appended later (paused)
-            successAnimation = animation.animateAlert(alertWrapper, true);
+            successAnimation = animation.animateAlert(alertWrapper, true, 'paused');
 
             closeBtn.addEventListener('click', () => {
                 modalView.removeAdminModal('companies');
@@ -4423,7 +4335,7 @@ class AdminController {
                 // Clear the alert wrapper contents
                 while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
 
-                const data = adminView.getCompanyValues(fields, true); 
+                const data = adminView.getCompanyValues(fields, 'edit'); 
                 const { changed, ...values } = data;
 
                 
@@ -4454,61 +4366,65 @@ class AdminController {
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
                         successAnimation.play(0);
 
-                        // The animation should start before the updated data is fetched
-                        const tl = gsap.timeline();
+                        const page = paginationView.getCurrentPage(this.state.companies.searchOptions.index, this.state.companies.searchOptions.limit);
 
-                        // Add loaders outside of animation
-                        adminView.renderAdminLoaders('companies');
+                        this.changeCompaniesPage(page, null, null, null, res.data.company);      
 
-                        tl
-                          .add(animation.animateAdminLoadersIn())
-                          .add(animation.animateTableContentOut('companies'), '<')
-                          .add(async() => {
-                            // Get data (updates total companies)
-                            await this.getData('companies');
-                            // this.state.companies.currentCompany = res.data.company;
+                        // // The animation should start before the updated data is fetched
+                        // const tl = gsap.timeline();
 
-                          // TABLE RENDERING/ANIMATION
-                            this.renderCompaniesTable();
-                            // Animate table body in (body, not content, because the table will already be present
-                            // if adding a company), and the loaders out
-                            gsap
-                              .timeline()
-                              .add(animation.animateTableBodyIn('companies'))
-                              .add(animation.animateAdminLoadersOut(), '<')
+                        // // Add loaders outside of animation
+                        // adminView.renderAdminLoaders('companies');
 
-                          // SUMMARY RENDERING/ANIMATION
-                            // Switch summary (No animation needed as behind the modal)
-                            summaryView.switchCompanySummary(this.state.companies.currentCompany, this.state.companies.searchOptions.searchTerm);
+                        // tl
+                        //   .add(animation.animateAdminLoadersIn())
+                        //   .add(animation.animateTableContentOut('companies'), '<')
+                        //   .add(async() => {
+                        //     // Get data (updates total companies)
+                        //     await this.getData('companies');
+                        //     // this.state.companies.currentCompany = res.data.company;
 
-                            // Add pagination for nested contacts, addresses, and jobs elements
-                            this.addCompanyNestedPagination();
+                        //   // TABLE RENDERING/ANIMATION
+                        //     this.renderCompaniesTable();
+                        //     // Animate table body in (body, not content, because the table will already be present
+                        //     // if adding a company), and the loaders out
+                        //     gsap
+                        //       .timeline()
+                        //       .add(animation.animateTableBodyIn('companies'))
+                        //       .add(animation.animateAdminLoadersOut(), '<')
 
-                            // Render the summary company jobs table
-                            this.renderCompanyJobsTable();  
+                        //   // SUMMARY RENDERING/ANIMATION
+                        //     // Switch summary (No animation needed as behind the modal)
+                        //     summaryView.switchCompanySummary(this.state.companies.currentCompany, this.state.companies.searchOptions.searchTerm);
 
-                            if(this.state.companies.paginatedJobs.length === 0) {
-                                // render a placeholder saying 'no jobs'
-                                document.querySelector('.table__content--company-jobs')
-                                .insertAdjacentHTML('beforeend', adminView.createNoJobsPlaceholder());
-                                // Animate the placeholder in
-                                animation.animateTablePlaceholderIn(document.querySelector('.company-jobs-placeholder'));   
-                            } 
+                        //     // Add pagination for nested contacts, addresses, and jobs elements
+                        //     this.addCompanyNestedPagination();
 
-                            // this.addCompanySummaryListeners();
+                        //     // Render the summary company jobs table
+                        //     this.renderCompanyJobsTable();  
 
-                            // Add to the successAnimation once the getData() call has now completed
-                            // NB: animating the modal out, not the summary out (which would also animate the modal)
-                            successAnimation.add(animation.animateSummaryModalOut(companySummaryModal));
-                            successAnimation.add(animation.animateSummaryModalOut(companySummaryModalHeader));
+                        //     if(this.state.companies.paginatedJobs.length === 0) {
+                        //         // render a placeholder saying 'no jobs'
+                        //         document.querySelector('.table__content--company-jobs')
+                        //         .insertAdjacentHTML('beforeend', adminView.createNoJobsPlaceholder());
+                        //         // Animate the placeholder in
+                        //         animation.animateTablePlaceholderIn(document.querySelector('.company-jobs-placeholder'));   
+                        //     } 
+
+                        //     // this.addCompanySummaryListeners();
+
+                        //     // Add to the successAnimation once the getData() call has now completed
+                        //     // NB: animating the modal out, not the summary out (which would also animate the modal)
+                        //     successAnimation.add(animation.animateSummaryModalOut(companySummaryModal));
+                        //     successAnimation.add(animation.animateSummaryModalOut(companySummaryModalHeader));
                             
-                          // PAGINATION RENDERING
-                            // Update pagination
-                            const { totalCompanies, searchOptions: {index, limit} } = this.state.companies;
-                            const { pages, page: current } = paginationView.calculatePagination(index, limit, totalCompanies);
-                            paginationView.initPagination(pages, current, 'companies');
+                        //   // PAGINATION RENDERING
+                        //     // Update pagination
+                        //     const { totalCompanies, searchOptions: {index, limit} } = this.state.companies;
+                        //     const { pages, page: current } = paginationView.calculatePagination(index, limit, totalCompanies);
+                        //     paginationView.initPagination(pages, current, 'companies');
 
-                        })
+                        // })
                         
 
 
@@ -4619,11 +4535,9 @@ class AdminController {
 
                     if(status === 200) {
                         // Reset the nested pagination state
-                        this.resetCompanyState();
+                        this.resetNestedCompanyState();
                         // Remove any search terms
                         this.state.companies.searchOptions.searchTerm = '';
-
-                        const tl = gsap.timeline();
 
                         alert = modalView.getAlert(`Company ${companyId} deleted`, true);
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
@@ -4633,95 +4547,14 @@ class AdminController {
 
                         // If it's the last item on the page
                         if(lastRow) {
-                            // Move back 1 page if not on page 1
-                            if(this.state.companies.currentPage !== 1){
-                                this.handleCompaniesPagination(null, true, null, 'delete');
-                            }
-                            else {
-                                const selectOption = document.querySelector(`.custom-select-option--companies[data-value="0"]`);
+                            const onLastPage = paginationView.onLastPage(this.state.companies.searchOptions.index, this.state.companies.searchOptions.limit, this.state.companies.totalCompanies);
 
-                                this.handleCompaniesPagination(selectOption, null, null, 'delete');
-
-                                // // InitPagination to remove a select option
-                                // const { totalCompanies, searchOptions: { index, limit } } = this.state.companies;
-                                // const { pages,  index: current} = paginationView.calculatePagination(index, limit, totalCompanies);
-                                // paginationView.initPagination(pages, current, 'companies');
-                            }
-                            //  // Set the pagination state (2nd param simulates pressing the prev btn)
-                            //  this.setJobsPaginationState(null, true, null);
-                            //  paginationView.updatePaginationBtns(this.state.jobs.currentPage -1);
+                            const currentPage = paginationView.getCurrentPage(this.state.companies.searchOptions.index, this.state.companies.searchOptions.limit);
+                            // LastPage? moveback. !LastPage? Stay on currentPage
+                            this.changeCompaniesPage(onLastPage? null:currentPage, onLastPage? true:null, null, 'page-change');
                              
-                            // // Render the admin loaders and animate them in and the table out
-                            // adminView.renderAdminLoaders(0);
-
-                            // tl.add(adminView.animateTableContentOut())
-                            //   .add(adminView.animateAdminLoadersIn(), '<')
-                            //   .add(async() => {
-                            //     // Update the jobs array
-                            //     await this.getData('jobs');
-
-                            //     this.changeTablePageAnimation(tl, 'jobs');
-
-                            //     const { totalJobs, searchOptions: {index, limit} } = this.state.jobs;
-                            //     const { pages, index: current } = paginationView.calculatePagination(index, limit, totalJobs);
-                            //     paginationView.initPagination(pages, current, 'jobs'); 
-                            //   })
-
-
                         } else {
-                            
-                            // 1: Render loaders
-                            adminView.renderAdminLoaders('companies');
-
-                            // 2: Animate the loaders in / table body out
-                            tl.add(animation.animateTableContentOut('companies'))
-                            .add(animation.animateAdminLoadersIn(), '<')
-                            // 3: Nest subsequent functions so they execute after the above animations
-                            .add(async () => {
-                                // 4: Update the data and state (getData fn also updates the total count)
-                                await this.getData('companies');
-                                this.state.companies.currentCompany = this.companies[0];
-                                this.resetCompanyState();
-                                this.state.isActiveRequest = false;
-                                // SUMMARY (NESTED TL)
-                                // 5: Animate the Summary out (modal animation handled in animateSummaryOut)
-                                gsap
-                                    .timeline().add(animation.animateSummaryOut('companies'))
-                                    // 6: Switch the summary *after* the out animation has occurred
-                                    .add(() => {
-                                        summaryView.switchCompanySummary(this.companies[0], this.state.companies.searchOptions.searchTerm);
-
-                                        // Unlike the Jobs and Apps summaries, clicking another row has to re-calculate pagination
-                                        // on nested tables and contact/address sections
-
-                                            // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
-                                            this.initCompanyJobsState();
-                        
-                                            // // Add pagination for nested contacts, addresses, and jobs elements
-                                            this.addCompanyNestedPagination();
-                                            this.renderCompanyJobsTable()
-
-                                        // 7: Animate the summary back in
-                                        animation.animateCompanySummaryIn(this.state.companies.paginatedJobs.length);
-                                    })  
-
-                                // TABLE (NESTED TL) 
-                                // 8: Change table
-                                this.renderCompaniesTable();
-                                // 9: Animate table body in (body, not content, because the table will already be present)
-                                //    and the loaders out
-                                gsap
-                                    .timeline()
-                                    .add(animation.animateTableBodyIn('companies'))
-                                    .add(animation.animateAdminLoadersOut(), '<')
-
-                                // CALCULATE/RENDER PAGINATION
-                                const { totalCompanies, searchOptions: {index, limit} } = this.state.companies;
-                                const { pages, index: current } = paginationView.calculatePagination(index, limit, totalCompanies);
-
-                                const customSelect = document.querySelector('.custom-select-container--companies');
-                                paginationView.updatePaginationBtns(pages, current, 'companies');
-                            })
+                            this.changeCompaniesPage(this.state.companies.currentPage, null, null);
                         }
 
                     } else {
@@ -4983,7 +4816,7 @@ class AdminController {
     //     });
     // }
 
-    resetCompanyState() {
+    resetNestedCompanyState() {
         // Limit should be at least 1 (because one must be displayed)
         this.state.companies.companyJobsPagination.index = 0;
         this.state.companies.companyJobsPagination.limit = 1;
@@ -5117,12 +4950,12 @@ class AdminController {
         // Jobs Table
         const jobsOption = e.target.closest('.custom-select-option--jobs');
         const jobsOptionValue = jobsOption? jobsOption.dataset.value : null;
-        console.log(jobsOptionValue)
         const jobsPrevious = e.target.closest('.pagination__previous--jobs');
         const jobsNext = e.target.closest('.pagination__next--jobs');
 
         // Companies Table
         const companiesOption = e.target.closest('.custom-select-option--companies');
+        const companiesOptionValue = companiesOption? companiesOption.dataset.value : null;
         const companiesPrevious = e.target.closest('.pagination__previous--companies');
         const companiesNext = e.target.closest('.pagination__next--companies');
 
@@ -5133,6 +4966,7 @@ class AdminController {
 
         // Company Summary Contacts
         const companyContactsOption = e.target.closest('.custom-select-option--company-contacts');
+        const companyContactsOptionValue = companyContactsOption? companyContactsOption.dataset.value : null;
         const companyContactsPrevious = e.target.closest('.pagination__previous--company-contacts');
         const companyContactsNext = e.target.closest('.pagination__next--company-contacts');
 
@@ -5168,7 +5002,6 @@ class AdminController {
         // set both animation and request state
         this.state.isActivePaginationAnimation = true;
         this.state.isActiveRequest = true;
-        
 
         // Choose which table's pagination is being updated, and with which functions
         if(users) {
@@ -5176,55 +5009,18 @@ class AdminController {
         } else if(jobs){
             this.changeJobsPage(jobsOptionValue, jobsPrevious, jobsNext);
         } else if(companies) {
-            this.handleCompaniesPagination(companiesOption, companiesPrevious, companiesNext);
+            this.changeCompaniesPage(companiesOptionValue, companiesPrevious, companiesNext);
         } else if(companyJobs) {
             this.handleCompanyJobsPagination(companyJobsOption, companyJobsPrevious, companyJobsNext);
-        } else  if(companyContacts){
-            this.handleCompanyContactsPagination(companyContactsOption, companyContactsPrevious, companyContactsNext);
+        } else if(companyContacts){
+            this.handleCompanyContactsPagination(companyContactsOptionValue, companyContactsPrevious, companyContactsNext);
         } else if(companyAddresses) {
             this.handleCompanyAddressesPagination(companyAddressesOption, companyAddressesPrevious, companyAddressesNext);
         } else if(applications) {
-            // this.handleApplicationPagination(applicationBtn, applicationPrevious, applicationNext, tl);
             this.handleApplicationsPagination(applicationsOption, applicationsPrevious, applicationsNext);
         } else {
             return;
         }
-
- 
-
-        //// Set the pagination state
-        // setPagination();
-
-        // // Update the pagination view
-        // adminView.updatePagination(this.state.applications.currentPage);
-
-        // // Update the admin data
-        // await requestData();
-        // this.state.isActiveRequest = false;
-
-        // tl
-        //     // Animate the loaders out
-        //   .add(adminView.animateAdminLoadersOut())
-        //   .add(() => {
-        //     // Populate summary while not visible
-        //     populateSummary();
-
-        //     // Animate summary in
-        //     gsap.fromTo('.summary', {autoAlpha: 0}, {autoAlpha: 1});
-
-        //     // Update the table
-        //     // this.renderApplicationTable();
-        //     this.updateApplicationTable();
-
-        //     // Animate table in
-        //     renderTable();
-
-        //     this.state.isActivePaginationAnimation = false;
-
-        //     console.log(this.state.isActivePaginationAnimation, this.state.isActiveRequest);
-        //   });
-
-       
     };
 
     handleUsersPagination(option, previous, next) {
@@ -5377,15 +5173,17 @@ class AdminController {
         }
         if(option) {
             console.log('move');
-            // const page = option.dataset.value;
-            // console.log(page);
             this.movePage(state, option);
         }
     }
 
-    handleCompanyContactsPagination(option, previous, next) {
+    // Pagination Changed means the number of pages has changed
+    // A new contact means the page has changed to an existing one
+    // Null for both means the existing page is being updated
+    handleCompanyContactsPagination(option, previous, next, paginationChanged) {
+
         const companyContactsState = this.state.companies.companyContactsPagination;
-        const pages = Math.ceil(companyContactsState.totalContacts / companyContactsState.limit);
+        const pages = paginationView.getTotalPages(companyContactsState.limit, companyContactsState.totalContacts);
 
         const tl = gsap.timeline();
         tl.add(animation.animateContactSectionOut())
@@ -5393,29 +5191,31 @@ class AdminController {
             // Set the pagination state (This does to the company jobs array what limit and offset do in the api call
             // and sets the paginatedJobs array for the company
             this.setCurrentPage(option, previous, next, companyContactsState, pages);
+
             // Set the current contact (because only 1 is displayed it's just the index)
+            // If called from a fn that adds/deletes a contact, the index is changed there, otherwise it's changed by the 'setCurrentPage' fn 
             const currentContact = this.state.companies.currentCompany.contacts[companyContactsState.index]
             summaryView.switchContact(currentContact);
 
             // Animate the company jobs table back in
             animation.animateContactSectionIn();
 
-            paginationView.updatePaginationBtns(pages, companyContactsState.currentPage, 'company-contacts');
+            if(paginationChanged) {
+                const page = paginationView.getCurrentPage(companyContactsState.index, companyContactsState.limit);
+                // Pages calculated before total updated by call to getData
+                const newTotalPages = paginationView.getTotalPages(companyContactsState.limit, companyContactsState.totalContacts);
 
-            const customSelect = document.querySelector('.custom-select-container--company-contacts');
-
-            // This will work for next/prev or option
-            const moveEvent = new CustomEvent('companyContactsChange', { detail: { page: companyContactsState.currentPage } });
-            customSelect.dispatchEvent(moveEvent, { bubbles: true });
-        
-
+                paginationView.initPagination(newTotalPages, page, 'company-contacts');
+            } else {
+                paginationView.changePagination(companyContactsState.index, companyContactsState.limit, companyContactsState.totalContacts, 'company-contacts');
+            }
         })
     }
 
-    handleCompanyAddressesPagination(option, previous, next) {
+    handleCompanyAddressesPagination(option, previous, next, paginationChanged) {
         const companyAddressesState = this.state.companies.companyAddressesPagination;
-        const pages = Math.ceil(companyAddressesState.totalAddresses / companyAddressesState.limit);
-
+        // const pages = Math.ceil(companyAddressesState.totalAddresses / companyAddressesState.limit);
+        const pages = paginationView.getTotalPages(companyAddressesState.limit, companyAddressesState.totalAddresses);
 
         // Pagination flow:
         const tl = gsap.timeline();
@@ -5431,22 +5231,14 @@ class AdminController {
             // Animate the company jobs table back in
             animation.animateAddressSectionIn();
 
-            // Setup to allow the navigation btns (previous/next) to control the custom select element
-
-            // Get the custom select / eventTarget
-            const customSelect = document.querySelector('.custom-select-container--company-addresses');
-
-             
-            if(previous || next) {
-                const moveEvent = new CustomEvent('companyAddressesChange', { detail: { page: companyAddressesState.currentPage } });
-                customSelect.dispatchEvent(moveEvent, { bubbles: true });
+            if(paginationChanged) {
+                const page = paginationView.getCurrentPage(companyAddressesState.index, companyAddressesState.limit);
+                // Previous pages calculated before total updated by call to getData
+                const newTotalPages = paginationView.getTotalPages(companyAddressesState.limit, companyAddressesState.totalAddresses);
+                paginationView.initPagination(newTotalPages, page, 'company-addresses');
+            } else {
+                paginationView.changePagination(companyAddressesState.index, companyAddressesState.limit, companyAddressesState.totalAddresses, 'company-addresses');
             }
-            // if(next) {
-            //     const eventForwards = new CustomEvent('companyAddressesForwards', { detail: { page: companyAddressesState.currentPage } });
-            //     customSelect.dispatchEvent(eventForwards, { bubbles: true });
-            // }
-
-            paginationView.updatePaginationBtns(pages, companyAddressesState.currentPage, 'company-addresses');
         })
     }
 
@@ -5486,11 +5278,13 @@ class AdminController {
         })
     }
 
-    async handleCompaniesPagination(option, previous, next, row) {
+    // Pagination Changed means the number of pages has changed
+    // A new company means the page has changed to an existing one
+    async changeCompaniesPage(option, previous, next, paginationChanged, newCompany) {
         const tl = gsap.timeline();
         // Set the pagination state
         const companyState = this.state.companies;
-        const pages = Math.ceil(companyState.totalCompanies / companyState.searchOptions.limit);
+        const pages = paginationView.getTotalPages(companyState.searchOptions.limit, companyState.totalCompanies);
         this.setCurrentPage(option, previous, next, companyState, pages);
 
         // ANIMATION ORDER/LOGIC
@@ -5519,9 +5313,11 @@ class AdminController {
           // 3: Nest subsequent functions so they execute after the above animations
           .add(async () => {
               // 4: Update the data and state (getData fn also updates the total count)
-              await this.getData('companies');
-              this.state.companies.currentCompany = this.companies[0];
-              this.resetCompanyState();
+              await this.getData('companies', newCompany?.id);
+              this.state.companies.currentCompany = newCompany || this.companies[0];
+
+              // @TODO: Should it reset the totals?
+              this.resetNestedCompanyState();
               this.state.isActiveRequest = false;
             // SUMMARY (NESTED TL)
               // 5: Animate the Summary out (modal animation handled in animateSummaryOut)
@@ -5529,15 +5325,14 @@ class AdminController {
                 .timeline().add(animation.animateSummaryOut('companies'))
                 // 6: Switch the summary *after* the out animation has occurred
                 .add(() => {
-                    summaryView.switchCompanySummary(this.companies[0], this.state.companies.searchOptions.searchTerm);
+                    summaryView.switchCompanySummary(newCompany || this.companies[0], this.state.companies.searchOptions.searchTerm);
 
                     // Unlike the Jobs and Apps summaries, clicking another row has to re-calculate pagination
                     // on nested tables and contact/address sections
 
                         // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
                         this.initCompanyJobsState();
-    
-                        // // Add pagination for nested contacts, addresses, and jobs elements
+                    //  Add pagination for nested contacts, addresses, and jobs elements
                         this.addCompanyNestedPagination();
                         this.renderCompanyJobsTable()
 
@@ -5552,13 +5347,12 @@ class AdminController {
                         tag.addEventListener('click', e => {
             
                             // // Tag is embedded in the search div, if it propagates it toggles the search input
-                            // e.stopPropagation();
                             gsap.to(tag, { opacity: 0, duration: .4, onComplete: () => tag.parentElement.removeChild(tag) })
                         });
                     }
 
 
-                })  
+              })  
 
             // TABLE (NESTED TL) 
               // 8: Change table
@@ -5572,23 +5366,28 @@ class AdminController {
 
             // CALCULATE/RENDER PAGINATION
             const { totalCompanies, searchOptions: {index, limit} } = this.state.companies;
-            console.log({index}, {limit});
 
-            const { pages, page: current } = paginationView.calculatePagination(index, limit, totalCompanies);
+            // const { pages, page: current } = paginationView.calculatePagination(index, limit, totalCompanies);
 
             // If the pagination event came from a deletion, reinitialise the pagination view (removing a select option)
             // Adding is dealt with in a separate fn, not by calling handlePagination
-            if(row === 'delete') {
-                paginationView.initPagination(pages, current, 'companies');
+            if(paginationChanged) {
+                const page = paginationView.getCurrentPage(index, limit);
+                // Pages calculated before total updated by call to getData
+                const newTotalPages = paginationView.getTotalPages(limit, totalCompanies);
+                paginationView.initPagination(newTotalPages, page, 'companies');
+            } else {
+                paginationView.changePagination(index, limit, totalCompanies, 'companies');
+
             }
 
-            const customSelect = document.querySelector('.custom-select-container--companies');
-            paginationView.updatePaginationBtns(pages, current, 'companies', customSelect);
+            // const customSelect = document.querySelector('.custom-select-container--companies');
+            // paginationView.updatePaginationBtns(pages, current, 'companies', customSelect);
 
-            if(previous || next || option) {
-                const moveEvent = new CustomEvent('companiesChange', { detail: { page: companyState.currentPage } });
-                customSelect.dispatchEvent(moveEvent, { bubbles: true });
-            }
+            // if(previous || next || option) {
+            //     const moveEvent = new CustomEvent('companiesChange', { detail: { page: companyState.currentPage } });
+            //     customSelect.dispatchEvent(moveEvent, { bubbles: true });
+            // }
 
         })
 
@@ -5665,11 +5464,17 @@ class AdminController {
 
     }
 
-    async handleApplicationsPagination(option, previous, next) {
+    async handleApplicationsPagination(option, previous, next, paginationChanged, newApplication) {
         const tl = gsap.timeline();
 
-        // Set the pagination state
-        this.setApplicationsPagination(option, previous, next);
+        // Set the new page
+        const applicationsState = this.state.applications;
+
+        const pages = paginationView.getTotalPages(applicationsState.searchOptions.limit,applicationsState.totalApplications);
+        this.setCurrentPage(option, previous, next, applicationsState, pages);
+       
+        // // Set the pagination state
+        // this.setApplicationsPagination(option, previous, next);
         
         // ANIMATION ORDER/LOGIC
         // 1: Place the loaders in the DOM
@@ -5697,17 +5502,17 @@ class AdminController {
           // 3: Nest subsequent functions so they execute after the above animations
           .add(async () => {
               // 4: Update the data and state (getData fn also updates the total count)
-              await this.getData('applications');
+              await this.getData('applications', newApplication?.id);
               this.state.applications.currentApplication = this.applications[0];
               this.state.isActiveRequest = false;
 
             // SUMMARY (NESTED TL)
               // 5: Animate the Summary out (modal animation handled in animateSummaryOut)
               gsap
-                .timeline().add(animation.animateSummaryOut())
+                .timeline().add(animation.animateSummaryOut('applications'))
                 // 6: Switch the summary *after* the out animation has occurred
                 .add(() => {
-                    summaryView.switchApplicationSummary(this.applications[0]);
+                    summaryView.switchApplicationSummary(newApplication || this.applications[0], this.state.applications.searchOptions.searchTerm);
                     // 7: Animate the summary back in
                     animation.animateSummaryIn();
                 })  
@@ -5722,10 +5527,20 @@ class AdminController {
                 .add(animation.animateTableBodyIn('applications'))
                 .add(animation.animateAdminLoadersOut(), '<')
 
-            // CALCULATE/RENDER PAGINATION
-            const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
-            const { pages, page: current } = paginationView.calculatePagination(index, limit, totalApplications);
-            paginationView.initPagination(pages, current, 'applications');  
+            
+            // CHANGE PAGINATION
+              const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
+
+              // If the pagination event came from a deletion or addition that changed the number of pages, 
+              // reinitialise the pagination view (removing/adding a select option)
+              if(paginationChanged) {
+                const page = paginationView.getCurrentPage(index, limit);
+                // Pages calculated before total updated by call to getData                    
+                const newTotalPages = paginationView.getTotalPages(limit, totalApplications);
+                    paginationView.initPagination(newTotalPages, page, 'applications');
+              } else {
+                  paginationView.changePagination(index, limit, totalApplications, 'applications');
+              }
 
           })
 
@@ -5755,6 +5570,8 @@ class AdminController {
         // .add(adminView.animateSummaryIn())
     }
 
+    // Pagination Changed means the number of pages has changed
+    // A new job means the page has changed to an existing one
     async changeJobsPage(option, previous, next, paginationChanged, newJob) {
         const tl = gsap.timeline();
         // // Set the pagination state
@@ -5762,6 +5579,7 @@ class AdminController {
         
         // Set the new page
         const jobsState = this.state.jobs;
+
         const pages = paginationView.getTotalPages(jobsState.searchOptions.limit,jobsState.totalJobs);
         this.setCurrentPage(option, previous, next, jobsState, pages);
 
@@ -5823,8 +5641,8 @@ class AdminController {
             if(paginationChanged) {
                 const page = paginationView.getCurrentPage(index, limit);
                 // Pages calculated before total updated by call to getData
-                const newPages = paginationView.getTotalPages(limit, totalJobs);
-                paginationView.initPagination(newPages, page, 'jobs');
+                const newTotalPages = paginationView.getTotalPages(limit, totalJobs);
+                paginationView.initPagination(newTotalPages, page, 'jobs');
             } else {
                 paginationView.changePagination(index, limit, totalJobs, 'jobs');
             }
@@ -5992,7 +5810,7 @@ class AdminController {
 
     }
     movePage(state, page) {
-
+        console.log('MOVE PAGE', page)
         // Ajax requests (for main tables) use a searchOption object
         // Nested tables/summary sections just have the index/limit property
         if(state.searchOptions) {
