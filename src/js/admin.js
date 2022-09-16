@@ -1381,6 +1381,8 @@ class AdminController {
 
     addApplicationSummaryListeners() {
         const applicationSummary = document.querySelector('.summary--applications-page');
+        applicationSummary.addEventListener('focusout', this.handleApplicationSearchFocusEvent.bind(this));
+        applicationSummary.addEventListener('submit', this.handleApplicationSearchSubmitEvent.bind(this));
 
         applicationSummary.addEventListener(
             'click', 
@@ -1389,6 +1391,46 @@ class AdminController {
 
     }
 
+    handleApplicationSearchFocusEvent(e) {
+        const searchInput = e.target.closest('.summary__search-input');
+        const searchBtn = document.querySelector('.summary__search');
+        if(searchInput){
+            // If the input loses focus to the submit button, return (the click listener will handle it)
+            if(e.relatedTarget === searchBtn) return;
+
+            // If the input loses focus to anything else, clear the input and close it
+            this.toggleSearch();
+        }
+        
+    }
+
+    async handleApplicationSearchSubmitEvent(e) {
+        const inputOpen = document.querySelector('.summary__search-input.open');
+        if(!inputOpen) return;
+        console.log('OPEN');
+
+        if(inputOpen && !inputOpen.value) {this.toggleSearch(); console.log('CLOSING, NO SUBMIT'); return;}
+        const searchBtn = e.target.closest('.summary__search');
+        const searchForm = e.target.closest('.summary__item--header-search');
+
+        // Check the type, the origin of the event, and if we want to respond to it (if the input is open)
+        const submitEvent = e.type === 'submit' && searchForm && inputOpen;
+        const clickEvent = e.type === 'click' && searchBtn && inputOpen;
+
+        if((submitEvent || clickEvent) && inputOpen.value) {
+            this.state.applications.searchOptions.searchTerm = inputOpen.value;
+            this.toggleSearch();
+
+            summaryView.addSearchTag(this.state.applications.searchOptions.searchTerm);
+            
+            await this.getData('applications');
+
+            this.handleApplicationsPagination(this.state.applications.currentPage, null, null);
+        } else {
+            this.toggleSearch();
+        }
+
+    }
     async applicationSummaryListener (e) {
 
         // Buttons
@@ -1396,10 +1438,33 @@ class AdminController {
         const deleteBtn = e.target.closest('.summary__delete-application-btn--applications');
         const cvBtn = e.target.closest('.summary__cv-btn--applications');
 
+        const searchBtn = e.target.closest('.summary__search');
+        const searchTag = e.target.closest('.summary__tag');
+
         // Applicant/Job/Company links
         const jobLink = e.target.closest('.summary__link--job');
         const companyLink = e.target.closest('.summary__link--company');
         const applicantLink = e.target.closest('.summary__link--applicant');
+
+        if(searchBtn) {
+            // Check if search input is open
+            const inputOpen = document.querySelector('.summary__search-input.open');
+            if(inputOpen) {
+                // This already handles the toggling (closed) of the search bar
+                this.handleApplicationSearchSubmitEvent(e);
+            } else {
+                // Open the search bar
+                this.toggleSearch();
+            }
+
+        }
+        if(searchTag) {
+            // Remove the searchTerm 
+            this.state.applications.searchOptions.searchTerm = '';
+            gsap.to(searchTag, { opacity: 0, duration: .2 })
+
+            this.handleApplicationsPagination(this.state.applications.currentPage, null, null);
+        }
 
         // Copy links
         const emailCopy = e.target.closest('.summary__field--contact-email');
@@ -1459,9 +1524,9 @@ class AdminController {
             const alertWrapper = document.querySelector('.alert-wrapper');
 
             // Get the animation for the application alerts (paused)
-            errorAnimation = animation.animateAlert(alertWrapper, false);
+            errorAnimation = animation.animateAlert(alertWrapper, false, 'paused');
             // Success animation is the same, but appended later (paused)
-            successAnimation = animation.animateAlert(alertWrapper, true);
+            successAnimation = animation.animateAlert(alertWrapper, true, 'paused');
                 
             closeBtn.addEventListener('click', () => {
                 modalView.removeAdminModal('applications');
@@ -1469,10 +1534,14 @@ class AdminController {
         
             submitNewBtn.addEventListener('click',  async (e) => {
                 e.preventDefault();
+
+                // Remove searchTerms
+                this.state.jobs.searchOptions.searchTerm = '';
+
                 // Clear the alert wrapper
                 while(alertWrapper.firstChild) alertWrapper.removeChild(alertWrapper.firstChild);
 
-                // Get the job id from the select
+                // Get the job/person id from the select
                 const jobId = document.querySelector('.new-application__input--job').value;
                 const personId = document.querySelector('.new-application__input--applicant').value;
                 let msg;
@@ -1489,51 +1558,22 @@ class AdminController {
 
                 try {
                     const res = await this.Admin.createApplication(jobId, personId);
-                    if(res.status === 200) {                                 
+                    if(res.status !== 201) {
+                        throw new Error();
+                    } else {                                 
                         // Display successful alert      
                         const alert = modalView.getAlert('Application Created', true);
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
                         successAnimation.play(0);
 
-                        // set up animation timeline (before data updated)
-                        const tl = gsap.timeline();
-                        adminView.renderAdminLoaders('applications');
-                        tl
-                        .add(animation.animateAdminLoadersIn())
-                        .add(animation.animateTableContentOut('applications'), '<')
-                        .add(async () => {
-
-                            // Get data (Updates the total applications)
-                            // Pass the indexId to return the new row first
-                            await this.getData('applications', res.data.application.id);
-                            // Update the current application
-                            this.state.applications.currentApplication = this.applications[0];
-                            
-
-                        // TABLE RENDERING/ANIMATIONs
-                            this.renderApplicationTable();
-                            // Animate table body in (body, not content, because the table will already be present
-                            // if adding an applicant), and the loaders out
-                            gsap
-                            .timeline()
-                            .add(animation.animateTableBodyIn('applications'))
-                            .add(animation.animateAdminLoadersOut(), '<')
-                            
-                        // SUMMARY RENDERING/ANIMATION
-                            // Switch summary (No animation needed as behind the modal, should happen prior to animation of modal itself)
-                            summaryView.switchApplicationSummary(this.applications[0]);
-
-                            // Add to the successAnimation once the getData() call has now completed
-                            // NB: animating the modal out, not the summary out (which would also animate the modal)
-                            successAnimation.add(animation.animateSummaryModalOut(applicationSummaryModal));
-
-                        // PAGINATION RENDERING
-                            // Update pagination
-                            const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
-                            const { pages, page: current } = paginationView.calculatePagination(index, limit, totalApplications);
-                            paginationView.initPagination(pages, current, 'applications');
-                        })
-
+                        // Calculate if new page need, and move there or the last page
+                        const newPage = this.state.applications.totalApplications % this.state.applications.searchOptions.limit === 0;
+                        const pages = paginationView.getTotalPages(this.state.applications.searchOptions.limit, this.state.applications.totalApplications);
+                        if(newPage) {
+                            this.handleApplicationsPagination(pages+1, null, null, 'new', res.data.application);
+                        } else {
+                           this.handleApplicationsPagination(pages, null, null, null, res.data.application);
+                        }
                     }
 
                 } catch (err) {
@@ -1571,9 +1611,9 @@ class AdminController {
             const alertWrapper = document.querySelector('.alert-wrapper');
 
             // Get the animation for the application alerts
-            errorAnimation = animation.animateAlert(alertWrapper, false);
+            errorAnimation = animation.animateAlert(alertWrapper, false, 'paused');
             // Success animation is the same, but is added to after async call to get data
-            successAnimation = animation.animateAlert(alertWrapper, true);
+            successAnimation = animation.animateAlert(alertWrapper, true, 'paused');
 
             const confirm = document.querySelector('.confirmation__btn--confirm');
             const cancel = document.querySelector('.confirmation__btn--cancel');
@@ -1593,46 +1633,15 @@ class AdminController {
                         alertWrapper.insertAdjacentHTML('afterbegin', alert);
                         successAnimation.play(0);
 
-                        // If it's the last item on the page
-                        if(this.applications.length === 1) {
-                            this.handleApplicationPagination(null, true, null)
+                        // Last Row means there's one item on the last page, regardless of the page currently on
+                        const lastRow = this.state.applications.totalApplications % this.state.applications.searchOptions.limit === 1;
+                        if(lastRow) {
+                            const onLastPage = paginationView.onLastPage(this.state.applications.searchOptions.index, this.state.applications.searchOptions.limit, this.state.applications.totalApplications);
+                            const page = paginationView.getCurrentPage(this.state.applications.searchOptions.index, this.state.applications.searchOptions.limit);
+                            // On last page? move a page back. Not on last page? Stay on current page.
+                            this.handleApplicationsPagination(onLastPage? null:page, onLastPage? true: null, null, 'delete')
                         } else {
-
-                            adminView.renderAdminLoaders('applications');
-
-                            const tl = gsap.timeline();
-                            tl.add(animation.animateAdminLoadersIn())
-                            .add(animation.animateTableContentOut('applications'), '<')
-                            .add(async() => {
-                                // Update the data
-                                await this.getData('applications');
-
-                                // Update the current application 
-                                this.state.applications.currentApplication = this.applications[0];
-
-                            // TABLE RENDERING/ANIMATION
-                                this.renderApplicationTable();
-                                // Animate table body in (body, not content, because the table will already be present
-                                // if adding an applicant), and the loaders out
-                                gsap
-                                .timeline()
-                                .add(animation.animateTableBodyIn('applications'))
-                                .add(animation.animateAdminLoadersOut(), '<')    
-                                    
-                            // SUMMARY RENDERING
-                                // Switch the summary (No animation needed)
-                                summaryView.switchApplicationSummary(this.applications[0]);
-                                
-                                // Add to the successAnimation once the getData() call has now completed
-                                // NB: animating the modal out, not the summary out (which would also animate the modal)
-                                successAnimation.add(animation.animateSummaryModalOut(confirmation));
-                                // console.log('Added to the success animation', successAnimation.getChildren());
-
-                                const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
-                                const { pages, page: current } = paginationView.calculatePagination(index, limit, totalApplications);
-                                paginationView.initPagination(pages, current, 'applications');
-                            
-                            })   
+                            this.handleApplicationsPagination(this.state.applications.currentPage, null, null);
                         }
 
                     } else {
@@ -1847,10 +1856,11 @@ class AdminController {
 
     addJobsSummaryListeners() {
         const jobSummary = document.querySelector('.summary--jobs-page');
+        const searchBtn = document.querySelector('.summary__search');
 
         jobSummary.addEventListener('focusout', this.handleJobSearchFocusEvent.bind(this));
         jobSummary.addEventListener('submit', this.handleJobSearchSubmitEvent.bind(this));
-        // jobSummary.addEventListener('click', this.handleJobSearchSubmitEvent.bind(this));
+        // searchBtn.addEventListener('click', this.handleJobSearchSubmitEvent.bind(this));
 
         jobSummary.addEventListener(
             'click', 
@@ -1861,7 +1871,10 @@ class AdminController {
 
     async handleJobSearchSubmitEvent(e) {
         const inputOpen = document.querySelector('.summary__search-input.open');
+        if(!inputOpen) return;
+        console.log('OPEN');
 
+        if(inputOpen && !inputOpen.value) {this.toggleSearch(); console.log('CLOSING, NO SUBMIT'); return;}
         const searchBtn = e.target.closest('.summary__search');
         const searchForm = e.target.closest('.summary__item--header-search');
 
@@ -1869,18 +1882,17 @@ class AdminController {
         const submitEvent = e.type === 'submit' && searchForm && inputOpen;
         const clickEvent = e.type === 'click' && searchBtn && inputOpen;
 
-        // Click events are already toggled, do the same with submit events
-        if(submitEvent) this.toggleSearch();
-
         if((submitEvent || clickEvent) && inputOpen.value) {
             this.state.jobs.searchOptions.searchTerm = inputOpen.value;
-            inputOpen.value = "";
+            this.toggleSearch();
 
             summaryView.addSearchTag(this.state.jobs.searchOptions.searchTerm);
             
             await this.getData('jobs');
-            // const selectOption = document.querySelector(`.custom-select-option--jobs[data-value="1"]`);
+
             this.changeJobsPage(this.state.jobs.currentPage, null, null);
+        } else {
+            this.toggleSearch();
         }
 
     }
@@ -1889,17 +1901,18 @@ class AdminController {
         const searchInput = e.target.closest('.summary__search-input');
         const searchBtn = document.querySelector('.summary__search');
         if(searchInput){
-            console.log(e.relatedTarget === searchBtn);
             // If the input loses focus to the submit button, return (the click listener will handle it)
             if(e.relatedTarget === searchBtn) return;
 
-            // If the input loses focus to anything else, close it
+            // If the input loses focus to anything else, clear the input and close it
             this.toggleSearch();
         }
         
     }
 
     async handleJobSummaryEvent(e) {
+        // // If the search bar is open then this handler shouldn't run
+        // if(e.target.closest('.summary__search') && e.target.closest('.summary__search').classList.contains('open')) return;
 
         // Buttons
         const newBtn = e.target.closest('.summary__new-job-btn--jobs');
@@ -1914,11 +1927,21 @@ class AdminController {
         const companyLink = e.target.closest('.summary__link--company');
 
         if(searchBtn) {
-            this.toggleSearch();
+            // Check if search input is open
+            const inputOpen = document.querySelector('.summary__search-input.open');
+            if(inputOpen) {
+                // This already handles the toggling (closed) of the search bar
+                this.handleJobSearchSubmitEvent(e);
+            } else {
+                // Open the search bar
+                this.toggleSearch();
+            }
+
         }
         if(searchTag) {
             // Remove the searchTerm 
             this.state.jobs.searchOptions.searchTerm = '';
+            gsap.to(searchTag, { opacity: 0, duration: .2 })
 
             this.changeJobsPage(this.state.jobs.currentPage, null, null);
         }
@@ -2001,6 +2024,7 @@ class AdminController {
 
                             const newPage = this.state.jobs.totalJobs % this.state.jobs.searchOptions.limit === 0;
                             const pages = paginationView.getTotalPages(this.state.jobs.searchOptions.limit, this.state.jobs.totalJobs);
+
                             if(newPage) {
                                 this.changeJobsPage(pages+1, null, null, 'new', res.data.job);
                             } else {
@@ -2151,7 +2175,6 @@ class AdminController {
                         successAnimation.play(0);
 
                         const lastRow = this.state.jobs.totalJobs % this.state.jobs.searchOptions.limit === 1;
-                        // If it's the last item on the page
                         if(lastRow) {
                             const onLastPage = paginationView.onLastPage(this.state.jobs.searchOptions.index, this.state.jobs.searchOptions.limit, this.state.jobs.totalJobs);
                             const page = paginationView.getCurrentPage(this.state.jobs.searchOptions.index, this.state.jobs.searchOptions.limit);
@@ -3102,7 +3125,7 @@ class AdminController {
 
         companySummary.addEventListener('focusout', this.handleCompanySearchFocusEvent.bind(this));
         companySummary.addEventListener('submit', this.handleCompanySearchSubmitEvent.bind(this));
-        companySummary.addEventListener('click', this.handleCompanySearchSubmitEvent.bind(this));
+        // companySummary.addEventListener('click', this.handleCompanySearchSubmitEvent.bind(this));
         // Has to be after the submit listener as it changes the search input classname
         companySummary.addEventListener(
             'click',
@@ -3113,6 +3136,10 @@ class AdminController {
     async handleCompanySearchSubmitEvent(e) {
 
         const inputOpen = document.querySelector('.summary__search-input.open');
+        if(!inputOpen) return;
+        console.log('OPEN');
+
+        if(inputOpen && !inputOpen.value) {this.toggleSearch(); console.log('CLOSING, NO SUBMIT'); return;}
 
         const searchBtn = e.target.closest('.summary__search');
         const searchForm = e.target.closest('.summary__item--header-search');
@@ -3121,13 +3148,10 @@ class AdminController {
         const submitEvent = e.type === 'submit' && searchForm && inputOpen;
         const clickEvent = e.type === 'click' && searchBtn && inputOpen;
 
-        // Click events are already toggled, do the same with submit events
-        if(submitEvent) this.toggleSearch();
-
         if((submitEvent || clickEvent) && inputOpen.value) {
 
             this.state.companies.searchOptions.searchTerm = inputOpen.value;
-            inputOpen.value = "";
+            this.toggleSearch();
 
             summaryView.addSearchTag(this.state.companies.searchOptions.searchTerm);
             
@@ -3135,6 +3159,8 @@ class AdminController {
 
             // Move to the first page
             this.changeCompaniesPage(1, null, null);
+        } else {
+            this.toggleSearch();
         }
 
 
@@ -3223,7 +3249,11 @@ class AdminController {
         const tag = document.querySelector('.summary__tag');
         if(tag) return
 
-        const searchInput = document.querySelector('.summary__search-input')
+        const searchInput = document.querySelector('.summary__search-input');
+        const searchBtn = document.querySelector('.summary__search');
+        searchInput.value = "";
+
+        searchBtn.classList.toggle('open');
         searchInput.classList.toggle('open');
         if(searchInput.classList.contains('open')) {searchInput.animation.play(0)}
         else {
@@ -3261,11 +3291,20 @@ class AdminController {
             this.copyLink(emailCopy, text);
         }
         if(searchBtn) {
-            this.toggleSearch();
+            // Check if search input is open
+            const inputOpen = document.querySelector('.summary__search-input.open');
+            if(inputOpen) {
+                // This already handles the toggling (closed) of the search bar
+                this.handleCompanySearchSubmitEvent(e);
+            } else {
+                // Open the search bar
+                this.toggleSearch();
+            }
         }
         if(searchTag) {
             // Remove the searchTerm 
             this.state.companies.searchOptions.searchTerm = '';
+            gsap.to(searchTag, { opacity: 0, duration: .2 })
 
             // Move to first page
             this.changeCompaniesPage(1, null, null);
@@ -4938,7 +4977,8 @@ class AdminController {
         // Find the element that has been clicked
 
         // Applications Table
-        const applicationsOption = e.target.closest('.pagination__item--applications');
+        const applicationsOption = e.target.closest('.custom-select-option--applications');
+        const applicationsOptionValue = applicationsOption? applicationsOption.dataset.value : null;
         const applicationsPrevious = e.target.closest('.pagination__previous--applications');
         const applicationsNext = e.target.closest('.pagination__next--applications');
         
@@ -4982,7 +5022,7 @@ class AdminController {
         const companyContacts = companyContactsPrevious || companyContactsNext || companyContactsOption;
         const companyAddresses = companyAddressesPrevious || companyAddressesNext || companyAddressesOption;
         const users = usersPrevious || usersNext || usersOption;
-
+console.log(applications)
         // If no pagination btns are clicked, return
         if(!applications && !jobs && !companies && !users && !companyJobs && !companyContacts && !companyAddresses) return;
 
@@ -5017,7 +5057,7 @@ class AdminController {
         } else if(companyAddresses) {
             this.handleCompanyAddressesPagination(companyAddressesOption, companyAddressesPrevious, companyAddressesNext);
         } else if(applications) {
-            this.handleApplicationsPagination(applicationsOption, applicationsPrevious, applicationsNext);
+            this.handleApplicationsPagination(applicationsOptionValue, applicationsPrevious, applicationsNext);
         } else {
             return;
         }
@@ -5160,7 +5200,6 @@ class AdminController {
     // }
 
     setCurrentPage(option, previous, next, state, pages) {
-
         if(previous && !(state.currentPage === 1)) {
             console.log('backwards');
 
@@ -5340,16 +5379,16 @@ class AdminController {
                     animation.animateCompanySummaryIn(this.state.companies.paginatedJobs.length);
 
                     
-                    // If there's a search tag re-add the listener
-                    const tag = document.querySelector('.summary__tag');
+                    // // If there's a search tag re-add the listener
+                    // const tag = document.querySelector('.summary__tag');
 
-                    if(tag) {
-                        tag.addEventListener('click', e => {
+                    // if(tag) {
+                    //     tag.addEventListener('click', e => {
             
-                            // // Tag is embedded in the search div, if it propagates it toggles the search input
-                            gsap.to(tag, { opacity: 0, duration: .4, onComplete: () => tag.parentElement.removeChild(tag) })
-                        });
-                    }
+                    //         // // Tag is embedded in the search div, if it propagates it toggles the search input
+                    //         gsap.to(tag, { opacity: 0, duration: .4, onComplete: () => tag.parentElement.removeChild(tag) })
+                    //     });
+                    // }
 
 
               })  
@@ -5472,7 +5511,7 @@ class AdminController {
 
         const pages = paginationView.getTotalPages(applicationsState.searchOptions.limit,applicationsState.totalApplications);
         this.setCurrentPage(option, previous, next, applicationsState, pages);
-       
+
         // // Set the pagination state
         // this.setApplicationsPagination(option, previous, next);
         
@@ -5530,7 +5569,6 @@ class AdminController {
             
             // CHANGE PAGINATION
               const { totalApplications, searchOptions: {index, limit} } = this.state.applications;
-
               // If the pagination event came from a deletion or addition that changed the number of pages, 
               // reinitialise the pagination view (removing/adding a select option)
               if(paginationChanged) {
@@ -5543,10 +5581,6 @@ class AdminController {
               }
 
           })
-
-
-
-
 
         // await this.getData('applications');
         // // Update the current application state
@@ -5582,7 +5616,6 @@ class AdminController {
 
         const pages = paginationView.getTotalPages(jobsState.searchOptions.limit,jobsState.totalJobs);
         this.setCurrentPage(option, previous, next, jobsState, pages);
-
         // ANIMATION ORDER/LOGIC
         // 1: Place the loaders in the DOM
         // 2: Animate the loaders in, while animating the table body out
@@ -5711,7 +5744,7 @@ class AdminController {
             });
     }
 
-    // async handleApplicationPagination(applicationBtn, applicationPrevious, applicationNext) {
+    // async handleApplicationsPagination(applicationBtn, applicationPrevious, applicationNext) {
     //     const tl = gsap.timeline();
     //     // // If there's an active request, cancel it
     //     // if(this.state.isActiveRequest) { 

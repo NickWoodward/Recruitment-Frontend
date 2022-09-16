@@ -215,7 +215,6 @@ th {
         }
         &:last-of-type {
             padding-right: var(--row-h-padding);
-            border: 1px solid red;
         }
         &:not(.thead--applications .th--added) {
             text-align: left;
@@ -224,9 +223,7 @@ th {
     & .th--id {
         width: 10rem;
     }
-    & .th--name {
-        // width: 14rem;
-    }
+  
     & .th--cv {
         width: 10rem;
     }

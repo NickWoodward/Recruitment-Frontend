@@ -2175,16 +2175,7 @@
 .pagination-wrapper {
     z-index: 1;
 
-    
-    &--applications {
-        display: flex;
-        align-items: center;
-        height: 5.5rem;
-        width: auto;
-        min-width: 40%;
-        margin-top: 2.5rem;
-    }
-    &--companies, &--jobs {
+    &--applications, &--companies, &--jobs {
         display: flex;
         align-items: center;
         margin-left: auto;
@@ -2284,10 +2275,13 @@
         }
 
         &--companies { color: white; }
+        &--applications.pagination__previous--inactive,
         &--companies.pagination__previous--inactive,
         &--jobs.pagination__previous--inactive {
             color: #5a889f;
         }
+        &--applications.pagination__next--inactive,
+        &--companies.pagination__next--inactive,
         &--companies.pagination__next--inactive,
         &--jobs.pagination__next--inactive {
             color: #5a889f;

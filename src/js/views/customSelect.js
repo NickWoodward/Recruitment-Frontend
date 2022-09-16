@@ -40,7 +40,6 @@ export default class Select {
     // These listen for events from external controls (next/prev buttons etc)
     addCustomSelectListeners(selectName) {
       const changeValueEvents = [];
-
       if(selectName === 'companies') {
         changeValueEvents.push('companiesChange');
       }
@@ -56,6 +55,9 @@ export default class Select {
       }
       if(selectName == 'jobs') {
         changeValueEvents.push('jobsChange');
+      }
+      if(selectName === 'applications') {
+        changeValueEvents.push('applicationsChange');
       }
       changeValueEvents.forEach(event => {
         this.customSelect.addEventListener(event, e => {this.selectValue(`${e.detail.page}`)});

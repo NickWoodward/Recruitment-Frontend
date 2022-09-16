@@ -129,13 +129,17 @@
 
 //// SPECIFIC STYLES THAT CAN BE DELETED FOR NEW PROJECTS ////
 .custom-select-container {
-    // These 2 are in a table head
+    // These are in a table head
+    &--applications,
     &--companies, &--jobs {
         color: white;
         min-width: 2rem;
         margin-right: 1.2rem;
     }
 
+    &--applications.custom-select-container--applications-disabled {
+        margin-right: 0;
+    }
     &--companies.custom-select-container--companies-disabled {
         margin-right: 0;
     }
@@ -169,6 +173,7 @@
 
 .custom-select-value {
     &--companies { color: white; }
+    &--applications,
     &--companies, &--jobs {
         font-size: 1.3rem;
         // padding: .6rem .6rem;
@@ -185,12 +190,14 @@
         color: black;
     }
 
+    &--applications::after,
     &--companies::after, &--jobs::after {
         position:absolute;
         right: -1rem;
         margin-top: 6px;
         border-top-color: white;
     }
+    &--applications-disabled,
     &--companies-disabled, &--jobs-disabled {
         color: #5a889f !important; // important because the placeholder class in the custom select is more specific
         cursor: default;
@@ -198,6 +205,7 @@
         border: none;
     }
 
+    &--applications.custom-select-value--applications-disabled::after,
     &--jobs.custom-select-value--jobs-disabled::after,
     &--companies.custom-select-value--companies-disabled::after {
         visibility: hidden;
@@ -231,6 +239,7 @@
 }
 
 .custom-select-options {
+    &--applications,
     &--companies, &--company-contacts, &--company-addresses, &--company-jobs,
     &--jobs {
         font-size: 1.3rem;
@@ -258,6 +267,7 @@
 }
 
 .custom-select-option {
+    &--applications,
     &--companies, &--company-contacts, &--company-addresses, &--company-jobs,
     &--jobs {
         padding: .6rem 0;

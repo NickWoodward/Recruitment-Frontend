@@ -3448,6 +3448,12 @@ const addTableWrapper = (container, page) => {
 
             break;
         }
+        case 'applications': {
+            tableHeader.append(tablePagination);
+            tableWrapper.append(tableHeader, tableContent);
+
+            break;
+        }
         default: {
             tableWrapper.append(tableHeader, tableContent, tablePagination);
         }
@@ -3507,34 +3513,34 @@ export const createCompaniesControls = () => {
 }
 
 
-export const initialiseAdminPage = (page) => {
-    // Animate and remove existing content
+// export const initialiseAdminPage = (page) => {
+//     // Animate and remove existing content
 
-    utils.clearElement(elements.adminContent);
+//     utils.clearElement(elements.adminContent);
 
-    // Replace existing classname
-    elements.adminContent.className = `admin__content admin__content--${page}`;
+//     // Replace existing classname
+//     elements.adminContent.className = `admin__content admin__content--${page}`;
 
-    // Insert new Summary
-    insertSummary(page);
+//     // Insert new Summary
+//     insertSummary(page);
 
-    // Insert a Table wrapper
-    elements.adminContent.insertAdjacentHTML('beforeend', `<div class="${page}-table__wrapper"></div>`);
-};
+//     // Insert a Table wrapper
+//     elements.adminContent.insertAdjacentHTML('beforeend', `<div class="${page}-table__wrapper"></div>`);
+// };
 
-const insertSummary = (page) => {
-    let createSummary;
+// const insertSummary = (page) => {
+//     let createSummary;
 
-    switch(page) {
-        case 'users':           createSummary = createUserSummary; break;
-        case 'jobs':            createSummary = createJobSummary; break;
-        case 'companies':       createSummary = createCompanySummary; break;
-        case 'applications':    createSummary = createApplicationSummary; break;
-    }
+//     switch(page) {
+//         case 'users':           createSummary = createUserSummary; break;
+//         case 'jobs':            createSummary = createJobSummary; break;
+//         case 'companies':       createSummary = createCompanySummary; break;
+//         case 'applications':    createSummary = createApplicationSummary; break;
+//     }
 
-    // Insert placeholders
-    if(createSummary) elements.adminContent.insertAdjacentHTML('afterbegin', createSummary());
-}
+//     // Insert placeholders
+//     if(createSummary) elements.adminContent.insertAdjacentHTML('afterbegin', createSummary());
+// }
 
 
 

@@ -172,7 +172,6 @@ export const insertTableArrows = (tableName, state) => {
                 state.searchOptions.orderField === 'company'? companyTh :
                 state.searchOptions.orderField === 'cv'? cvTh :
                 state.searchOptions.orderField === 'added'? addedTh : null;
-            console.log(containers);
             break;
         }
         case 'companies': {
@@ -252,13 +251,18 @@ const changeOrderField = (header, state, tableName) => {
             const idTh = header.classList.contains('th--id');
             const nameTh = header.classList.contains('th--name');
             const surnameTh = header.classList.contains('th--surname');
-
-            const addedTh = header.classList.contains('th--added');     
-
+            const positionTh = header.classList.contains('th--position');
+            const companyTh = header.classList.contains('th--company');
+            const cvTh = header.classList.contains('th--cv');
+            const addedTh = header.classList.contains('th--added');   
+            
             // Set the orderField
             if(idTh) state.searchOptions.orderField = 'id';
             if(nameTh) state.searchOptions.orderField = 'name';
             if(surnameTh) state.searchOptions.orderField = 'surname';
+            if(positionTh) state.searchOptions.orderField = 'title';
+            if(companyTh) state.searchOptions.orderField = 'company';
+            if(cvTh) state.searchOptions.orderField = 'cv';
             if(addedTh) state.searchOptions.orderField = 'createdAt';
 
             break;

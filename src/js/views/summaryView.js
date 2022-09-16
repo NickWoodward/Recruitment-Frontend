@@ -45,9 +45,10 @@ export const createApplicationSummaryContent = ({
             <div class="summary__item summary__item--header">
                 <div class="summary__id">${applicationId}</div>
             </div>
-            <div class="summary__item summary__item--header summary__item--header-date">
-                <div class="summary__date">${applicationDate}</div>
-            </div>
+            <form class="summary__item summary__item--header summary__item--header-search">
+                <input class="summary__search-input no-focusborder">
+                <div class="summary__search" tabindex="-1"><svg><use xlink:href="svg/spritesheet.svg#search"></svg></div>
+            </form>
         </div>
     `;
 
@@ -172,10 +173,10 @@ export const insertNewApplicationSummary = (application, searchTerm) => {
     document.querySelector('.summary__section--application-job').insertAdjacentHTML('beforeend', positionContent);
     document.querySelector('.summary__controls').insertAdjacentHTML('beforeend', controlContent);
 
-    // // Insert New tag if needed
-    // if(searchTerm) addSearchTag(searchTerm);
+    // Insert New tag if needed
+    if(searchTerm) addSearchTag(searchTerm);
 
-    // initSearchBar();
+    initSearchBar();
 }
 
 //// END APPLICATION SUMMARY VIEW ////
