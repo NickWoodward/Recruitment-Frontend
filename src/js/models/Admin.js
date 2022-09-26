@@ -14,6 +14,8 @@ export default class Admin {
     // }
 
     getUsers({limit, index, orderField, orderDirection}, indexId) {
+        console.log('GETTING USERS');
+
         return JRS.get('/admin/applicants', { 
             params: { indexId, index, limit, orderField, orderDirection },     
             cancelToken: new axios.CancelToken(c => cancelTokenSource = c)
@@ -39,7 +41,8 @@ export default class Admin {
 
     /////////// Application Methods ////////////
     getApplications({index, limit, orderField, orderDirection, searchTerm}, indexId) {
-        console.log('APPLICATIONS SEARCH TERM', searchTerm)
+        console.log('GETTING APLLICATIONS');
+        
         return JRS.get('/admin/applications', { 
             params: { index, limit, orderField, orderDirection, indexId, searchTerm}, 
             cancelToken: new axios.CancelToken(c => cancelTokenSource = c)
@@ -55,6 +58,8 @@ export default class Admin {
 
     ///////////  Job Methods  ///////////
     getJobs({limit, index, titles, locations, orderField, orderDirection, searchTerm} = {}, indexId) {
+        console.log('GETTING JOBS');
+
         return JRS.get('/admin/jobs', {
             params: {
                 limit,

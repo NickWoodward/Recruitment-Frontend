@@ -194,8 +194,50 @@ export const animateSummaryIn = (firstAnimation) => {
 
     return tl;
 }
+export const animateApplicationSummaryIn = (firstAnimation) => {
+    // Slower animations on first render
+    const duration = firstAnimation? .4:.3;
+
+    const tl = gsap.timeline();
+
+    tl
+    .fromTo('.summary__item--header-title', { autoAlpha: 0, y: 15 },{ autoAlpha: 1, y: 0, stagger: duration })
+    .fromTo('.summary__section-content', { autoAlpha: 0, y: 15 },{ autoAlpha: 1, y: 0, stagger: duration }, `<.1`)
+    .fromTo('.summary__btn', 
+        { autoAlpha: 0, y: 10 },
+        { 
+            autoAlpha: 1, 
+            y: function(index, target, targets) {
+                if(index === 0) return 1;
+                return 0;
+            }, 
+            stagger: { from: 'end', each: .1 } 
+        }, 
+    '<');
+}
 
 export const animateJobSummaryIn = (firstAnimation) => {
+    // Slower animations on first render
+    const duration = firstAnimation? .4:.3;
+
+    const tl = gsap.timeline();
+
+    tl
+    .fromTo('.summary__item--header-title', { autoAlpha: 0, y: 15 },{ autoAlpha: 1, y: 0, stagger: duration })
+    .fromTo('.summary__section-content', { autoAlpha: 0, y: 15 },{ autoAlpha: 1, y: 0, stagger: duration }, `<.1`)
+    .fromTo('.summary__btn', 
+        { autoAlpha: 0, y: 10 },
+        { 
+            autoAlpha: 1, 
+            y: function(index, target, targets) {
+                if(index === 0) return 1;
+                return 0;
+            }, 
+            stagger: { from: 'end', each: .1 } 
+        }, 
+    '<');
+}
+export const animateUserSummaryIn = (firstAnimation) => {
     // Slower animations on first render
     const duration = firstAnimation? .4:.3;
 
@@ -255,12 +297,20 @@ export const animateSummaryOut = (page) => {
     }
 
     switch(page) {
+        case 'applications': {
+            tl.add(animateApplicationSummaryOut());
+            break;
+        }
         case 'companies': {
             tl.add(animateCompanySummaryOut());
             break;
         } 
         case 'jobs': {
             tl.add(animateJobSummaryOut());
+            break;
+        }
+        case 'users': {
+            tl.add(animateUserSummaryOut());
             break;
         }
         default:       
@@ -278,6 +328,34 @@ export const animateSummaryOut = (page) => {
     }
 
     return tl;
+}
+
+const animateApplicationSummaryOut = () => {
+    return gsap.timeline({defaults: { overwrite: true }})
+    .add(animateHeadingOut())
+    .fromTo('.summary__section-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -15 }, `<.1`)
+    .fromTo('.summary__btn', 
+        { autoAlpha: 1, y: 0 },
+        { 
+            autoAlpha: 0, 
+            y:15, 
+            stagger: { from: 'end', each: .1 } 
+        }, 
+    '<');
+}
+
+const animateUserSummaryOut = () => {
+    return gsap.timeline({defaults: { overwrite: true }})
+    .add(animateHeadingOut())
+    .fromTo('.summary__section-content', { autoAlpha: 1, y: 0 },{ autoAlpha: 0, y: -15 }, `<.1`)
+    .fromTo('.summary__btn', 
+        { autoAlpha: 1, y: 0 },
+        { 
+            autoAlpha: 0, 
+            y:15, 
+            stagger: { from: 'end', each: .1 } 
+        }, 
+    '<');
 }
 
 const animateJobSummaryOut = () => {

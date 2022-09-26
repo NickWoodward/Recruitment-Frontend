@@ -42,7 +42,7 @@ export const createApplicationSummaryContent = ({
 
     const headerContent = `
         <div class="summary__header-content">
-            <div class="summary__item summary__item--header">
+            <div class="summary__item summary__item--header summary__item--header-title">
                 <div class="summary__id">${applicationId}</div>
             </div>
             <form class="summary__item summary__item--header summary__item--header-search">
@@ -146,9 +146,9 @@ export const createApplicationSummaryContent = ({
     return {headerContent, applicantContent, positionContent, controlContent};
 };
 
-export const switchApplicationSummary = (application) => {
+export const switchApplicationSummary = (application, searchTerm) => {
     removeOldApplicationSummary();
-    insertNewApplicationSummary(application);
+    insertNewApplicationSummary(application, searchTerm);
 }
 
 const removeOldApplicationSummary = () => {
@@ -564,6 +564,178 @@ const createCompanyAddress = ({id, firstLine, secondLine, city, county, postcode
 }
 
 //// END COMPANY SUMMARY VIEW ////
+
+//// USER SUMMARY VIEW ////
+export const switchUserSummary = (user, searchTerm) => {
+    removeOldUserSummary();
+    insertNewUserSummary(user, searchTerm);
+}
+
+const removeOldUserSummary = () => {
+    // Select old content
+    const oldHeaderContent = document.querySelector('.summary__header-content');
+    const oldDetailsContent = document.querySelector('.summary__section-content--details');
+    const oldDescriptionContent = document.querySelector('.summary__section-content--description');
+    const oldControlsContent = document.querySelector('.summary__controls-content--users');
+    const items = [oldHeaderContent, oldDetailsContent, oldDescriptionContent, oldControlsContent];
+
+    // Remove old content
+    items.forEach(item => item.parentElement.removeChild(item));
+}
+
+export const insertNewUserSummary = (user, searchTerm) => {
+    // Create new content
+    const { headerContent, contactContent, contactControls, addressContent, addressControls } = createUserSummaryContent(user);
+    
+    // Add new content
+    document.querySelector('.summary__header').insertAdjacentHTML('afterbegin', headerContent);
+    document.querySelector('.summary__section--user-details').insertAdjacentHTML('beforeend', contactContent);
+    document.querySelector('.summary__contact-controls--users-page').insertAdjacentHTML('beforeend', contactControls);
+
+    document.querySelector('.summary__section--user-addresses').insertAdjacentHTML('beforeend', addressContent);
+    document.querySelector('.summary__address-controls--users-page').insertAdjacentHTML('beforeend', addressControls);
+
+    // document.querySelector('.summary__controls').insertAdjacentHTML('beforeend', controlContent);
+
+    // Insert New tag if needed
+    if(searchTerm) addSearchTag(searchTerm);
+
+    initSearchBar();
+}
+
+const createUserSummaryContent = (user) => {
+    const headerContent = `
+        <div class="summary__header-content" data-id=${user.id}>
+            <div class="summary__item summary__item--header summary__item--header-title">
+                <div class="summary__title">${user.firstName}\u00A0\u00A0${user.lastName}</div>
+            </div>
+
+            <form class="summary__item summary__item--header summary__item--header-search">
+                <input class="summary__search-input no-focusborder">
+                <div class="summary__search" tabindex="-1"><svg><use xlink:href="svg/spritesheet.svg#search"></svg></div>
+            </form>
+        </div>
+    `;
+    const contactContent = createUserContact(user);
+    const contactControls = createUserControls('contact', 'users');
+    const addressContent = createUserAddress(user.addresses[0]);
+    const addressControls = createUserControls('address', 'users');
+
+    return { headerContent, contactContent, contactControls, addressContent, addressControls };
+
+}
+
+const createUserContact = ({id, firstName, lastName, email, phone, cvUrl}) => {
+    let cvType;
+    if(cvUrl) {
+        cvType = cvUrl.indexOf('.doc') !== -1 ? 'doc':'pdf';
+    } 
+    return `
+        <div class="summary__section-content summary__section-content--contacts" data-id="${id}" >
+
+            <div class="summary__item summary__item--user-details summary__item--users-page">
+                <div class="summary__label summary__label">Name:</div>
+                <div class="summary__field summary__field--name" data-id="${id}" title="${firstName} ${lastName}">
+                    <a class="summary__link summary__link--name">${firstName} ${lastName}</a>
+                </div>
+            </div>
+
+            <div class="summary__item summary__item--user-details summary__item--users-page">
+                <div class="summary__label summary__label">Email:</div>
+                <div class="summary__field summary__field--email" title="${email}">
+                    <a class="summary__link summary__link--email">${email}</a>
+                </div>
+            </div>
+
+            <div class="summary__item summary__item--user-details summary__item--users-page">
+                <div class="summary__label summary__label">Phone:</div>
+                <div class="summary__field summary__field--phone">${phone}</div>
+            </div>
+
+            <div class="summary__item summary__item--user-details summary__item--cv summary__item--users-page">
+                <div class="summary__label summary__label">CV:</div>
+                <div class="summary__field summary__field--CV">
+                    ${cvUrl? 'Yes': 'No'}
+                </div>
+            </div>
+        </div>
+    `; 
+}
+
+export const createUserControls = (type, page) => {
+    const newBtn = `            
+        <div class="summary__btn summary__btn--${type} summary__new-${type}-btn--${page}">
+            <svg class="summary__new-${type}-icon summary__icon">
+                <use xlink:href="svg/spritesheet.svg#add">
+            </svg>
+        </div>
+    `;
+    const editBtn = `
+        <div class="summary__btn summary__btn--${type} summary__edit-${type}-btn--${page}">
+            <svg class="summary__icon summary__edit-${type}-icon--${page}">
+                <use xlink:href="svg/spritesheet.svg#edit-np1">
+            </svg>
+        </div>
+    `;
+    const deleteBtn = `
+        <div class="summary__btn summary__btn--${type} summary__delete-${type}-btn--${page}">
+            <svg class="summary__icon summary__delete-${type}-icon--${page}">
+                <use xlink:href="svg/spritesheet.svg#delete-np1">
+            </svg>
+        </div>
+    `;
+
+    return `
+        <div class="summary__controls-content summary__controls-content--${type}">
+            ${newBtn}
+            ${editBtn}
+            ${deleteBtn}
+        </div>
+    `;
+}
+
+
+const createUserAddress = ({id = 'na', firstLine = 'None', secondLine, city = 'None', county = 'None', postcode = 'None'}) => {
+    return `
+        <div class="summary__section-content summary__section-content--addresses" data-id="${id}">
+
+            <div class="summary__item summary__item--user-addresses summary__item--users-page">
+                <div class="summary__label summary__label">First Line:</div>
+                <div class="summary__field summary__field--first-line">${firstLine}</div>
+            </div>
+
+            
+            <div class="summary__item summary__item--user-addresses summary__item--users-page">
+                <div class="summary__label summary__label">SecondLine:</div>
+                <div class="summary__field summary__field--second-line">
+                    ${secondLine? secondLine : 'n/a'}
+                </div>
+            </div>
+                
+
+            <div class="summary__item summary__item--user-addresses summary__item--users-page">
+                <div class="summary__label summary__label">City:</div>
+                <div class="summary__field summary__field--city">${city}</div>
+            </div>
+
+
+            <div class="summary__item summary__item--user-addresses summary__item--users-page">
+                <div class="summary__label summary__label">County:</div>
+                <div class="summary__field summary__field--county">${county}</div>
+            </div>
+
+            <div class="summary__item summary__item--user-addresses summary__item--users-page">
+                <div class="summary__label summary__label">Postcode:</div>
+                <div class="summary__field summary__field--postcode">${postcode}</div>
+            </div>
+
+        </div>
+    `;
+}
+
+
+
+//// END USER SUMMARY VIEW ////
 
 
 const initSearchBar = () => {

@@ -140,7 +140,7 @@ class AdminController {
                 searchOptions: {
                     index: 0,
                     limit: 6,
-                    orderField: "createdAt",
+                    orderField: "id",
                     orderDirection: "DESC"
                 },
                 userJobsPagination: {
@@ -149,7 +149,7 @@ class AdminController {
                     index: 0,
                     totalJobs: 0
                 },
-                companyAddressesPagination: {
+                userAddressesPagination: {
                     currentPage: 1,
                     index: 0,
                     limit: 0,
@@ -617,56 +617,92 @@ class AdminController {
                         // Render the summary company jobs table
                         this.renderCompanyJobsTable();  
 
-                        if(this.state.companies.paginatedJobs.length === 0) {
-                            // render a placeholder saying 'no jobs'
-                            document.querySelector('.table__content--company-jobs')
-                            .insertAdjacentHTML('beforeend', adminView.createNoJobsPlaceholder());
-                            // Animate the placeholder in
-                            animation.animateTablePlaceholderIn(document.querySelector('.company-jobs-placeholder'));   
+                        // if(this.state.companies.paginatedJobs.length === 0) {
+                        //     // render a placeholder saying 'no jobs'
+                        //     document.querySelector('.table__content--company-jobs')
+                        //     .insertAdjacentHTML('beforeend', adminView.createNoJobsPlaceholder());
+                        //     // Animate the placeholder in
+                        //     animation.animateTablePlaceholderIn(document.querySelector('.company-jobs-placeholder'));   
 
-                        } 
+                        // } 
 
                         this.addCompanySummaryListeners();
 
                         break;
                     }
 
-                    case 'users': 
+                    case 'users': {
                         this.state.users.currentUser = this.users[0];
+
+                        // Init pagination
+                        const { totalUsers, searchOptions: {index, limit} } = this.state.users;
+                        const pages = paginationView.getTotalPages(limit, totalUsers);
+                        const page = paginationView.getCurrentPage(index, limit);
+                        paginationView.initPagination(pages, page, 'users');
+
                         // Render table
                         this.renderUsersTable();
 
-                        // Add pagination
-                        const { totalUsers, searchOptions: {index: userIndex, limit: userLimit} } = this.state.users;
-                        const { pages: numUserPages, current: currentUserPage } = adminView.calculatePagination(userIndex, userLimit, totalUsers);
-                        adminView.renderPagination(numUserPages, currentUserPage, document.querySelector('.table-wrapper'), 'users');
-                        // Add summary
-                        const userSummary = adminView.createUserSummary(this.users[0]);
+                        // Render summary
+                        summaryView.insertNewUserSummary(this.users[0]);
+                        console.log(this.users[0]);
 
-                        document.querySelector('.summary-wrapper').insertAdjacentHTML('afterbegin', userSummary);
+                        //// Nested Address pagination
+                        this.state.users.userAddressesPagination.totalAddresses = this.state.users.currentUser.addresses.length;
+                        const { totalAddresses, index: addressIndex } = this.state.users.userAddressesPagination;
+
+                        // No need to calculate contact pagination - displayed 1 at a time, so number of pages = addresses.length
+                        paginationView.initPagination(totalAddresses, addressIndex + 1, 'user-addresses');
+
+                        this.initUserJobsState();
+                        console.log(this.state.users.paginatedJobs, this.state.users.userJobsPagination);
+
+                        this.renderUserJobsTable();
+
+                        const { totalJobs, index: jobsIndex, limit: jobsLimit } = this.state.users.userJobsPagination;
+                
+                        const currentJobsPage = paginationView.getCurrentPage(jobsIndex, jobsLimit);
+                        const jobsPages = paginationView.getTotalPages(jobsLimit, totalJobs);
+
+                        paginationView.initPagination(jobsPages, currentJobsPage, 'user-jobs');
+
+
+
+                        // // Render table
+                        // this.renderUsersTable();
+
+                        // // Add pagination
+                        // const { totalUsers, searchOptions: {index: userIndex, limit: userLimit} } = this.state.users;
+                        // const { pages: numUserPages, current: currentUserPage } = adminView.calculatePagination(userIndex, userLimit, totalUsers);
+                        // adminView.renderPagination(numUserPages, currentUserPage, document.querySelector('.table-wrapper'), 'users');
+                        // // Add summary
+                        // const userSummary = adminView.createUserSummary(this.users[0]);
+
+                        // document.querySelector('.summary-wrapper').insertAdjacentHTML('afterbegin', userSummary);
                         
                         
-                        // This paginates the results locally, much as the API call to getUsers does using limit and index
-                        this.setUserJobsState();
+                        // // This paginates the results locally, much as the API call to getUsers does using limit and index
+                        // this.setUserJobsState();
 
-                        // Render the summary user jobs table
-                        if(this.state.users.paginatedJobs.length > 0) {
-                            // remove any placeholders
-                            const placeholder = document.querySelector('.user-jobs-placeholder');
-                            if(placeholder) placeholder.parentElement.removeChild(placeholder);
+                        // // Render the summary user jobs table
+                        // if(this.state.users.paginatedJobs.length > 0) {
+                        //     // remove any placeholders
+                        //     const placeholder = document.querySelector('.user-jobs-placeholder');
+                        //     if(placeholder) placeholder.parentElement.removeChild(placeholder);
 
-                            this.renderUserJobsTable();
-                        } else {
-                            // render a placeholder saying 'no jobs'
-                            // this shouldn't be needed, but is a safety net
-                            document.querySelector('.table-wrapper--nested-user-jobs')
-                                .insertAdjacentHTML('afterbegin', adminView.generateUserJobsPlaceholder());
-                        } 
-                        // Add pagination for nested contacts, addresses, and jobs elements
-                        this.addUserNestedPagination();
+                        //     this.renderUserJobsTable();
+                        // } else {
+                        //     // render a placeholder saying 'no jobs'
+                        //     // this shouldn't be needed, but is a safety net
+                        //     document.querySelector('.table-wrapper--user-jobs')
+                        //         .insertAdjacentHTML('afterbegin', adminView.generateUserJobsPlaceholder());
+                        // } 
+                        // // Add pagination for nested contacts, addresses, and jobs elements
+                        // this.addUserNestedPagination();
 
-                        // this.addCompanySummaryListeners();
+                        // // this.addCompanySummaryListeners();
                         break;
+                    }
                 }
 
                 // Remove loaders
@@ -686,8 +722,6 @@ class AdminController {
                     nestedTl.add(animation.animateTableContentIn('jobs'), '<')
                 }
 
-                // Animate the pagination in
-                // nestedTl.fromTo('.pagination', { y: 20, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .6 }, '>');
             });
 
             // Request and store 
@@ -910,6 +944,7 @@ class AdminController {
 
                 // Calculate the # of rows that can fit in the table
                 this.state.applications.searchOptions.limit = tableView.calculateRows(sectionName);
+                break;
             }
             case 'companies': {
                 // Reset the subpage search options / state before async call
@@ -922,6 +957,7 @@ class AdminController {
 
                 // Calculate the # of rows that can fit in the table
                 this.state.companies.searchOptions.limit = tableView.calculateRows(sectionName);
+                break;
             }
             case 'jobs': {
                 this.state.jobs.currentPage = 1;
@@ -932,17 +968,15 @@ class AdminController {
                 this.state.jobs.activeTableArrow = null;
 
                 // // Calculate the # of rows that can fit in the table
-                this.state.jobs.searchOptions.limit = tableView.calculateRows(sectionName)
+                this.state.jobs.searchOptions.limit = tableView.calculateRows(sectionName);
+                break;
 
             }
-            case 'applications': {
-                // Calculate the # of rows that can fit in the table
-                this.state.applications.searchOptions.limit = tableView.calculateRows(sectionName)
-            }
+
             case 'users': {
                 // Calculate the # of rows that can fit in the table
                 this.state.users.searchOptions.limit = tableView.calculateRows(sectionName)
-
+                break;
             }
         }
     } 
@@ -974,21 +1008,21 @@ class AdminController {
         paginationView.initPagination(totalAddresses, addressIndex + 1, 'company-addresses');
     }
 
-    addUserNestedPagination() {
-        // Paginate userJobs array
-        const { totalJobs, index: jobIndex, limit: jobLimit } = this.state.users.userJobsPagination;
-        const { pages, current } = adminView.calculatePagination(jobIndex, jobLimit, totalJobs);
-        // Render the userJobs pagination
-        adminView.renderPagination(pages, current, document.querySelector('.table-wrapper--nested-user-jobs'), 'nested-user-jobs');
+    // addUserNestedPagination() {
+    //     // Paginate userJobs array
+    //     const { totalJobs, index: jobIndex, limit: jobLimit } = this.state.users.userJobsPagination;
+    //     const { pages, current } = adminView.calculatePagination(jobIndex, jobLimit, totalJobs);
+    //     // Render the userJobs pagination
+    //     adminView.renderPagination(pages, current, document.querySelector('.table-wrapper--user-jobs'), 'user-jobs');
 
-        //// Nested Addresses pagination
-        // Displayed 1 at a time
-        this.state.users.addressesPagination.totalAddresses = this.state.users.currentUser.addresses.length;
-        const { totalAddresses, index: addressIndex } = this.state.users.addressesPagination;
+    //     //// Nested Addresses pagination
+    //     // Displayed 1 at a time
+    //     this.state.users.addressesPagination.totalAddresses = this.state.users.currentUser.addresses.length;
+    //     const { totalAddresses, index: addressIndex } = this.state.users.addressesPagination;
 
-        // No need to calculate contact pagination - displayed 1 at a time, so number of pages = contacts.length
-        adminView.renderPagination(totalAddresses, addressIndex, document.querySelector('.pagination-wrapper--addresses'), 'addresses');
-    }
+    //     // No need to calculate contact pagination - displayed 1 at a time, so number of pages = contacts.length
+    //     adminView.renderPagination(totalAddresses, addressIndex, document.querySelector('.pagination-wrapper--addresses'), 'addresses');
+    // }
 
     getNumOfRows(sectionName) {
         switch(sectionName) {
@@ -1007,7 +1041,7 @@ class AdminController {
             case 'company-jobs':
                 this.state.companies.companyJobsPagination.limit = adminView.calculateRows(sectionName, true, false);
                 break;
-            case 'nested-user-jobs':
+            case 'user-jobs':
                 this.state.users.userJobsPagination.jobLimit = adminView.calculateRows(sectionName, true, true);
         }
     }
@@ -1289,7 +1323,7 @@ class AdminController {
     renderApplicationTable() {
   
         // Format applications/headers into html elements
-        const {headers, rows} = adminView.formatApplications(this.applications);
+        const {headers, rows} = adminView.formatApplications(this.applications, this.state.applications.searchOptions.searchTerm);
 
         const table = document.querySelector('.table--applications');
         const tableContent = document.querySelector('.table__content--applications');
@@ -1317,7 +1351,7 @@ class AdminController {
                 // Change the table arrow direction, the searchOption direction
                 tableView.updateTableOrder(header, this.state.applications, 'applications');
 
-                this.handleApplicationsPagination(this.state.applications.currentPage, null, null);
+                this.changeApplicationPage(this.state.applications.currentPage, null, null);
             });
 
             // Else remove the tbody and render just the content
@@ -1347,7 +1381,7 @@ class AdminController {
                 // if(document.querySelector('.summary__modal')) tl.add(gsap.to('.summary__modal', { autoAlpha: 0, onComplete: () => adminView.removeSummaryModals() }), '<')
                 // if(document.querySelector('.confirmation')) tl.add(gsap.to('.confirmation', { autoAlpha: 0, onComplete: () => adminView.removeSummaryModals() }), '<');
         
-                tl.add(animation.animateSummaryOut());
+                tl.add(animation.animateSummaryOut('applications'));
                 tl.add(() => {
                     // Putting the row selection and switching logic inside the timeline
                     // should minimise issues with fast successive clicks
@@ -1362,10 +1396,10 @@ class AdminController {
                     this.state.applications.currentApplication = application[0];
 
                     // Remove old summary items, add new ones
-                    summaryView.switchApplicationSummary(application[0]);
+                    summaryView.switchApplicationSummary(application[0], this.state.applications.searchOptions.searchTerm);
 
                     // Animate the summary back in
-                    animation.animateSummaryIn();
+                    animation.animateApplicationSummaryIn();
                 });
                 tl.play(0); 
             });
@@ -1407,9 +1441,8 @@ class AdminController {
     async handleApplicationSearchSubmitEvent(e) {
         const inputOpen = document.querySelector('.summary__search-input.open');
         if(!inputOpen) return;
-        console.log('OPEN');
 
-        if(inputOpen && !inputOpen.value) {this.toggleSearch(); console.log('CLOSING, NO SUBMIT'); return;}
+        if(inputOpen && !inputOpen.value) {this.toggleSearch(); return;}
         const searchBtn = e.target.closest('.summary__search');
         const searchForm = e.target.closest('.summary__item--header-search');
 
@@ -1423,9 +1456,8 @@ class AdminController {
 
             summaryView.addSearchTag(this.state.applications.searchOptions.searchTerm);
             
-            await this.getData('applications');
-
-            this.handleApplicationsPagination(this.state.applications.currentPage, null, null);
+            // Moving the page gets the new data
+            this.changeApplicationPage(this.state.applications.currentPage, null, null);
         } else {
             this.toggleSearch();
         }
@@ -1463,7 +1495,7 @@ class AdminController {
             this.state.applications.searchOptions.searchTerm = '';
             gsap.to(searchTag, { opacity: 0, duration: .2 })
 
-            this.handleApplicationsPagination(this.state.applications.currentPage, null, null);
+            this.changeApplicationPage(this.state.applications.currentPage, null, null);
         }
 
         // Copy links
@@ -1570,9 +1602,9 @@ class AdminController {
                         const newPage = this.state.applications.totalApplications % this.state.applications.searchOptions.limit === 0;
                         const pages = paginationView.getTotalPages(this.state.applications.searchOptions.limit, this.state.applications.totalApplications);
                         if(newPage) {
-                            this.handleApplicationsPagination(pages+1, null, null, 'new', res.data.application);
+                            this.changeApplicationPage(pages+1, null, null, 'new', res.data.application);
                         } else {
-                           this.handleApplicationsPagination(pages, null, null, null, res.data.application);
+                           this.changeApplicationPage(pages, null, null, null, res.data.application);
                         }
                     }
 
@@ -1639,9 +1671,9 @@ class AdminController {
                             const onLastPage = paginationView.onLastPage(this.state.applications.searchOptions.index, this.state.applications.searchOptions.limit, this.state.applications.totalApplications);
                             const page = paginationView.getCurrentPage(this.state.applications.searchOptions.index, this.state.applications.searchOptions.limit);
                             // On last page? move a page back. Not on last page? Stay on current page.
-                            this.handleApplicationsPagination(onLastPage? null:page, onLastPage? true: null, null, 'delete')
+                            this.changeApplicationPage(onLastPage? null:page, onLastPage? true: null, null, 'delete')
                         } else {
-                            this.handleApplicationsPagination(this.state.applications.currentPage, null, null);
+                            this.changeApplicationPage(this.state.applications.currentPage, null, null);
                         }
 
                     } else {
@@ -1765,7 +1797,7 @@ class AdminController {
 
                     // Set the new row
                     const targetRow = e.target.closest('.row');
-                    const rowId = row.querySelector('.td-data--company').dataset.id;
+                    const rowId = row.querySelector('.td-data--jobId').dataset.id;
                     const job = this.jobs.filter((job, index) => {
                         if(parseInt(rowId) === job.id) this.state.jobsTable.index = index;
                         return parseInt(rowId) === job.id;
@@ -1775,7 +1807,7 @@ class AdminController {
                     this.state.jobs.currentJob = job;
     
                     // Remove old summary items, add new ones
-                    summaryView.switchJobSummary(job);
+                    summaryView.switchJobSummary(job, this.state.jobs.searchOptions.searchTerm);
                     // // Animate the summary back in
                     animation.animateJobSummaryIn();
                 })
@@ -1888,8 +1920,7 @@ class AdminController {
 
             summaryView.addSearchTag(this.state.jobs.searchOptions.searchTerm);
             
-            await this.getData('jobs');
-
+            // changeJobsPage gets the new data
             this.changeJobsPage(this.state.jobs.currentPage, null, null);
         } else {
             this.toggleSearch();
@@ -2402,20 +2433,60 @@ class AdminController {
 
     renderUsersTable() {
         // Format applications/headers into html elements
-        const {headers, rows} = adminView.formatUsers(this.users);
+        const {headers, rows} = adminView.formatUsers(this.users, this.state.users.searchOptions.searchTerm);
 
-        const tableWrapper = document.querySelector('.table-wrapper');
+        // const tableWrapper = document.querySelector('.table-wrapper');
         const table = document.querySelector('.table--users');
+        const tableContent = document.querySelector('.table__content--users');
 
         // If no table visible, render both the header and content
         if(!table) { 
-            tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('users', headers, rows, false));
-            adminView.animateTableContentIn('users')
+            console.log('No Table')
+            // Heading content added here to animate at the same time as the data comes in
+            const headerContent = `<div class="table__heading">Users</div>`;
+            document.querySelector('.table__header').insertAdjacentHTML('afterbegin', headerContent);
+
+            // Create and insert the table
+            const newTable = tableView.createTableTest('users', headers, rows, false);
+            tableContent.insertAdjacentHTML('afterbegin', newTable);
+
+            // Insert order arrows
+            tableView.insertTableArrows('users', this.state.users);
+
+            const thead = document.querySelector('.thead--users');
+            thead.addEventListener('click', async e => {
+                // Get the header
+                const header = e.target.closest('th');
+                if(!header) return;
+
+                this.state.users.currentPage = 1;
+
+                // Change the table arrow direction, the searchOption direction
+                tableView.updateTableOrder(header, this.state.users, 'users');
+
+                this.changeUsersPage(this.state.users.currentPage, null, null);
+            });
+
+            // tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('users', headers, rows, false));
+            // adminView.animateTableContentIn('users')
+
+                        // Render the controls the first time the table is created
+            
+            document.querySelector('.summary__user-controls--users-page')
+            .insertAdjacentHTML('beforeend', tableView.createTableControls('user', 'users'));
+
+            const tableControls = document.querySelector('.summary__user-controls--users-page');
+            // tableControls.addEventListener('click', (e) => {this.userControlsListener(e)});
+        
+
             // Else remove the tbody and render just the content
         } else {
             utils.removeElement(document.querySelector('tbody'));
             document.querySelector('thead').insertAdjacentHTML('afterend', tableView.updateTableContent('users', rows));
-            adminView.animateTableBodyIn('users');
+
+            // utils.removeElement(document.querySelector('tbody'));
+            // document.querySelector('thead').insertAdjacentHTML('afterend', tableView.updateTableContent('users', rows));
+            // adminView.animateTableBodyIn('users');
         }
 
         
@@ -2430,54 +2501,79 @@ class AdminController {
         // Add table row listeners
         userRows.forEach(row => {
             row.addEventListener('click', e => {
-                const targetRow = e.target.closest('.row');
-                const rowId = row.querySelector('.td-data--first-name').dataset.id;
-                const user = this.users.filter((user, index) => {
-                    return parseInt(rowId) === user.id;
-                });
-                utils.changeActiveRow(targetRow, userRows);
-                this.state.users.currentUser = user[0];
+                const tl = gsap.timeline({ paused: true });
 
-
-                // Change the summary
-                const summary = document.querySelector('.summary');
-                const newSummary = adminView.createUserSummary(user[0])
-
-                const tl = gsap.timeline();
-
-                // adminView.swapSummary(summary, adminView.createCompanySummary(company[0]), this.handleCompanySummaryEvent.bind(this), tl);
-                tl.add(adminView.animateSummaryWrapperOut());
+                tl.add(animation.animateSummaryOut('users'));
                 tl.add(() => {
-                    // Switch the summary
-                    adminView.switchSummary(summary, newSummary);
+                    // Putting the row selection and switching logic inside the timeline
+                    // should prevent issues with fast successive clicks
 
-                    // // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
-                    this.setUserJobsState();
+                    // Set the new row
+                    const targetRow = e.target.closest('.row');
+                    const rowId = row.querySelector('.td-data--applicantId').dataset.id;
+                    const user = this.users.filter((user, index) => {
+                        if(parseInt(rowId) === user.id) this.state.usersTable.index = index;
+                        return parseInt(rowId) === user.id;
+                    })[0];
 
-                    // Render the summary user jobs table
-                    if(this.state.users.paginatedJobs.length > 0) {
-                        // remove any placeholders
-                        const placeholder = document.querySelector('.user-jobs-placeholder');
-                        if(placeholder) placeholder.parentElement.removeChild(placeholder);
+                    utils.changeActiveRow(targetRow, userRows);
+                    this.state.users.currentJob = user;
+    
+                    // Remove old summary items, add new ones
+                    summaryView.switchUserSummary(user, this.state.users.searchOptions.searchTerm);
+                    // // Animate the summary back in
+                    animation.animateUserSummaryIn();
+                })
+                tl.play(0); 
 
-                        this.renderUserJobsTable();
-                    } else {
-                        // render a placeholder saying 'no jobs'
-                        // this shouldn't be needed, but is a safety net
-                        document.querySelector('.table-wrapper--nested-user-jobs')
-                            .insertAdjacentHTML('afterbegin', adminView.generateUserJobsPlaceholder());
-                    } 
-                    // Add pagination for nested contacts, addresses, and jobs elements
-                    this.addUserNestedPagination();
+                // const targetRow = e.target.closest('.row');
+                // const rowId = row.querySelector('.td-data--first-name').dataset.id;
+                // const user = this.users.filter((user, index) => {
+                //     return parseInt(rowId) === user.id;
+                // });
+                // utils.changeActiveRow(targetRow, userRows);
+                // this.state.users.currentUser = user[0];
+
+
+                // // Change the summary
+                // const summary = document.querySelector('.summary');
+                // const newSummary = adminView.createUserSummary(user[0])
+
+                // const tl = gsap.timeline();
+
+                // // adminView.swapSummary(summary, adminView.createCompanySummary(company[0]), this.handleCompanySummaryEvent.bind(this), tl);
+                // tl.add(adminView.animateSummaryWrapperOut());
+                // tl.add(() => {
+                //     // Switch the summary
+                //     adminView.switchSummary(summary, newSummary);
+
+                //     // // Set the pagination state (This does to the company jobs array what limit and offset do in the api call)
+                //     this.setUserJobsState();
+
+                //     // Render the summary user jobs table
+                //     if(this.state.users.paginatedJobs.length > 0) {
+                //         // remove any placeholders
+                //         const placeholder = document.querySelector('.user-jobs-placeholder');
+                //         if(placeholder) placeholder.parentElement.removeChild(placeholder);
+
+                //         this.renderUserJobsTable();
+                //     } else {
+                //         // render a placeholder saying 'no jobs'
+                //         // this shouldn't be needed, but is a safety net
+                //         document.querySelector('.table-wrapper--user-jobs')
+                //             .insertAdjacentHTML('afterbegin', adminView.generateUserJobsPlaceholder());
+                //     } 
+                //     // Add pagination for nested contacts, addresses, and jobs elements
+                //     this.addUserNestedPagination();
                     
-                    // Add the listener to the new summary
-                    document.querySelector('.summary').addEventListener('click', (e) => this.userSummaryListener(e))
+                //     // Add the listener to the new summary
+                //     document.querySelector('.summary').addEventListener('click', (e) => this.userSummaryListener(e))
 
-                    // Remove any modals
-                    adminView.removeSummaryModals();
+                //     // Remove any modals
+                //     adminView.removeSummaryModals();
             
-                  })
-                  tl.add(adminView.animateSummaryWrapperIn());
+                //   })
+                //   tl.add(adminView.animateSummaryWrapperIn());
 
             });
         });
@@ -2762,7 +2858,7 @@ class AdminController {
 
     setUserJobsState() {
         // Set the state for the summary's nested table
-        this.getNumOfRows('nested-user-jobs');
+        this.getNumOfRows('user-jobs');
         this.state.users.userJobsPagination.totalJobs = this.state.users.currentUser.jobs.length;
         const { index, limit } = this.state.users.userJobsPagination;
 
@@ -2772,21 +2868,39 @@ class AdminController {
     }
 
     renderUserJobsTable() {
+
         // Format the paginated jobs into html elements
         const {headers, rows} = adminView.formatUserJobs(this.state.users.paginatedJobs);
 
-        const tableWrapper = document.querySelector('.table-wrapper--nested-user-jobs');
-        const table = document.querySelector('.table--nested-user-jobs');
+        const tableWrapper = document.querySelector('.table__content--user-jobs');
+        const table = document.querySelector('.table--user-jobs');
+        const tbody = document.querySelector('.tbody--user-jobs');
+
         // If no table visible, render both the header and content
         if(!table) { 
-            tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('nested-user-jobs', headers, rows, false));
+            console.log('No Table');
+            tableWrapper.insertAdjacentHTML('afterbegin', tableView.createTableTest('user-jobs', headers, rows, false));
+            
             // Else remove the tbody and render just the content
         } else {
-            utils.removeElement(document.querySelector('tbody'));
-            document.querySelector('thead').insertAdjacentHTML('afterend', tableView.updateTableContent('nested-user-jobs', rows));
+            console.log('Table');
+
+            if(tbody) tbody.parentElement.removeChild(tbody);
+            if(rows.length > 0) document.querySelector('thead--user-jobs').insertAdjacentHTML('afterend', tableView.updateTableContent('user-jobs', rows));
         }
 
-        adminView.animateTableContentIn('nested-user-jobs')
+        const placeholder = document.querySelector('.user-jobs-placeholder');
+        if(this.state.users.paginatedJobs.length === 0 && !placeholder) {
+            document.querySelector('.table__content--user-jobs').insertAdjacentHTML('beforeend', adminView.createNoJobsPlaceholder('user-jobs'));
+        } else if(placeholder) {
+            placeholder.parentElement.removeChild(placeholder);
+        }
+        
+        document.querySelector('.summary__job-controls--users-page')
+        .insertAdjacentHTML('beforeend', tableView.createTableControls('user-job', 'users'));
+
+
+        // adminView.animateTableContentIn('user-jobs')
     }
 
     initCompanyJobsState() {
@@ -2797,6 +2911,15 @@ class AdminController {
 
         // Paginate the company jobs
         this.state.companies.paginatedJobs = this.state.companies.currentCompany.jobs.slice(index, index + limit);
+    }
+    initUserJobsState() {
+        this.state.users.userJobsPagination.limit = tableView.calculateRows('user-jobs');
+        this.state.users.userJobsPagination.totalJobs = this.state.users.currentUser.jobs.length;
+
+        const { index, limit } = this.state.users.userJobsPagination;
+
+        // Paginate the user jobs
+        this.state.users.paginatedJobs = this.state.users.currentUser.jobs.slice(index, index + limit);
     }
 
 //     setCompanyJobsState(companyJobsOption, companyJobsPrevious, companyJobsNext, companyJobsState, pages) {
@@ -2842,7 +2965,7 @@ class AdminController {
 
         const placeholder = document.querySelector('.company-jobs-placeholder');
         if(this.state.companies.paginatedJobs.length === 0 && !placeholder) {
-            document.querySelector('.table__content--company-jobs').insertAdjacentHTML('beforeend', adminView.createNoJobsPlaceholder());
+            document.querySelector('.table__content--company-jobs').insertAdjacentHTML('beforeend', adminView.createNoJobsPlaceholder('company-jobs'));
         } else if(placeholder) {
             placeholder.parentElement.removeChild(placeholder);
         }
@@ -2883,7 +3006,7 @@ class AdminController {
             // Render the controls the first time the table is created
             
             document.querySelector('.summary__company-controls--companies-page')
-                .insertAdjacentHTML('beforeend', adminView.createCompaniesControls());
+                .insertAdjacentHTML('beforeend', tableView.createTableControls('company', 'companies'));
 
             const tableControls = document.querySelector('.summary__company-controls--companies-page');
             tableControls.addEventListener('click', (e) => {this.companyControlsListener(e)});
@@ -3155,7 +3278,7 @@ class AdminController {
 
             summaryView.addSearchTag(this.state.companies.searchOptions.searchTerm);
             
-            await this.getData('companies');
+            // await this.getData('companies');
 
             // Move to the first page
             this.changeCompaniesPage(1, null, null);
@@ -5022,7 +5145,7 @@ class AdminController {
         const companyContacts = companyContactsPrevious || companyContactsNext || companyContactsOption;
         const companyAddresses = companyAddressesPrevious || companyAddressesNext || companyAddressesOption;
         const users = usersPrevious || usersNext || usersOption;
-console.log(applications)
+
         // If no pagination btns are clicked, return
         if(!applications && !jobs && !companies && !users && !companyJobs && !companyContacts && !companyAddresses) return;
 
@@ -5047,8 +5170,10 @@ console.log(applications)
         if(users) {
             this.handleUsersPagination(usersOption, usersPrevious, usersNext);
         } else if(jobs){
+            this.state.jobs.searchOptions.searchTerm = '';
             this.changeJobsPage(jobsOptionValue, jobsPrevious, jobsNext);
         } else if(companies) {
+            this.state.companies.searchOptions.searchTerm = '';
             this.changeCompaniesPage(companiesOptionValue, companiesPrevious, companiesNext);
         } else if(companyJobs) {
             this.handleCompanyJobsPagination(companyJobsOption, companyJobsPrevious, companyJobsNext);
@@ -5057,7 +5182,8 @@ console.log(applications)
         } else if(companyAddresses) {
             this.handleCompanyAddressesPagination(companyAddressesOption, companyAddressesPrevious, companyAddressesNext);
         } else if(applications) {
-            this.handleApplicationsPagination(applicationsOptionValue, applicationsPrevious, applicationsNext);
+            this.state.applications.searchOptions.searchTerm = '';
+            this.changeApplicationPage(applicationsOptionValue, applicationsPrevious, applicationsNext);
         } else {
             return;
         }
@@ -5503,7 +5629,7 @@ console.log(applications)
 
     }
 
-    async handleApplicationsPagination(option, previous, next, paginationChanged, newApplication) {
+    async changeApplicationPage(option, previous, next, paginationChanged, newApplication) {
         const tl = gsap.timeline();
 
         // Set the new page
@@ -5553,7 +5679,7 @@ console.log(applications)
                 .add(() => {
                     summaryView.switchApplicationSummary(newApplication || this.applications[0], this.state.applications.searchOptions.searchTerm);
                     // 7: Animate the summary back in
-                    animation.animateSummaryIn();
+                    animation.animateApplicationSummaryIn();
                 })  
 
             // TABLE (NESTED TL) 
@@ -5744,7 +5870,7 @@ console.log(applications)
             });
     }
 
-    // async handleApplicationsPagination(applicationBtn, applicationPrevious, applicationNext) {
+    // async changeApplicationPage(applicationBtn, applicationPrevious, applicationNext) {
     //     const tl = gsap.timeline();
     //     // // If there's an active request, cancel it
     //     // if(this.state.isActiveRequest) { 

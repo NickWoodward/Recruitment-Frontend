@@ -33,12 +33,12 @@ export const forceDownload = (res, filename, ext) => {
 // firstName/lastName : personId
 // position : jobsId
 // 
-export const formatApplications = (applications) => {
+export const formatApplications = (applications, searchTerm) => {
     // Headers should match the returned divs in createApplicationElement
     const headers = ['ID', 'Name','Surname','Position','Company','CV', 'Added']
     const rows = applications.map(application => {
         
-        return createApplicationElement(formatProperties(application, ['cvUrl']));
+        return createApplicationElement(formatProperties(application, ['cvUrl']), searchTerm);
     });
     return { headers, rows };
 }; 
@@ -62,7 +62,18 @@ const createApplicationElement = ({
             name: companyName
         }
     }
-}) => {
+}, searchTerm) => {
+
+    if(searchTerm) {
+        const start = companyName.toLowerCase().indexOf(searchTerm.toLowerCase());
+        const end = start + searchTerm.length;
+        if(start !== -1) {
+            const name = companyName.split('');
+            name.splice(start, 0, '<mark>');
+            name.splice(end+1, 0, '</mark>');
+            companyName = name.join('');
+        }
+    }
 
     let cvType;
     if(cvUrl) cvType = cvUrl.indexOf('doc') !== -1? 'doc':'pdf';
@@ -384,19 +395,35 @@ export const animateApplicationAnimation = (success, msg) => {
 //////////  USER PAGE  //////////
 
 export const formatUsers = (users) => {
+    console.log(users);
     // Headers should match the returned divs in createUserElement
-    const headers = ['ID', 'Name', 'Surname', 'Added'];
+    const headers = ['ID', 'Name', 'Surname', 'CV', 'Added'];
     const rows = users.map(user => {
-        return createUserElement(formatProperties(user, ['applicantId', 'createdAt', 'jobs']));
+        return createUserElement(formatProperties(user, ['applicantId', 'cvName', 'createdAt', 'jobs']));
     });
     return { headers, rows };
 };
-const createUserElement = ({ id, firstName, lastName, userDate }) => {
+const createUserElement = ({ id, firstName, lastName, phone, email, cvName, userDate }) => {
+    let cvType;
+    if(cvName) cvType = cvName.indexOf('doc') !== -1? 'doc':'pdf';
+
     const row = [
-        `<td class="td-data--applicantId">${id}</td>`,
-        `<td class="td-data--first-name" data-id=${id}>${firstName}</td>`,
-        `<td class="td-data--last-name" data-id=${id}>${lastName}</td>`,
-        `<td class="td-data--date" data-id=${id}>${userDate}</td>`
+        `<td class="td--users td-data--applicantId" data-id=${id}>${id}</td>`,
+        `<td class="td--users td-data--first-name">${firstName}</td>`,
+        `<td class="td--users td-data--last-name">${lastName}</td>`,
+
+        `<td class="td--users td--users td-data--cv" data-cvName=${id}>
+            <div class="cv-wrapper">
+                <svg class="cv-icon">
+                    ${cvName? 
+                        (cvType === 'doc'? 
+                            '<use xlink:href="svg/spritesheet.svg#doc">':
+                            '<use xlink:href="svg/spritesheet.svg#pdf">'
+                        ): '<use xlink:href="svg/spritesheet.svg#ios-minus-empty">'}
+                </svg>
+            </div>
+        </td>`,
+        `<td class="td--users td-data--added">${userDate}</td>`
     ];
     return row;
 }
@@ -1452,7 +1479,6 @@ export const getDeleteJobHtml = (jobId) => {
                     <div>${applicationDate}</div>
                 </div> */}
 export const getDeleteApplicationHtml = (applicationId) => {
-    const applicationDate = document.querySelector('.summary__date').innerText;
     const positionName = document.querySelector('.summary__field--title').innerText;
     const positionCompany = document.querySelector('.summary__field--company').innerText;
     const applicantName = `${document.querySelector('.summary__field--applicant').innerText}`;
@@ -1879,7 +1905,7 @@ const createJobElement = ({id, companyName, title, location, featured, jobDate},
 
     const row = [
         `<td class="td--jobs td-data--jobId" data-id=${id}>${id}</td>`,
-        `<td class="td--jobs td-data--company" data-id=${id}>${companyName}</td>`,
+        `<td class="td--jobs td-data--company">${companyName}</td>`,
         `<td class="td--jobs td-data--title">${title}</td>`,
         `<td class="td--jobs td-data--location">${location}</td>`,
         `<td class="td--jobs td-data--featured">${featured? 'Yes':'No'}</td>`,
@@ -2075,7 +2101,7 @@ const createCompanyJobElement = (job) => {
 }; 
 
 export const formatUserJobs = (jobs) => {
-    const headers = ['Id','Company','Title', 'Added'];
+    const headers = ['Id','Company','Title', 'Location', 'Wage', 'Type', 'PQE', 'Added'];
     const rows = jobs.map(job => {
         return createUserJobElement(job);
     });
@@ -2083,10 +2109,14 @@ export const formatUserJobs = (jobs) => {
 }
 const createUserJobElement = (job) => {
     const row = [
-        `<td class="td-data--jobId" data-id=${job.jobId}>${job.jobId}</td>`,
-        `<td class="td-data--title">${job.companyName}</td>`,
-        `<td class="td-data--title">${job.title}</td>`,
-        `<td class="td-data--location">${job.jobDate}</td>`
+        `<td class="td--user-jobs td-data--jobId" data-id=${job.jobId}>${job.jobId}</td>`,
+        `<td class="td--user-jobs td-data--title">${job.companyName}</td>`,
+        `<td class="td--user-jobs td-data--title">${job.title}</td>`,
+        `<td class="td--user-jobs td-data--location">${job.location}</td>`,
+        `<td class="td--user-jobs td-data--wage">${job.wage}</td>`,
+        `<td class="td--user-jobs td-data--jobType">${job.jobType}</td>`,
+        `<td class="td--user-jobs td-data--pqe">${job.pqe}</td>`,
+        `<td class="td--user-jobs td-data--added">${job.jobDate}</td>`
     ];
     return row;
 }; 
@@ -2097,24 +2127,24 @@ export const createAddJobsLink = () => {
     </div>`;
 }
 
-export const createNoJobsPlaceholder = () => {
+export const createNoJobsPlaceholder = (tableName) => {
     const markup = `
-        <div class="company-jobs-placeholder">
-            <div class="company-jobs-placeholder__message">No Current Jobs</div>
-            <div class="company-jobs-placeholder__add-link"><a>Add Job</a></div>
+        <div class="${tableName}-placeholder">
+            <div class="${tableName}-placeholder__message">No Current Jobs</div>
+            <div class="${tableName}-placeholder__add-link"><a>Add Job</a></div>
         </div>
     `;
     return markup;
 }
-export const createUserJobsPlaceholder = () => {
-    const markup = `
-        <div class="company-jobs-placeholder">
-            <div class="company-jobs-placeholder__message">No Current Jobs</div>
-            <div class="company-jobs-placeholder__add-link"><a>Add Job</a></div>
-        </div>
-    `;
-    return(markup);
-}
+// export const createUserJobsPlaceholder = () => {
+//     const markup = `
+//         <div class="company-jobs-placeholder">
+//             <div class="company-jobs-placeholder__message">No Current Jobs</div>
+//             <div class="company-jobs-placeholder__add-link"><a>Add Job</a></div>
+//         </div>
+//     `;
+//     return(markup);
+// }
 
 //     /**
 //      * Create the markup for the new/edit company modal
@@ -3254,7 +3284,11 @@ export const initAdminView = (tl, sectionName) => {
             ];
             break;
         case 'users':
-            loaderContainers = [['.table-wrapper', 'admin-table'], ['.summary-wrapper', 'summary']];
+            loaderContainers = [
+                ['.table-wrapper', 'admin-table'], 
+                ['.summary__section--user-details', 'details-summary'],
+                // ['.summary__section--description', 'description-summary']
+            ];            
             break;
     }
     tl
@@ -3281,7 +3315,7 @@ export const createAdminTemplate = (page) => {
     // Create conditional here for different page types/structure 
     if(page === 'users') {
         addTableWrapper(adminContent, page);
-        addSummaryWrapper(adminContent, page);
+        addUserSummaryTemplate(adminContent, page);
     } else if(page === 'companies') {
         addTableWrapper(adminContent, page);
         addCompanySummaryTemplate(adminContent);
@@ -3296,6 +3330,52 @@ export const createAdminTemplate = (page) => {
 
     return adminContent;
 }
+
+const addUserSummaryTemplate = (adminContent) => {
+    // Create the summary, minus the content divs that'll be animated in after the axios request
+    const summaryWrapper = createSummaryElement('summary-wrapper summary-wrapper--users');
+    const summary = createSummaryElement('summary summary--users-page');
+    const details = createSummaryElement('summary__details summary__details--users-page');
+    const header = createSummaryElement('summary__header');
+    const mainContent = createSummaryElement('summary__content summary__content--users');
+
+    // Sections
+    const detailsSection = createSummaryElement('summary__section summary__section--user-details');
+    const detailsHeading = createSummaryElement('summary__heading summary__heading--users-page');
+  
+    const addressSection = createSummaryElement('summary__section summary__section--user-addresses');
+    const addressHeading = createSummaryElement('summary__heading summary__heading--users-page');
+    const addressPagination = createPagination('user-addresses');
+
+    const jobsSection = createSummaryElement('summary__section summary__section--user-jobs');
+    const jobsTable = createTableContent('user-jobs');
+    const jobsHeading = createSummaryElement('summary__heading summary__heading--users-page');
+    const jobsPagination = createPagination('user-jobs');
+
+    const contactControls = createSummaryElement('summary__controls summary__contact-controls--users-page');
+    const addressControls = createSummaryElement('summary__controls summary__address-controls--users-page');
+    const userJobControls = createSummaryElement('summary__controls summary__job-controls--users-page');
+
+    detailsHeading.innerText = 'Contact Details';
+    addressHeading.innerText = 'Addresses';
+    jobsHeading.innerText = 'Jobs';
+
+    addressHeading.append(addressPagination);
+    jobsHeading.append(jobsPagination);
+
+    mainContent.append(detailsSection, contactControls, addressSection, addressControls, jobsSection, userJobControls);
+    detailsSection.appendChild(detailsHeading);
+    addressSection.appendChild(addressHeading);
+    jobsSection.appendChild(jobsHeading);
+
+    jobsSection.appendChild(jobsTable);
+
+    details.append(header, mainContent);
+    summary.appendChild(details);
+    summaryWrapper.append(summary);
+    adminContent.append(summaryWrapper);
+}
+
 
 const addCompanySummaryTemplate = (adminContent) => {
     // Create the summary, minus the content divs that'll be animated in after the axios request
@@ -3321,7 +3401,7 @@ const addCompanySummaryTemplate = (adminContent) => {
     const jobsSection = createSummaryElement('summary__section summary__section--company-jobs');
     const jobsTable = createTableContent('company-jobs');
     const jobsHeading = createSummaryElement('summary__heading summary__heading--companies-page');
-    // const jobsControlsWrapper = createSummaryElement('summary__jobs-controls-wrapper--companies-page');
+    const jobsControlsWrapper = createSummaryElement('summary__jobs-controls-wrapper--companies-page');
     const jobsPagination = createPagination('company-jobs');
     
     // const companyControls = createSummaryElement('summary__controls summary__company-controls--companies-page');
@@ -3454,6 +3534,13 @@ const addTableWrapper = (container, page) => {
 
             break;
         }
+        case 'users': {
+            const userControls = createSummaryElement('summary__controls summary__user-controls--users-page');
+
+            tableHeader.append(tablePagination);
+            tableWrapper.append(tableHeader, tableContent, userControls);
+            break;
+        }
         default: {
             tableWrapper.append(tableHeader, tableContent, tablePagination);
         }
@@ -3483,34 +3570,7 @@ const createPagination = (page) => {
     return pagination;
 };
 
-export const createCompaniesControls = () => {
-    const companyControls = `
-        <div class="summary__controls-content summary__controls-content--companies">
-            <div class="summary__btn summary__btn--company-jobs summary__new-company-btn--companies">
-                <svg class="summary__icon summary__new-company-icon--companies">
-                    <use xlink:href="svg/spritesheet.svg#add">
-                </svg>
-            </div>
-            <div class="summary__btn summary__btn--company-jobs summary__edit-company-btn--companies">
-                <svg class="summary__icon summary__edit-company-icon--companies">
-                    <use xlink:href="svg/spritesheet.svg#edit-np1">
-                </svg>
-            </div>
-            <div class="summary__btn summary__btn--company-jobs summary__hubspot-btn--companies">
-                <svg class="summary__icon summary__hubspot-icon--companies">
-                    <use xlink:href="svg/spritesheet.svg#hubspot">
-                </svg>
-            </div>
-            <div class="summary__btn summary__btn--company-jobs summary__delete-company-btn--companies">
-                <svg class="summary__icon summary__delete-company-icon--companies">
-                    <use xlink:href="svg/spritesheet.svg#delete-np1">
-                </svg>
-            </div>
-        </div>
-    `;
 
-    return companyControls;
-}
 
 
 // export const initialiseAdminPage = (page) => {

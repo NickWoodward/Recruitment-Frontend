@@ -131,7 +131,7 @@
 .custom-select-container {
     // These are in a table head
     &--applications,
-    &--companies, &--jobs {
+    &--companies, &--jobs, &--users {
         color: white;
         min-width: 2rem;
         margin-right: 1.2rem;
@@ -146,8 +146,11 @@
     &--jobs.custom-select-container--jobs-disabled {
         margin-right: 0;
     }
+    &--users.custom-select-container--users-disabled {
+        margin-right: 0;
+    }
 
-    &--company-contacts, &--company-addresses, &--company-jobs {
+    &--company-contacts, &--company-addresses, &--company-jobs, &--user-addresses, &--user-jobs {
         min-width: 2rem;
         margin-right: 1.2rem;
     }
@@ -160,7 +163,12 @@
     &--company-jobs.custom-select-container--company-jobs-disabled {
         margin-right: 0;
     } 
-
+    &--user-addresses.custom-select-container--user-addresses-disabled {
+        margin-right: 0;
+    } 
+    &--user-jobs.custom-select-container--user-jobs-disabled {
+        margin-right: 0;
+    } 
 
     &--companies-disabled {
         color: #5a889f !important; // important because the placeholder class in the custom select is more specific
@@ -174,31 +182,31 @@
 .custom-select-value {
     &--companies { color: white; }
     &--applications,
-    &--companies, &--jobs {
+    &--companies, &--jobs, &--users {
         font-size: 1.3rem;
         // padding: .6rem .6rem;
         border: none;
         border-bottom: 1px solid white;
     }
-    &--company-contacts, &--company-addresses, &--company-jobs {
+    &--company-contacts, &--company-addresses, &--company-jobs, &--user-addresses, &--user-jobs {
         font-size: 1.3rem;
         // padding: .6rem .6rem;
         border: none;
         border-bottom: 1px solid firebrick;
     }
-    &--company-contacts.placeholder, &--company-addresses.placeholder, &--company-jobs.placeholder{
+    &--company-contacts.placeholder, &--company-addresses.placeholder, &--company-jobs.placeholder, &--user-addresses.placeholder{
         color: black;
     }
 
     &--applications::after,
-    &--companies::after, &--jobs::after {
+    &--companies::after, &--jobs::after, &--users::after {
         position:absolute;
         right: -1rem;
         margin-top: 6px;
         border-top-color: white;
     }
     &--applications-disabled,
-    &--companies-disabled, &--jobs-disabled {
+    &--companies-disabled, &--jobs-disabled, &--users-disabled {
         color: #5a889f !important; // important because the placeholder class in the custom select is more specific
         cursor: default;
         pointer-events: none;
@@ -207,7 +215,8 @@
 
     &--applications.custom-select-value--applications-disabled::after,
     &--jobs.custom-select-value--jobs-disabled::after,
-    &--companies.custom-select-value--companies-disabled::after {
+    &--companies.custom-select-value--companies-disabled::after,
+    &--users.custom-select-value--users-disabled::after {
         visibility: hidden;
     }
     &--company-contacts.custom-select-value--company-contacts-disabled::after {
@@ -219,9 +228,14 @@
     &--company-jobs.custom-select-value--company-jobs-disabled::after {
         visibility: hidden;
     }
-    
+    &--user-addresses.custom-select-value--user-addresses-disabled::after {
+        visibility: hidden;
+    }
+    &--user-jobs.custom-select-value--user-jobs-disabled::after {
+        visibility: hidden;
+    }
 
-    &--company-contacts, &--company-addresses, &--company-jobs {
+    &--company-contacts, &--company-addresses, &--company-jobs, &--user-addresses, &--user-jobs {
         &::after {
             position:absolute;
             right: -1rem;
@@ -240,14 +254,14 @@
 
 .custom-select-options {
     &--applications,
-    &--companies, &--company-contacts, &--company-addresses, &--company-jobs,
-    &--jobs {
+    &--companies, &--company-contacts, &--company-addresses, &--company-jobs, &--user-addresses, &--user-jobs,
+    &--jobs, &--users {
         font-size: 1.3rem;
         padding: .1rem 0;
         // margin-top: .5rem;
     }
 
-    &--company-contacts {
+    &--company-contacts, &--company-addresses, &--user-addresses, &--user-jobs {
         &::-webkit-scrollbar {
 
             width: 1px;
@@ -268,8 +282,8 @@
 
 .custom-select-option {
     &--applications,
-    &--companies, &--company-contacts, &--company-addresses, &--company-jobs,
-    &--jobs {
+    &--companies, &--company-contacts, &--company-addresses, &--company-jobs, &--user-addresses, &--user-jobs,
+    &--jobs, &--users {
         padding: .6rem 0;
         justify-content: center;
         color: black;

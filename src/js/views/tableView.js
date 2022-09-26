@@ -102,6 +102,50 @@ export const createTableHeader = (page, title) => {
     return markup;
 };
 
+export const createTableControls = (tableName, modifier) => {
+    const newBtn = `
+        <div class="summary__btn summary__btn--${tableName} summary__new-${tableName}-btn--${modifier}">
+            <svg class="summary__icon summary__new-${tableName}-icon--${modifier}">
+                <use xlink:href="svg/spritesheet.svg#add">
+            </svg>
+        </div>
+    `;
+
+    const editBtn = `
+        <div class="summary__btn summary__btn--${tableName} summary__edit-${tableName}-btn--${modifier}">
+            <svg class="summary__icon summary__edit-${tableName}-icon--${modifier}">
+                <use xlink:href="svg/spritesheet.svg#edit-np1">
+            </svg>
+        </div>
+    `;
+
+    const hubspotBtn = `
+        <div class="summary__btn summary__btn--${tableName} summary__hubspot-btn--${modifier}">
+            <svg class="summary__icon summary__hubspot-icon--${modifier}">
+                <use xlink:href="svg/spritesheet.svg#hubspot">
+            </svg>
+        </div>
+    `;
+
+    const deleteBtn = `
+        <div class="summary__btn summary__btn--${tableName} summary__delete-${tableName}-btn--${modifier}">
+            <svg class="summary__icon summary__delete-${tableName}-icon--${modifier}">
+                <use xlink:href="svg/spritesheet.svg#delete-np1">
+            </svg>
+        </div>
+    `;
+
+    return `
+        <div class="summary__controls-content summary__controls-content--${modifier}">
+            ${newBtn}
+            ${tableName === 'user-job'? '' : editBtn}
+            ${tableName === 'user-job'? '' : hubspotBtn}
+            ${tableName === 'user-job'? '' : deleteBtn}
+        </div>
+    `;
+
+}
+
 
 export const calculateRows = (tableName) => {
     // Sets whether the calculation should take the height of the header/pagination into account
@@ -124,8 +168,8 @@ export const calculateRows = (tableName) => {
         case 'company-jobs':
             header = true; pagination = false;
             break;
-        case 'nested-user-jobs':
-            header = true; pagination = true;
+        case 'user-jobs':
+            header = true; pagination = false;
             break;
     }
 
@@ -145,6 +189,30 @@ export const insertTableArrows = (tableName, state) => {
     let header;
 
     switch(tableName) {
+        case 'users': {
+            const idTh = document.querySelector('.thead--users .th--id');
+            const nameTh = document.querySelector('.thead--users .th--name');
+            const surnameTh = document.querySelector('.thead--users .th--surname');
+            const cvTh = document.querySelector('.thead--users .th--cv');
+            const addedTh = document.querySelector('.thead--users .th--added');
+
+            containers = [
+                ['id', idTh],
+                ['name', nameTh],
+                ['surname', surnameTh],
+                ['cv', cvTh],
+                ['added', addedTh]
+            ];
+
+            header = 
+                state.searchOptions.orderField === 'id'? idTh :
+                state.searchOptions.orderField === 'name'? nameTh :
+                state.searchOptions.orderField === 'surname'? surnameTh :
+                state.searchOptions.orderField === 'cv'? cvTh :
+                state.searchOptions.orderField === 'added'? addedTh : null;
+            
+            break;
+        }
         case 'applications': {
             const idTh = document.querySelector('.thead--applications .th--id');
             const nameTh = document.querySelector('.thead--applications .th--name');
@@ -232,6 +300,7 @@ export const insertTableArrows = (tableName, state) => {
     const arrows = document.querySelectorAll(`.thead--${tableName} .th__arrow`);
     arrows.forEach(arrow => arrow.direction = 'none');
 
+    console.log({header}, {state});
     changeArrowDirection(header, state);
 }
 
